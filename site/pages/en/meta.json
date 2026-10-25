@@ -112,7 +112,7 @@
     "members_intro": "The timetables followed here:",
     "most_followed": "the most followed",
     "combine_heading": "How Taqwa combines them",
-    "combine_body": "Taqwa rebuilds each of them and combines them: each prayer once all have begun it, sunrise and the end of eating at the earliest of them, and Maghrib capped at the most-followed timetable’s own minutes.",
+    "combine_body": "Taqwa rebuilds each of them and combines them: each prayer once all have begun it, and sunrise and the end of eating at the earliest of them.",
     "decides_legend": "decides today, the latest to begin it (for sunrise, the earliest).",
     "match_prompt": "Your mosque follows one of them? The app can follow it alone:",
     "replays_cautious": "Then Taqwa replays every checked day against each of the published timetables.",

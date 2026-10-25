@@ -1,7 +1,7 @@
 {
   "entry": "ca.toronto",
   "class": "C",
-  "engineHash": "d75552d1fddd3996",
+  "engineHash": "591ef03173f4b400",
   "broken": 0,
   "places": 6,
   "first": "2026-01-01",
@@ -93,14 +93,14 @@
       "checked": 1400,
       "early": 0,
       "late": {
-        "0": 299,
-        "1": 397,
-        "2": 491,
-        "3+": 213
+        "0": 161,
+        "1": 362,
+        "2": 401,
+        "3+": 476
       },
-      "exactShare": 0.2136,
-      "worstLate": 5,
-      "lateLimit": 6,
+      "exactShare": 0.115,
+      "worstLate": 7,
+      "lateLimit": 7,
       "lateLimitFrom": "entry ca.toronto",
       "overLimit": 0
     },
@@ -218,14 +218,14 @@
         "checked": 1050,
         "early": 0,
         "late": {
-          "0": 257,
-          "1": 303,
-          "2": 300,
-          "3+": 190
+          "0": 159,
+          "1": 273,
+          "2": 250,
+          "3+": 368
         },
-        "exactShare": 0.2448,
-        "worstLate": 5,
-        "lateLimit": 6,
+        "exactShare": 0.1514,
+        "worstLate": 7,
+        "lateLimit": 7,
         "lateLimitFrom": "entry ca.toronto",
         "overLimit": 0
       },
@@ -258,29 +258,6 @@
         "lateLimit": 4,
         "lateLimitFrom": "entry ca.toronto",
         "overLimit": 0
-      }
-    }
-  },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "ca.ift": {
-        "days": 1400,
-        "cappedDays": 40,
-        "leastGap": 0,
-        "mostGap": 5
-      },
-      "ca.iit": {
-        "days": 1400,
-        "cappedDays": 40,
-        "leastGap": -1,
-        "mostGap": 5
-      },
-      "ca.mac": {
-        "days": 1400,
-        "cappedDays": 40,
-        "leastGap": 1,
-        "mostGap": 5
       }
     }
   },
@@ -389,12 +366,16 @@
       "events": ["endOfEating"]
     },
     "entry ca.toronto: 6 min": {
-      "reason": "Toronto's three tables round and offset their times irregularly against their own rules (IFT's Fajr and Isha up to 80 s after them, IIT's Asr up to 107 s, IIT's own Maghrib drifting over the year), so each member keeps its table's widest margin and the latest of them runs up to 4 min after the latest printed time at the mosques. West of the mosques the user's own sun is later (at Milton by 2.5 min), and Dhuhr, Asr and Maghrib shown follow it: up to 5, 6 and 5 min.",
-      "events": ["dhuhr", "asrStandard", "asrHanafi", "maghrib"]
+      "reason": "Toronto's three tables round and offset their times irregularly against their own rules (IFT's Fajr and Isha up to 80 s after them, IIT's Asr up to 107 s, IIT's own Maghrib drifting over the year), so each member keeps its table's widest margin and the latest of them runs up to 4 min after the latest printed time at the mosques. West of the mosques the user's own sun is later (at Milton by 2.5 min), and Dhuhr and Asr shown follow it: up to 5 and 6 min.",
+      "events": ["dhuhr", "asrStandard", "asrHanafi"]
     },
-    "entry ca.toronto: 7 min": {
+    "entry ca.toronto: 7 min (fajr)": {
       "reason": "Toronto's three tables round and offset their times irregularly against their own rules (IFT's Fajr and Isha up to 80 s after them, IIT's Asr up to 107 s, IIT's own Maghrib drifting over the year), so each member keeps its table's widest margin and the latest of them runs up to 4 min after the latest printed time at the mosques. West of the mosques the user's own sun is later than the tables' points (at Milton, the reach's western end, by 2.5 min), and Fajr and Isha shown follow it: up to 6 and 7 min.",
       "events": ["fajr", "isha"]
+    },
+    "entry ca.toronto: 7 min (maghrib)": {
+      "reason": "Toronto's three tables round and offset their times irregularly against their own rules (IFT's Fajr and Isha up to 80 s after them, IIT's Asr up to 107 s, IIT's own Maghrib drifting over the year), so each member keeps its table's widest margin and the latest of them runs up to 4 min after the latest printed time at the mosques. Maghrib is the latest member's like every start (ruling R155), at the mosques up to 3 min after the latest table's; west of them the user's own sun is later (at Milton by 2.5 min), and Maghrib shown follows it: up to 7 min in December.",
+      "events": ["maghrib"]
     }
   }
 }

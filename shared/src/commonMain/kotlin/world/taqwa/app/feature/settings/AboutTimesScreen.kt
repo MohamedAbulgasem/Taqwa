@@ -69,7 +69,8 @@ import world.taqwa.app.resources.about_authority_unchecked_body
 import world.taqwa.app.resources.about_calculated_body
 import world.taqwa.app.resources.about_cautious_body
 import world.taqwa.app.resources.about_cautious_checked
-import world.taqwa.app.resources.about_cautious_maghrib_cap
+import world.taqwa.app.resources.about_cautious_maghrib_guard
+import world.taqwa.app.resources.about_cautious_maghrib_no_sunset
 import world.taqwa.app.resources.about_check_mosque_body
 import world.taqwa.app.resources.about_check_mosque_heading
 import world.taqwa.app.resources.about_checked_so_far_with_data
@@ -145,12 +146,17 @@ sealed interface AboutTimesUiState {
      *
      * [stamp] is the cautious entry's own proof, like the two authority states' (ruling R100): the
      * gate over every member's official days, read by [cautiousProof] into the tiles and sentence.
+     *
+     * [realSunset] is the real sunset at the user's point that day ([DayPipeline.realSunset]), null where the sun
+     * does not set there: ruling R155 counts a member's Maghrib from the sun only where it does, so the table
+     * ([decidingRow]) and the guard sentence ([maghribGuardToday]) read it as [combined] was made.
      */
     data class Cautious(
         override val resolution: Resolution,
         val members: List<Pair<Member, PrayerDay>>,
         val combined: PrayerDay,
         val stamp: ProofStamp?,
+        val realSunset: Instant?,
     ) : AboutTimesUiState
 
     data class Calculated(override val resolution: Resolution) : AboutTimesUiState
@@ -174,7 +180,13 @@ fun aboutTimesUiState(engineDay: EngineDay, place: Place, date: LocalDate, hijri
             val zone = TimeZone.of(place.zoneId)
             val days = DayPipeline.members(resolution, date, zone, engineDay.school, hijriOffsetDays)
             val combined = DayPipeline.day(resolution, date, zone, engineDay.school, hijriOffsetDays)
-            AboutTimesUiState.Cautious(resolution, resolution.members.zip(days), combined, ProofStamps.of(resolution.entry.id))
+            AboutTimesUiState.Cautious(
+                resolution,
+                resolution.members.zip(days),
+                combined,
+                ProofStamps.of(resolution.entry.id),
+                DayPipeline.realSunset(resolution.point, date, zone),
+            )
         }
         AboutTemplate.CALCULATED -> AboutTimesUiState.Calculated(resolution)
     }
@@ -362,19 +374,19 @@ private fun CautiousContent(
     val names = state.members.map { (member, _) -> authorityShortName(member.nameKey) }
     SectionHeading(stringResource(Res.string.timetable_cautious))
     SectionBody(stringResource(Res.string.about_cautious_body, cityLabel, joinNames(names)))
-    maghribCapToday(state)?.let { cap ->
+    maghribGuardToday(state)?.let { guard ->
         SectionBody(
             stringResource(
-                Res.string.about_cautious_maghrib_cap,
-                authorityShortName(cap.followed.nameKey),
-                joinNames(cap.later.map { authorityShortName(it.nameKey) }),
+                if (guard.sunSets) Res.string.about_cautious_maghrib_guard else Res.string.about_cautious_maghrib_no_sunset,
+                authorityShortName(guard.followed.nameKey),
+                joinNames(guard.later.map { authorityShortName(it.nameKey) }),
             ),
         )
     }
 
     CardDivider()
     SectionHeading(stringResource(Res.string.about_which_decides))
-    CautiousTable(state.members, state.combined, zone, format)
+    CautiousTable(state, zone, format)
 
     // The proof the site's cautious page shows from the same stamp (rulings R100, R105, R111 and
     // R112): two tiles and the sentence, and nothing at all where the proof does not reach this place.
@@ -404,9 +416,10 @@ private fun CautiousContent(
  * same two from the same stamp.
  *
  * The second tile says "the timetable that decides it", never "any of them" (R111): the gate checks a
- * start against the latest member's printed time, and a Maghrib the cap decided against the
- * most-followed member's alone, so on a capped day another member's printed Maghrib is later than
- * the shown one — exactly what [MaghribCap] says above the table. Deliberately no "at most" figure
+ * start against the latest member's printed time, and on a day R155's far-north guard decided Maghrib
+ * (a member's Maghrib set by a high-latitude rule, or no sunset at the user's point) against the time
+ * the table names for it, so another member's printed Maghrib is later than the shown one — exactly
+ * what [MaghribGuard] says above the table. Deliberately no "at most" figure
  * (R105): a cautious stamp is entry-wide, so its worst lateness would be another place's spread
  * (Oslo would read Trondheim's Isha, over two hours; Oslo's own is under half an hour). And no date
  * (R112): a cautious stamp's last date is the latest of *any* member's rows, which would claim the
@@ -432,21 +445,57 @@ internal fun cautiousProof(resolution: Resolution, stamp: ProofStamp?): Cautious
 }
 
 /**
- * Ruling R91 (spec §3.6): where the Maghrib cap decided today's Maghrib, so that "each prayer once
- * all have begun it" does not hold for it: the shown Maghrib is before some member's own. [followed]
- * is the member whose own minutes it keeps (the most-followed among those giving the shown minute;
- * the most-followed member where a repair moved it), [later] the members whose Maghrib is later, in
- * the resolution's order. Null where every member has begun Maghrib by the minute shown.
+ * Ruling R155's far-north guard (the owner's decision of 24 Oct 2026, spec §3.6), where it decided today's Maghrib,
+ * so that "each prayer once all have begun it" does not hold for it: some member's own Maghrib is later than the one
+ * shown. That is so only where a member's Maghrib is set by a high-latitude rule rather than the sun (Diyanet's
+ * five-hour winter day, a time borrowed on a polar day, a clock rule's estimate) and that member is not the most
+ * followed, or where the real sun does not set at the user's point, when only the most-followed member's own counts:
+ * from about 62.6° north, never south of it, where Maghrib is the latest member's like every other start.
+ *
+ * - [later]: the members whose own Maghrib is later than the one shown, in the resolution's order.
+ * - [followed]: the first member [decidingRow] names for the minute shown (its own Maghrib, or its Maghrib from the
+ *   sun), else the most-followed member (a minute the repair moved).
+ * - [sunSets]: the real sun sets at the user's point today ([AboutTimesUiState.Cautious.realSunset]), and the minute
+ *   shown is the latest any member gives from the sun: "it follows the sun, as Diyanet calculates it, rather than the
+ *   later Maghrib of Diyanet, set by a high-latitude rule" at Trondheim in December, where Diyanet's own sun time
+ *   is the latest and its five-hour winter day holds its own Maghrib later. Otherwise there is no sunset there that
+ *   day and the most-followed member's own Maghrib is shown, itself often set by rule (IRN's at Bodø in June), so
+ *   About says that instead: never "it follows the sun" on a day the sun does not set.
+ *
+ * Null on every other day.
  */
-internal data class MaghribCap(val followed: Member, val later: List<Member>)
+internal data class MaghribGuard(val followed: Member, val later: List<Member>, val sunSets: Boolean)
 
-internal fun maghribCapToday(state: AboutTimesUiState.Cautious): MaghribCap? {
+internal fun maghribGuardToday(state: AboutTimesUiState.Cautious): MaghribGuard? {
     val shown = state.combined.maghrib
     val later = state.members.filter { (_, day) -> day.maghrib > shown }.map { (member, _) -> member }
     if (later.isEmpty()) return null
-    val followed = state.members.firstOrNull { (_, day) -> day.maghrib == shown }?.first
+    val followed = decidingRow(state, Prayer.MAGHRIB).deciders.firstOrNull()
         ?: state.members.minBy { (member, _) -> member.shareRank }.first
-    return MaghribCap(followed, later)
+    return MaghribGuard(followed, later, sunSets = state.realSunset != null)
+}
+
+/**
+ * One line of "which timetable decides each time today": the time [shown] ([AboutTimesUiState.Cautious.combined]'s),
+ * the members that give it ([deciders]), and every other member with its own time ([others]), each in the
+ * resolution's order (most-followed first).
+ *
+ * A member gives the shown time where its own time is that minute, and for Maghrib also where its Maghrib from the
+ * sun is (ruling R155, [PrayerDay.maghribBySun], counted only where the real sun sets at the user's point, as
+ * [world.taqwa.app.prayer.engine.day.Cautious] counts it): at Trondheim in December the shown Maghrib is Diyanet's
+ * sunset + 7, which is no member's own Maghrib (Diyanet's own is held later by its five-hour winter day), and the
+ * table names Diyanet for it, never no one (item A of the adversarial check of 24 Oct 2026). A minute a table riding
+ * alongside or the repair moved can still be no member's ([deciders] empty); the line then lists the others alone.
+ */
+internal data class DecidingRow(val shown: Instant, val deciders: List<Member>, val others: List<Pair<Member, Instant>>)
+
+internal fun decidingRow(state: AboutTimesUiState.Cautious, prayer: Prayer): DecidingRow {
+    val shown = state.combined.instantFor(prayer)
+    val (deciding, other) = state.members.partition { (_, day) ->
+        day.instantFor(prayer) == shown ||
+            (prayer == Prayer.MAGHRIB && state.realSunset != null && day.maghribBySun == shown)
+    }
+    return DecidingRow(shown, deciding.map { (member, _) -> member }, other.map { (member, day) -> member to day.instantFor(prayer) })
 }
 
 @Composable
@@ -458,19 +507,17 @@ private fun CalculatedContent(state: AboutTimesUiState.Calculated, cityLabel: St
 }
 
 /**
- * Each prayer's shown time, and which member(s) it came from ([world.taqwa.app.prayer.engine.day.Cautious]'s
- * own logic, read back at the UI layer since it is private there): [day] is [AboutTimesUiState.Cautious.combined],
- * the members combined *before* any adjustment — never [EngineDay.day] (review fix: comparing an
- * adjusted instant against every member's own raw one left rows with no match and a stray leading
- * "; "). [members] is each member's own day ([DayPipeline.members]).
+ * Each prayer's shown time, and which member(s) it came from ([decidingRow]: [world.taqwa.app.prayer.engine.day.Cautious]'s
+ * own logic, read back at the UI layer since it is private there), from [AboutTimesUiState.Cautious.combined], the
+ * members combined *before* any adjustment — never [EngineDay.day] (review fix: comparing an adjusted instant
+ * against every member's own raw one left rows with no match and a stray leading "; ").
  */
 @Composable
-private fun CautiousTable(members: List<Pair<Member, PrayerDay>>, day: PrayerDay, zone: TimeZone, format: PlatformFormat) {
+private fun CautiousTable(state: AboutTimesUiState.Cautious, zone: TimeZone, format: PlatformFormat) {
     val colors = LocalTaqwaColors.current
     for ((prayer, label) in ROWS) {
-        val shown = day.instantFor(prayer)
-        val agreeing = members.filter { (_, memberDay) -> memberDay.instantFor(prayer) == shown }
-        val disagreeing = members - agreeing.toSet()
+        val row = decidingRow(state, prayer)
+        val shown = row.shown
         // The card's own 16 dp inset, as every heading and body line in it has.
         Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
             Text(
@@ -481,16 +528,17 @@ private fun CautiousTable(members: List<Pair<Member, PrayerDay>>, day: PrayerDay
             )
             Column {
                 Text(formatClock(shown, zone, format), style = TaqwaText.caption, color = colors.textPrimary)
-                val decidedBy = joinNames(agreeing.map { (member, _) -> authorityShortName(member.nameKey) })
+                val decidedBy = joinNames(row.deciders.map { member -> authorityShortName(member.nameKey) })
                 // Not `joinToString { }`: its transform parameter is nullable, so the Compose
                 // compiler cannot treat the lambda as inlined into this composable's context.
-                val extraNames = disagreeing.map { (member, memberDay) ->
-                    "${authorityShortName(member.nameKey)} ${isolatedClock(formatClock(memberDay.instantFor(prayer), zone, format))}"
+                val extraNames = row.others.map { (member, time) ->
+                    "${authorityShortName(member.nameKey)} ${isolatedClock(formatClock(time, zone, format))}"
                 }
                 val semicolon = listSemicolon()
                 val extra = extraNames.joinToString(semicolon)
-                // Defensive: with the unadjusted [day] every row has at least one agreeing member
-                // (tested), but this never prints a bare "; " even if that were somehow not so.
+                // With the unadjusted day every row names at least one member (tested, Maghrib's by its time
+                // from the sun on a far-north guard day); a minute only a table riding alongside or the
+                // repair gives names none, and the line never prints a bare "; " then.
                 val text = when {
                     decidedBy.isBlank() -> extra
                     extra.isBlank() -> decidedBy

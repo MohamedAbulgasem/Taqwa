@@ -1,7 +1,7 @@
 {
   "entry": "za.cape",
   "class": "C",
-  "engineHash": "98d08a040d637d3b",
+  "engineHash": "ed5b0ea8846d621e",
   "broken": 0,
   "places": 1,
   "first": "2026-09-01",
@@ -79,13 +79,13 @@
       "early": 0,
       "late": {
         "0": 0,
-        "1": 25,
+        "1": 44,
         "2": 17,
-        "3+": 19
+        "3+": 0
       },
       "exactShare": 0,
-      "worstLate": 4,
-      "lateLimit": 4,
+      "worstLate": 2,
+      "lateLimit": 2,
       "lateLimitFrom": "entry za.cape",
       "overLimit": 0
     },
@@ -189,13 +189,13 @@
         "early": 0,
         "late": {
           "0": 0,
-          "1": 25,
+          "1": 44,
           "2": 17,
-          "3+": 19
+          "3+": 0
         },
         "exactShare": 0,
-        "worstLate": 4,
-        "lateLimit": 4,
+        "worstLate": 2,
+        "lateLimit": 2,
         "lateLimitFrom": "entry za.cape",
         "overLimit": 0
       },
@@ -231,29 +231,6 @@
       }
     }
   },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "za.jamiat.shafii": {
-        "days": 61,
-        "cappedDays": 19,
-        "leastGap": 1,
-        "mostGap": 2
-      },
-      "za.mjc": {
-        "days": 61,
-        "cappedDays": 19,
-        "leastGap": 3,
-        "mostGap": 4
-      },
-      "za.voc": {
-        "days": 61,
-        "cappedDays": 19,
-        "leastGap": 1,
-        "mostGap": 2
-      }
-    }
-  },
   "members": {
     "za.jamiat.shafii": {
       "checked": ["2026-09-01..2026-10-31"],
@@ -278,13 +255,13 @@
     "class C: 1 min": {
       "events": ["fajr", "dhuhr", "asrStandard", "isha", "endOfEating"]
     },
-    "entry za.cape: 2 min": {
+    "entry za.cape: 2 min (maghrib)": {
+      "reason": "The three tables print Maghrib from sunset to sunset + 3; Maghrib is the latest member's like every start (ruling R155), never before any, each member with its own margins: up to 2 min after the latest table's.",
+      "events": ["maghrib"]
+    },
+    "entry za.cape: 2 min (sunrise)": {
       "reason": "Sunrise is the earliest of the three members', each a little before its own table's: up to 2 min before the MJC's printed sunrise.",
       "events": ["sunrise"]
-    },
-    "entry za.cape: 4 min": {
-      "reason": "The three tables print Maghrib from sunset to sunset + 3; Maghrib is the latest member's, never before any, so on the days the MJC prints it 3 min before the others it runs up to 4 min after the MJC's.",
-      "events": ["maghrib"]
     }
   }
 }

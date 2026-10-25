@@ -13,9 +13,11 @@ import java.security.MessageDigest
  * read at — ruling R115: a page shows only days some table was checked on — with the days the gate
  * file excuses there and the kind of reason, never its words: ruling R117), place-days, Ramadan
  * days, early and late-end counts per event, the late histogram, the exact share, the worst late
- * minutes, the cells declared not followed and their dates (ruling R82), and the engine hash they
- * were measured on. Committed as `official/stamps/<entry>.json`; the same inputs always write the
- * same bytes.
+ * minutes, the cells declared not followed and their dates (ruling R82), a cautious entry's
+ * Maghrib cells the far-north guard read otherwise than as printed (ruling R156) and its place-days
+ * that show no Maghrib end (ruling R158), and the engine
+ * hash they were measured on. Committed as `official/stamps/<entry>.json`; the same inputs always
+ * write the same bytes.
  *
  * The engine hash covers the engine's core (everything under `prayer/engine/` but the authority
  * files and their data, plus the Umm al-Qura dates, the `Prayer` keys and the Hijri calendar every
@@ -63,13 +65,23 @@ object Stamps {
             "ramadanDays" to s.testRamadanDays,
             "events" to events(s.heldOut),
         ),
-        // A cautious entry's Maghrib cap against each member's printed Maghrib (spec §3.6), in minutes.
-        "maghribCap" to if (s.maghribGaps.isEmpty() && s.maghribUnchecked == 0) null else linkedMapOf(
-            "uncheckedDays" to s.maghribUnchecked,
-            "members" to s.maghribGaps.entries.associate { (member, g) ->
-                member to linkedMapOf("days" to g.days, "cappedDays" to g.capped, "leastGap" to g.least, "mostGap" to g.most)
-            },
-        ),
+        // Ruling R156, a cautious entry's far-north guard: each member whose printed Maghrib was not the bar on some
+        // days (its far-north or winter rule set it, or the real sun did not set there): those days, how many were
+        // checked against its Maghrib from the sun, and the shown Maghrib less its printed one, in minutes (below
+        // zero: before it); and the cells no member's time checked, with their dates. Written only where there are some.
+        "maghribGuard" to if (s.maghribGuards.isEmpty() && s.maghribGuardUnchecked == 0) null else linkedMapOf(
+            "uncheckedDays" to s.maghribGuardUnchecked.takeIf { it > 0 },
+            "uncheckedDates" to s.maghribGuardUncheckedDates.takeIf { it.isNotEmpty() }?.let(::dateRanges),
+            "members" to s.maghribGuards.entries.associate { (member, g) ->
+                member to linkedMapOf(
+                    "days" to g.days, "checkedAtSun" to g.atSun, "leastGap" to g.least, "mostGap" to g.most,
+                    "dates" to dateRanges(g.dates),
+                )
+            }.takeIf { it.isNotEmpty() },
+        ).filterValues { it != null },
+        // Ruling R158, a cautious entry's place-days that show no Maghrib end (no end in play after the Maghrib shown: a
+        // member's Isha has begun by then), and their dates. Written only where there are some; recorded, never broken.
+        "maghribNoEnd" to if (s.maghribNoEnd == 0) null else linkedMapOf("days" to s.maghribNoEnd, "dates" to dateRanges(s.maghribNoEndDates)),
         // A cautious entry's members: each one's checked days, and by the point its rows were read at
         // (ruling R115: a place is proven only where every member's table was checked near it).
         // Ruling R117: and the days its rows there leave out for a reason the gate file records, by

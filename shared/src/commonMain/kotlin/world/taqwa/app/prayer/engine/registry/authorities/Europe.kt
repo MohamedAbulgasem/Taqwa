@@ -293,10 +293,12 @@ object Europe {
      *
      * Against every calendar at its own point, faults left out (UkMawaqitSurveyTest in tools/timetables):
      * no Fajr, Isha, Zuhr or Asr in the default school before it, and no sunrise or end of eating after
-     * it, but for nine calendars whose cases no member absorbs at a fair cost for everyone, and Maghrib,
-     * capped at Wifaqul's (spec §3.6). Those, and the threshold night where the latest Isha meets the
-     * next end of eating (the night a member's Isha angle, 15°, 17° or 18°, is last or first reached: up
-     * to two nights a year at a point, by up to 3 min, at some latitudes only; UkCautiousTest), are
+     * it, but for nine calendars whose cases no member absorbs at a fair cost for everyone, and the
+     * calendars printing a later Maghrib than every member (Glasgow's, recorded under the 26 September
+     * cap; Maghrib is now the latest member's, ruling R155). Those, and the threshold night where the
+     * latest Isha meets the next end of eating (the night a member's Isha angle, 15°, 17° or 18°, is last
+     * or first reached: up to two nights a year at a point, by up to 3 min, at some latitudes only;
+     * UkCautiousTest), are
      * recorded in the proof (7g-europe-americas-africa-oceania.md, "The UK outside London") and the
      * survey's outliers, not as late limits: a late limit covers lateness, never an early start or a late
      * end.
@@ -428,9 +430,9 @@ object Europe {
             ),
             LateLimit(
                 3,
-                "Each member keeps its own margins, and Maghrib is capped at IFI's where the two spread: up to 2 min after " +
-                    "the later table's at the tables' point, and at the app's own Dublin, 2 km south-east of it, where the " +
-                    "tables' point rides beside the user's (rulings R30, R44), up to 3.",
+                "Maghrib is the later member's like every start (ruling R155), most days IFI's; each member keeps its own " +
+                    "margins: up to 2 min after the later table's at the tables' point, and at the app's own Dublin, 2 km " +
+                    "south-east of it, where the tables' point rides beside the user's (rulings R30, R44), up to 3.",
                 setOf(TimedEvent.MAGHRIB),
             ),
             LateLimit(
@@ -515,8 +517,9 @@ object Europe {
      * angle, and against the three families alone its Isha was up to 11 min early, its Asr 2, its
      * imsak 22 and its sunrise, the sun's less 7, up to 7 min before the one shown). Checked at Paris
      * against one table of each of the three families (fr-cautious.tsv; Diyanet's Paris table is its
-     * own entry's) and against 12 Lyon and Marseille calendars (ContinentalMawaqitSurveyTest). Maghrib
-     * stays capped at the 12–13° family's + 4: Diyanet's + 7 is one calendar of the twelve, recorded.
+     * own entry's) and against 12 Lyon and Marseille calendars (ContinentalMawaqitSurveyTest). Maghrib is
+     * the latest member's (ruling R155), Diyanet's + 7 (+ 5.5 to + 12.3 on the exact sun) where it is
+     * later than the 12–13° family's + 4, as the Lyon DITIB calendar prints it.
      */
     val france = cautious(
         id = "fr.cautious",
@@ -590,8 +593,11 @@ object Europe {
                 setOf(TimedEvent.ASR),
             ),
             LateLimit(
-                3,
-                FRANCE_SPREAD + " Maghrib (capped at the 12–13° family's + 4) runs up to 3 min after the latest of them.",
+                6,
+                "Maghrib is the latest member's like every start (ruling R155), Diyanet's sunset + 7 on its own Paris " +
+                    "table's sun: at Paris up to 6 min after the latest of the three families' tables (the 12–13° " +
+                    "family's and the Grande Mosquée's sunset + 3..4), in summer and early autumn; up to 1 after " +
+                    "Diyanet's own Lyon and Lille tables.",
                 setOf(TimedEvent.MAGHRIB),
             ),
             LateLimit(
@@ -654,14 +660,12 @@ object Europe {
      * Fajr runs up to 5 min after the Brussels curve and the generic edge; two calendars' Isha at 18° or
      * the middle of the night in summer; and Maghrib, below).
      *
-     * Maghrib (ruling R88): spec §3.6's cap, the most-followed member's own minutes, EMB's sunset + 2. The
-     * five Diyanet calendars print Diyanet's Maghrib, sunset + 7 on its own sun taken at 0h UT (+ 6 to + 9
-     * on the exact sun), so the two members spread past [Cautious.MAGHRIB_AGREEMENT] on every day and the
-     * cap decides: those calendars' Maghrib comes after the one shown, recorded as `maghribCap` in the
-     * survey (be-cautious/outliers.tsv). Track L had given the EMB member sunset + 7 so that Diyanet's
-     * followers were never ahead, which put Maghrib 5–7 min after EMB's own table for EMB's own majority,
-     * against the owner's cap decision of 26 September (the latest sunset definition plus physical
-     * margins, never the sum of every mosque's precaution); it is gone, with the edge hook it needed.
+     * Maghrib (ruling R155, superseding R88's cap): the later member's, Diyanet's, sunset + 7 on its own
+     * sun taken at 0h UT (+ 6 to + 9 on the exact sun), as the five Diyanet calendars of the survey print
+     * it (Mawaqit's exact-sun rendering runs a minute after it on a few days), 2 to 9 min after EMB's own
+     * sunset + 2. R88's other half stays: the EMB member is EMB's own entry (track L had given it
+     * sunset + 7, through an edge hook, so that Diyanet's followers were never ahead; Diyanet's own member
+     * now does that, and the hook stays gone).
      */
     val belgium = cautious(
         id = "be.cautious", members = listOf(emb.asMember(1), Diyanet.europe.asMember(2)),
@@ -691,28 +695,23 @@ object Europe {
     )
 
     /**
-     * The seconds the Dutch Maghrib floor adds by month, January to December (ruling R87): the surveyed
-     * Turkish and Arab calendars' Maghrib on the exact sun peaks at sunset + 9.2 from August to October.
-     */
-    private val NL_MAGHRIB_EXTRA_SECONDS = intArrayOf(0, 0, 0, 0, 0, 60, 120, 120, 120, 120, 120, 60)
-
-    /**
      * The Netherlands: no authority, at least four families (HIGH). Members: the shared Moroccan
      * calendar (22 of 34 Amsterdam Mawaqit mosques; Fajr 16.3° in winter to 14° in spring and
      * autumn, Isha 15.4° to 14.4°, sunrise − 2, Dhuhr + 1, Maghrib + 1..4), taken at its latest
      * angles; Diyanet (ISN); plain 18°/17°. The Awqati observation tables (Fajr about 40 min after
      * 18°) have no known share and are left to Task 7g.
      *
-     * Maghrib (ruling R87): the Moroccan calendar prints sunset + 1..4, but 7 of the 12 Mawaqit calendars
+     * Maghrib (ruling R155): the latest member's, like every other start. The Moroccan calendar prints
+     * sunset + 1..4 (its member takes the latest, [NL_MAGHRIB]), but 7 of the 12 Mawaqit calendars
      * research-mawaqit surveyed across Rotterdam, Den Haag, Utrecht and Amsterdam (Turkish and Arab
      * mosques alike) print Diyanet's Maghrib, sunset + 7 on Diyanet's own sun taken at 0h UT: sunset + 6
-     * in spring to + 9 in autumn on the exact sun. The members' Maghribs never agree within
-     * [Cautious.MAGHRIB_AGREEMENT] (MWL's is the sun's own), so Maghrib is always capped at the Moroccan
-     * member's, the most followed (spec §3.6), which was up to 5 min before those calendars at + 3. The
-     * Moroccan member now carries their Maghrib as a floor, month by month: sunset + [NL_MAGHRIB] from
-     * January to May, + 8 in June and December, + 9 from July to November ([NL_MAGHRIB_EXTRA_SECONDS]),
-     * never before any of the seven. It costs the Moroccan calendar's own mosques 4–8 min at Maghrib
-     * (nl-cautious.tsv, the late limit).
+     * in spring to + 9 in autumn on the exact sun. Diyanet's member, at the later of its Amsterdam table's
+     * point and the user's (ruling R15), gives that Maghrib on Diyanet's own daily sun and is the latest:
+     * never before Diyanet's own Amsterdam table, and a minute before Mawaqit's exact-sun rendering of the
+     * same rule on a few days (Mevlana Moskee Amsterdam, 8 days from January to April, recorded in the
+     * survey as in Belgium and France). R87 had given the Moroccan member their Maghrib as a monthly floor
+     * on the exact sun (+ 7 to + 9) while spec §3.6's cap followed the most-followed member; with the cap
+     * gone the floor is gone too, and the Moroccan member is the calendar's own again.
      */
     val netherlands = cautious(
         id = "nl.cautious",
@@ -722,7 +721,6 @@ object Europe {
                 TimetableMethod(
                     id = "nl.moroccan", fajrAngle = 14.0, isha = IshaRule.Angle(15.4),
                     authorityMinutes = EventOffsets(sunrise = -2, dhuhr = 1, maghrib = NL_MAGHRIB), margins = safe,
-                    monthlyOffsets = mapOf(Prayer.MAGHRIB to NL_MAGHRIB_EXTRA_SECONDS),
                 ),
                 1,
                 measuredAt = listOf(GeoPoint(52.37403, 4.88969)),
@@ -745,14 +743,6 @@ object Europe {
                 "Isha is the latest member's, MWL's 17°, whose own table is not held here: up to 6 min after the " +
                     "Moroccan calendar's and Diyanet's.",
                 setOf(TimedEvent.ISHA),
-            ),
-            LateLimit(
-                8,
-                "Maghrib is capped at the Moroccan member's, which carries the Turkish and Arab calendars' Maghrib " +
-                    "as a floor (ruling R87: 7 of 12 surveyed calendars print Diyanet's, sunset + 6 in spring to + 9 in " +
-                    "autumn on the exact sun), so against the Moroccan calendar, which prints sunset + 1..4, it runs up " +
-                    "to 8 min late.",
-                setOf(TimedEvent.MAGHRIB),
             ),
             LateLimit(
                 2,
@@ -790,9 +780,7 @@ object Europe {
      * hour or two after VIKZ's; VIKZ's + 10 then always passes it), Zuhr + 4, Asr, Maghrib + 4 and sunrise
      * − 2 are never the ones shown (ContinentalCautiousTest). The curve was derived on the exact sun; at
      * dawn, three hours from 0h UT, the two models differ by seconds. Germany's Maghrib stays Diyanet's
-     * + 7: the latest
-     * member's where the members' Maghribs agree, and spec §3.6's cap, the most-followed member's, where
-     * Diyanet's sun at 0h UT puts its own past the others' by more than 2 min in autumn.
+     * + 7, the latest member's (ruling R155).
      */
     private val deLateDawn = convention(
         "de.latedawn", "timetable_late_dawn",
@@ -1142,7 +1130,27 @@ object Europe {
         TwilightCurves.fajr(latitude, 16.0) { d -> if (TwilightCurves.month(d) in 4..9) 60.0 / d.morningNight else null }
 
     /**
-     * Rabita Helsinki's family (Mawaqit): 18°/17°, Zuhr + 2, Maghrib + 3..6. From April to August its Fajr
+     * Rabita's Maghrib past its sunset + 3 and the 30 s start margin, in seconds, January to December (ruling R155; the
+     * gate of 25 Oct 2026 and the Lead's review of the same day). Its Helsinki calendar's Maghrib is the sun at about
+     * -1.22 degrees rounded to the minute (fitted, as ruling R42 records a derived parameter: the sun at -1.2183 degrees
+     * plus 7 s, rounded, gives 354 of 2026's 365 printed minutes, the other 11 a minute either side), 2:40 to 6:00 min
+     * after the exact sunset, the most near the solstices. The member's sunset + 3 alone ran up to 2 min before it in June
+     * and July; the 26 September cap had hidden that (it followed Diyanet's later Maghrib), and it showed past Diyanet's
+     * Helsinki unit, where the calendar's day rides beside the user's ([rabitaRide]): 5,286 early cells at the
+     * envelope's points 42 to 69 km out. Each month takes the least half minute that keeps the member at or after the
+     * calendar on every day of a leap cycle, 2026 to 2033, whether Mawaqit keeps the 2026 calendar as it is (it is
+     * year-agnostic: the same month-day's minute every year) or regenerates it by its rule; a table fitted to 2026 alone
+     * ran a minute before the calendar kept as it is on September and October days of 2028 and 2032. On its own at
+     * Helsinki in 2026 the member is on the calendar's minute on 42 days, a minute after it on 195 (53 %) and two on 128
+     * (35 %). A table by month rather than the calendar's own depression: Rabita's member reaches Lapland, where the sun
+     * that sets at -0.83 degrees does not reach -1.22 near midsummer from about 65.3 to 65.7 degrees north, a band that
+     * would have no Maghrib. Declared before [rabita], which reads it (an object initialises in order).
+     */
+    private val RABITA_MAGHRIB_SECONDS = intArrayOf(120, 60, 0, 30, 90, 120, 120, 90, 60, 60, 90, 90)
+
+    /**
+     * Rabita Helsinki's family (Mawaqit): 18°/17°, Zuhr + 2, Maghrib + 3..6 (its calendar's Maghrib month by month,
+     * [RABITA_MAGHRIB_SECONDS], ruling R155). From April to August its Fajr
      * is near the middle of the night: its own calendar's Fajr is its curve ([RabitaCurves], as IRN's under
      * ruling R48), and, as it prints no imsak, the fast begins at that Fajr (ruling R39:
      * EndOfEatingDawns.rabitaHelsinki). While 17° does not occur its Isha is Maghrib + 88 (PlaceCurves; the
@@ -1155,6 +1163,7 @@ object Europe {
         TimetableMethod(
             id = "se.rabita", fajrAngle = 18.0, isha = IshaRule.Angle(17.0),
             authorityMinutes = EventOffsets(dhuhr = 2, maghrib = 3), margins = safe,
+            monthlyOffsets = mapOf(Prayer.MAGHRIB to RABITA_MAGHRIB_SECONDS),
             highLatitude = HighLatRule.NightFraction(fajrFraction = 1.0 / 7.0, ishaFraction = 0.25),
             fajrAngleByDayOfYear = RabitaCurves.fajr,
             endOfEatingMarginSeconds = RABITA_END,
@@ -1269,9 +1278,14 @@ object Europe {
                 setOf(TimedEvent.DHUHR),
             ),
             LateLimit(
-                4,
-                "Maghrib is capped at IRN's (the most followed) where the members spread: up to 4 min after it (at " +
-                    "Trondheim in June, where IRN's monthly minutes run ahead of its calendar).",
+                50,
+                "Maghrib is the later member's from the sun like every start (ruling R155), most days Diyanet's sunset + 7: " +
+                    "up to 5 min after IRN's Oslo calendar and 6 after its Trondheim calendar, and up to 4 after Diyanet's " +
+                    "own Bergen table and 1 after its Oslo, Kristiansand and Stavanger tables. From late May to late July " +
+                    "Diyanet's own Trondheim table holds the day to about nineteen hours around Dhuhr and prints its Maghrib " +
+                    "before the sun sets; Maghrib never comes before the sun's, up to 50 min after that table (the safe " +
+                    "side). On the winter days Diyanet's five-hour day holds its Trondheim Maghrib later than the sun, its " +
+                    "Maghrib from the sun is the one checked (ruling R156).",
                 setOf(TimedEvent.MAGHRIB),
             ),
         ),
@@ -1332,10 +1346,12 @@ object Europe {
             ),
             LateLimit(
                 126,
-                "Maghrib is capped at Diyanet's (its sunset + 7) where the members spread: up to 2 min after it, and from " +
-                    "late May to late July, where Diyanet holds its tables' day to nineteen hours around Dhuhr and prints " +
-                    "its Maghrib before the sun sets, never before the real sunset: up to 4 min after its Turku table and " +
-                    "126 after its Luleå table.",
+                "Maghrib is the later member's from the sun like every start (ruling R155), most days Diyanet's sunset + 7: " +
+                    "up to 7 min after Rabita's Helsinki calendar (sunset + 3 to + 6) at Helsinki and 8 at its towns, and up to " +
+                    "1 after Diyanet's own tables. From late May to late July, where Diyanet holds its tables' day to " +
+                    "nineteen hours around Dhuhr and prints its Maghrib before the sun sets, Maghrib never comes before the " +
+                    "sun's: up to 4 min after its Turku table, 17 after Tampere's, 32 after Sundsvall's, 59 after Umeå's, " +
+                    "94 after Oulu's and 126 after Luleå's.",
                 setOf(TimedEvent.MAGHRIB),
             ),
         ),
@@ -1380,7 +1396,7 @@ object Europe {
         "later than 17/60 after sunset (adhan-js's TwilightAngle rule); on the curve's slots each is widened over the day " +
         "before and after (ruling R28), most when the rule takes over, in late April and May:"
 
-    /** Why France's cautious Dhuhr, Asr and Maghrib run late (Task 7g's gate). */
+    /** Why France's cautious Dhuhr and Asr run late (Task 7g's gate). */
     private const val FRANCE_SPREAD = "Each family's tables differ among themselves (Drancy's and Al-Amel's Asr swing by " +
         "3-5 min over the year; the 12-13° family prints Zuhr + 5 and Maghrib + 3..4); each member takes its family's latest."
 
@@ -1395,8 +1411,8 @@ object Europe {
     /** The UK Karachi family's end-of-eating dawn: Faizan-e-Makkah prints 18.44–18.58° (research-uk). */
     private const val UK_EATING_DAWN = 18.6
 
-    /** The Dutch Moroccan member's Maghrib minutes (ruling R87; the calendar itself prints + 1..4). */
-    private const val NL_MAGHRIB = 7
+    /** The Dutch Moroccan member's Maghrib minutes: the calendar's own latest (it prints + 1..4; ruling R155). */
+    private const val NL_MAGHRIB = 4
 
     /**
      * France's late limits with Diyanet as a member (ruling R87; measured by the gate at Paris, and since

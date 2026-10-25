@@ -10,6 +10,7 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.astro.AsrModel
 import world.taqwa.app.prayer.engine.astro.SolarMath
 import world.taqwa.app.prayer.engine.astro.SunClock
@@ -485,7 +486,7 @@ class HighLatitudeTest {
             val ownMaghrib = startOf(sunset(murmansk, date, moscow))
             val angle = compute(plain, murmansk, date, moscow)
             val after = compute(afterMaghrib, murmansk, date, moscow)
-            val cautious = Cautious.combine(listOf(angle, after), mostFollowed = 0)
+            val cautious = Cautious.combine(listOf(angle, after), mostFollowed = 0, realSunset = DayPipeline.realSunset(murmansk, date, moscow))
             for (day in listOf(angle, after, cautious)) {
                 assertFalse(day.polar, "$date ${day.methodId}")
                 assertTrue(day.maghrib >= ownMaghrib, "$date ${day.methodId}: maghrib ${day.maghrib.clock(moscow)}")

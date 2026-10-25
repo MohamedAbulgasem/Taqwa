@@ -240,14 +240,14 @@
     }
 
     /* A cautious place's explainer for the reader's today (spec §3.3, §9.3): which timetable
-       decides each time, the Maghrib cap's sentence on a day it decided, when to stop eating,
-       and the Fajr ruler drawn from the members' own minutes. Without script the built day's
-       rows and the ruler's sentence stand. */
+       decides each time, the far-north guard's sentence on a day it set a member's later
+       Maghrib aside (ruling R155), when to stop eating, and the Fajr ruler drawn from the
+       members' own minutes. Without script the built day's rows and the ruler's sentence stand. */
     function cautiousParts() {
       var names = data.mn;
       var words = data.ruler;
       var decideRows = [].slice.call(document.querySelectorAll(".decides li[data-p]"));
-      var cap = document.querySelector('[data-tt="cap"]');
+      var guard = document.querySelector('[data-tt="guard"]');
       var stop = document.querySelector('[data-tt="stop"]');
       var figure = document.querySelector("figure.ruler.fajr");
       var sentence = figure ? figure.querySelector(".ruler-text") : null;
@@ -256,12 +256,20 @@
       var X0 = 24;
       var X1 = 318;
 
+      /* Whether member k gives the shown Maghrib from the sun (ruling R155): its Maghrib before
+         its own far-north or winter rule held it later (null where its Maghrib is set by rule),
+         as site/timetables.py's sun_gives reads it. */
+      function sunGives(day, k, p) {
+        return p === MAGHRIB && day.ms[k] === day.e[p];
+      }
+
       /* The members whose own instant is the one shown — the latest to begin it, for sunrise
-         the earliest, for a capped Maghrib the most-followed's — as site/timetables.py picks
-         them for the built day; a repaired day falls back to the latest (earliest) member. */
+         the earliest — and, for Maghrib, those whose Maghrib from the sun is the one shown, as
+         site/timetables.py picks them for the built day; a day with no such member (repaired,
+         or held to the real sunset) falls back to the latest (earliest) member. */
       function deciders(day, p) {
         var on = [];
-        day.me.forEach(function (m, k) { if (m[p] === day.e[p]) on.push(k); });
+        day.me.forEach(function (m, k) { if (m[p] === day.e[p] || sunGives(day, k, p)) on.push(k); });
         if (!on.length) {
           var pick = null;
           day.me.forEach(function (m) {
@@ -288,18 +296,20 @@
         });
       }
 
-      /* The app's maghribCapToday: the member whose Maghrib is the one shown (else the most
-         followed, the first) and those whose own is later. */
-      function capSentence(day, i) {
-        if (i === data.today) return data.capText;
+      /* The app's guard sentence (ruling R155), as the generator fills it for the built day:
+         the first member giving the shown Maghrib, its own or from the sun (else the most
+         followed, the first), and those whose own Maghrib, set by a far-north rule, is later;
+         on a day the real sun does not set there, the app's second sentence (guardNoSunT). */
+      function guardSentence(day, i) {
+        if (i === data.today) return data.guardText;
         var followed = -1;
         var later = [];
         day.me.forEach(function (m, k) {
           if (m[MAGHRIB] > day.e[MAGHRIB]) later.push(names[k]);
-          if (followed < 0 && m[MAGHRIB] === day.e[MAGHRIB]) followed = k;
+          if (followed < 0 && (m[MAGHRIB] === day.e[MAGHRIB] || sunGives(day, k, MAGHRIB))) followed = k;
         });
         if (followed < 0) followed = 0;
-        return put(data.capT, { "1": names[followed], "2": later.join(data.comma) });
+        return put(day.ss ? data.guardT : data.guardNoSunT, { "1": names[followed], "2": later.join(data.comma) });
       }
 
       /* The members grouped by their Fajr minute, earliest first. */
@@ -438,9 +448,9 @@
             who.appendChild(chip(isOn ? name : name + " " + day.m[k][p], isOn));
           });
         });
-        if (cap) {
-          cap.hidden = !day.cap;
-          if (day.cap) cap.textContent = capSentence(day, i);
+        if (guard) {
+          guard.hidden = !day.g;
+          if (day.g) guard.textContent = guardSentence(day, i);
         }
         if (stop) stop.textContent = put(data.stop, { time: day.x });
         drawRuler(day, i);

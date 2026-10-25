@@ -375,9 +375,16 @@ object Americas {
             ),
             LateLimit(
                 6,
-                TORONTO_SPREAD + " West of the mosques the user's own sun is later (at Milton by 2.5 min), and Dhuhr, " +
-                    "Asr and Maghrib shown follow it: up to 5, 6 and 5 min.",
-                setOf(TimedEvent.DHUHR, TimedEvent.ASR, TimedEvent.MAGHRIB),
+                TORONTO_SPREAD + " West of the mosques the user's own sun is later (at Milton by 2.5 min), and Dhuhr " +
+                    "and Asr shown follow it: up to 5 and 6 min.",
+                setOf(TimedEvent.DHUHR, TimedEvent.ASR),
+            ),
+            LateLimit(
+                7,
+                TORONTO_SPREAD + " Maghrib is the latest member's like every start (ruling R155), at the mosques up to " +
+                    "3 min after the latest table's; west of them the user's own sun is later (at Milton by 2.5 min), " +
+                    "and Maghrib shown follows it: up to 7 min in December.",
+                setOf(TimedEvent.MAGHRIB),
             ),
             LateLimit(
                 3,
@@ -505,9 +512,16 @@ object Americas {
             ),
             LateLimit(
                 6,
-                CANADA_FAMILIES + " Each keeps its own tables' minutes (Al Farooq's Zuhr + 5, Al Omari's Maghrib + 6 from " +
-                    "August): Zuhr and Maghrib up to 5 min after the others' at their mosques; " + FAMILIES_REACH + " 6.",
-                setOf(TimedEvent.DHUHR, TimedEvent.MAGHRIB),
+                CANADA_FAMILIES + " Each keeps its own tables' minutes (Al Farooq's Zuhr + 5): Zuhr up to 5 min after the " +
+                    "others' at their mosques; " + FAMILIES_REACH + " 6.",
+                setOf(TimedEvent.DHUHR),
+            ),
+            LateLimit(
+                8,
+                CANADA_FAMILIES + " Maghrib is the latest family's like every start (ruling R155), most days the 18° " +
+                    "family's (Al Omari's Maghrib + 6 from August): up to 7 min after Calgary Islamic Centre SW's at its " +
+                    "mosque and 6 after the others' at theirs; " + FAMILIES_REACH + " 8 (Evergreen and Tuscany, Calgary).",
+                setOf(TimedEvent.MAGHRIB),
             ),
             LateLimit(
                 5,
@@ -604,8 +618,8 @@ object Americas {
 
     /**
      * Australia: no dominant table (HIGH): Lakemba's, and Diyanet's per-suburb tables (the TURKEY preset ± 1).
-     * Maghrib is capped at LMA's (the most followed) where the two spread, 5–6 min before Diyanet's
-     * (its sunset + 7), as the spec's cautious Maghrib (Task 7g's gate, proof.md).
+     * Maghrib is the latest member's (ruling R155): Diyanet's, its sunset + 7, up to 9 min after LMA's,
+     * the most followed (until 24 Oct 2026 it was capped at LMA's, Task 7g's gate, proof.md).
      */
     val australia = cautious(
         id = "au.cautious", members = listOf(lakemba.asMember(1), Diyanet.other.asMember(2)),
@@ -623,6 +637,13 @@ object Americas {
                 10,
                 "Isha is the later member's, the TURKEY preset's 17° or LMA's Maghrib + 90: up to 10 min after the other's.",
                 setOf(TimedEvent.ISHA),
+            ),
+            LateLimit(
+                9,
+                "Maghrib is the later member's like every start (ruling R155), the TURKEY preset's sunset + 7: up to 9 min " +
+                    "after LMA's printed Maghrib (its sunset rounded up) at Lakemba and at the app's own Sydney, and up to " +
+                    "1 after Diyanet's own Melbourne table.",
+                setOf(TimedEvent.MAGHRIB),
             ),
             LateLimit(
                 9,

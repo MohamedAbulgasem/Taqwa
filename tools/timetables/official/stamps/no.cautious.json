@@ -1,7 +1,7 @@
 {
   "entry": "no.cautious",
   "class": "C",
-  "engineHash": "f01f63df9a6ef3fd",
+  "engineHash": "fdfd5dd3312ed9b7",
   "broken": 0,
   "places": 5,
   "first": "2026-01-01",
@@ -90,17 +90,17 @@
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 730,
+      "checked": 2648,
       "early": 0,
       "late": {
-        "0": 334,
-        "1": 168,
-        "2": 185,
-        "3+": 43
+        "0": 1392,
+        "1": 656,
+        "2": 202,
+        "3+": 398
       },
-      "exactShare": 0.4575,
-      "worstLate": 4,
-      "lateLimit": 4,
+      "exactShare": 0.5257,
+      "worstLate": 50,
+      "lateLimit": 50,
       "lateLimitFrom": "entry no.cautious",
       "overLimit": 0
     },
@@ -215,17 +215,17 @@
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 730,
+        "checked": 2648,
         "early": 0,
         "late": {
-          "0": 334,
-          "1": 168,
-          "2": 185,
-          "3+": 43
+          "0": 1392,
+          "1": 656,
+          "2": 202,
+          "3+": 398
         },
-        "exactShare": 0.4575,
-        "worstLate": 4,
-        "lateLimit": 4,
+        "exactShare": 0.5257,
+        "worstLate": 50,
+        "lateLimit": 50,
         "lateLimitFrom": "entry no.cautious",
         "overLimit": 0
       },
@@ -261,20 +261,14 @@
       }
     }
   },
-  "maghribCap": {
-    "uncheckedDays": 0,
+  "maghribGuard": {
     "members": {
-      "no.irn": {
-        "days": 730,
-        "cappedDays": 400,
-        "leastGap": 0,
-        "mostGap": 4
-      },
       "tr.diyanet.europe": {
-        "days": 62,
-        "cappedDays": 62,
-        "leastGap": -4,
-        "mostGap": -3
+        "days": 28,
+        "checkedAtSun": 28,
+        "leastGap": -13,
+        "mostGap": 0,
+        "dates": ["2027-01-01..2027-01-05", "2027-12-09..2027-12-31"]
       }
     }
   },
@@ -298,10 +292,6 @@
     }
   },
   "lateLimits": {
-    "entry no.cautious: 4 min": {
-      "reason": "Maghrib is capped at IRN's (the most followed) where the members spread: up to 4 min after it (at Trondheim in June, where IRN's monthly minutes run ahead of its calendar).",
-      "events": ["maghrib"]
-    },
     "entry no.cautious: 6 min": {
       "reason": "Zuhr is the later member's (IRN's + 4 to + 9, Diyanet's + 5): up to 5 min after the tables', and beyond IRN's calendars, where its edge keeps + 10, up to 6 after Diyanet's Kristiansand table.",
       "events": ["dhuhr"]
@@ -309,6 +299,10 @@
     "entry no.cautious: 8 min": {
       "reason": "Asr is the later member's, in the later school (the school is not known): up to 8 min after IRN's Trondheim Asr.",
       "events": ["asrStandard", "asrHanafi"]
+    },
+    "entry no.cautious: 50 min": {
+      "reason": "Maghrib is the later member's from the sun like every start (ruling R155), most days Diyanet's sunset + 7: up to 5 min after IRN's Oslo calendar and 6 after its Trondheim calendar, and up to 4 after Diyanet's own Bergen table and 1 after its Oslo, Kristiansand and Stavanger tables. From late May to late July Diyanet's own Trondheim table holds the day to about nineteen hours around Dhuhr and prints its Maghrib before the sun sets; Maghrib never comes before the sun's, up to 50 min after that table (the safe side). On the winter days Diyanet's five-hour day holds its Trondheim Maghrib later than the sun, its Maghrib from the sun is the one checked (ruling R156).",
+      "events": ["maghrib"]
     },
     "entry no.cautious: 57 min": {
       "reason": "The end of eating is the earlier member's: IRN's own earliest dawns (ruling R39) at Oslo, up to 55 min before Diyanet's imsak and 26 before IRN's Fajr; at Trondheim Diyanet's own table's dawn, up to 55 before IRN's printed Fajr in spring; at Bergen up to 57 before Diyanet's imsak in August.",

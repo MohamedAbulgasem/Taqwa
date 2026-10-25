@@ -1,7 +1,7 @@
 {
   "entry": "de.cautious",
   "class": "C",
-  "engineHash": "c60fe2674f344dbb",
+  "engineHash": "cd9c130157d34c8d",
   "broken": 0,
   "places": 1,
   "first": "2026-09-01",
@@ -228,17 +228,6 @@
         "lateLimit": 5,
         "lateLimitFrom": "entry de.cautious",
         "overLimit": 0
-      }
-    }
-  },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "tr.diyanet.europe": {
-        "days": 61,
-        "cappedDays": 14,
-        "leastGap": 0,
-        "mostGap": 1
       }
     }
   },

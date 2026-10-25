@@ -1,7 +1,7 @@
 {
   "entry": "ie.cautious",
   "class": "C",
-  "engineHash": "e2b479fe38e72df7",
+  "engineHash": "c987a35086bd426c",
   "broken": 0,
   "places": 2,
   "first": "2026-01-01",
@@ -231,23 +231,6 @@
       }
     }
   },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "ie.icci": {
-        "days": 730,
-        "cappedDays": 402,
-        "leastGap": 0,
-        "mostGap": 7
-      },
-      "ie.ifi": {
-        "days": 730,
-        "cappedDays": 402,
-        "leastGap": 0,
-        "mostGap": 3
-      }
-    }
-  },
   "members": {
     "ie.icci": {
       "checked": ["2026-01-01..2026-12-31"],
@@ -277,7 +260,7 @@
       "events": ["endOfEating"]
     },
     "entry ie.cautious: 3 min (maghrib)": {
-      "reason": "Each member keeps its own margins, and Maghrib is capped at IFI's where the two spread: up to 2 min after the later table's at the tables' point, and at the app's own Dublin, 2 km south-east of it, where the tables' point rides beside the user's (rulings R30, R44), up to 3.",
+      "reason": "Maghrib is the later member's like every start (ruling R155), most days IFI's; each member keeps its own margins: up to 2 min after the later table's at the tables' point, and at the app's own Dublin, 2 km south-east of it, where the tables' point rides beside the user's (rulings R30, R44), up to 3.",
       "events": ["maghrib"]
     },
     "entry ie.cautious: 5 min": {

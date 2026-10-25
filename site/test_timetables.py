@@ -220,7 +220,7 @@ def made_up_document(months: list, today: str) -> dict:
             "howReproduces": "How Taqwa reproduces them", "methodIntro": "The way Made-up Authority calculates.",
             "howChecked": "How it was checked", "statDaysValue": "365", "statDays": "days at 1 places",
             "statNever": "starts before Made-up Authority’s", "statNeverAny": "", "statMinutes": "2 min", "statAtMost": "at most after",
-            "cautiousBody": "", "maghribCap": "", "maghribCapTemplate": "", "whichDecides": "Which timetable decides each time today",
+            "cautiousBody": "", "maghribGuard": "", "maghribGuardTemplate": "", "maghribNoSunsetTemplate": "", "whichDecides": "Which timetable decides each time today",
             "matchMosque": "Match my mosque", "setByRule": "Set by rule", "polarLine": "The sun does not rise or set here today.",
             "stopEating": "Stop eating by {time} today.",
         },
@@ -310,6 +310,161 @@ class OneMonthPageTest(unittest.TestCase):
         emptied = re.sub(r'(<table class="tt" data-month="0">.*?<tbody>).*?(</tbody>)', r"\1\2", one, flags=re.S)
         problems = timetables.check_page(REL, emptied, one_data)  # an empty table
         self.assertTrue(any("0 rows for 31 days" in p for p in problems), problems)
+
+
+# ---------------------------------------------------------------- a made-up cautious page: the far-north guard
+
+COUNCIL, DIRECTORATE, MISSION = "Made-up Council", "Made-up Directorate", "Made-up Mission"
+# The app's guard sentence (ruling R155) as the generator hands it over, unfilled: %1$s the member
+# followed, %2$s the members whose own Maghrib, set by a far-north rule, is later. Made up here; the
+# page takes whatever the app's strings say.
+GUARD_T = ("Maghrib is the exception today: it follows %1$s rather than the later Maghrib of %2$s, "
+           "set by a far-north rule instead of the sun.")
+# The guard days of the made-up October: each held member's (Maghrib from the sun, own Maghrib its
+# far-north rule holds), in UTC (London is on UTC from the 25th). On the 29th the Mission's held
+# Maghrib is the latest member's own, so a page that fell back to the latest own Maghrib would
+# name the Mission, not the Directorate whose Maghrib from the sun is the one shown.
+GUARD_DAYS = {29: {1: ((17, 21), (17, 40)), 2: ((17, 15), (17, 50))}, 31: {1: ((17, 17), (17, 40))}}
+# The app's second guard sentence, for a day the real sun does not set at the place: no member's
+# Maghrib counts as from the sun, and only the most-followed member's own stands. Made up here too.
+NO_SUN_T = "Maghrib is the exception today, as there is no sunset here: it follows %1$s rather than the later Maghrib of %2$s."
+# The made-up October's day without a sunset: the Directorate's own Maghrib, set by its polar rule.
+NO_SUNSET_DAYS = {27: {1: (17, 40)}}
+
+
+def guard_sentence(followed: str, later: str, template: str = GUARD_T) -> str:
+    return template.replace("%1$s", followed).replace("%2$s", later)
+
+
+def made_up_cautious_document(today: str) -> dict:
+    """The made-up city's October as a cautious place, built on `today`: the most-followed Made-up
+    Council, whose own times are the ones shown, the Made-up Directorate two minutes before it at
+    every start (after it at sunrise) and the Made-up Mission one minute before it, each with its
+    own Maghrib from the sun — except on GUARD_DAYS, where a far-north rule holds a member's own
+    Maghrib later and the guard sets that aside (ruling R155): on the 29th the Directorate's
+    Maghrib from the sun, 17:21, is the latest and is shown, while its own is 17:40 and the
+    Mission's 17:50; on the 31st the Directorate's from the sun is 17:17 and the Council's own
+    17:19 stands. On NO_SUNSET_DAYS (the 27th) the real sun does not set: no member's Maghrib
+    counts from the sun, the Council's own stands and the Directorate's polar 17:40 is later."""
+    doc = made_up_document([OCTOBER], today)
+    city = doc["cities"][0]
+    city["entryClass"] = "C"
+    city["proof"]["cautious"] = True
+    page = city["pages"]["en"]
+    page["members"] = [COUNCIL, DIRECTORATE, MISSION]
+    built = int(today[-2:])
+    for facts, day in zip(city["days"], page["days"]):
+        date = datetime.date.fromisoformat(facts["date"])
+        epochs = facts["epochs"]
+        council = epochs + [facts["endOfEating"]]
+        members = [council] + [[e + (step if p == timetables.SUNRISE else -step) for p, e in enumerate(epochs)]
+                               + [facts["endOfEating"]] for step in (120, 60)]
+        by_sun = [member[timetables.MAGHRIB] for member in members]
+        guard = date.day in GUARD_DAYS or date.day in NO_SUNSET_DAYS
+        sun_sets = date.day not in NO_SUNSET_DAYS
+        if date.day in GUARD_DAYS:
+            for k, ((sun_h, sun_m), (own_h, own_m)) in GUARD_DAYS[date.day].items():
+                by_sun[k] = at(10, date.day, sun_h, sun_m)
+                members[k][timetables.MAGHRIB] = at(10, date.day, own_h, own_m)
+            epochs[timetables.MAGHRIB] = max(by_sun)
+            day["times"][timetables.MAGHRIB] = clock(epochs[timetables.MAGHRIB], WESTERN)
+        if not sun_sets:
+            by_sun = [None for _ in members]
+            for k, (own_h, own_m) in NO_SUNSET_DAYS[date.day].items():
+                members[k][timetables.MAGHRIB] = at(10, date.day, own_h, own_m)
+        facts.update(members=members, maghribBySun=by_sun, guard=guard, sunSets=sun_sets)
+        day["members"] = [[clock(e, WESTERN) for e in member] for member in facts["members"]]
+    followed, later = (DIRECTORATE, f"{DIRECTORATE}, {MISSION}") if built == 29 else (COUNCIL, DIRECTORATE)
+    sentence = ""
+    if built in GUARD_DAYS:
+        sentence = guard_sentence(followed, later)
+    elif built in NO_SUNSET_DAYS:
+        sentence = guard_sentence(COUNCIL, DIRECTORATE, NO_SUN_T)
+    page["strings"].update(
+        cautiousBody="Mosques in Made-up City follow different timetables in good faith, and none is followed by most.",
+        statNeverAny="starts before the timetable that decides it", maghribGuardTemplate=GUARD_T,
+        maghribNoSunsetTemplate=NO_SUN_T, maghribGuard=sentence,
+    )
+    return doc
+
+
+def rendered_cautious(today: str) -> tuple:
+    data = timetables.Timetables({"en": language("en")}, made_up_cautious_document(today))
+    return data.city_body(data.cities[0], "en"), data
+
+
+def guard_paragraph(html: str) -> tuple:
+    """The guard's paragraph: whether it is shown, and its words."""
+    found = re.search(r'<p class="guard" data-tt="guard"( hidden(?:="[^"]*")?)?>([^<]*)</p>', html)
+    return found.group(1) is None, found.group(2)
+
+
+def maghrib_row(html: str) -> tuple:
+    """Which timetable decides Maghrib: the time shown, the deciding chips, the others' chips."""
+    row = re.search(r'<li data-p="4"><span class="pn">.*?</li>', html, re.S).group(0)
+    return (re.search(r'<span class="shown">([^<]*)<', row).group(1), re.findall(r'<b class="chip on">([^<]*)</b>', row),
+            re.findall(r'<span class="chip">([^<]*)</span>', row))
+
+
+class CautiousGuardTest(unittest.TestCase):
+    """Ruling R155 on a cautious page, as the app's About shows it: Maghrib is the latest any
+    timetable gives from the sun, so a member whose far-north rule holds its own Maghrib later
+    can decide it by its Maghrib from the sun, and on such a day the guard's sentence says that a
+    later Maghrib was set aside. There is no cap any more."""
+
+    def test_on_a_guard_day_the_sentence_stands_and_the_sun_time_decides(self):
+        body, data = rendered_cautious("2026-10-29")
+        self.assertEqual((True, guard_sentence(DIRECTORATE, f"{DIRECTORATE}, {MISSION}")), guard_paragraph(body))
+        # 17:21 is the Directorate's Maghrib from the sun, not its own (17:40): it decides all the
+        # same, and the Mission, whose own is the latest, does not.
+        self.assertEqual(("17:21", [DIRECTORATE], [f"{COUNCIL} 17:19", f"{MISSION} 17:50"]), maghrib_row(body))
+        self.assertEqual([], timetables.check_page(REL, body, data))
+
+    def test_where_the_most_followeds_own_maghrib_is_shown_it_decides(self):
+        body, _ = rendered_cautious("2026-10-31")
+        self.assertEqual((True, guard_sentence(COUNCIL, DIRECTORATE)), guard_paragraph(body))
+        self.assertEqual(("17:19", [COUNCIL], [f"{DIRECTORATE} 17:40", f"{MISSION} 17:18"]), maghrib_row(body))
+
+    def test_on_a_day_without_a_sunset_the_second_sentence_stands_and_the_most_followed_decides(self):
+        body, data = rendered_cautious("2026-10-27")
+        self.assertEqual((True, guard_sentence(COUNCIL, DIRECTORATE, NO_SUN_T)), guard_paragraph(body))
+        shown, deciding, others = maghrib_row(body)
+        self.assertEqual(([COUNCIL], f"{DIRECTORATE} 17:40"), (deciding, others[0]))
+        self.assertEqual([], timetables.check_page(REL, body, data))
+
+    def test_on_any_other_day_nothing_is_said_and_the_latest_decides(self):
+        body, data = rendered_cautious("2026-10-28")
+        self.assertEqual((False, ""), guard_paragraph(body))
+        self.assertEqual(("17:19", [COUNCIL], [f"{DIRECTORATE} 17:17", f"{MISSION} 17:18"]), maghrib_row(body))
+        self.assertNotIn("cap", re.findall(r'data-tt="(\w+)"', body))
+        self.assertEqual([], timetables.check_page(REL, body, data))
+
+    def test_deciders_match_a_members_maghrib_from_the_sun_and_nothing_else(self):
+        doc = made_up_cautious_document("2026-10-28")
+        days = doc["cities"][0]["days"]
+        self.assertEqual([1], timetables.deciders(days[28], timetables.MAGHRIB))  # the 29th
+        self.assertEqual([0], timetables.deciders(days[30], timetables.MAGHRIB))  # the 31st
+        # A sun time equal to another prayer's shown instant decides nothing but Maghrib.
+        day = copy.deepcopy(days[27])
+        day["maghribBySun"] = [None, day["epochs"][timetables.ISHA], None]
+        self.assertEqual([0], timetables.deciders(day, timetables.ISHA))
+        self.assertEqual([0], timetables.deciders(day, timetables.MAGHRIB))
+
+    def test_the_live_data_carries_the_guard_and_each_members_maghrib_from_the_sun(self):
+        body, _ = rendered_cautious("2026-10-28")
+        data = live(body)
+        guard_days = set(GUARD_DAYS) | set(NO_SUNSET_DAYS)
+        self.assertEqual([1 if d in guard_days else 0 for d in range(1, 32)], [day["g"] for day in data["days"]])
+        self.assertEqual([0 if d in NO_SUNSET_DAYS else 1 for d in range(1, 32)], [day["ss"] for day in data["days"]])
+        # "s" stays the day's sunset epoch on a cautious page, as on every page: the page script ends Asr at it.
+        doc = made_up_cautious_document("2026-10-28")
+        self.assertEqual([facts["sunset"] for facts in doc["cities"][0]["days"]], [day["s"] for day in data["days"]])
+        self.assertEqual([at(10, 29, 17, 19), at(10, 29, 17, 21), at(10, 29, 17, 15)], data["days"][28]["ms"])
+        self.assertEqual([None, None, None], data["days"][26]["ms"])
+        self.assertEqual(GUARD_T, data["guardT"])
+        self.assertEqual(NO_SUN_T, data["guardNoSunT"])
+        self.assertEqual("", data["guardText"])
+        self.assertFalse({"cap", "capT", "capText"} & (set(data) | set(data["days"][0])))
 
 
 class FrenchElisionTest(unittest.TestCase):
@@ -424,13 +579,18 @@ def run_page(body: str, instant: str) -> dict:
         return re.search(rf'data-tt="{tt}">([^<]*)<', dom).group(1)
 
     today = re.search(r'<tr data-i="(\d+)" class="[^"]*\bis-today\b', dom)
+    # The Today card's rows come first; a cautious page's "which timetable decides" list repeats data-p below them.
+    rows = {}
+    for p, cls in re.findall(r'<li data-p="(\d)"(?: class="([^"]*)")?>', dom):
+        rows.setdefault(int(p), (cls or "").split())
     return {
         "label": text("label"), "count": text("count"), "at": text("at"),
         "arc": re.search(r'class="ring-arc"[^>]*stroke-dasharray="([^"]*)"', dom).group(1),
-        "rows": {int(p): (cls or "").split() for p, cls in re.findall(r'<li data-p="(\d)"(?: class="([^"]*)")?>', dom)},
+        "rows": rows,
         "stale": "hidden" not in re.search(r'<p class="tt-stale"[^>]*>', dom).group(0),
         "today": int(today.group(1)) if today else None,
         "fold": re.search(r'<tr class="fold">.*?</tr>', dom, re.S),
+        "dom": dom,
     }
 
 
@@ -489,6 +649,54 @@ class LastEveningTest(unittest.TestCase):
         shown = run_page(self.two, "2026-10-31T20:00:00Z")
         self.assertEqual(("Fajr in", "8:07:00", "4:07"), (shown["label"], shown["count"], shown["at"]))
         self.assertFalse(shown["stale"])
+
+
+@unittest.skipUnless(CHROME, "no Chrome to run the page script in")
+class CautiousGuardScriptTest(unittest.TestCase):
+    """The page script redraws the cautious explainer for the reader's today (ruling R155): the
+    guard's sentence, filled as the generator fills it for the built day, on the reader's guard
+    day and nowhere else, and the Maghrib decided by a member's Maghrib from the sun."""
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            ran = 'id="ok"' in dump_dom('<!doctype html><p id="ok">ok</p>')
+        except (OSError, subprocess.SubprocessError):
+            ran = False
+        if not ran:
+            raise unittest.SkipTest(f"{CHROME} runs no page here")
+        cls.plain = rendered_cautious("2026-10-28")[0]
+        cls.guarded = rendered_cautious("2026-10-29")[0]
+
+    def test_the_readers_guard_day_says_the_sentence_and_its_sun_time_decides(self):
+        dom = run_page(self.plain, "2026-10-29T12:00:00Z")["dom"]
+        self.assertEqual((True, guard_sentence(DIRECTORATE, f"{DIRECTORATE}, {MISSION}")), guard_paragraph(dom))
+        self.assertEqual(("17:21", [DIRECTORATE], [f"{COUNCIL} 17:19", f"{MISSION} 17:50"]), maghrib_row(dom))
+
+    def test_where_the_most_followeds_own_maghrib_is_shown_it_is_the_one_followed(self):
+        dom = run_page(self.plain, "2026-10-31T12:00:00Z")["dom"]
+        self.assertEqual((True, guard_sentence(COUNCIL, DIRECTORATE)), guard_paragraph(dom))
+        self.assertEqual(("17:19", [COUNCIL], [f"{DIRECTORATE} 17:40", f"{MISSION} 17:18"]), maghrib_row(dom))
+
+    def test_the_readers_day_without_a_sunset_says_the_second_sentence(self):
+        dom = run_page(self.plain, "2026-10-27T12:00:00Z")["dom"]
+        self.assertEqual((True, guard_sentence(COUNCIL, DIRECTORATE, NO_SUN_T)), guard_paragraph(dom))
+        self.assertEqual([COUNCIL], maghrib_row(dom)[1])
+
+    def test_a_day_without_the_guard_hides_the_built_days_sentence(self):
+        dom = run_page(self.guarded, "2026-10-30T12:00:00Z")["dom"]
+        self.assertFalse(guard_paragraph(dom)[0])
+        self.assertEqual(("17:19", [COUNCIL], [f"{DIRECTORATE} 17:17", f"{MISSION} 17:18"]), maghrib_row(dom))
+
+    def test_asr_stays_current_until_sunset_on_a_cautious_page_as_in_the_app(self):
+        # Between Asr and sunset Asr is the current prayer (the app's TimelineBuilder); the page
+        # script ends it at the day's sunset epoch, which the sun-sets flag must not overwrite.
+        facts = made_up_cautious_document("2026-10-28")["cities"][0]["days"][27]
+        middle = (facts["epochs"][timetables.ASR] + facts["sunset"]) // 2
+        instant = datetime.datetime.fromtimestamp(middle, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        shown = run_page(self.plain, instant)
+        self.assertIn("now", shown["rows"][timetables.ASR])
+        self.assertEqual("Maghrib in", shown["label"])
 
 
 if __name__ == "__main__":

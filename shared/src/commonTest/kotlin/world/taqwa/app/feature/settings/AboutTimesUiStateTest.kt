@@ -17,6 +17,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
@@ -33,9 +34,9 @@ class AboutTimesUiStateTest {
 
     private val date = LocalDate(2026, 9, 26)
 
-    private fun stateFor(place: Place): AboutTimesUiState {
-        val engineDay = PrayerEngine.dayTimes(place, date, EngineSettings())
-        return aboutTimesUiState(engineDay, place, date)
+    private fun stateFor(place: Place, on: LocalDate = date): AboutTimesUiState {
+        val engineDay = PrayerEngine.dayTimes(place, on, EngineSettings())
+        return aboutTimesUiState(engineDay, place, on)
     }
 
     @Test
@@ -191,6 +192,9 @@ class AboutTimesUiStateTest {
             val shown = instantFor(state.combined, prayer)
             val agrees = state.members.any { (_, memberDay) -> instantFor(memberDay, prayer) == shown }
             assertTrue(agrees, "no member's own $prayer time matches the unadjusted combined day")
+            val row = decidingRow(state, prayer)
+            assertEquals(shown, row.shown)
+            assertTrue(row.deciders.isNotEmpty(), "the table names a member for $prayer")
         }
     }
 
@@ -420,42 +424,130 @@ class AboutTimesUiStateTest {
         assertNull(notFollowedNoteRes(stateFor(Place(59.91273, 10.74609, "Europe/Oslo", "NO")).resolution)) // Oslo, cautious
     }
 
-    @Test
-    fun `the maghrib cap is named where it decided today's maghrib and not otherwise`() {
-        // Ruling R91 (spec §3.6): About says so where the shown Maghrib keeps the most-followed
-        // member's own minutes while another member's is later, naming the later one; nowhere else.
-        // Brussels: EMB's own Maghrib under the cap, Diyanet's later, every day (ruling R88).
-        val brussels = Place(50.8503, 4.3517, "Europe/Brussels", "BE")
-        val state = stateFor(brussels)
+    private val trondheim = Place(63.43049, 10.39506, "Europe/Oslo", "NO")
+    private val bodo = Place(67.28267, 14.37513, "Europe/Oslo", "NO")
+
+    private fun cautiousOn(place: Place, on: LocalDate): AboutTimesUiState.Cautious {
+        val state = stateFor(place, on)
         assertIs<AboutTimesUiState.Cautious>(state)
-        assertEquals("be.cautious", state.resolution.entry.id)
-        val cap = requireNotNull(maghribCapToday(state)) { "Belgium's members spread past the agreement every day" }
-        assertEquals("be.emb", cap.followed.id)
-        assertEquals(listOf("tr.diyanet.europe"), cap.later.map { it.id })
-        val emb = state.members.single { (member, _) -> member.id == "be.emb" }.second
-        val diyanet = state.members.single { (member, _) -> member.id == "tr.diyanet.europe" }.second
-        assertEquals(emb.maghrib, state.combined.maghrib, "the shown Maghrib is EMB's own minutes")
+        return state
+    }
+
+    private fun AboutTimesUiState.Cautious.day(id: String): PrayerDay = members.single { (member, _) -> member.id == id }.second
+
+    /**
+     * Ruling R155 (the owner's decision of 24 Oct 2026): south of the far north every member's Maghrib follows the
+     * sun and Maghrib is the latest member's, so "each prayer once all have begun it" holds and About says nothing
+     * more. Brussels shows Diyanet's, the later member's, every day; Toronto the latest; Trondheim outside Diyanet's
+     * five-hour winter day the latest too.
+     */
+    @Test
+    fun `no maghrib sentence where every member has begun maghrib by the minute shown`() {
+        val brussels = cautiousOn(Place(50.8503, 4.3517, "Europe/Brussels", "BE"), date)
+        assertEquals("be.cautious", brussels.resolution.entry.id)
+        assertEquals(brussels.day("tr.diyanet.europe").maghrib, brussels.combined.maghrib, "the later member's, Diyanet's")
+        assertNull(maghribGuardToday(brussels))
+        assertNull(maghribGuardToday(cautiousOn(Place(43.6532, -79.3832, "America/Toronto", "CA"), date)))
+        val spring = cautiousOn(trondheim, LocalDate(2027, 3, 15))
+        assertEquals("no.cautious", spring.resolution.entry.id)
+        assertTrue(spring.members.none { (_, day) -> day.maghribHeld })
+        assertNull(maghribGuardToday(spring))
+    }
+
+    /**
+     * The far-north guard's sentence (item D of the adversarial check): at Trondheim on 10 December 2026 Diyanet's
+     * five-hour winter day holds its own Maghrib later than the sun gives it, and IRN is the most followed, so the
+     * minute shown is Diyanet's from the sun (its sunset + 7), the latest from the sun, and About says Maghrib follows
+     * the sun as Diyanet calculates it rather than Diyanet's later Maghrib. The table names Diyanet for it (item A),
+     * never no one, and lists IRN's own beside it.
+     */
+    @Test
+    fun `trondheim's winter guard day names the sun's maghrib and diyanet's later one`() {
+        val state = cautiousOn(trondheim, LocalDate(2026, 12, 10))
+        assertEquals("no.cautious", state.resolution.entry.id)
+        assertTrue(state.realSunset != null, "the sun sets at Trondheim")
+        val diyanet = state.day("tr.diyanet.europe")
+        val irn = state.day("no.irn")
+        assertTrue(diyanet.maghribHeld, "Diyanet's winter day holds its Maghrib")
+        assertEquals(diyanet.maghribBeforeHold, state.combined.maghrib, "the shown Maghrib is Diyanet's from the sun")
         assertTrue(diyanet.maghrib > state.combined.maghrib)
+        assertTrue(irn.maghrib < state.combined.maghrib)
 
-        // Where every member has begun Maghrib by the minute shown there is nothing to say.
-        val agreed = state.copy(members = state.members.map { (member, day) -> member to day.copy(maghrib = state.combined.maghrib) })
-        assertNull(maghribCapToday(agreed))
+        val guard = assertNotNull(maghribGuardToday(state))
+        assertTrue(guard.sunSets)
+        assertEquals("tr.diyanet.europe", guard.followed.id)
+        assertEquals(listOf("tr.diyanet.europe"), guard.later.map { it.id })
 
-        // The member followed is the one giving the shown minute, whichever it is; the later ones are named.
+        val row = decidingRow(state, Prayer.MAGHRIB)
+        assertEquals(state.combined.maghrib, row.shown)
+        assertEquals(listOf("tr.diyanet.europe"), row.deciders.map { it.id })
+        assertEquals(listOf("no.irn" to irn.maghrib), row.others.map { (member, time) -> member.id to time })
+        for (prayer in Prayer.entries) {
+            assertTrue(decidingRow(state, prayer).deciders.isNotEmpty(), "the table names a member for $prayer")
+        }
+    }
+
+    /**
+     * At Bodø from 23 December 2026 IRN's own Maghrib is later than Diyanet's from the sun: About names IRN as the
+     * one followed and Diyanet's held Maghrib as the later one.
+     */
+    @Test
+    fun `bodo's winter guard day follows irn's maghrib from the sun`() {
+        val state = cautiousOn(bodo, LocalDate(2026, 12, 24))
+        assertTrue(state.realSunset != null, "the sun sets at Bodø")
+        assertTrue(state.day("tr.diyanet.europe").maghribHeld)
+        assertEquals(state.day("no.irn").maghrib, state.combined.maghrib)
+        val guard = assertNotNull(maghribGuardToday(state))
+        assertTrue(guard.sunSets)
+        assertEquals("no.irn", guard.followed.id)
+        assertEquals(listOf("tr.diyanet.europe"), guard.later.map { it.id })
+        assertEquals(listOf("no.irn"), decidingRow(state, Prayer.MAGHRIB).deciders.map { it.id })
+    }
+
+    /**
+     * Where the real sun does not set at the user's point (Bodø on 4 June 2027, under the midnight sun) only the
+     * most-followed member's own Maghrib counts, IRN's, itself set by rule: About says there is no sunset, never that
+     * Maghrib follows the sun. A member's own sun model setting the sun (Diyanet's) counts for nothing in the table
+     * either.
+     */
+    @Test
+    fun `a guard day without a sunset follows the most followed timetable`() {
+        val state = cautiousOn(bodo, LocalDate(2027, 6, 4))
+        assertNull(state.realSunset, "the midnight sun")
+        assertEquals(state.day("no.irn").maghrib, state.combined.maghrib, "IRN's own, the most followed")
+        val guard = assertNotNull(maghribGuardToday(state))
+        assertFalse(guard.sunSets)
+        assertEquals("no.irn", guard.followed.id)
+        assertEquals(listOf("tr.diyanet.europe"), guard.later.map { it.id })
+        assertEquals(listOf("no.irn"), decidingRow(state, Prayer.MAGHRIB).deciders.map { it.id })
+
+        // The same day read as if the sun did not set at Trondheim: Diyanet's time from the sun is no longer a
+        // decider, and the sentence falls back to the most-followed member.
+        val winter = cautiousOn(trondheim, LocalDate(2026, 12, 10))
+        val noSunset = winter.copy(realSunset = null)
+        assertTrue(decidingRow(noSunset, Prayer.MAGHRIB).deciders.isEmpty())
+        val fallback = assertNotNull(maghribGuardToday(noSunset))
+        assertFalse(fallback.sunSets)
+        assertEquals("no.irn", fallback.followed.id)
+    }
+
+    /** The mechanics on a synthetic day: every member later than the minute shown is named, in the members' order. */
+    @Test
+    fun `every member whose own maghrib is later than the one shown is named`() {
+        val state = cautiousOn(Place(50.8503, 4.3517, "Europe/Brussels", "BE"), date)
         val shown = state.combined.maghrib
-        val swapped = state.copy(
+        val embLater = state.copy(
             members = state.members.map { (member, day) ->
                 member to day.copy(maghrib = if (member.id == "be.emb") shown + 3.minutes else shown)
             },
         )
-        val swappedCap = requireNotNull(maghribCapToday(swapped))
-        assertEquals("tr.diyanet.europe", swappedCap.followed.id)
-        assertEquals(listOf("be.emb"), swappedCap.later.map { it.id })
-
-        // Toronto's members are within the agreement today: the latest is shown, and nothing is said.
-        val toronto = stateFor(Place(43.6532, -79.3832, "America/Toronto", "CA"))
-        assertIs<AboutTimesUiState.Cautious>(toronto)
-        assertEquals(toronto.members.none { (_, day) -> day.maghrib > toronto.combined.maghrib }, maghribCapToday(toronto) == null)
+        val guard = assertNotNull(maghribGuardToday(embLater))
+        assertEquals("tr.diyanet.europe", guard.followed.id)
+        assertEquals(listOf("be.emb"), guard.later.map { it.id })
+        assertEquals(listOf("be.emb" to shown + 3.minutes), decidingRow(embLater, Prayer.MAGHRIB).others.map { (m, t) -> m.id to t })
+        val agreed = state.copy(members = state.members.map { (member, day) -> member to day.copy(maghrib = shown) })
+        assertNull(maghribGuardToday(agreed))
+        assertEquals(state.members.map { it.first }, decidingRow(agreed, Prayer.MAGHRIB).deciders)
     }
 
     @Test

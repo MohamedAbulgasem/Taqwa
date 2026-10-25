@@ -96,6 +96,67 @@ class DayComputerTest {
             val ruled = compute(winterDay, trondheimLike, date, osloZone)
             val plainDay = compute(winterDay.copy(dayAroundDhuhrMinutes = null), trondheimLike, date, osloZone)
             assertEquals(plainDay.everyInstant(), ruled.everyInstant(), "$date")
+            assertFalse(ruled.maghribHeld, "$date")
+            assertEquals(null, ruled.maghribBeforeHold, "$date")
+            assertEquals(ruled.maghrib, ruled.maghribBySun, "$date")
+        }
+    }
+
+    /**
+     * Ruling R155: a day says when its own day-length rule set its Maghrib, and the Maghrib the sun gives
+     * (its sunset plus its minutes and margins, the method's own without the rule), so that a cautious day
+     * can count a member at its sun time and the gate can name the gap.
+     */
+    @Test
+    fun `the day around dhuhr marks the maghrib it holds and keeps the sun's own`() {
+        val date = LocalDate(2027, 12, 21)
+        val ruled = compute(winterDay, trondheimLike, date, osloZone)
+        val plainDay = compute(winterDay.copy(dayAroundDhuhrMinutes = null), trondheimLike, date, osloZone)
+        assertTrue(ruled.maghribHeld)
+        assertEquals(plainDay.maghrib, ruled.maghribBeforeHold)
+        assertEquals(plainDay.maghrib, ruled.maghribBySun)
+        assertTrue(ruled.maghrib > plainDay.maghrib)
+        assertFalse(Prayer.MAGHRIB in ruled.setByRule, "a held Maghrib is the authority's own, not set by rule")
+        assertFalse(plainDay.maghribHeld)
+    }
+
+    /**
+     * A polar day borrows its Maghrib from the nearest latitude where the sun sets (ruling R23), where the
+     * day-length rule may have held it: the borrowed time is set by rule, not held, and gives no Maghrib from the sun.
+     */
+    @Test
+    fun `a polar day's borrowed maghrib is set by rule and not held`() {
+        val tromso = GeoPoint(69.6489, 18.95508)
+        val date = LocalDate(2026, 12, 15)
+        val day = compute(winterDay, tromso, date, osloZone)
+        assertTrue(day.polar)
+        assertTrue(Prayer.MAGHRIB in day.setByRule)
+        assertFalse(day.maghribHeld)
+        assertEquals(null, day.maghribBeforeHold)
+        assertEquals(null, day.maghribBySun)
+    }
+
+    /**
+     * The safe side of two days for one date (a table's days alongside, ruling of 17 Oct 2026): the later
+     * Maghrib, held only where every day giving it is held, its Maghrib from the sun the latest of the two.
+     */
+    @Test
+    fun `the safe side of two days is held only where every day giving its maghrib is`() {
+        val date = LocalDate(2027, 12, 21)
+        val held = compute(winterDay, trondheimLike, date, osloZone)
+        val sunOnly = compute(winterDay.copy(dayAroundDhuhrMinutes = null), trondheimLike, date, osloZone)
+        val earlier = sunOnly.copy(maghrib = sunOnly.maghrib + 2.minutes)
+        val bothWays = listOf(DayComputer.safeSide(held, earlier), DayComputer.safeSide(earlier, held))
+        for (side in bothWays) {
+            assertEquals(held.maghrib, side.maghrib)
+            assertTrue(side.maghribHeld)
+            assertEquals(earlier.maghrib, side.maghribBeforeHold, "the later Maghrib from the sun")
+        }
+        val tied = sunOnly.copy(maghrib = held.maghrib)
+        for (side in listOf(DayComputer.safeSide(held, tied), DayComputer.safeSide(tied, held))) {
+            assertEquals(held.maghrib, side.maghrib)
+            assertFalse(side.maghribHeld, "the sun gives the same minute")
+            assertEquals(held.maghrib, side.maghribBySun)
         }
     }
 

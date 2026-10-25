@@ -354,7 +354,8 @@
     <string name="about_majority_unchecked_body">%2$s-এর বেশিরভাগ মসজিদ %1$s পদ্ধতি মেনে চলে। তাকওয়া সেই পদ্ধতিতেই সময় হিসাব করে, সঙ্গে নিরাপত্তার জন্য কিছুটা বাড়তি সময় রাখে।</string>
     <string name="about_nearby_heading">কিছু স্থানীয় মসজিদ এর বদলে যেসব সময়সূচি মানে</string>
     <string name="about_cautious_body">%1$s-এর মসজিদগুলো সরল বিশ্বাসে ভিন্ন ভিন্ন সময়সূচি মানে, আর কোনোটিই বেশিরভাগ মসজিদ মানে না। তাকওয়া %2$s একত্র করে: প্রতিটি নামাজ দেখানো হয় সবগুলোতে ওয়াক্ত শুরু হওয়ার পর।</string>
-    <string name="about_cautious_maghrib_cap">আজ মাগরিব ব্যতিক্রম: এটি %1$s অনুসরণ করে, যে সময়সূচি সবচেয়ে বেশি মানা হয়, %2$s-এর পরের মাগরিব নয়।</string>
+    <string name="about_cautious_maghrib_guard">আজ মাগরিব ব্যতিক্রম: এটি %1$s-এর হিসাবমতো সূর্যাস্ত অনুযায়ী হয়, %2$s-এর আরও পরের মাগরিব অনুযায়ী নয়, যা উচ্চ অক্ষাংশের নিয়মে নির্ধারিত।</string>
+    <string name="about_cautious_maghrib_no_sunset">আজ মাগরিব ব্যতিক্রম, কারণ এখানে সূর্যাস্ত নেই: এটি %1$s অনুসরণ করে, যে সময়সূচি সবচেয়ে বেশি মানা হয়, %2$s-এর আরও পরের মাগরিব নয়।</string>
     <string name="about_which_decides">আজ কোন সময়সূচি কোন সময় ঠিক করছে</string>
     <string name="about_stat_never_before_decider">যে সময়সূচি তা ঠিক করে, তার আগে শুরু</string>
     <string name="about_cautious_checked">এখানে অনুসৃত সময়সূচিগুলোর সঙ্গে মিলিয়ে দেখা হয়েছে।</string>

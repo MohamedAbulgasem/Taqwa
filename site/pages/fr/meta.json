@@ -112,7 +112,7 @@
     "members_intro": "Les calendriers suivis ici :",
     "most_followed": "le plus suivi",
     "combine_heading": "Comment Taqwa les combine",
-    "combine_body": "Taqwa recalcule chacun d’eux et les combine : chaque prière une fois que tous l’ont commencée, le lever du soleil et la fin du repas au plus tôt d’entre eux, et le Maghrib plafonné aux minutes propres du calendrier le plus suivi.",
+    "combine_body": "Taqwa recalcule chacun d’eux et les combine : chaque prière une fois que tous l’ont commencée, et le lever du soleil et la fin du repas au plus tôt d’entre eux.",
     "decides_legend": "fixe l’horaire aujourd’hui : le dernier à la commencer (pour le lever du soleil, le premier).",
     "match_prompt": "Votre mosquée suit l’un d’eux ? L’application peut le suivre seul :",
     "replays_cautious": "Puis Taqwa rejoue chaque jour vérifié contre chacun des calendriers publiés.",

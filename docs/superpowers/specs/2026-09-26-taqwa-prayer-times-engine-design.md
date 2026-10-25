@@ -82,9 +82,10 @@ One screen, filled from the registry and the proof stamp:
   times for {place}. Taqwa calculates them the way {authority} does, with a few safety minutes." With
   data: "Checked on {n} days so far: never before {authority}'s, up to {worst} minutes after." Without:
   "Taqwa has not yet compared them with {authority}'s own timetable."
-- **Cautious times**: the timetables combined, by name; each prayer once all have begun it; Maghrib
-  by the majority's own minutes where there is one (any later Maghrib among listed timetables is
-  named); today's table saying which timetable decides each time; Match my mosque.
+- **Cautious times**: the timetables combined, by name; each prayer once all have begun it, Maghrib
+  too (R155); on a day the far-north guard sets a later Maghrib aside, a sentence naming the timetable
+  whose Maghrib is followed and the later ones, and saying so where the sun does not set (R157); today's
+  table saying which timetable decides each time; Match my mosque.
 - **Calculated by Taqwa** (no authority known): the method in plain words, the Asr school and why,
   "check your mosque".
 
@@ -133,7 +134,7 @@ place-days.
 | Field | Meaning |
 |---|---|
 | `fajr`, `sunrise`, `dhuhr`, `asr`, `maghrib`, `isha` | What the app shows: when each prayer begins in the authority's own words. Where it prints one morning time, that time; where it says the prayer begins at a later column, that column (Kosovo: "Sabahu … fillon 20 min. pas imsakut", so Fajr = imsak + 20); never a column it labels as a mosque or congregation time (DUM RT: "Совершается в мечетях"). DUM RT's Dhuhr is its printed 12:00 until the meaning is confirmed (slice 2), since that is never early. |
-| `sunset` | The astronomical sunset, for the invariants and the Maghrib cap. |
+| `sunset` | The astronomical sunset, for the invariants. |
 | `asrOther`, `ishaOther` | The other school's time. |
 | `earliestStart` | Per prayer, the earliest member's start (cautious places), for "Show where timetables differ". |
 | `endOfEating` | The authority's printed column where it has one (Kosovo imsak, Tatarstan end of suhoor, Bangladesh sehri, Jamiatul Ulama's Fajr − 5), otherwise its dawn without its start margin at the earliest point of its zone; never after `fajr`. In About now; on the Prayer screen from the Ramadan release. |
@@ -283,9 +284,12 @@ al-Qura's lag dates, MUIS's neighbours, and Kemenag's step at the March equinox 
   (37 of 55 sampled mosques), Montreal ISNA (12 of 16), Ottawa ISNA (6 of 6).
 - **No majority**: cautious times over the **members**, published timetables in the manifest each
   followed by roughly a tenth or more of the place's mosques. Each prayer starts at the latest member;
-  sunrise and the end of eating at the earliest. **Maghrib is capped** at the most-followed member's own
-  minutes (decided 26 Sep): the latest sunset definition plus physical margins, never the sum of every
-  mosque's precaution. The stamp records the cap's gap to each listed timetable.
+  sunrise and the end of eating at the earliest. **Maghrib** (R155, the owner's decision of 24 Oct 2026,
+  replacing the 26 Sep cap at the most-followed member's own minutes) is the latest time any member gives
+  from the sun, never before the most-followed member's own Maghrib, and never before the real sunset at
+  the user's point. South of about 62.6° that is the latest member's, like every other prayer; further
+  north a member's far-north or winter rule time (Diyanet's five-hour winter day, a time borrowed on a
+  polar day, a clock rule's estimate) counts only when that member is the most followed.
 - Where members agree within 2 minutes over the whole year, the place shows the most-followed
   member's name; the times stay the latest.
 - Example at launch: Toronto (no majority; the Islamic Foundation of Toronto, the Islamic Institute of
@@ -372,7 +376,9 @@ support@taqwa.world.
   data. Perpetual tables are proven over a leap cycle.
 - **The gate**, per unit, on every valid official day: each start at or after the official, sunrise and
   end of eating at or before, lateness within the unit's `lateLimit` (the class default or a recorded
-  exception with its reason, §6.3). It also samples GPS points inside each unit, near its edges, for
+  exception with its reason, §6.3). A cautious entry's starts, Maghrib among them, are checked against
+  the latest member's printed time (R38, R155); a far-north guard day's Maghrib against a held member's
+  time from the sun, with the gap stamped (R156); a cautious day with no Maghrib end is recorded too (R158). It also samples GPS points inside each unit, near its edges, for
   never-early and lateness; checks each Automatic Asr against the place's mosque tables; and checks that
   no class-D Fajr begins before the Fajr of most mosque tables held for the place.
 - **Stamps** per unit: places, dates, place-days, Ramadan coverage, worst minutes, class,
@@ -490,7 +496,7 @@ Versioned, run before any reader, per-field writes, each case tested:
 | Question | Decision |
 |---|---|
 | Indonesia's Fajr | Kemenag, the majority; Muhammadiyah is a named timetable. |
-| Maghrib minutes | Capped at the most-followed timetable's own. |
+| Maghrib minutes | The latest timetable's from the sun, never before the most-followed one's own (R155, 24 Oct 2026; capped at the most-followed one's own until then). |
 | Later Fajr after Umm al-Qura | "Pray Fajr 5 minutes later", Saudi Arabia only, off by default. |
 | Scholar review | None available; sources in About, corrections invited. |
 | Suhoor, iftar, imsak, alerts, Ramadan widgets | Ramadan release; About gives the end of eating until then. |
@@ -649,5 +655,120 @@ never early first, good accuracy where most Muslims live).
   disagree on whether it set at all.
 - **R91**: About's cautious text names the Maghrib cap on a day it decided the Maghrib (§2.3, §3.6):
   the most-followed timetable's own minutes rather than the later Maghrib of the members named.
+  Superseded by R155 and R157 (24 Oct 2026).
 - **R92**: R62's cap on a limited Isha reads the next day's end of eating as shown, after that day's
   clock rule, band, table bound and R90, so a limited Isha never lands on the end shown.
+
+## 13. What changed after launch
+
+R93–R129 are in the build log. R130–R154 are the parked engine waves' (W1 R130–R134, W5 R135–R139,
+W6 R140–R144, W3 R145–R147, the monitor's W9/W8 R150–R154), recorded in their own branches. From R155 on,
+the rulings are listed here too. (The cautious-Maghrib branch's first commits, up to d8aeba25, called
+R155–R157 R130–R132.)
+
+- **R155** (owner, 24 Oct 2026, option B with the far-north guard (a)): cautious Maghrib is one rule with
+  the other prayers. "Cautious Maghrib is the latest time any of the place's timetables gives from the
+  sun, never before the most-followed timetable's own Maghrib, and never before the real sunset." Each
+  member counts at its Maghrib from the sun (its sunset plus its own minutes, before its own day-length
+  rule holds it later; `PrayerDay.maghribBySun`); a Maghrib a member's rule sets instead (Diyanet's
+  five-hour winter day, `PrayerDay.maghribHeld`; a polar day's borrowed time or a clock rule's estimate,
+  `setByRule`) counts only when that member is the most followed; on a day the real sun does not set at
+  the user's point no member's Maghrib counts as from the sun; and Maghrib is never before the minute
+  after the real sunset at the user's point (`DayPipeline.realSunset`, the exact sun at −0.8333°: the
+  Lapland fix). The 26 Sep cap (`Cautious.MAGHRIB_AGREEMENT`) is gone; it amends R38's Maghrib exception,
+  supersedes R88's cap half (Belgium's Maghrib is Diyanet's) and R91, and takes away R87's Dutch floor and
+  Task 7g's MJC Maghrib margin, which existed for the cap. The Dutch floor, on the exact sun, also covered
+  the minute by which Mawaqit's exact-sun rendering of Diyanet's rule can follow Diyanet's own daily-sun
+  table: without it Mevlana Moskee Amsterdam's calendar is a minute after the Maghrib shown (Diyanet's own)
+  on 8 days from January to April, recorded in the Dutch survey as El-Gazali, Fatih and Lyon's DITIB are in
+  the Belgian and French ones. The owner chose this over a smaller Dutch floor on 25 Oct 2026, having seen
+  the measured size: Dutch Maghrib 1 to 3 min earlier than under the floor on about 73% of place-days at
+  254 cities (1 min on 47,915, 2 on 18,758, 3 on 1,218), never before Diyanet's own. A minute the sun gives that is no member's own Maghrib shown is real: it
+  marks nothing set by rule or polar. The guard acts wherever Diyanet's winter day binds, from about 62.6°
+  north (Molde, Kristiansund, Trondheim, Levanger, Namsos, Bodø, Svalbard, Lapland, Iceland); there a
+  Diyanet-following family sees Maghrib before its mosque's printed winter time (Trondheim up to 13 min,
+  Namsos 31), and the owner accepts it. That is not quite "as before", the premise he accepted it on. On
+  most of those days the cap had shown the same minute, but where Diyanet's held Maghrib is within 2 min of
+  the other member's, as the hold starts or ends, the cap showed Diyanet's held minute and the guard shows
+  the later of the sun times, 1 to 2 min earlier; and on a day the real sun does not set the guard shows the
+  most-followed member's own, where the cap showed Diyanet's 1 to 2 min later. The review probe of 25 Oct
+  2026 (app cities, Oct 2026 to Sep 2027) found 23 place-days earlier than the cap: 8 winter days at the
+  hold's edges (Molde 2, Kristiansund, Trondheim, Stjørdal, Levanger, Bodø and Harstad 1 each) and 15
+  without a real sunset (Alta 6, Harstad 3, Rovaniemi 3, Bodø 2, Longyearbyen 1); the final verification
+  of the same day found 29, the other 6 being Kiruna's days without a real sunset (4 and 9 to 13 June 2027),
+  every one at most 2 min earlier; never before a member's Maghrib from the sun, the most-followed member's
+  own, or the minute after the real sunset. The owner confirmed the 29 days on 25 Oct 2026, having seen the
+  guard's measured size: the shown Maghrib comes before Diyanet's winter-rule Maghrib by up to 124 min at
+  Bodø (89 days), 138 at Harstad, 141 at Alta, 142 at Longyearbyen, 75 at Mo i Rana and 18 at Levanger (the
+  engine's own Diyanet method where no Diyanet table is held), never before IRN's Maghrib or the real
+  sunset.
+- **R156** (owner, 24 Oct 2026, following from R155's far-north guard; item B of the adversarial check): the
+  gate checks a cautious Maghrib like every start, against the latest member's printed time, and reads each
+  member's printed Maghrib as the guard counts it. The most-followed member's, and any member's whose Maghrib
+  follows the sun that day, as printed. A member that is not the most followed and whose own day-length rule
+  holds its Maghrib later than the sun (Diyanet's five-hour winter day, `PrayerDay.maghribHeld`) at its
+  Maghrib from the sun (`maghribBySun`; no table prints it). A member whose Maghrib a rule sets outright (a
+  polar day's borrowed time, a clock rule's estimate), or any member but the most followed on a day the real
+  sun does not set at the point, not at all. Each such member's days, how many were checked at the sun, and
+  the shown Maghrib less its printed one go in the report and the stamp's `maghribGuard`, with the cells no
+  member's time checks; recorded, never broken. Diyanet's Trondheim table on 1–5 January and 9–31 December
+  2027 is the one held case: 28 days, shown 0 to 13 min before its printed winter Maghrib, as R155 accepts.
+  Every Maghrib column the cap had set to `-` is checked again (`M`), and each cautious entry's Maghrib late
+  limit was measured anew (gate of 25 Oct 2026): Australia 9 (the TURKEY preset's sunset + 7 against LMA's),
+  France 6, Canada 8, Toronto 7, Norway 50 (Diyanet's nineteen-hour summer day at Trondheim), the Nordics
+  126 as before (Luleå's), Cape Town 2, Ireland 3 as before; the Netherlands' 8 is gone (1, the class's).
+  A cautious entry has no unit late limits, so Norway's 50 holds at every Norwegian point: Oslo, Bergen,
+  Kristiansand and Stavanger, whose measured worst is 5, 4, 1 and 1, would pass up to 50 min late, as Sweden's
+  126 (Luleå's) already does at Stockholm. Scoping it to Diyanet's Trondheim rows needs late limits by member
+  unit on a cautious entry, which is left for later. One engine fix came out of that run: Rabita's member
+  takes its Helsinki calendar's Maghrib month by month; the cap had hidden that it ran up to 2 min before the
+  calendar, which showed past Diyanet's Helsinki unit (5,286 early cells at the envelope's points 42 to 69 km
+  out). Rabita's Maghrib is fitted, a derived parameter as R42 records one, not the printed table: the
+  calendar's rule is the sun at about −1.22° rounded to the minute (−1.2183° + 7 s gives 354 of 2026's 365
+  printed minutes, the other 11 a minute either side), and `Europe.RABITA_MAGHRIB_SECONDS` (0 to 120 s past
+  sunset + 3½, by month) is the least half minute per month that keeps the member at or after that calendar on
+  every day of the leap cycle 2026–2033, whether Mawaqit keeps its year-agnostic 2026 calendar as it is or
+  regenerates it by the rule (the Lead's review of 25 Oct 2026; the first fit, to 2026 alone, ran a minute
+  before the kept calendar on September and October days of 2028 and 2032). A table by month, not the
+  calendar's depression, since −1.22° would leave a band with no Maghrib near midsummer at about 65.3–65.7°
+  north, which the member reaches. On its own at Helsinki in 2026 it is on the calendar's minute on 42 days, a
+  minute after on 195 and two on 128; never before it at Helsinki 2026–2035 nor at the gate's 309 Rabita
+  points 2026–2033. `CityPointsEnvelopeTest` walks both calendars day by day from 2026 to 2033 at Helsinki
+  and across its ride; the monitor's `fi-rabita-helsinki` (manual, due 2027-01) asks for the calendar to be
+  captured again in January 2027 and the fit checked against it.
+- **R157** (owner, 24 Oct 2026, item D; replaces R91): About and the site keep a sentence for the far-north
+  guard, since on its days "each prayer once all have begun it" does not hold for Maghrib. Where some member's
+  own Maghrib is later than the one shown: `about_cautious_maghrib_guard` ("it follows the sun, as {the member
+  whose Maghrib from the sun is shown} calculates it, rather than the later Maghrib of {the later members}, set
+  by a high-latitude rule") where the real sun sets at the user's point, else `about_cautious_maghrib_no_sunset`
+  (it follows the most-followed timetable, as there is no sunset here): never "it follows the sun" on a day the
+  sun does not set. "Which timetable decides" names a member whose Maghrib from the sun is the minute shown, so
+  Trondheim in December names Diyanet, never no one. The site says the same per day (`guard`, `maghribBySun`,
+  `sunSets` in the document; app = site, R117). South of about 62.6° nothing is said: over every class C city
+  from Oct 2026 to Sep 2027 (the sweep of 24 Oct 2026) the guard decided Maghrib on 755 place-days, 330 with a sunset (Trondheim, Bodø
+  and nearby in winter) and 425 without (the midnight sun and the polar night).
+- **R158** (not the owner's; the gate of 25 Oct 2026, as R26; confirmed in the Lead's review of the same day): a
+  cautious Maghrib end not after the Maghrib shown is left out, as R26 leaves out an Isha end not after the
+  latest Isha (in the pipeline R26 acts through `Ends.withNextDay`, the members coming without Isha ends). By
+  that member's timetable Maghrib's time is over when it is shown, so a later member's end would be a late end,
+  which no gate event checks. Its reach over the app's class C cities, Oct 2026 to Sep 2027 (measured 25 Oct
+  2026, after Rabita's leap-cycle fit): 127 city-days at 12 places show no Maghrib end, from Haukipudas (65.2°N)
+  to Longyearbyen (78.2°N), 17 April to 26 August 2027 (Norway 81, the Nordics 46: Haukipudas 1, Akureyri 2,
+  Kemi 10, Boden 8, Tornio 6, Mo i Rana 4, Rovaniemi 6, Bodø 11, Kiruna 13, Harstad 15, Alta 16, Longyearbyen
+  35). On 20 of them main showed an end, after its earlier Maghrib under the cap; on the other 107 main showed
+  none either, as it repaired the day into order and dropped the end, and 88 of those are now in order without a
+  repair. At Haukipudas on 4 June 2027 Diyanet's Isha (23:57) comes a minute after its own Maghrib and a minute
+  before Rabita's Maghrib shown (23:58). With Rabita's first fit it was 129 days at 13 places, 22 of them
+  differing from main, Luleå on 30 May 2027 among them, where the gate found it (now Rabita's Maghrib 23:02,
+  Diyanet's Isha 23:03: an end).
+  Not every such day is in order without a repair: 24 of the 127 are repaired. 5 newly, where main showed an end
+  and needed none: Boden 15 and 26 June, Kemi 18 and 23 June and Tornio 27 June 2027, where the Maghrib shown is
+  not before the latest member's Isha and the repair puts Isha a minute after it (1 to 5 min later than on
+  main). The other 19 were repaired on main too (Bodø 3, Harstad 4, Kemi 1, Alta 4, Longyearbyen 7), as are 385
+  far-north class C city-days in all (473 on main): left for later.
+  The gate records each cautious entry's own place-days with no Maghrib end, with their dates, in its report and
+  in the stamp's `maghribNoEnd`, as `maghribGuard` records R156's: recorded, never broken. The gate of 25 Oct
+  2026, after the leap-cycle fit, records none: no cautious gate point has such a day (Luleå on 30 May 2027,
+  where the gate found the rule, now ends at Diyanet's Isha), so no stamp carries the key yet.
+  A future "ends by" line (when a prayer's time ends, if the app or the site shows one) shows, on a day with no
+  Maghrib end, nothing for Maghrib, or "{the member}'s Isha has begun", never a later member's end.

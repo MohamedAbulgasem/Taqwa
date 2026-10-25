@@ -69,7 +69,7 @@ class DayPipelineTest {
         val members = resolution.members.map { member ->
             DayComputer.compute(member.method, point, date, zone, uk.school, Registry.ramadanCalendarFor(uk), Registry.lagDates)
         }
-        val combined = Invariants.repair(Cautious.combine(members, mostFollowed = 0))
+        val combined = Invariants.repair(Cautious.combine(members, mostFollowed = 0, realSunset = DayPipeline.realSunset(point, date, zone)))
         assertEquals(combined.fajr, day.fajr)
         assertEquals(members.maxOf { it.isha }, day.isha)
         assertEquals(members.minOf { it.sunrise }, day.sunrise)

@@ -180,6 +180,7 @@ object DayComputer {
         endOfEating = endOfEating + by, imsak = imsak?.plus(by),
         earliestStart = earliestStart.mapValues { it.value + by },
         ends = ends.mapValues { it.value + by },
+        maghribBeforeHold = maghribBeforeHold?.plus(by),
     )
 
     /**
@@ -194,7 +195,8 @@ object DayComputer {
     /**
      * The safe side of two days that stand for one date: each start the later, sunrise, sunset, the
      * end of eating, imsak and each end the earlier (an end only where both have it); a time is set by
-     * rule where the day it is taken from sets it.
+     * rule where the day it is taken from sets it, and Maghrib held ([PrayerDay.maghribHeld]) where
+     * every day it is taken from holds it, from the later of their Maghribs from the sun.
      */
     private fun PrayerDay.safest(other: PrayerDay): PrayerDay {
         val setByRule = Prayer.entries.filter { prayer ->
@@ -207,6 +209,13 @@ object DayComputer {
             }
             from.all { prayer in it.setByRule }
         }.toSet()
+        // The Maghrib shown is held only where every day giving it is held; the sun's own is the later of the two.
+        val maghribFrom = when {
+            maghrib == other.maghrib -> listOf(this, other)
+            maghrib > other.maghrib -> listOf(this)
+            else -> listOf(other)
+        }
+        val held = maghribFrom.all { it.maghribHeld }
         return copy(
             fajr = maxOf(fajr, other.fajr), sunrise = minOf(sunrise, other.sunrise), dhuhr = maxOf(dhuhr, other.dhuhr),
             asr = maxOf(asr, other.asr), asrOther = maxOf(asrOther, other.asrOther), maghrib = maxOf(maghrib, other.maghrib),
@@ -217,6 +226,8 @@ object DayComputer {
             polar = polar || other.polar,
             repaired = repaired || other.repaired,
             notFollowed = notFollowed + other.notFollowed,
+            maghribHeld = held,
+            maghribBeforeHold = if (held) listOfNotNull(maghribBySun, other.maghribBySun).maxOrNull() else null,
         )
     }
 
@@ -378,9 +389,10 @@ object DayComputer {
          * - the sunrise shown, and Fajr's end, never after the sun's own sunrise, rounded down, the
          *   earliest over [here] (an end never after the sun's);
          * - the sunset the date's own, rounded down, the earliest over [here] ([PrayerDay.sunset], the
-         *   invariants' and the Maghrib cap's), and Asr's end with it;
+         *   invariants'), and Asr's end with it;
          * - Maghrib never before the minute after the sun's own sunset, rounded down, the latest over the
-         *   start points (the sun has set wherever the start is read), and Isha after the Maghrib shown;
+         *   start points (the sun has set wherever the start is read), its Maghrib from the sun
+         *   ([PrayerDay.maghribBeforeHold]) too, and Isha after the Maghrib shown;
          * - Maghrib's end the earlier of the Isha shown and the date's own red twilight;
          * - under [TimetableMethod.fixedTableOwnDawn], Fajr never before, and the end of eating and imsak
          *   never after, what the method gives on the date's own sun.
@@ -392,11 +404,11 @@ object DayComputer {
             val setsForStarts = (startHere + method.startPoints).map { sky(it).sunset(date) }
             val sunriseShown = if (rises.all { it != null }) minOf(sunrise, endOf(rises.minOf { it!! })) else sunrise
             val sunsetShown = if (sets.all { it != null }) endOf(sets.minOf { it!! }) else sunset
-            val maghribShown = if (setsForStarts.all { it != null }) {
-                maxOf(maghrib, endOf(setsForStarts.maxOf { it!! }) + 1.minutes)
-            } else {
-                maghrib
-            }
+            val sunFloor = if (setsForStarts.all { it != null }) endOf(setsForStarts.maxOf { it!! }) + 1.minutes else null
+            val maghribShown = sunFloor?.let { maxOf(maghrib, it) } ?: maghrib
+            // A held Maghrib's own from the sun is held to the same floor; still held only where it stays before.
+            val beforeHold = maghribBeforeHold?.let { own -> sunFloor?.let { maxOf(own, it) } ?: own }
+            val held = maghribHeld && beforeHold != null && maghribShown > beforeHold
             val ishaShown = maxOf(isha, maghribShown + 1.minutes)
             val redTwilight = here.mapNotNull { sky(it).altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
                 .minOrNull()?.let(::endOf)
@@ -434,6 +446,8 @@ object DayComputer {
                 imsak = imsakShown?.let { minOf(it, fajrShown) },
                 ends = endsShown,
                 setByRule = rule,
+                maghribHeld = held,
+                maghribBeforeHold = beforeHold.takeIf { held },
             )
         }
 
@@ -517,7 +531,8 @@ object DayComputer {
          *   the rule's Fajr is declared not followed.
          * - Dhuhr and Asr: the rule's.
          * - Maghrib: the later of the rule's and the day's own; the rule's alone where the sun does
-         *   not set (and its sunset stands in for the day's).
+         *   not set (and its sunset stands in for the day's). The rule's is never held by the day's own
+         *   day-length rule ([PrayerDay.maghribHeld]).
          * - Isha: the rule's where it is after the Maghrib shown; otherwise the day's own, after it.
          * - The end of eating: the rule's where the rule's Fajr is shown (the authority's own dawn as
          *   an end, spec §3.3), never after that Fajr; otherwise the earliest of the rule's, the day's
@@ -576,11 +591,8 @@ object DayComputer {
             val asrOther = otherSchool?.at ?: day.asrOther
             val noSunset = at.values.all { it.noSunset }
             val ruleMaghrib = start({ it.maghrib }, margins.maghrib)
-            val maghrib = if (ruleMaghrib != null && (noSunset || ruleMaghrib.at >= day.maghrib)) {
-                shown(Prayer.MAGHRIB, ruleMaghrib)
-            } else {
-                day.maghrib
-            }
+            val maghribFromRule = ruleMaghrib != null && (noSunset || ruleMaghrib.at >= day.maghrib)
+            val maghrib = if (maghribFromRule) shown(Prayer.MAGHRIB, ruleMaghrib!!) else day.maghrib
             val ruleSunset = forEnds.map { it.sunset }.takeIf { noSunset && it.all { s -> s != null } }?.minOf { it!! }
             val sunset = ruleSunset?.let(::endOf) ?: day.sunset
             val ruleIsha = start({ it.isha }, margins.isha)
@@ -615,6 +627,9 @@ object DayComputer {
                 isha = isha, sunset = sunset, endOfEating = endOfEating, imsak = day.imsak?.let { minOf(it, fajr) },
                 ends = ends, setByRule = setByRule, notFollowed = notFollowed,
                 polar = day.polar && !fromRule.containsAll(Prayer.entries),
+                // A Maghrib the rule shows is the rule's (the sun's, or set by rule), never the day's own hold.
+                maghribHeld = day.maghribHeld && !maghribFromRule,
+                maghribBeforeHold = day.maghribBeforeHold.takeUnless { maghribFromRule },
             )
         }
 
@@ -1041,6 +1056,9 @@ object DayComputer {
                 ends = ends,
                 setByRule = setByRule,
                 polar = true,
+                // The place's own sunset, or a borrowed Maghrib (set by rule): never the substitute's hold.
+                maghribHeld = false,
+                maghribBeforeHold = null,
             )
         }
 
@@ -1125,7 +1143,8 @@ object DayComputer {
             // TimetableMethod.dayAroundDhuhrMinutes: the authority's day is never shorter than twice
             // these minutes around its own Dhuhr (the transit plus its Dhuhr minutes): its sunrise no
             // later than Dhuhr − minutes, its Maghrib no earlier than Dhuhr + minutes, each with the
-            // event's own margin (Diyanet's 5-hour winter day at Trondheim).
+            // event's own margin (Diyanet's 5-hour winter day at Trondheim). A Maghrib it holds later
+            // than the sun's own minute is marked, with that minute (PrayerDay.maghribHeld, ruling R155).
             val halfDay = method.dayAroundDhuhrMinutes?.let { it * 60.0 }
             val authorityDhuhr = latest { it.transit } + offsets.authority(Prayer.DHUHR)
             val sunriseRaw = earliest { it.sunrise } + total(Prayer.SUNRISE)
@@ -1138,9 +1157,11 @@ object DayComputer {
             val asrOther = startOf(latest { it.asrOther } + total(Prayer.ASR))
             val maghribRaw = latest { it.sunset }
             val maghribAt = maghribRaw + total(Prayer.MAGHRIB) + ramadanMaghrib
+            val maghribBySun = startOf(maghribAt)
             val maghrib = startOf(
                 if (halfDay == null) maghribAt else maxOf(maghribAt, authorityDhuhr + halfDay + method.margins[Prayer.MAGHRIB]),
             )
+            val maghribHeld = maghrib > maghribBySun
             val ishaRaw = when (val rule = method.isha) {
                 is IshaRule.Angle -> latest { it.dusk!! }
                 is IshaRule.AfterMaghrib ->
@@ -1252,6 +1273,8 @@ object DayComputer {
                 ),
                 setByRule = setByRule,
                 methodId = method.id,
+                maghribHeld = maghribHeld,
+                maghribBeforeHold = maghribBySun.takeIf { maghribHeld },
             )
         }
 

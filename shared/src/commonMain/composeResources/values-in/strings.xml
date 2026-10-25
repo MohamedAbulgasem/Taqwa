@@ -349,7 +349,8 @@
     <string name="about_majority_unchecked_body">Kebanyakan masjid di %2$s mengikuti metode %1$s. Taqwa menghitung waktunya dengan metode itu, ditambah margin pengaman.</string>
     <string name="about_nearby_heading">Jadwal yang diikuti sebagian masjid setempat sebagai gantinya</string>
     <string name="about_cautious_body">Masjid-masjid di %1$s mengikuti jadwal yang berbeda dengan niat baik, dan tidak satu pun diikuti mayoritas. Taqwa menggabungkan %2$s: setiap salat ditampilkan setelah waktunya masuk di semua jadwal itu.</string>
-    <string name="about_cautious_maghrib_cap">Maghrib hari ini pengecualian: mengikuti %1$s, jadwal yang paling banyak diikuti, bukan Maghrib yang lebih lambat dari %2$s.</string>
+    <string name="about_cautious_maghrib_guard">Maghrib hari ini menjadi pengecualian: mengikuti hitungan %1$s dari terbenamnya matahari, bukan Maghrib %2$s yang lebih lambat karena ditetapkan menurut aturan lintang tinggi.</string>
+    <string name="about_cautious_maghrib_no_sunset">Maghrib hari ini menjadi pengecualian karena di sini tidak ada matahari terbenam: mengikuti %1$s, jadwal yang paling banyak diikuti, bukan Maghrib %2$s yang lebih lambat.</string>
     <string name="about_which_decides">Jadwal mana yang menentukan setiap waktu hari ini</string>
     <string name="about_stat_never_before_decider">awal waktu sebelum jadwal yang menentukannya</string>
     <string name="about_cautious_checked">Dicocokkan dengan jadwal-jadwal yang diikuti di sini.</string>

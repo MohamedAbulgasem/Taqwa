@@ -363,7 +363,8 @@
     <string name="about_majority_unchecked_body">%2$s camilerinin çoğu %1$s yöntemine uyuyor. Taqwa vakitleri bu yöntemle, bir güvenlik payı ekleyerek hesaplar.</string>
     <string name="about_nearby_heading">Bazı yerel camilerin bunun yerine uyduğu takvimler</string>
     <string name="about_cautious_body">%1$s camileri iyi niyetle farklı takvimlere uyuyor ve hiçbirine çoğunluk uymuyor. Taqwa %2$s takvimlerini birleştirir: her namaz, hepsinde vakit girdikten sonra gösterilir.</string>
-    <string name="about_cautious_maghrib_cap">Akşam bugün istisnadır: en çok uyulan takvim olan %1$s takvimine uyar, %2$s takviminin daha geç akşam vaktine değil.</string>
+    <string name="about_cautious_maghrib_guard">Akşam bugün istisnadır: vakti %1$s takviminin gün batımı hesabına göre girer, %2$s takviminin yüksek enlem kuralıyla belirlediği daha geç akşam vaktine göre değil.</string>
+    <string name="about_cautious_maghrib_no_sunset">Akşam bugün istisnadır, çünkü burada gün batımı yok: en çok uyulan takvim olan %1$s takvimine uyar, %2$s takviminin daha geç akşam vaktine değil.</string>
     <string name="about_which_decides">Bugün her vakti hangi takvim belirliyor</string>
     <string name="about_stat_never_before_decider">onu belirleyen takvimin vaktinden önce başlangıç</string>
     <string name="about_cautious_checked">Burada uyulan takvimlerle karşılaştırıldı.</string>

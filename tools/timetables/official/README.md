@@ -65,7 +65,7 @@ table and how to check the engine against it. The header names these columns, in
 | `school` | the school of the `A` column: `standard`, `hanafi`, or `-` |
 | `split` | `fit` (margins are fitted on it) or `test` (held out) |
 | `note` | free text |
-| `member` | optional; for a cautious (class C) entry, the member id whose printed table the row is. Each start is checked against every member, Maghrib against the most-followed member's alone where the members' printed Maghribs spread beyond 2 minutes (ruling R38) |
+| `member` | optional; for a cautious (class C) entry, the member id whose printed table the row is. Each start, Maghrib too, is checked against the latest member's printed time (rulings R38, R155); on a day a member that is not the most followed has its Maghrib set by its own far-north or winter rule, or the real sun does not set there, that member is checked at its Maghrib from the sun, or not at all, and the gap is recorded in the stamp's `maghribGuard` (ruling R156); a cautious place-day that shows no Maghrib end, as no end in play is after the Maghrib shown, is recorded in the stamp's `maghribNoEnd` with its dates (ruling R158), never broken |
 
 Each event of a row is held to a late limit: the `LateLimit` its unit records for that event, else
 the one its entry records, else its class's (A 1, B 2, C 1 after the latest member, D 3). An

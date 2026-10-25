@@ -49,8 +49,21 @@ data class TimetableDay(
      * prayers in [Prayer] order, then the end of eating. Empty for a single method.
      */
     val members: List<List<Instant>> = emptyList(),
-    /** A member's Maghrib is after the one shown: the Maghrib cap decided it (spec §3.6). */
-    val capped: Boolean = false,
+    /**
+     * Ruling R155's far-north guard decided Maghrib: a member's own Maghrib is after the one shown (its far-north or
+     * winter rule set it rather than the sun and it is not the most followed, or the real sun did not set there and
+     * only the most-followed member's own counted); the app's `maghribGuardToday`. Never south of about 62.6°.
+     */
+    val guard: Boolean = false,
+    /**
+     * A cautious place's members' Maghribs from the sun ([world.taqwa.app.prayer.engine.day.PrayerDay.maghribBySun]),
+     * in the resolution's order: null where a rule sets the member's Maghrib, and every one null where the real sun
+     * does not set at the city's point that day ([sunSets]), as the engine counts them (ruling R155). On a guard day the
+     * Maghrib shown can be one of these, no member's own Maghrib. Empty for a single method.
+     */
+    val maghribBySun: List<Instant?> = emptyList(),
+    /** The real sun sets at the city's point that day ([DayPipeline.realSunset]); which guard sentence a page says. */
+    val sunSets: Boolean = true,
 )
 
 data class TimetableMonth(val year: Int, val month: Int, val days: List<TimetableDay>)
@@ -96,12 +109,14 @@ class Timetable(
         )
         // A cautious place's members, each computed with its own method at the city's point in the
         // page's school, as the app's About screen lists them (DayPipeline.members).
-        val members = if (source.effective.members.isEmpty()) {
+        val memberDays = if (source.effective.members.isEmpty()) {
             emptyList()
         } else {
             DayPipeline.members(source.effective, date, zone, source.school, settings.hijriOffsetDays)
-                .map { listOf(it.fajr, it.sunrise, it.dhuhr, it.asr, it.maghrib, it.isha, it.endOfEating) }
         }
+        val members = memberDays.map { listOf(it.fajr, it.sunrise, it.dhuhr, it.asr, it.maghrib, it.isha, it.endOfEating) }
+        // Ruling R155: a member's Maghrib counts from the sun only where the real sun sets at the city's point that day.
+        val sunSets = memberDays.isEmpty() || DayPipeline.realSunset(source.effective.point, date, zone) != null
         return TimetableDay(
             date = date,
             times = times,
@@ -116,7 +131,9 @@ class Timetable(
             polar = day.polar,
             ramadanIsha = ramadanIsha(source, date),
             members = members,
-            capped = members.any { it[MEMBER_MAGHRIB] > day.maghrib },
+            guard = members.any { it[MEMBER_MAGHRIB] > day.maghrib },
+            maghribBySun = memberDays.map { it.maghribBySun.takeIf { sunSets } },
+            sunSets = sunSets,
         )
     }
 

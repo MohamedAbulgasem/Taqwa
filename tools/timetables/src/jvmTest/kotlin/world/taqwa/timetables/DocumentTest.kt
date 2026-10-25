@@ -4,6 +4,7 @@ import kotlinx.datetime.LocalDate
 import world.taqwa.app.domain.Prayer
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Instant
@@ -350,7 +351,9 @@ class DocumentTest {
         assertEquals("$luptAtMost min", s["statMinutes"])
         assertEquals("at most after", s["statAtMost"])
         assertEquals("", s["cautiousBody"])
-        assertEquals("", s["maghribCap"])
+        assertEquals("", s["maghribGuard"])
+        assertEquals("", s["maghribGuardTemplate"])
+        assertEquals("", s["maghribNoSunsetTemplate"])
         assertEquals("Which timetable decides each time today", s["whichDecides"])
         assertEquals("Match my mosque", s["matchMosque"])
         assertEquals("Set by rule", s["setByRule"])
@@ -395,17 +398,59 @@ class DocumentTest {
         assertEquals("starts before the timetable that decides it", s["statNeverAny"])
         assertEquals(strings.get("ur", "about_cautious_checked"), page(toronto, "ur").map("strings")["checkedThrough"])
         assertEquals(strings.get("ur", "about_stat_never_before_decider"), page(toronto, "ur").map("strings")["statNeverAny"])
-        // The built day's members, seven epochs and seven clocks each, and the Maghrib cap's sentence only on a capped day.
+        // The built day's members, seven epochs and seven clocks each, each one's Maghrib from the sun, and the far-north
+        // guard's sentence only on a day a member's Maghrib is after the one shown (ruling R155: never at Toronto).
         val todayIndex = dayIndex(LocalDate(2026, 9, 25))
         val dayMembers = city.list("days")[todayIndex]["members"] as List<*>
         assertEquals(3, dayMembers.size)
         assertTrue(dayMembers.all { (it as List<*>).size == 7 && it.all { e -> e is Long } }, dayMembers.toString())
         val pageMembers = page.list("days")[todayIndex]["members"] as List<*>
         assertTrue(pageMembers.all { (it as List<*>).size == 7 && it.all { c -> clock.matches(c as String) } }, pageMembers.toString())
-        val capped = city.list("days")[todayIndex]["capped"] as Boolean
-        val cap = s["maghribCap"] as String
-        assertEquals(capped, cap.isNotEmpty(), cap)
-        if (capped) assertTrue(cap.startsWith("Maghrib is the exception today"), cap)
+        val bySun = city.list("days")[todayIndex]["maghribBySun"] as List<*>
+        assertEquals(dayMembers.map { (it as List<*>)[4] }, bySun)
+        val guard = city.list("days")[todayIndex]["guard"] as Boolean
+        val sentence = s["maghribGuard"] as String
+        assertEquals(guard, sentence.isNotEmpty(), sentence)
+        assertFalse(guard, sentence)
+        assertEquals(true, city.list("days")[todayIndex]["sunSets"])
+        assertEquals(strings.get("en", "about_cautious_maghrib_guard"), s["maghribGuardTemplate"])
+        assertEquals(strings.get("en", "about_cautious_maghrib_no_sunset"), s["maghribNoSunsetTemplate"])
+    }
+
+    @Test
+    fun aFarNorthGuardDaySaysTheGuardsSentenceAndCarriesEachMembersMaghribFromTheSun() {
+        // Ruling R155 at Trondheim in December: Diyanet's five-hour winter day holds its own Maghrib later than the sun
+        // gives it, and Diyanet is not the most followed (IRN is), so the Maghrib shown is the latest from the sun and
+        // Diyanet's own is later. No page city is this far north; the generator says it as the app does all the same.
+        val trondheim = city("trondheim-norway", "NO", 63.43049, 10.39506, "Europe/Oslo", linkedMapOf("en" to "Trondheim"))
+        val city = document.city(trondheim, Instant.parse("2026-12-17T00:07:00Z"))
+        val day = city.list("days")[dayIndex(LocalDate(2026, 12, 17))]
+        assertEquals(true, day["guard"])
+        val members = day["members"] as List<*>
+        val bySun = day["maghribBySun"] as List<*>
+        val shown = (day["epochs"] as List<*>)[Prayer.MAGHRIB.ordinal]
+        assertTrue(members.any { ((it as List<*>)[4] as Long) > (shown as Long) }, "a member's own Maghrib after the one shown")
+        assertTrue(shown in bySun, "the Maghrib shown is a member's from the sun: $shown in $bySun")
+        val page = city.map("pages").map("en")
+        val sentence = page.map("strings")["maghribGuard"] as String
+        assertTrue(sentence.startsWith("Maghrib is the exception today: it follows the sun, as "), sentence)
+        assertTrue(sentence.endsWith(", set by a high-latitude rule."), sentence)
+        assertEquals(true, day["sunSets"])
+    }
+
+    @Test
+    fun aGuardDayWithoutASunsetSaysSoAndCountsNoMembersMaghribFromTheSun() {
+        // Ruling R155 at Bodø under the midnight sun: the real sun does not set, so no member's Maghrib counts as from
+        // the sun and only the most-followed member's own stands; About's second sentence says so, never "it follows
+        // the sun" (the app's maghribGuardToday), and the page's script picks the same template from `sunSets`.
+        val bodo = city("bodo-norway", "NO", 67.28, 14.405, "Europe/Oslo", linkedMapOf("en" to "Bodø"))
+        val city = document.city(bodo, Instant.parse("2027-06-04T00:07:00Z"))
+        val day = city.list("days")[dayIndex(LocalDate(2027, 6, 4))]
+        assertEquals(false, day["sunSets"])
+        assertEquals(true, day["guard"])
+        assertTrue((day["maghribBySun"] as List<*>).all { it == null }, day["maghribBySun"].toString())
+        val sentence = city.map("pages").map("en").map("strings")["maghribGuard"] as String
+        assertTrue(sentence.startsWith("Maghrib is the exception today, as there is no sunset here: it follows "), sentence)
     }
 
     @Test

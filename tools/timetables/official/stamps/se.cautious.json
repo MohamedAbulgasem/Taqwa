@@ -1,7 +1,7 @@
 {
   "entry": "se.cautious",
   "class": "C",
-  "engineHash": "4a9aa64f1ea24bc1",
+  "engineHash": "69c6933fed777f42",
   "broken": 0,
   "places": 23,
   "first": "2025-12-01",
@@ -77,15 +77,15 @@
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 5755,
+      "checked": 9344,
       "early": 0,
       "late": {
-        "0": 4238,
-        "1": 1206,
-        "2": 9,
-        "3+": 302
+        "0": 4087,
+        "1": 1581,
+        "2": 1026,
+        "3+": 2650
       },
-      "exactShare": 0.7364,
+      "exactShare": 0.4374,
       "worstLate": 126,
       "lateLimit": 126,
       "lateLimitFrom": "entry se.cautious",
@@ -191,15 +191,15 @@
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 5755,
+        "checked": 9344,
         "early": 0,
         "late": {
-          "0": 4238,
-          "1": 1206,
-          "2": 9,
-          "3+": 302
+          "0": 4087,
+          "1": 1581,
+          "2": 1026,
+          "3+": 2650
         },
-        "exactShare": 0.7364,
+        "exactShare": 0.4374,
         "worstLate": 126,
         "lateLimit": 126,
         "lateLimitFrom": "entry se.cautious",
@@ -236,17 +236,6 @@
         "lateLimit": 154,
         "lateLimitFrom": "entry se.cautious",
         "overLimit": 0
-      }
-    }
-  },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "tr.diyanet.europe": {
-        "days": 5755,
-        "cappedDays": 3433,
-        "leastGap": 0,
-        "mostGap": 126
       }
     }
   },
@@ -332,7 +321,7 @@
       "events": ["fajr"]
     },
     "entry se.cautious: 126 min": {
-      "reason": "Maghrib is capped at Diyanet's (its sunset + 7) where the members spread: up to 2 min after it, and from late May to late July, where Diyanet holds its tables' day to nineteen hours around Dhuhr and prints its Maghrib before the sun sets, never before the real sunset: up to 4 min after its Turku table and 126 after its Luleå table.",
+      "reason": "Maghrib is the later member's from the sun like every start (ruling R155), most days Diyanet's sunset + 7: up to 7 min after Rabita's Helsinki calendar (sunset + 3 to + 6) at Helsinki and 8 at its towns, and up to 1 after Diyanet's own tables. From late May to late July, where Diyanet holds its tables' day to nineteen hours around Dhuhr and prints its Maghrib before the sun sets, Maghrib never comes before the sun's: up to 4 min after its Turku table, 17 after Tampere's, 32 after Sundsvall's, 59 after Umeå's, 94 after Oulu's and 126 after Luleå's.",
       "events": ["maghrib"]
     },
     "entry se.cautious: 129 min": {

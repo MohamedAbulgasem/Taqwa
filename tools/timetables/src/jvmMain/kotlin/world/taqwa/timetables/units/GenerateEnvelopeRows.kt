@@ -168,8 +168,9 @@ object EnvelopeRows {
 
     /**
      * A cautious [entry] that rides another entry's [tables] (Units.crossRide), checked under [member], its most-followed
-     * member, so that its Maghrib is checked on every day, capped or not: ISNA's Montréal and Ottawa mosques beside Canada's
-     * cautious times.
+     * member: a table riding beside the place is shown on the safe side whatever the far-north guard says (DayComputer.safeSide),
+     * and the most-followed member's Maghrib is the one the guard always reads as printed (ruling R156), so its Maghrib is
+     * checked as printed on every day: ISNA's Montréal and Ottawa mosques beside Canada's cautious times.
      */
     class Cross(val entry: String, val tables: String, val member: String)
 
@@ -247,7 +248,7 @@ object EnvelopeRows {
             val envelope = requireNotNull(set.envelope) { "${cross.tables} rides no envelope" }
             val entry = requireNotNull(Registry.byId(cross.entry)) { "no entry ${cross.entry}" }
             require(Units.crossRide(cross.entry)?.tablesEntryId == cross.tables) { "${cross.entry} rides no ${cross.tables} tables" }
-            require(entry.members.minBy { it.shareRank }.id == cross.member) { "${cross.member} is not ${cross.entry}'s most-followed member" }
+            require(entry.members.minBy { it.shareRank }.id == cross.member) { "${cross.member} is not ${cross.entry}'s most-followed member, whose Maghrib the gate always reads as printed (ruling R156)" }
 
             for (c in cities) {
                 if (c.cc !in entry.countries) continue

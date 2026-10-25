@@ -1,7 +1,7 @@
 {
   "entry": "nl.cautious",
   "class": "C",
-  "engineHash": "f72b8d30ae21f592",
+  "engineHash": "b6aa5289f1b9a296",
   "broken": 0,
   "places": 1,
   "first": "2026-09-25",
@@ -78,15 +78,15 @@
       "checked": 31,
       "early": 0,
       "late": {
-        "0": 0,
-        "1": 0,
+        "0": 24,
+        "1": 7,
         "2": 0,
-        "3+": 31
+        "3+": 0
       },
-      "exactShare": 0,
-      "worstLate": 8,
-      "lateLimit": 8,
-      "lateLimitFrom": "entry nl.cautious",
+      "exactShare": 0.7742,
+      "worstLate": 1,
+      "lateLimit": 1,
+      "lateLimitFrom": "class C",
       "overLimit": 0
     },
     "isha": {
@@ -188,15 +188,15 @@
         "checked": 31,
         "early": 0,
         "late": {
-          "0": 0,
-          "1": 0,
+          "0": 24,
+          "1": 7,
           "2": 0,
-          "3+": 31
+          "3+": 0
         },
-        "exactShare": 0,
-        "worstLate": 8,
-        "lateLimit": 8,
-        "lateLimitFrom": "entry nl.cautious",
+        "exactShare": 0.7742,
+        "worstLate": 1,
+        "lateLimit": 1,
+        "lateLimitFrom": "class C",
         "overLimit": 0
       },
       "isha": {
@@ -231,23 +231,6 @@
       }
     }
   },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "nl.moroccan": {
-        "days": 31,
-        "cappedDays": 31,
-        "leastGap": 7,
-        "mostGap": 8
-      },
-      "tr.diyanet.europe": {
-        "days": 31,
-        "cappedDays": 31,
-        "leastGap": 1,
-        "mostGap": 2
-      }
-    }
-  },
   "members": {
     "nl.moroccan": {
       "checked": ["2026-09-25..2026-10-25"],
@@ -264,7 +247,7 @@
   },
   "lateLimits": {
     "class C: 1 min": {
-      "events": ["sunrise", "dhuhr", "asrStandard"]
+      "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
     },
     "entry nl.cautious: 2 min": {
       "reason": "The members' own margins: the end of eating (Diyanet's earliest dawns) up to 2 min before the tables held.",
@@ -273,10 +256,6 @@
     "entry nl.cautious: 6 min": {
       "reason": "Isha is the latest member's, MWL's 17°, whose own table is not held here: up to 6 min after the Moroccan calendar's and Diyanet's.",
       "events": ["isha"]
-    },
-    "entry nl.cautious: 8 min": {
-      "reason": "Maghrib is capped at the Moroccan member's, which carries the Turkish and Arab calendars' Maghrib as a floor (ruling R87: 7 of 12 surveyed calendars print Diyanet's, sunset + 6 in spring to + 9 in autumn on the exact sun), so against the Moroccan calendar, which prints sunset + 1..4, it runs up to 8 min late.",
-      "events": ["maghrib"]
     },
     "entry nl.cautious: 16 min": {
       "reason": "The Moroccan calendar's Fajr moves from about 16° in winter to 14° in May and August; its member takes 14°, the calendar's latest, never before it, and so runs up to 16 min after it in autumn (Task 7g checked it at Amsterdam from 25 September to 25 October).",

@@ -250,7 +250,7 @@ class Monitor(
         }
         val what = "the gate: ${result.checkedRows} rows, ${result.placeDays} place-days, ${result.entries.size} entries"
         val never = result.entries.values.flatMap { result.neverEarly(it) }
-        val late = result.entries.values.flatMap { result.overLimit(it) + result.unchecked(it) }
+        val late = result.entries.values.flatMap { result.overLimit(it) }
         if (never.isEmpty() && late.isEmpty()) return listOf(Item(Kind.GREEN, "$what, 0 broken"))
         val items = mutableListOf<Item>()
         if (never.isNotEmpty()) {
@@ -270,7 +270,7 @@ class Monitor(
             items += Item(
                 Kind.GATE_LATE, what, late.map { it.replace("\n", "; ") },
                 "the stamp is red: refit the margins (`./gradlew -p tools/timetables gate -Pfit=<entry>`) or record the exception in the " +
-                    "registry (rulings R37, R41); a capped Maghrib left unchecked wants the most-followed member's table held at that point.",
+                    "registry (rulings R37, R41).",
                 key = "gate:late",
             )
         }

@@ -314,15 +314,24 @@ def ruler_svg(shares: dict, rtl: bool, words: dict, digit_set: str) -> str:
     return "".join(parts)
 
 
+def sun_gives(facts: dict, k: int, p: int) -> bool:
+    """Whether member `k` gives the shown Maghrib from the sun (ruling R155): its Maghrib before
+    its own far-north or winter rule held it later ("maghribBySun", null where its Maghrib is set
+    by rule or the real sun does not set at the place that day). On a guard day the minute shown
+    can be such a member's sun time, which is no member's own Maghrib."""
+    return p == MAGHRIB and facts["maghribBySun"][k] == facts["epochs"][p]
+
+
 def deciders(facts: dict, p: int) -> list:
     """The members of a cautious place that decide prayer `p` on a day (spec §3.3): those whose own
-    instant is the one shown — the latest to begin it, for sunrise the earliest, and for a capped
-    Maghrib the most-followed timetable's (the app's CautiousTable reads the same equality). Where
-    the day was repaired into order and no member's instant is the shown one, the latest (for
-    sunrise the earliest) member stands, so a row never lacks a deciding chip."""
+    instant is the one shown — the latest to begin it, for sunrise the earliest — and, for Maghrib,
+    those whose Maghrib from the sun is the one shown (sun_gives; the app's CautiousTable reads the
+    same equalities). Where the day was repaired into order, or Maghrib was held to the real
+    sunset, and no member's instant is the shown one, the latest (for sunrise the earliest) member
+    stands, so a row never lacks a deciding chip."""
     shown = facts["epochs"][p]
     members = facts["members"]
-    on = [k for k, member in enumerate(members) if member[p] == shown]
+    on = [k for k, member in enumerate(members) if member[p] == shown or sun_gives(facts, k, p)]
     if not on:
         pick = min(member[p] for member in members) if p == SUNRISE else max(member[p] for member in members)
         on = [k for k, member in enumerate(members) if member[p] == pick]
@@ -665,10 +674,11 @@ class Timetables:
 
     def cautious_steps(self, city: dict, lang: str, today: int, checks_link: str) -> list:
         """A cautious place's three steps (spec §3.3): the members the app names, with the most
-        followed tagged; how Taqwa combines them — the Maghrib cap's sentence on a day it decided,
-        the Fajr ruler (the built day's sentence; the script draws it for the reader's today),
-        which timetable decides each time today, when to stop eating, and Match my mosque; and
-        the proof — the two tiles of ruling R105 — with the link to the checks page."""
+        followed tagged; how Taqwa combines them — the far-north guard's sentence on a day it set a
+        member's later Maghrib aside (ruling R155, as the app's About says it), the Fajr ruler (the
+        built day's sentence; the script draws it for the reader's today), which timetable decides
+        each time today, when to stop eating, and Match my mosque; and the proof — the two tiles of
+        ruling R105 — with the link to the checks page."""
         cfg = self.langs[lang]
         t = cfg["timetable"]
         page = city["pages"][lang]
@@ -698,7 +708,7 @@ class Timetables:
             f'<li><h2>{esc(words["whoPublishes"])}</h2><p>{esc(words["cautiousBody"])}</p><p class="members-intro">{esc(t["members_intro"])}</p>'
             f'<ul class="members">{members}</ul><p>{esc(t["not_affiliated_any"])}</p></li>',
             f'<li><h2>{esc(t["combine_heading"])}</h2><p>{esc(t["combine_body"])}</p>'
-            f'<p class="cap" data-tt="cap"{"" if facts["capped"] else " hidden"}>{esc(words["maghribCap"])}</p>{ruler}'
+            f'<p class="guard" data-tt="guard"{"" if facts["guard"] else " hidden"}>{esc(words["maghribGuard"])}</p>{ruler}'
             f'<h3>{esc(words["whichDecides"])}</h3><ul class="decides">{"".join(rows)}</ul>'
             f'<p class="legend"><i class="swatch" aria-hidden="true"></i>{esc(t["decides_legend"])}</p>'
             f'<p class="stop" data-tt="stop">{fill(words["stopEating"], time=day["endOfEating"])}</p>'
@@ -896,9 +906,13 @@ class Timetables:
                          "o": day["asrOther"], "x": day["endOfEating"]})
             if cautious:
                 # m: each member's seven clocks; me: the same as epochs; xe: the end of eating's
-                # epoch (the Fajr ruler's start); cap: the Maghrib cap decided the day.
+                # epoch (the Fajr ruler's start); ms: each member's Maghrib from the sun (sun_gives);
+                # g: the far-north guard set a member's later Maghrib aside (ruling R155); ss: the real
+                # sun sets at the place that day, which of the app's two guard sentences is said (its own
+                # key: "s" stays the sunset's epoch, which ends Asr).
                 days[-1].update({"m": day["members"], "me": facts["members"], "xe": facts["endOfEating"],
-                                 "cap": 1 if facts["capped"] else 0})
+                                 "ms": facts["maghribBySun"], "g": 1 if facts["guard"] else 0,
+                                 "ss": 1 if facts["sunSets"] else 0})
         last = page["days"][-1]
         data = {
             "tz": city["timeZone"],
@@ -923,12 +937,14 @@ class Timetables:
         }
         if cautious:
             # The cautious explainer's words for the reader's today: the members' names (mn), the
-            # Maghrib cap's sentence for the built day (capText) and its template for a day with
-            # another split (capT), the stop-eating line, and the Fajr ruler's words.
+            # far-north guard's sentence for the built day (guardText) and its templates for
+            # another guard day, where the sun sets (guardT) and where it does not (guardNoSunT),
+            # the stop-eating line, and the Fajr ruler's words.
             data.update({
                 "mn": page["members"],
-                "capT": words["maghribCapTemplate"],
-                "capText": words["maghribCap"],
+                "guardT": words["maghribGuardTemplate"],
+                "guardNoSunT": words["maghribNoSunsetTemplate"],
+                "guardText": words["maghribGuard"],
                 "stop": words["stopEating"],
                 "ruler": {
                     "fajr": page["prayers"][FAJR], "stop": t["fajr_ruler_stop"], "notAll": t["fajr_ruler_not_all"],

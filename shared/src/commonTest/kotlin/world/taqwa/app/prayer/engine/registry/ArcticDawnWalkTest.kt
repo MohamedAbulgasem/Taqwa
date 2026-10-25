@@ -89,7 +89,7 @@ class ArcticDawnWalkTest {
                 } else {
                     val days = DayPipeline.members(resolution, date, zone)
                     members = resolution.members.zip(days).mapIndexed { i, (member, day) -> Member(member.id, member.method, day, memberSkies[i].second) }
-                    raw = Cautious.combine(days, mostFollowed)
+                    raw = Cautious.combine(days, mostFollowed, DayPipeline.realSunset(resolution.point, date, zone))
                 }
                 Walked(date, raw, Invariants.repair(raw), members)
             }

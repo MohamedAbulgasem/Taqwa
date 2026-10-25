@@ -1,7 +1,7 @@
 {
   "entry": "fr.cautious",
   "class": "C",
-  "engineHash": "19d9c218859e71d8",
+  "engineHash": "68dbcfaeda95b044",
   "broken": 0,
   "places": 3,
   "first": "2026-01-01",
@@ -75,17 +75,17 @@
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 365,
+      "checked": 1197,
       "early": 0,
       "late": {
-        "0": 0,
-        "1": 7,
-        "2": 259,
-        "3+": 99
+        "0": 654,
+        "1": 178,
+        "2": 0,
+        "3+": 365
       },
-      "exactShare": 0,
-      "worstLate": 3,
-      "lateLimit": 3,
+      "exactShare": 0.5464,
+      "worstLate": 6,
+      "lateLimit": 6,
       "lateLimitFrom": "entry fr.cautious",
       "overLimit": 0
     },
@@ -185,17 +185,17 @@
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 365,
+        "checked": 1197,
         "early": 0,
         "late": {
-          "0": 0,
-          "1": 7,
-          "2": 259,
-          "3+": 99
+          "0": 654,
+          "1": 178,
+          "2": 0,
+          "3+": 365
         },
-        "exactShare": 0,
-        "worstLate": 3,
-        "lateLimit": 3,
+        "exactShare": 0.5464,
+        "worstLate": 6,
+        "lateLimit": 6,
         "lateLimitFrom": "entry fr.cautious",
         "overLimit": 0
       },
@@ -231,29 +231,6 @@
       }
     }
   },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "fr.fifteen": {
-        "days": 365,
-        "cappedDays": 258,
-        "leastGap": 4,
-        "mostGap": 5
-      },
-      "fr.gmp": {
-        "days": 365,
-        "cappedDays": 258,
-        "leastGap": 1,
-        "mostGap": 3
-      },
-      "fr.twelve": {
-        "days": 365,
-        "cappedDays": 258,
-        "leastGap": 1,
-        "mostGap": 3
-      }
-    }
-  },
   "members": {
     "fr.fifteen": {
       "checked": ["2026-01-01..2026-12-31"],
@@ -286,13 +263,13 @@
       "reason": "Each family's tables differ among themselves (Drancy's and Al-Amel's Asr swing by 3-5 min over the year; the 12-13° family prints Zuhr + 5 and Maghrib + 3..4); each member takes its family's latest. Dhuhr runs up to 2 min after the latest of them.",
       "events": ["dhuhr"]
     },
-    "entry fr.cautious: 3 min": {
-      "reason": "Each family's tables differ among themselves (Drancy's and Al-Amel's Asr swing by 3-5 min over the year; the 12-13° family prints Zuhr + 5 and Maghrib + 3..4); each member takes its family's latest. Maghrib (capped at the 12–13° family's + 4) runs up to 3 min after the latest of them.",
-      "events": ["maghrib"]
-    },
     "entry fr.cautious: 4 min": {
       "reason": "Each family's tables differ among themselves (Drancy's and Al-Amel's Asr swing by 3-5 min over the year; the 12-13° family prints Zuhr + 5 and Maghrib + 3..4); each member takes its family's latest. Asr (Diyanet's + 4 the latest) runs up to 4 min after the latest of the three tables held.",
       "events": ["asrStandard"]
+    },
+    "entry fr.cautious: 6 min": {
+      "reason": "Maghrib is the latest member's like every start (ruling R155), Diyanet's sunset + 7 on its own Paris table's sun: at Paris up to 6 min after the latest of the three families' tables (the 12–13° family's and the Grande Mosquée's sunset + 3..4), in summer and early autumn; up to 1 after Diyanet's own Lyon and Lille tables.",
+      "events": ["maghrib"]
     },
     "entry fr.cautious: 8 min": {
       "reason": "Sunrise is the earliest member's, Diyanet's (the sun's less 7): up to 8 min before the three families' tables, which print the sun's own.",

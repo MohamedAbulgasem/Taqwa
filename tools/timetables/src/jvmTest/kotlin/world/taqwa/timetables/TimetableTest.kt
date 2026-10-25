@@ -137,7 +137,8 @@ class TimetableTest {
     @Test
     fun aCautiousDayCarriesEachMembersOwnSevenInstants() {
         // Toronto combines three timetables: each prayer once all have begun it, so no member's
-        // Fajr is after the one shown, and no member's sunrise before it.
+        // Fajr is after the one shown, and no member's sunrise before it; and since ruling R155 no
+        // member's Maghrib after it either (the far-north guard never acts this far south).
         val toronto = city("toronto-canada", "CA", 43.70643, -79.39864, "America/Toronto")
         val day = timetable.day(toronto, LocalDate(2026, 10, 1))
         assertEquals(3, day.members.size)
@@ -146,7 +147,12 @@ class TimetableTest {
         assertTrue(day.members.all { it[0] <= fajr }, "a member's Fajr after the shown ${day.members.map { it[0] }} > $fajr")
         assertTrue(day.members.all { it[1] >= day.times.getValue(Prayer.SUNRISE) })
         assertTrue(day.members.all { it[6] <= it[0] }, "a member's end of eating after its own Fajr")
-        assertEquals(day.members.any { it[4] > day.times.getValue(Prayer.MAGHRIB) }, day.capped)
+        assertEquals(day.members.any { it[4] > day.times.getValue(Prayer.MAGHRIB) }, day.guard)
+        assertFalse(day.guard)
+        // Each member's Maghrib from the sun is its own Maghrib here, and the one shown is the latest of them.
+        assertTrue(day.sunSets)
+        assertEquals(day.members.map { it[4] }, day.maghribBySun)
+        assertEquals(day.maghribBySun.maxOf { it!! }, day.times.getValue(Prayer.MAGHRIB))
     }
 
     @Test
@@ -154,7 +160,8 @@ class TimetableTest {
         val london = city("london-uk", "GB", 51.50853, -0.12574, "Europe/London")
         val day = timetable.day(london, LocalDate(2026, 10, 1))
         assertTrue(day.members.isEmpty())
-        assertFalse(day.capped)
+        assertFalse(day.guard)
+        assertTrue(day.maghribBySun.isEmpty())
         // London Unified leads with the Hanafi Asr (its school is not known), so the other is the earlier Standard one.
         assertTrue(day.asrOther < day.times.getValue(Prayer.ASR), "${day.asrOther} vs ${day.times.getValue(Prayer.ASR)}")
         assertTrue(day.endOfEating <= day.times.getValue(Prayer.FAJR))

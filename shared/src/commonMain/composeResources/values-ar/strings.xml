@@ -369,7 +369,8 @@
     <string name="about_majority_unchecked_body">تتبع أغلب المساجد في %2$s طريقة %1$s، ويحسب تقوى المواقيت بها مع هامش احتياط.</string>
     <string name="about_nearby_heading">جداول تتبعها بعض المساجد المحلية بدلًا منه</string>
     <string name="about_cautious_body">تتبع المساجد في %1$s جداول مختلفة بحسن نية، ولا يتبع أغلبُها جدولًا واحدًا. يجمع تقوى بين %2$s: فيعرض كل صلاة بعد دخول وقتها فيها جميعًا.</string>
-    <string name="about_cautious_maghrib_cap">المغرب استثناء اليوم: يتبع فيه تقوى %1$s، الجدول الأكثر اتباعًا، لا المغرب الأكثر تأخرًا في %2$s.</string>
+    <string name="about_cautious_maghrib_guard">المغرب استثناء اليوم: يتبع فيه تقوى مغربَ %1$s المحسوبَ من غروب الشمس، لا مغربَ %2$s الأكثرَ تأخرًا، الذي تحدّده قاعدةٌ لخطوط العرض العليا.</string>
+    <string name="about_cautious_maghrib_no_sunset">المغرب استثناء اليوم لأنه لا غروب هنا: يتبع فيه تقوى مغربَ %1$s، الجدول الأكثر اتباعًا، لا مغربَ %2$s الأكثرَ تأخرًا.</string>
     <string name="about_which_decides">أي جدول يحدّد كل وقت اليوم</string>
     <string name="about_stat_never_before_decider">بداية قبل وقت الجدول الذي يحدّده</string>
     <string name="about_cautious_checked">قورنت بالجداول المتّبعة هنا.</string>

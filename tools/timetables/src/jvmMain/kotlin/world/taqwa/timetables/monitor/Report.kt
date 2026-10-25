@@ -43,7 +43,8 @@ enum class Kind(val tier: Int, val attention: Boolean, val heading: String) {
 
     /**
      * Lateness measured on a member row (the spread between a cautious entry's members, not an
-     * engine error) and capped Maghribs left unchecked (the most-followed member's table not held).
+     * engine error) and a member's Maghrib the far-north guard read otherwise than as printed
+     * (ruling R156: its days and gap).
      */
     FOR_THE_RECORD(6, false, "For the record"),
 

@@ -1,10 +1,26 @@
 package world.taqwa.timetables.gate
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.offsetAt
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
+import world.taqwa.app.domain.Prayer
+import world.taqwa.app.prayer.engine.DayPipeline
+import world.taqwa.app.prayer.engine.astro.SunClock
+import world.taqwa.app.prayer.engine.astro.SunModel
 import world.taqwa.app.prayer.engine.method.AsrSchool
+import world.taqwa.app.prayer.engine.method.ClockRule
+import world.taqwa.app.prayer.engine.method.ClockTime
+import world.taqwa.app.prayer.engine.method.ClockTimes
 import world.taqwa.app.prayer.engine.method.EventOffsets
+import world.taqwa.app.prayer.engine.method.GeoPoint
+import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.registry.AboutTemplate
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.Member
+import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.Scope
@@ -15,12 +31,16 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 /**
- * Ruling R38 on a synthetic cautious entry made from MUIS: member `test.a` (most-followed) is
- * MUIS's method and prints the open MUIS rows of the fixture; member `test.b` is the same method
- * three minutes later on every time, and prints those rows shifted. Their Maghribs spread beyond
- * the two-minute agreement, so the engine caps Maghrib at `test.a`'s.
+ * Rulings R38 and R155 on a synthetic cautious entry made from MUIS: member `test.a` (most-followed)
+ * is MUIS's method and prints the open MUIS rows of the fixture; member `test.b` is the same method
+ * three minutes later on every time, and prints those rows shifted. Every start, Maghrib too, is
+ * checked against the latest member's printed time. Ruling R156's far-north guard on members whose
+ * own rule sets their Maghrib: one held by a day of twice 400 minutes around Dhuhr, one by an
+ * invented clock rule's estimate, each printing the engine's own days.
  */
 class CautiousGateTest {
 
@@ -77,7 +97,7 @@ class CautiousGateTest {
     }
 
     @Test
-    fun `two members as printed pass and the cap's gap to each is recorded`() {
+    fun `two members as printed pass and no maghrib is guarded`() {
         val result = gate(twoMembers).evaluate(
             manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), row(shifted("b.txt", 3), "test.b")),
         )
@@ -88,39 +108,35 @@ class CautiousGateTest {
             val e = s.event(event)
             assertEquals(listOf(5, 0, 0), listOf(e.checked, e.early, e.lateEnd), "${event.key}\n${result.report()}")
         }
-        assertEquals(0, s.maghribUnchecked)
-        val a = s.maghribGaps.getValue("test.a")
-        val b = s.maghribGaps.getValue("test.b")
-        assertEquals(listOf(5, 5), listOf(a.capped, b.capped))
-        assertTrue(a.least >= 0, "the cap is never before the most-followed member's Maghrib")
-        assertTrue(b.most < 0, "the cap is before the later member's Maghrib on every day: ${b.least}..${b.most}")
-        @Suppress("UNCHECKED_CAST")
-        val cap = Stamps.stamp(s, "core")["maghribCap"] as Map<String, Any>
-        assertEquals(0, cap["uncheckedDays"])
+        assertTrue(s.maghribGuards.isEmpty(), result.report())
+        assertEquals(0, s.maghribGuardUnchecked)
+        assertTrue("maghribGuard" !in Stamps.stamp(s, "core"))
+        assertEquals(0, s.neverEarlyBroken, result.report())
     }
 
     @Test
-    fun `a start before any member's printed time is early but a capped maghrib answers only to the most-followed`() {
-        // test.b prints five minutes after test.a while its method runs three: two minutes it cannot meet.
+    fun `a start before any member's printed time is early and maghrib is no exception`() {
+        // test.b prints five minutes after test.a while its method runs three: two minutes it cannot meet, Maghrib's
+        // too since ruling R155 (but on the 18th, where MUIS's Ramadan minute a day early puts the engine's 2 later).
         val result = gate(twoMembers).evaluate(
             manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), row(shifted("b.txt", 5), "test.b")),
         )
         val s = result.entries.getValue("test.cautious")
         assertEquals(5, s.event(Event.FAJR).early, result.report())
         assertEquals(5, s.event(Event.ISHA).early, result.report())
-        assertEquals(0, s.event(Event.MAGHRIB).early, result.report())
+        assertEquals(4, s.event(Event.MAGHRIB).early, result.report())
         assertEquals(0, s.event(Event.SUNRISE).lateEnd, result.report())
+        assertTrue(result.violations().any { "test.cautious maghrib: 4 early" in it }, result.report())
     }
 
     @Test
-    fun `maghribs within the agreement are checked against the latest member`() {
-        // test.b prints one minute after test.a: the members agree, and the latest Maghrib is the bar.
+    fun `maghrib is checked against the latest member`() {
+        // test.b prints one minute after test.a: the latest Maghrib is the bar.
         val close = cautious(member("test.a", 1), member("test.b", 2, EventOffsets(maghrib = 1)))
         val result = gate(close).evaluate(
             manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), row(shifted("b.txt", 1), "test.b")),
         )
         val s = result.entries.getValue("test.cautious")
-        assertEquals(0, s.maghribGaps.getValue("test.b").capped)
         assertEquals(0, s.event(Event.MAGHRIB).early, result.report())
         // Measured against test.b, not test.a: a minute less late than against test.a's time.
         val againstA = gate(close).evaluate(manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a")))
@@ -131,57 +147,173 @@ class CautiousGateTest {
     }
 
     @Test
-    fun `a spread without the most-followed member's table is unchecked and breaks the gate`() {
-        val three = cautious(member("test.a", 1), member("test.b", 2, later), member("test.c", 3))
-        val result = gate(three).evaluate(
-            manifest(row(shifted("b.txt", 3), "test.b"), row(shifted("c.txt", 0), "test.c")),
-        )
-        val s = result.entries.getValue("test.cautious")
-        assertEquals(5, s.maghribUnchecked)
-        assertTrue(result.violations().any { "test.cautious maghrib: 5 capped days unchecked" in it }, result.report())
-    }
-
-    /**
-     * Only `test.b`'s table held: nothing printed shows the spread, but the engine's own members
-     * are three minutes apart, so it capped at `test.a`'s Maghrib. Checked against `test.b`'s time
-     * it would read as early; it is unchecked instead.
-     */
-    @Test
-    fun `a capped maghrib with only a less-followed member held is unchecked not early`() {
+    fun `a less-followed member's table alone checks maghrib`() {
+        // Under the 26 Sep cap these days were unchecked; since ruling R155 test.b's later Maghrib is shown and checked.
         val result = gate(twoMembers).evaluate(manifest(row(shifted("b.txt", 3), "test.b")))
         val s = result.entries.getValue("test.cautious")
-        assertEquals(5, s.maghribUnchecked, result.report())
-        assertEquals(0, s.event(Event.MAGHRIB).checked)
-        assertEquals(0, s.event(Event.MAGHRIB).early)
-        assertEquals(0, s.event(Event.FAJR).early, result.report())
-        assertTrue(result.violations().any { "test.cautious maghrib: 5 capped days unchecked" in it }, result.report())
-        assertTrue(result.violations().none { "maghrib: 5 early" in it }, result.report())
+        assertEquals(listOf(5, 0), listOf(s.event(Event.MAGHRIB).checked, s.event(Event.MAGHRIB).early), result.report())
+        assertTrue(s.maghribGuards.isEmpty(), result.report())
+        assertEquals(0, s.neverEarlyBroken, result.report())
     }
+
+    // ── Ruling R156: the far-north guard ──
+
+    private val point = "1.28967,103.85007"
+    private val zone = TimeZone.of("Asia/Singapore")
+    private val dates = (14..18).map { LocalDate(2026, 2, it) }
 
     /**
-     * `test.b` and `test.c` held, both three minutes after `test.a` and agreeing with each other in
-     * print, so nothing printed shows a spread; the engine's own members are three minutes apart and
-     * it capped at `test.a`'s Maghrib, whose table is not held. Unchecked, not early.
+     * MUIS's method held to a day of twice 400 minutes around its Dhuhr (as Diyanet's five-hour winter day holds
+     * Trondheim's): in Singapore its Maghrib some 35 minutes after its sunset, and its sunrise as far before.
      */
-    @Test
-    fun `members agreeing in print without the most-followed still leave a capped maghrib unchecked`() {
-        val three = cautious(member("test.a", 1), member("test.b", 2, later), member("test.c", 3, later))
-        val result = gate(three).evaluate(
-            manifest(row(shifted("b.txt", 3), "test.b"), row(shifted("c.txt", 3), "test.c")),
+    private fun held(id: String, rank: Int) = Member(id, "timetable_cautious", muis.copy(id = id, dayAroundDhuhrMinutes = 400), rank)
+
+    /** An invented clock rule whose Maghrib, an estimate, is six and a half hours after noon: after Singapore's sunset. */
+    private data object EstimatedMaghrib : ClockRule {
+        override fun on(date: LocalDate, point: GeoPoint, zone: TimeZone): ClockTimes {
+            val offset = zone.offsetAt(date.atTime(12, 0).toInstant(zone)).totalSeconds
+            val noon = SunClock(point.lat, point.lon, date, offset, SunModel.EXACT).transit()
+            return ClockTimes(
+                fajr = null, sunrise = null, dhuhr = null, asrStandard = null, asrHanafi = null,
+                maghrib = ClockTime(noon + 6.5 * 3600, estimated = true), isha = null, endOfEating = null, sunset = null, noSunset = false,
+            )
+        }
+    }
+
+    private fun ruled(id: String, rank: Int) = Member(id, "timetable_cautious", muis.copy(id = id, clockRule = EstimatedMaghrib), rank)
+
+    /** [member]'s own days on the fixture's five dates as the engine gives them at the rows' point, printed as `archive/<name>`. */
+    private fun engineTable(entry: RegistryEntry, member: String, name: String): String {
+        val resolution = Registry.resolveEntry(entry, Place(1.28967, 103.85007, "Asia/Singapore", ""))
+        val index = resolution.members.indexOfFirst { it.id == member }
+        fun clock(at: Instant) = at.toLocalDateTime(zone).let { "%02d:%02d".format(it.hour, it.minute) }
+        archive.resolve("archive").mkdirs()
+        archive.resolve("archive/$name").writeText(
+            dates.joinToString("\n") { date ->
+                val day = DayPipeline.members(resolution, date, zone)[index]
+                "$date " + listOf(day.fajr, day.sunrise, day.dhuhr, day.asr, day.maghrib, day.isha).joinToString(" ") { clock(it) }
+            },
         )
-        val s = result.entries.getValue("test.cautious")
-        assertEquals(5, s.maghribUnchecked, result.report())
-        assertEquals(listOf(0, 0), listOf(s.event(Event.MAGHRIB).checked, s.event(Event.MAGHRIB).early), result.report())
-        assertEquals(0, s.event(Event.FAJR).early, result.report())
-        assertTrue(result.violations().none { "maghrib: 5 early" in it }, result.report())
+        return "archive/$name"
     }
 
     @Test
-    fun `the most-followed member's table alone checks the capped maghrib`() {
-        val result = gate(twoMembers).evaluate(manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a")))
+    fun `a member's bar is its printed maghrib unless its own rule set it and it is not the most followed`() {
+        val day = DayPipeline.members(Registry.resolveEntry(twoMembers, Place(1.28967, 103.85007, "Asia/Singapore", "")), dates[0], zone)[0]
+        assertEquals(MaghribBar.Printed, maghribBar(day, mostFollowed = false, sunSets = true))
+        assertEquals(MaghribBar.Printed, maghribBar(day, mostFollowed = true, sunSets = false))
+        // A member's own sun model setting the sun where the real sun does not (item E): nothing to check it by.
+        assertEquals(MaghribBar.None, maghribBar(day, mostFollowed = false, sunSets = false))
+        val sun = day.maghrib - 30.minutes
+        val heldDay = day.copy(maghribHeld = true, maghribBeforeHold = sun)
+        assertEquals(MaghribBar.Sun(sun), maghribBar(heldDay, mostFollowed = false, sunSets = true))
+        assertEquals(MaghribBar.Printed, maghribBar(heldDay, mostFollowed = true, sunSets = true))
+        assertEquals(MaghribBar.None, maghribBar(heldDay, mostFollowed = false, sunSets = false))
+        val ruledDay = day.copy(setByRule = setOf(Prayer.MAGHRIB))
+        assertEquals(MaghribBar.None, maghribBar(ruledDay, mostFollowed = false, sunSets = true))
+        assertEquals(MaghribBar.Printed, maghribBar(ruledDay, mostFollowed = true, sunSets = true))
+    }
+
+    @Test
+    fun `a held maghrib of a less-followed member is checked at its sun time and its gap recorded`() {
+        val entry = cautious(member("test.a", 1), held("test.h", 2))
+        val result = gate(entry).evaluate(
+            manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), row(engineTable(entry, "test.h", "h.txt"), "test.h")),
+        )
         val s = result.entries.getValue("test.cautious")
-        assertEquals(0, s.maghribUnchecked)
         assertEquals(listOf(5, 0), listOf(s.event(Event.MAGHRIB).checked, s.event(Event.MAGHRIB).early), result.report())
+        val guard = s.maghribGuards.getValue("test.h")
+        assertEquals(listOf(5, 5), listOf(guard.days, guard.atSun))
+        // Its printed Maghrib is its held one, half an hour and more after the Maghrib shown: as printed it would be early.
+        assertTrue(guard.most <= -30, "shown ${guard.least}..${guard.most} min after test.h's printed Maghrib")
+        assertEquals(setOf("test.h"), s.maghribGuards.keys)
+        assertEquals(0, s.neverEarlyBroken, result.report())
+        assertTrue("test.h's printed Maghrib not its own from the sun on 5 days" in result.report(), result.report())
+        @Suppress("UNCHECKED_CAST")
+        val stamp = Stamps.stamp(s, "core")["maghribGuard"] as Map<String, Any?>
+        @Suppress("UNCHECKED_CAST")
+        val h = (stamp["members"] as Map<String, Map<String, Any?>>).getValue("test.h")
+        assertEquals(listOf(5, 5, listOf("2026-02-14..2026-02-18")), listOf(h["days"], h["checkedAtSun"], h["dates"]))
+        assertEquals(null, stamp["uncheckedDays"])
+    }
+
+    @Test
+    fun `a held member's table alone checks maghrib at its sun time`() {
+        val entry = cautious(member("test.a", 1), held("test.h", 2))
+        val result = gate(entry).evaluate(manifest(row(engineTable(entry, "test.h", "h.txt"), "test.h")))
+        val s = result.entries.getValue("test.cautious")
+        assertEquals(listOf(5, 0), listOf(s.event(Event.MAGHRIB).checked, s.event(Event.MAGHRIB).early), result.report())
+        // The Maghrib shown is test.a's, the sun's own minute: test.h's from the sun, give or take the real sunset's minute.
+        assertTrue(s.event(Event.MAGHRIB).worst <= 1, result.report())
+        assertEquals(5, s.maghribGuards.getValue("test.h").atSun)
+        assertEquals(0, s.neverEarlyBroken, result.report())
+    }
+
+    @Test
+    fun `the most-followed member's held maghrib counts as printed`() {
+        val entry = cautious(held("test.h", 1), member("test.a", 2))
+        val result = gate(entry).evaluate(
+            manifest(row(engineTable(entry, "test.h", "h.txt"), "test.h"), row("open/SG-MUIS/muis-2026-02-a.txt", "test.a")),
+        )
+        val s = result.entries.getValue("test.cautious")
+        assertEquals(listOf(5, 0), listOf(s.event(Event.MAGHRIB).checked, s.event(Event.MAGHRIB).early), result.report())
+        // Its held minute is shown, exactly as it prints it.
+        assertEquals(5, s.event(Event.MAGHRIB).late[0], result.report())
+        assertTrue(s.maghribGuards.isEmpty(), result.report())
+    }
+
+    @Test
+    fun `a maghrib a rule sets is not the bar and a date no member's time checks is recorded not broken`() {
+        val entry = cautious(member("test.a", 1), ruled("test.r", 2))
+        val r = engineTable(entry, "test.r", "r.txt")
+        val both = gate(entry).evaluate(manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), row(r, "test.r")))
+        val s = both.entries.getValue("test.cautious")
+        assertEquals(listOf(5, 0), listOf(s.event(Event.MAGHRIB).checked, s.event(Event.MAGHRIB).early), both.report())
+        val guard = s.maghribGuards.getValue("test.r")
+        assertEquals(listOf(5, 0), listOf(guard.days, guard.atSun))
+        assertTrue(guard.most < 0, "shown ${guard.least}..${guard.most} min after test.r's printed Maghrib")
+        assertEquals(0, s.neverEarlyBroken, both.report())
+
+        val alone = gate(entry).evaluate(manifest(row(r, "test.r")))
+        val t = alone.entries.getValue("test.cautious")
+        assertEquals(listOf(0, 0), listOf(t.event(Event.MAGHRIB).checked, t.event(Event.MAGHRIB).early), alone.report())
+        assertEquals(5, t.maghribGuardUnchecked)
+        assertEquals(0, t.broken)
+        assertTrue(alone.violations().isEmpty(), alone.report())
+        assertTrue("5 cells no member's time checks (2026-02-14..2026-02-18; ruling R156)" in alone.report(), alone.report())
+        @Suppress("UNCHECKED_CAST")
+        val stamp = Stamps.stamp(t, "core")["maghribGuard"] as Map<String, Any?>
+        assertEquals(listOf(5, listOf("2026-02-14..2026-02-18")), listOf(stamp["uncheckedDays"], stamp["uncheckedDates"]))
+    }
+
+    @Test
+    fun `a day with no maghrib end is recorded with its dates and never broken`() {
+        // Ruling R158, as at Luleå: test.s's Isha comes two minutes after its own Maghrib, before test.b's Maghrib (three
+        // minutes later), the one shown; no end in play is after it, so the day shows none for Maghrib. Recorded in the
+        // report and the stamp, never broken.
+        val short = Member("test.s", "timetable_cautious", muis.copy(id = "test.s", isha = IshaRule.AfterMaghrib(2)), 1)
+        val entry = cautious(short, member("test.b", 2, later))
+        val result = gate(entry).evaluate(
+            manifest(row(engineTable(entry, "test.s", "s.txt"), "test.s"), row(engineTable(entry, "test.b", "b.txt"), "test.b")),
+        )
+        val s = result.entries.getValue("test.cautious")
+        assertEquals(listOf(5, 0), listOf(s.event(Event.MAGHRIB).checked, s.event(Event.MAGHRIB).early), result.report())
+        assertEquals(5, s.maghribNoEnd, result.report())
+        assertEquals(0, s.neverEarlyBroken, result.report())
+        assertTrue(
+            "maghrib: no end shown on 5 place-days (2026-02-14..2026-02-18; ruling R158: no end in play after the Maghrib shown)" in
+                result.report(),
+            result.report(),
+        )
+        @Suppress("UNCHECKED_CAST")
+        val stamp = Stamps.stamp(s, "core")["maghribNoEnd"] as Map<String, Any?>
+        assertEquals(listOf(5, listOf("2026-02-14..2026-02-18")), listOf(stamp["days"], stamp["dates"]))
+        // Two members as printed: every day ends Maghrib, and the stamp says nothing.
+        val plain = gate(twoMembers).evaluate(
+            manifest(row("open/SG-MUIS/muis-2026-02-a.txt", "test.a"), row(shifted("b.txt", 3), "test.b")),
+        ).entries.getValue("test.cautious")
+        assertEquals(0, plain.maghribNoEnd)
+        assertEquals(null, Stamps.stamp(plain, "core")["maghribNoEnd"])
     }
 
     @Test
@@ -205,8 +337,6 @@ class CautiousGateTest {
     }
 
     // ── Ruling R117: a member's days left out for a recorded reason ──
-
-    private val point = "1.28967,103.85007"
 
     private fun excuse(member: String, days: String, kind: String = "fault", at: String = "*") =
         "@excuse\ttest.cautious\t$member\t$at\t$days\t$kind\ta made-up reason"

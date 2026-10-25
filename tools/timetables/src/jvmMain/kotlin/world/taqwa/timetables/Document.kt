@@ -156,7 +156,9 @@ class Document(
                 ).also { facts ->
                     if (p.cautious) {
                         facts["members"] = day.members.map { member -> member.map { it.epochSeconds } }
-                        facts["capped"] = day.capped
+                        facts["guard"] = day.guard
+                        facts["maghribBySun"] = day.maghribBySun.map { it?.epochSeconds }
+                        facts["sunSets"] = day.sunSets
                     }
                 }
             },
@@ -295,8 +297,9 @@ class Document(
             "statMinutes" to (atMost?.let { strings.format(language, "about_stat_minutes_value", f.digits(it)) } ?: ""),
             "statAtMost" to (if (atMost == null) "" else strings.get(language, "about_stat_at_most_after")),
             "cautiousBody" to (if (cautious) strings.format(language, "about_cautious_body", p.city.name(language), members.joinToString(comma)) else ""),
-            "maghribCap" to (if (cautious) maghribCap(language, effective, todayRow, comma) else ""),
-            "maghribCapTemplate" to (if (cautious) strings.get(language, "about_cautious_maghrib_cap") else ""),
+            "maghribGuard" to (if (cautious) maghribGuard(language, effective, todayRow, comma) else ""),
+            "maghribGuardTemplate" to (if (cautious) strings.get(language, "about_cautious_maghrib_guard") else ""),
+            "maghribNoSunsetTemplate" to (if (cautious) strings.get(language, "about_cautious_maghrib_no_sunset") else ""),
             "whichDecides" to strings.get(language, "about_which_decides"),
             "matchMosque" to strings.get(language, "timetable_match_mosque"),
             "setByRule" to strings.get(language, "prayer_set_by_rule"),
@@ -306,19 +309,22 @@ class Document(
     }
 
     /**
-     * Ruling R91 (the app's `maghribCapToday`): where the Maghrib cap decided the day's Maghrib —
-     * a member's own is later than the one shown — the sentence naming the member followed (the
-     * first whose Maghrib is the one shown, else the most-followed) and the later ones; else "".
+     * Ruling R155's far-north guard (the app's `maghribGuardToday`, app = site): where a member's own Maghrib is later
+     * than the one shown, the sentence naming the member followed — the first whose own Maghrib, or whose Maghrib from
+     * the sun ([TimetableDay.maghribBySun]), is the one shown (the app's `decidingRow`), else the most-followed — and the
+     * later ones: `about_cautious_maghrib_guard` where the real sun sets at the place that day, else
+     * `about_cautious_maghrib_no_sunset`; "" on every other day.
      */
-    private fun maghribCap(language: String, effective: Resolution, day: TimetableDay, comma: String): String {
+    private fun maghribGuard(language: String, effective: Resolution, day: TimetableDay, comma: String): String {
         val shown = day.times.getValue(Prayer.MAGHRIB)
         val members = effective.members
         fun name(i: Int) = strings.get(language, members[i].nameKey)
         val later = members.indices.filter { day.members[it][MEMBER_MAGHRIB] > shown }
         if (later.isEmpty()) return ""
-        val followed = members.indices.firstOrNull { day.members[it][MEMBER_MAGHRIB] == shown }
+        val followed = members.indices.firstOrNull { day.members[it][MEMBER_MAGHRIB] == shown || day.maghribBySun.getOrNull(it) == shown }
             ?: members.indices.minBy { members[it].shareRank }
-        return strings.format(language, "about_cautious_maghrib_cap", name(followed), later.joinToString(comma) { name(it) })
+        val key = if (day.sunSets) "about_cautious_maghrib_guard" else "about_cautious_maghrib_no_sunset"
+        return strings.format(language, key, name(followed), later.joinToString(comma) { name(it) })
     }
 
     /**

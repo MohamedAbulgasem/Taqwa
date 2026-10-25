@@ -244,4 +244,37 @@ class ClockRuleDayTest {
         assertEquals(ordinaryDay.maghrib, day.maghrib)
         assertFalse(Prayer.MAGHRIB in day.setByRule)
     }
+
+    /**
+     * Ruling R155: a Maghrib the rule shows is the rule's, never the method's own day-length hold: the sun's
+     * where the rule gives the sun's, set by rule where it is an estimate. A rule's Maghrib before the held one
+     * leaves the day's own, still held.
+     */
+    @Test
+    fun `a rule's maghrib replaces a day length hold and an earlier one leaves it`() {
+        val north = GeoPoint(63.5, 10.0)
+        val winter = LocalDate(2027, 12, 21)
+        val holding = method.copy(id = "test.clock.held", authorityMinutes = EventOffsets(sunrise = -7, dhuhr = 5, maghrib = 7), dayAroundDhuhrMinutes = 150)
+        val heldDay = compute(holding, north, winter, oslo)
+        assertTrue(heldDay.maghribHeld, "the hold binds at 63.5° in December")
+        fun only(maghrib: ClockTime) = ClockTimes(
+            fajr = null, sunrise = null, dhuhr = null, asrStandard = null, asrHanafi = null,
+            maghrib = maghrib, isha = null, endOfEating = null, sunset = null, noSunset = false,
+        )
+        val sunLater = compute(holding.copy(clockRule = Fixed(only(sun(heldDay.maghrib.s(190))))), north, winter, oslo)
+        assertEquals(startOf(heldDay.maghrib.s(190)), sunLater.maghrib)
+        assertFalse(sunLater.maghribHeld)
+        assertEquals(null, sunLater.maghribBeforeHold)
+        assertEquals(sunLater.maghrib, sunLater.maghribBySun)
+
+        val estimated = compute(holding.copy(clockRule = Fixed(only(ruled(heldDay.maghrib.s(190))))), north, winter, oslo)
+        assertTrue(Prayer.MAGHRIB in estimated.setByRule)
+        assertFalse(estimated.maghribHeld)
+        assertEquals(null, estimated.maghribBySun)
+
+        val earlier = compute(holding.copy(clockRule = Fixed(only(sun(heldDay.maghrib.s(-600))))), north, winter, oslo)
+        assertEquals(heldDay.maghrib, earlier.maghrib)
+        assertTrue(earlier.maghribHeld)
+        assertEquals(heldDay.maghribBeforeHold, earlier.maghribBeforeHold)
+    }
 }

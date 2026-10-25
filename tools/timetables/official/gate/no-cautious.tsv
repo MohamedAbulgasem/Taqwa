@@ -1,35 +1,35 @@
 # Norway (no.cautious, ruling R64): no national authority. Members: IRN's joint calendar (no.irn, Oslo's largest
 # mosques, the most followed) and Diyanet's European method (subtask 7b's). Each member's tables where held:
 # - Oslo: IRN's 2026 calendar (both Asr columns printed) and Diyanet's Oslo table (September 2026-December 2027; its
-#   Fajr is also its imsak), split by year (Task 7g slices in europe/split-7g/): in 2027 Maghrib is not checked, since
-#   the members' Maghribs spread beyond 2 min and the cap follows the most-followed member, IRN, whose 2027 calendar
-#   is not held.
+#   Fajr is also its imsak), split by year (Task 7g slices in europe/split-7g/). Maghrib is checked like every start on
+#   every row below (ruling R155: the latest member's from the sun; until then the 26 Sep cap followed IRN's, the most
+#   followed, and left Diyanet's rows unchecked where IRN's calendar was not held). On the winter days Diyanet's own
+#   five-hour day holds its Maghrib later than the sun gives it (Trondheim), Diyanet's is checked at its Maghrib from the
+#   sun and the gap to its printed one recorded: the far-north guard (ruling R156).
 # - Trondheim: IRN's 2026 calendar.
 # Every row is held out (a cautious entry has no margins of its own).
 # - Trondheim, Diyanet (the monitor round, brief D): its own table, the member tr.diyanet.europe at its new unit there,
-#   the monitor's capture of 28 Sep 2026 sliced by year (archive/tables/monitor-round/): in 2026 Maghrib is checked
-#   under the cap against IRN's held calendar, in 2027 not (IRN's 2027 calendar is not held).
+#   the monitor's capture of 28 Sep 2026 sliced by year (archive/tables/monitor-round/).
 # - Kristiansand, Stavanger and Bergen, Diyanet (the monitor round, step c): its own tables, the member tr.diyanet.europe at
-#   its units there; Maghrib not checked (the cap follows IRN, whose calendars are Oslo's, Trondheim's and Tromsø's).
+#   its units there.
 # - Oslo, Diyanet (the monitor's capture of 28 Sep 2026, the member tr.diyanet.europe): 29 Sep – 29 Oct 2026 and 2027,
-#   the same minutes as the split-7g rows on every day both hold; it adds 26–29 October. Maghrib is not checked on
-#   this row (IRN's 2027 calendar is not held; in 2026 IRN's own row checks it under the cap).
+#   the same minutes as the split-7g rows on every day both hold; it adds 26–29 October.
 # - The monitor's captures are read from copies pinned as they were (archive/tables/pinned/tr-diyanet-europe/<date>/):
 #   2026-09-28 for the rows above; Oslo's capture of 2 Oct 2026 (2026-10-02/, 29 Sep – 1 Nov 2026 and 2027, the same
-#   minutes on every day both hold) is a row too, Maghrib not checked as on the 28 Sep row: it adds 30 Oct – 1 Nov.
+#   minutes on every day both hold) is a row too, as the 28 Sep row: it adds 30 Oct – 1 Nov.
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/nordic/off-irn-oslo-2026.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D As M I Ah	daily	-	test	IRN Oslo	no.irn
 archive/tables/moral-auth-world/europe/split-7g/dy-oslo-2026.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Oslo 2026	tr.diyanet.europe
-archive/tables/moral-auth-world/europe/split-7g/dy-oslo-2027.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo 2027	tr.diyanet.europe
+archive/tables/moral-auth-world/europe/split-7g/dy-oslo-2027.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Oslo 2027	tr.diyanet.europe
 archive/tables/moral-auth-world/europe/nordic/off-irn-trondheim-2026.txt	no.cautious	63.43049	10.39506	Europe/Oslo	F+E S D As M I Ah	daily	-	test	IRN Trondheim	no.irn
 archive/tables/monitor-round/tr-diyanet-europe/trondheim-2026.txt	no.cautious	63.43049	10.39506	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Trondheim 2026	tr.diyanet.europe
-archive/tables/monitor-round/tr-diyanet-europe/trondheim-2027.txt	no.cautious	63.43049	10.39506	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Trondheim 2027	tr.diyanet.europe
-archive/tables/pinned/tr-diyanet-europe/2026-09-28/kristiansand.txt	no.cautious	58.14671	7.9956	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Kristiansand (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
-archive/tables/pinned/tr-diyanet-europe/2026-09-28/stavanger.txt	no.cautious	58.97005	5.73332	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Stavanger (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
-archive/tables/pinned/tr-diyanet-europe/2026-09-28/bergen.txt	no.cautious	60.39299	5.32415	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Bergen (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
-archive/tables/pinned/tr-diyanet-europe/2026-09-28/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
-archive/tables/pinned/tr-diyanet-europe/2026-10-02/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo (the monitor capture of 2 Oct 2026)	tr.diyanet.europe
+archive/tables/monitor-round/tr-diyanet-europe/trondheim-2027.txt	no.cautious	63.43049	10.39506	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Trondheim 2027	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-09-28/kristiansand.txt	no.cautious	58.14671	7.9956	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Kristiansand (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-09-28/stavanger.txt	no.cautious	58.97005	5.73332	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Stavanger (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-09-28/bergen.txt	no.cautious	60.39299	5.32415	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Bergen (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-09-28/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Oslo (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-10-02/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Oslo (the monitor capture of 2 Oct 2026)	tr.diyanet.europe
 # prove, 2026-10-12: the monitor's captures pinned as they were under archive/tables/pinned/{tr-diyanet-europe}/2026-10-12/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
-archive/tables/pinned/tr-diyanet-europe/2026-10-12/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo (the monitor capture of 12 Oct 2026)	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-10-12/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Oslo (the monitor capture of 12 Oct 2026)	tr.diyanet.europe
 # prove, 2026-10-19: the monitor's captures pinned as they were under archive/tables/pinned/{tr-diyanet-europe}/2026-10-19/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
-archive/tables/pinned/tr-diyanet-europe/2026-10-19/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A - I	daily	standard	test	Diyanet Oslo (the monitor capture of 19 Oct 2026)	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-10-19/oslo.txt	no.cautious	59.91273	10.74609	Europe/Oslo	F+E S D A M I	daily	standard	test	Diyanet Oslo (the monitor capture of 19 Oct 2026)	tr.diyanet.europe

@@ -117,26 +117,19 @@ object SouthAfrica {
     }
 
     /**
-     * The MJC as Cape Town's cautious member: its own method with its Maghrib at sunset + 2 (Task 7g).
-     * The three tables print Maghrib from sunset to sunset + 3, and their printed Maghribs agree within
-     * 2 min on most days (ruling R38: then Maghrib is the latest of them); with each member's own
-     * never-early margin the engine's members spread past 2 min on those days and capped Maghrib at the
-     * MJC's, 2 min before Jamiat's and the calendar's (20 of 30 September days). So the MJC member's
-     * Maghrib is taken at the others' earliest, which keeps the engine's members within 2 min and its
-     * Maghrib the latest of the three, never before any.
-     */
-    private val mjcMember = mjc.asMember(1).let { it.copy(method = it.method.copy(margins = it.method.margins.copy(maghrib = MJC_MEMBER_MAGHRIB))) }
-
-    /**
      * Cape Town: no majority, three tables (research): the MJC's, the community calendar, and
      * Jamiat's Cape Town table with its Shafi'i Isha (15°). Standard Asr (the MJC, spec §3.7).
      * Jamiat's member is its Cape Town table, so that table's point rides as its fixed point
      * (ruling R30): across the metro its starts are never before the table's, its ends never after.
+     * The MJC's member is the MJC's own entry: Task 7g had moved its Maghrib to the others' earliest
+     * (a margin of 110 s) only so that the members stayed within the 26 September cap's 2-minute
+     * agreement; with Maghrib the latest member's at any spread (ruling R155) it is the latest of the
+     * three, never before any, as it was.
      */
     val cape = cautious(
         id = "za.cape",
         members = listOf(
-            mjcMember,
+            mjc.asMember(1),
             voc.asMember(2),
             convention(
                 "za.jamiat.shafii", "authority_jamiat",
@@ -149,9 +142,10 @@ object SouthAfrica {
         named = { it != "za.jamiat.shafii" },
         lateLimits = listOf(
             LateLimit(
-                4,
-                "The three tables print Maghrib from sunset to sunset + 3; Maghrib is the latest member's, never " +
-                    "before any, so on the days the MJC prints it 3 min before the others it runs up to 4 min after the MJC's.",
+                2,
+                "The three tables print Maghrib from sunset to sunset + 3; Maghrib is the latest member's like every " +
+                    "start (ruling R155), never before any, each member with its own margins: up to 2 min after the " +
+                    "latest table's.",
                 setOf(TimedEvent.MAGHRIB),
             ),
             LateLimit(
@@ -164,7 +158,4 @@ object SouthAfrica {
     )
 
     val entries = listOf(entry, mjc, voc, cape)
-
-    /** The MJC member's Maghrib margin in za.cape, seconds after sunset (see [mjcMember]). */
-    private const val MJC_MEMBER_MAGHRIB = 110
 }

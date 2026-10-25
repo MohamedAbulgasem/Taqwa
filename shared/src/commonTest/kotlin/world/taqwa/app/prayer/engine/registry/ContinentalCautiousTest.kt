@@ -132,8 +132,9 @@ class ContinentalCautiousTest {
             val old = r.members.indices.filter { r.members[it].id == "tr.diyanet.europe" || r.members[it].id == "de.vikz" }
             for (date in days(2026, step = 3)) {
                 val members = DayPipeline.members(r, date, berlinZone)
-                val all = Cautious.combine(members, 0)
-                val without = Cautious.combine(old.map { members[it] }, 0)
+                val sunset = DayPipeline.realSunset(r.point, date, berlinZone)
+                val all = Cautious.combine(members, 0, sunset)
+                val without = Cautious.combine(old.map { members[it] }, 0, sunset)
                 val label = "$name $date"
                 assertEquals(without.sunrise, all.sunrise, "$label sunrise")
                 assertEquals(without.dhuhr, all.dhuhr, "$label dhuhr")
@@ -190,8 +191,15 @@ class ContinentalCautiousTest {
 
     // The Netherlands and Belgium: Maghrib (ruling R87).
 
+    /**
+     * Ruling R155: the Netherlands' Maghrib is the latest member's, like every other start. Diyanet's member (its
+     * sunset + 7 on its own sun taken at 0h UT, + 6 in spring to + 9 in autumn on the exact sun) keeps it never
+     * before what the Turkish and Arab mosques print at their own points (the survey's ground truth: Diyanet's
+     * method at the user's point). R87's monthly floor on the Moroccan member, which carried Diyanet's Maghrib
+     * while the cap followed the Moroccan member, is gone: the member is the calendar's own latest, + 4.
+     */
     @Test
-    fun `the netherlands' maghrib is never before diyanet's own anywhere and the members agree in autumn`() {
+    fun `the netherlands' maghrib is the latest member's and never before diyanet's own anywhere`() {
         val zone = TimeZone.of("Europe/Amsterdam")
         val places = listOf(
             Place(52.37403, 4.88969, "Europe/Amsterdam", "NL"), // Amsterdam
@@ -206,37 +214,33 @@ class ContinentalCautiousTest {
             assertEquals("nl.cautious", r.entry.id)
             val diyanet = r.members.indexOfFirst { it.id == "tr.diyanet.europe" }
             val moroccan = r.members.indexOfFirst { it.id == "nl.moroccan" }
-            assertEquals(7, r.members[moroccan].method.authorityMinutes.maghrib)
+            val moroccanMethod = r.members[moroccan].method
+            assertEquals(4, moroccanMethod.authorityMinutes.maghrib, "the Moroccan calendar's own latest Maghrib")
+            assertNull(moroccanMethod.monthlyOffsets?.get(Prayer.MAGHRIB), "no monthly Maghrib floor")
             for (date in days(2026, step = 2)) {
                 val members = DayPipeline.members(r, date, zone)
                 val day = DayPipeline.day(r, date, zone)
                 val label = "${place.lat} ${place.lon} $date"
-                // Never before Diyanet's method at the user's own point (what the Turkish and Arab mosques print at
-                // theirs, the survey's ground truth). Diyanet's member itself carries its Amsterdam point across its
-                // reach (ruling R15: a start at the later of that point and the user's), up to 2 min past this.
+                assertEquals(members.maxOf { it.maghrib }, day.maghrib, "$label Maghrib is the latest member's")
+                // Never before Diyanet's method at the user's own point, nor its member, which carries its Amsterdam
+                // point across its reach (ruling R15: a start at the later of that point and the user's).
                 val diyanetHere = DayComputer.compute(Diyanet.europeMethod, GeoPoint(place.lat, place.lon), date, zone, AsrSchool.STANDARD, ramadan)
                 assertTrue(day.maghrib >= diyanetHere.maghrib, "$label Maghrib ${day.maghrib} before Diyanet's own ${diyanetHere.maghrib}")
-                assertTrue(day.maghrib >= members[diyanet].maghrib - 2.minutes, "$label Maghrib ${day.maghrib} before Diyanet's member's ${members[diyanet].maghrib}")
-                // MWL's Maghrib is the sun's own, so the members never agree: the cap is the Moroccan member's floor.
-                assertEquals(members[moroccan].maghrib, day.maghrib, "$label Maghrib is the Moroccan member's")
-                // Seven to nine minutes (plus 30 s) after the sun's own sunset, Maghrib rounded up and sunset down.
-                val afterSunset = members[moroccan].maghrib - members[moroccan].sunset
-                assertTrue(afterSunset >= 7.minutes && afterSunset <= 11.minutes, "$label Maghrib $afterSunset after sunset")
+                assertTrue(day.maghrib >= members[diyanet].maghrib, "$label Maghrib ${day.maghrib} before Diyanet's member's ${members[diyanet].maghrib}")
+                assertTrue(day.maghrib >= members[moroccan].maghrib, "$label Maghrib before the Moroccan calendar's")
             }
         }
     }
 
     /**
-     * Ruling R88: Belgium's Maghrib is spec §3.6's cap, the most-followed member's own minutes (EMB's sunset + 2,
-     * followed by 42 of 64 Brussels mosques), wherever the two members spread past [Cautious.MAGHRIB_AGREEMENT],
-     * and the later of the two where they agree. Diyanet's member (sunset + 7 on its own sun, + 6..9 on the
-     * exact one) spreads past it on every day, so the cap decides all year and the Diyanet calendars' earlier
-     * Maghrib is recorded as `maghribCap` in the survey. The EMB member is EMB's own entry, placed the same
-     * way inside the Brussels table's reach and beyond it (track L's + 7 for everyone, 5–7 min after EMB's
-     * own for its own majority, is gone with the edge hook it needed).
+     * Ruling R155 (superseding R88's cap half): Belgium's Maghrib is the later member's, Diyanet's (sunset + 7 on
+     * its own sun at 0h UT, + 6 to + 9 on the exact one), up to 7 min after EMB's own + 2 at these places, so that
+     * the five Diyanet calendars of the survey are never ahead. R88's other half stays: the EMB member is EMB's own
+     * entry, placed the same way inside the Brussels table's reach and beyond it (track L's + 7 for EMB's member,
+     * and the edge hook it needed, stay gone: Diyanet's own member now gives the later Maghrib).
      */
     @Test
-    fun `belgium's maghrib is capped at emb's own minutes and its emb member is emb's own entry`() {
+    fun `belgium's maghrib is the later member's and its emb member is emb's own entry`() {
         val zone = TimeZone.of("Europe/Brussels")
         val places = listOf(
             Place(50.8467, 4.3525, "Europe/Brussels", "BE"), // Brussels, inside EMB's table
@@ -268,30 +272,14 @@ class ContinentalCautiousTest {
                 val label = "${place.lat} ${place.lon} $date"
                 val ownDay = DayPipeline.day(own, date, zone)
                 assertEquals(DayPipeline.unended(own, date, zone), members[emb], "$label the EMB member's day is EMB's own")
-                val spread = members[diyanet].maghrib - members[emb].maghrib
-                spreads += spread
-                val expected = if (spread > Cautious.MAGHRIB_AGREEMENT) members[emb].maghrib else maxOf(members[emb].maghrib, members[diyanet].maghrib)
-                assertEquals(expected, day.maghrib, "$label Maghrib")
-                assertTrue(day.maghrib >= ownDay.maghrib && day.maghrib <= ownDay.maghrib + Cautious.MAGHRIB_AGREEMENT, "$label Maghrib ${day.maghrib} against EMB's own ${ownDay.maghrib}")
+                spreads += members[diyanet].maghrib - members[emb].maghrib
+                assertEquals(maxOf(members[emb].maghrib, members[diyanet].maghrib), day.maghrib, "$label Maghrib")
+                assertEquals(members[diyanet].maghrib, day.maghrib, "$label Maghrib is Diyanet's")
+                assertTrue(day.maghrib >= ownDay.maghrib, "$label Maghrib ${day.maghrib} before EMB's own ${ownDay.maghrib}")
             }
-            // Diyanet's sunset + 7 on its own sun runs 3 to 7 min after EMB's + 2 at EMB's own point and beyond
-            // every Diyanet table: past the agreement on every day, so the cap decides all year and Maghrib is
-            // EMB's own. At Antwerp Diyanet's member computes at its own table's point since the monitor round
-            // while EMB's stays at Brussels, whose winter sunset comes later: on a few winter days the two agree
-            // within 2 min and Maghrib is the later member's (asserted day by day above). Ghent's own point,
-            // west of Brussels, keeps Diyanet's Maghrib past the agreement all year.
+            // Diyanet's sunset + 7 on its own sun runs after EMB's + 2 on every sampled day, by up to 7 min here.
             val range = "${place.lat}: Diyanet's Maghrib ${spreads.min()}..${spreads.max()} after EMB's"
-            val agreeing = spreads.count { it <= Cautious.MAGHRIB_AGREEMENT }
-            // Keyed on the member itself (review D round 1, M4): only where Diyanet's member is its own
-            // Antwerpen table can the two agree; everywhere else the old strength holds.
-            val diyanetUnit = assertNotNull(r.members[diyanet].method).id
-            if (diyanetUnit == "tr.diyanet.europe.antwerpen") {
-                assertTrue(spreads.min() > Duration.ZERO && spreads.max() <= 7.minutes, range)
-                assertTrue(agreeing in 1..40, "$range: $agreeing sampled days within the agreement")
-            } else {
-                assertTrue(spreads.min() > Cautious.MAGHRIB_AGREEMENT && spreads.max() <= 7.minutes, range)
-                assertEquals(0, agreeing, "$range: within the agreement on $agreeing sampled days")
-            }
+            assertTrue(spreads.min() > Duration.ZERO && spreads.max() <= 7.minutes, range)
         }
     }
 
@@ -403,10 +391,11 @@ class ContinentalCautiousTest {
             assertTrue(day.isha >= members[diyanet].isha, "$label Isha before Diyanet's")
             assertTrue(day.asr >= members[diyanet].asr, "$label Asr before Diyanet's")
             assertTrue(day.endOfEating <= members[diyanet].endOfEating, "$label end of eating after Diyanet's")
-            // Maghrib stays the 12–13° family's + 4 (spec §3.6's cap where Diyanet's + 7 spreads past 2 min; the
-            // latest, Diyanet's, within 2 min of it where they agree), never Diyanet's + 7 outright.
+            // Maghrib is the latest member's (ruling R155), never before Diyanet's (its + 7, which the Lyon DITIB
+            // calendar prints) nor the 12–13° family's + 4.
             val twelve = members[r.members.indexOfFirst { it.id == "fr.twelve" }].maghrib
-            assertTrue(day.maghrib >= twelve && day.maghrib <= twelve + 2.minutes, "$label Maghrib ${day.maghrib} against the 12° family's $twelve")
+            assertEquals(members.maxOf { it.maghrib }, day.maghrib, "$label Maghrib is the latest member's")
+            assertTrue(day.maghrib >= members[diyanet].maghrib && day.maghrib >= twelve, "$label Maghrib ${day.maghrib}")
         }
     }
 }

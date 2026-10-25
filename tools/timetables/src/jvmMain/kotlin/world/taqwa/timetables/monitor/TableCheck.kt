@@ -29,8 +29,9 @@ import kotlin.time.Clock
  *
  * - where Automatic resolves the table's own entry at the point, one row of that entry;
  * - where Automatic resolves a cautious entry that lists the table's entry as a member, the member
- *   row (ruling R38: each start against the member's printed time, Maghrib under the cap) and a
- *   second row of the member's own entry at the point, so a drifting member model is still caught;
+ *   row (ruling R38: each start against the member's printed time, Maghrib read as the far-north
+ *   guard says, ruling R156) and a second row of the member's own entry at the point, so a drifting
+ *   member model is still caught;
  * - where the table names a unit (`entry/unit`), the unit's own row at its reference point, and,
  *   where Automatic follows a cautious entry there that lists the unit's entry, the member row too
  *   (review I3: the gate files hold Diyanet's Amsterdam table under nl.cautious the same way);
@@ -43,9 +44,10 @@ import kotlin.time.Clock
  * Each finding line is classified on its own (ruling R93): an early start, a late end or a day out
  * of order is never early (attention, tier 1, every run); lateness over the limit on the entry's
  * own row is attention (low) the first time and whenever it worsens, then carried as still open; on
- * a member row it is for the record (the spread between members, not an engine error); capped
- * Maghribs left unchecked are for the record, naming the missing member. A table nothing is wrong
- * with is new, changed, green again, or checked again and fine.
+ * a member row it is for the record (the spread between members, not an engine error); a member's
+ * Maghrib the far-north guard read otherwise than as printed (ruling R156) is for the record, with
+ * its days and gap. A table nothing is wrong with is new, changed, green again, or checked again and
+ * fine.
  */
 class TableCheck(
     private val roots: OfficialRoots,
@@ -205,7 +207,7 @@ class TableCheck(
         val neverEarly = mutableListOf<String>()
         val ownLate = mutableListOf<String>()
         val memberLate = mutableListOf<String>()
-        val unchecked = mutableListOf<String>()
+        val guarded = mutableListOf<String>()
         val failingDates = sortedSetOf<LocalDate>()
         var outOfOrder = 0
         var worstEarly = 0
@@ -234,9 +236,7 @@ class TableCheck(
             } else {
                 memberLate += late
             }
-            unchecked += result.unchecked(s).map {
-                "$it\n    the most-followed member ${s.maghribUncheckedMember ?: "?"}'s table is not held at ${table.name} (a coverage gap, not a failure)"
-            }
+            guarded += result.guarded(s)
         }
         val against = plan.rows.joinToString(" and ") { it.entry + (it.member?.let { m -> " (member $m)" } ?: "") }
         val head = "${table.id} (${table.name}) against $against"
@@ -278,8 +278,13 @@ class TableCheck(
                 key = "table:${table.id}:member",
             )
         }
-        if (unchecked.isNotEmpty()) {
-            items += Item(Kind.FOR_THE_RECORD, "$head: capped Maghrib unchecked", unchecked.map { it.replace("\n", "; ") }, key = "table:${table.id}:unchecked")
+        if (guarded.isNotEmpty()) {
+            items += Item(
+                Kind.FOR_THE_RECORD, "$head: Maghrib under the far-north guard",
+                guarded + "a Maghrib a member's far-north or winter rule sets, rather than the sun, counts only where that member is the " +
+                    "most followed (ruling R155): the gate checks the member's Maghrib from the sun instead and records the gap (ruling R156)",
+                key = "table:${table.id}:guard",
+            )
         }
         if (neverEarly.isEmpty() && ownLate.isEmpty()) {
             items += when {
@@ -475,7 +480,7 @@ class TableCheck(
         /** A survey finding's kind as the calendar column it was read from. */
         val COLUMN_OF = mapOf(
             "fajr" to "F", "endOfEating" to "F", "sunrise" to "S", "dhuhr" to "D", "asrStandard" to "A", "asrHanafi" to "A",
-            "maghrib" to "M", Survey.MAGHRIB_CAP to "M", "isha" to "I",
+            "maghrib" to "M", "isha" to "I",
         )
         val COLUMN_NAMES = mapOf("F" to "Fajr", "S" to "sunrise", "D" to "Dhuhr", "A" to "Asr", "M" to "Maghrib", "I" to "Isha")
 

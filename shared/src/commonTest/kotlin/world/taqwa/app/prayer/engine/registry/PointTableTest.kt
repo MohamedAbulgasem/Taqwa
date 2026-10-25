@@ -207,18 +207,19 @@ class PointTableTest {
 
     /**
      * Ruling R88 (R87's edge hook reverted with Belgium's Maghrib): beyond its table's reach a cautious member
-     * built from its entry's method with a change of its own carries the entry's own edge, not one built on
-     * its change. Cape Town's MJC member (Maghrib margin 110 s within the reach) is that member: in the NE and
-     * SE corners of the Cape Town box, beyond the MJC table's class-D reach, its edge is the MJC's own again,
-     * − 10 + 60 s, so za.cape's Maghrib there is what it was before R87.
+     * carries its entry's own edge, never one built on the member. Cape Town's MJC member is the MJC's own
+     * table inside the reach (until ruling R155 it had a change of its own there, a Maghrib margin of 110 s
+     * kept for the 26 September cap); in the NE and SE corners of the Cape Town box, beyond the MJC table's
+     * class-D reach, it is the MJC's own edge, − 10 + 60 s.
      */
     @Test
     fun `beyond its table's reach a cautious member carries its entry's own edge`() {
         val capeTown = GeoPoint(-33.92584, 18.42322)
         val zone = TimeZone.of("Africa/Johannesburg")
-        val inside = Registry.resolve(Place(capeTown.lat, capeTown.lon, zone.id, "ZA")).members.single { it.id == "za.mjc" }.method
-        assertEquals(110, inside.margins.maghrib)
         val mjc = Registry.byId("za.mjc")!!
+        val centre = Place(capeTown.lat, capeTown.lon, zone.id, "ZA")
+        val inside = Registry.resolve(centre).members.single { it.id == "za.mjc" }.method
+        assertEquals(Registry.resolveEntry(mjc, centre).method, inside, "the MJC's own table")
         for ((lat, lon) in listOf(-33.47 to 19.08, -34.38 to 19.08)) {
             val corner = Place(lat, lon, zone.id, "ZA")
             val r = Registry.resolve(corner)

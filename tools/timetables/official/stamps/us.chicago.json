@@ -1,7 +1,7 @@
 {
   "entry": "us.chicago",
   "class": "C",
-  "engineHash": "62527e7da96e889d",
+  "engineHash": "e2a5fb4bdca713ee",
   "broken": 0,
   "places": 133,
   "first": "2025-10-01",
@@ -228,23 +228,6 @@
         "lateLimit": 34,
         "lateLimitFrom": "entry us.chicago",
         "overLimit": 0
-      }
-    }
-  },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "us.chicago.eighteen": {
-        "days": 17716,
-        "cappedDays": 78,
-        "leastGap": 2,
-        "mostGap": 6
-      },
-      "us.isna": {
-        "days": 14914,
-        "cappedDays": 78,
-        "leastGap": 2,
-        "mostGap": 7
       }
     }
   },

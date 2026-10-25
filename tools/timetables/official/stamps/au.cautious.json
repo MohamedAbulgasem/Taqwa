@@ -1,7 +1,7 @@
 {
   "entry": "au.cautious",
   "class": "C",
-  "engineHash": "ad75f3aeafa61c3a",
+  "engineHash": "956d5519b3078db9",
   "broken": 0,
   "places": 3,
   "first": "2026-06-16",
@@ -75,18 +75,18 @@
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 698,
+      "checked": 729,
       "early": 0,
       "late": {
-        "0": 538,
-        "1": 160,
-        "2": 0,
-        "3+": 0
+        "0": 0,
+        "1": 51,
+        "2": 42,
+        "3+": 636
       },
-      "exactShare": 0.7708,
-      "worstLate": 1,
-      "lateLimit": 1,
-      "lateLimitFrom": "class C",
+      "exactShare": 0,
+      "worstLate": 9,
+      "lateLimit": 9,
+      "lateLimitFrom": "entry au.cautious",
       "overLimit": 0
     },
     "isha": {
@@ -185,18 +185,18 @@
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 698,
+        "checked": 729,
         "early": 0,
         "late": {
-          "0": 538,
-          "1": 160,
-          "2": 0,
-          "3+": 0
+          "0": 0,
+          "1": 51,
+          "2": 42,
+          "3+": 636
         },
-        "exactShare": 0.7708,
-        "worstLate": 1,
-        "lateLimit": 1,
-        "lateLimitFrom": "class C",
+        "exactShare": 0,
+        "worstLate": 9,
+        "lateLimit": 9,
+        "lateLimitFrom": "entry au.cautious",
         "overLimit": 0
       },
       "isha": {
@@ -231,23 +231,6 @@
       }
     }
   },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "au.lma": {
-        "days": 698,
-        "cappedDays": 698,
-        "leastGap": 0,
-        "mostGap": 1
-      },
-      "other.turkey": {
-        "days": 62,
-        "cappedDays": 62,
-        "leastGap": -6,
-        "mostGap": -5
-      }
-    }
-  },
   "members": {
     "au.lma": {
       "checked": ["2026-06-16..2026-12-01", "2026-12-03", "2026-12-05..2026-12-31", "2027-01-02..2027-01-30", "2027-02-01..2027-03-01", "2027-03-03..2027-04-29", "2027-05-01..2027-06-05"],
@@ -266,9 +249,6 @@
     }
   },
   "lateLimits": {
-    "class C: 1 min": {
-      "events": ["maghrib"]
-    },
     "entry au.cautious: 2 min": {
       "reason": "Fajr and the end of eating keep each member's own margins: up to 2 min from the tables'.",
       "events": ["fajr", "endOfEating"]
@@ -277,7 +257,11 @@
       "reason": "Zuhr is the later member's: the TURKEY preset's (+ 5) and LMA's (+ 2 to + 7 by month), up to 4 min after the earlier table's.",
       "events": ["dhuhr"]
     },
-    "entry au.cautious: 9 min": {
+    "entry au.cautious: 9 min (maghrib)": {
+      "reason": "Maghrib is the later member's like every start (ruling R155), the TURKEY preset's sunset + 7: up to 9 min after LMA's printed Maghrib (its sunset rounded up) at Lakemba and at the app's own Sydney, and up to 1 after Diyanet's own Melbourne table.",
+      "events": ["maghrib"]
+    },
+    "entry au.cautious: 9 min (sunrise)": {
       "reason": "Sunrise is the earlier member's, the TURKEY preset's (the sun's less 7 min): up to 8 min before LMA's at Lakemba, and up to 9 at the app's own Sydney, 12 km east of it, where the user's own sun rises earlier.",
       "events": ["sunrise"]
     },

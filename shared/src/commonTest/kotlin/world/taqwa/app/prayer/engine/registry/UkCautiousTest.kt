@@ -113,8 +113,9 @@ class UkCautiousTest {
             var date = LocalDate(2026, 1, 1)
             while (date.year == 2026) {
                 val members = DayPipeline.members(r, date, zone)
-                val all = Cautious.combine(members, 0)
-                val without = Cautious.combine(members.filterIndexed { i, _ -> i != late }, 0)
+                val sunset = DayPipeline.realSunset(r.point, date, zone)
+                val all = Cautious.combine(members, 0, sunset)
+                val without = Cautious.combine(members.filterIndexed { i, _ -> i != late }, 0, sunset)
                 val label = "$name $date"
                 assertEquals(without.sunrise, all.sunrise, "$label sunrise")
                 assertEquals(without.dhuhr, all.dhuhr, "$label dhuhr")

@@ -6,7 +6,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.DayPipeline
-import world.taqwa.app.prayer.engine.day.Cautious
 import world.taqwa.app.prayer.engine.day.Ends
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.AsrSchool
@@ -23,9 +22,8 @@ import kotlin.time.Instant
  * cautious check (every member's table at one place and date) cannot take it. Each calendar is held to
  * the promise on its own instead, day by day, as the app computes the entry there ([DayPipeline]):
  *
- * - no Fajr, Dhuhr, Maghrib or Isha shown before the calendar's (a Maghrib before it that spec §3.6
- *   capped, the members spreading and the most-followed member's own shown, is kind `maghribCap`, apart
- *   from any other early Maghrib);
+ * - no Fajr, Dhuhr, Maghrib or Isha shown before the calendar's (Maghrib a start like any other since
+ *   ruling R155, which took away the 26 Sep cap and the kind `maghribCap` the surveys recorded it by);
  * - no Asr before it: the entry's own school against every printed Asr where that school is the later
  *   (Hanafi), else against the prints nearer its time; the other school against the prints nearer its
  *   own time than the entry's (the one tap away in Settings);
@@ -45,8 +43,8 @@ import kotlin.time.Instant
  *   printed on where it is not its civil one (empty for that), as a gate row's `clock`;
  * - `faults.tsv`: `calendar` (its file's name without `.txt`), `from`, `to`, `columns` (letters as
  *   above; `F` also leaves the end of eating out), `reason`;
- * - `outliers.tsv`: `calendar` (or `*` for every one), `event` (an [Event] key, `maghribCap`,
- *   `ishaWindow` or `order`), `from`, `to`, `days` (the most days it may cover, at each calendar for
+ * - `outliers.tsv`: `calendar` (or `*` for every one), `event` (an [Event] key, `ishaWindow` or
+ *   `order`), `from`, `to`, `days` (the most days it may cover, at each calendar for
  *   `*`; `-` for no bound), `worst` (minutes), `reason`.
  */
 class Survey(
@@ -178,23 +176,12 @@ class Survey(
                     }
                     printed[column] = Gate.officialInstant(date, minutes, event, calendar.clock ?: zone, zone)
                 }
-                fun check(event: Event, shown: Instant, official: Instant, kind: () -> String = { event.key }) {
+                fun check(event: Event, shown: Instant, official: Instant) {
                     checked[event] = (checked[event] ?: 0) + 1
                     val bad = if (event.isStart) official - shown else shown - official
                     if (bad.isPositive()) {
-                        findings += Finding(calendar.id, kind(), date, bad.inWholeMinutes.toInt(), if (event.isStart) "early" else "late")
+                        findings += Finding(calendar.id, event.key, date, bad.inWholeMinutes.toInt(), if (event.isStart) "early" else "late")
                     }
-                }
-
-                // Spec §3.6's cap: the members' Maghribs spread past Cautious.MAGHRIB_AGREEMENT and the
-                // Maghrib shown is the most-followed member's own. A Maghrib before the calendar's for any
-                // other reason is `maghrib`.
-                fun maghribKind(): String {
-                    if (resolution.members.isEmpty()) return Event.MAGHRIB.key
-                    val maghribs = DayPipeline.members(resolution, date, zone).map { it.maghrib }
-                    val mostFollowed = resolution.members.indices.minBy { resolution.members[it].shareRank }
-                    val capped = maghribs.max() - maghribs.min() > Cautious.MAGHRIB_AGREEMENT && day.maghrib == maghribs[mostFollowed]
-                    return if (capped) MAGHRIB_CAP else Event.MAGHRIB.key
                 }
                 printed["F"]?.let { check(Event.FAJR, day.fajr, it); check(Event.END_OF_EATING, day.endOfEating, it) }
                 printed["S"]?.let { check(Event.SUNRISE, day.sunrise, it) }
@@ -206,7 +193,7 @@ class Survey(
                     if (entry.school == AsrSchool.HANAFI || !nearerStandard) check(Event.ASR_HANAFI, hanafi, asr)
                     if (nearerStandard) check(Event.ASR_STANDARD, standard, asr)
                 }
-                printed["M"]?.let { check(Event.MAGHRIB, day.maghrib, it) { maghribKind() } }
+                printed["M"]?.let { check(Event.MAGHRIB, day.maghrib, it) }
                 printed["I"]?.let { check(Event.ISHA, day.isha, it) }
             }
         }
@@ -225,12 +212,6 @@ class Survey(
 
         /** A day the pipeline put back in order. */
         const val ORDER = "order"
-
-        /**
-         * A Maghrib before a calendar's that spec §3.6 capped: the members' Maghribs spread past
-         * [Cautious.MAGHRIB_AGREEMENT] and the most-followed member's own is shown.
-         */
-        const val MAGHRIB_CAP = "maghribCap"
 
         private const val MAX_LISTED = 200
 
@@ -268,7 +249,7 @@ class Survey(
             }
             val outliers = rows(dir.resolve("outliers.tsv"), listOf("calendar", "event", "from", "to", "days", "worst", "reason")).map { r ->
                 val kind = r.getValue("event")
-                require(Event.byKey(kind) != null || kind in setOf(ISHA_WINDOW, ORDER, MAGHRIB_CAP)) { "outliers.tsv: event $kind" }
+                require(Event.byKey(kind) != null || kind in setOf(ISHA_WINDOW, ORDER)) { "outliers.tsv: event $kind" }
                 Outlier(
                     r.getValue("calendar"),
                     kind,

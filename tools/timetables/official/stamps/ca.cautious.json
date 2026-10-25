@@ -1,7 +1,7 @@
 {
   "entry": "ca.cautious",
   "class": "C",
-  "engineHash": "6f3e3916ee39c488",
+  "engineHash": "042856aecabb80dd",
   "broken": 0,
   "places": 55,
   "first": "2026-01-01",
@@ -75,17 +75,17 @@
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 3650,
+      "checked": 7607,
       "early": 0,
       "late": {
         "0": 141,
         "1": 439,
         "2": 136,
-        "3+": 2934
+        "3+": 6891
       },
-      "exactShare": 0.0386,
-      "worstLate": 6,
-      "lateLimit": 6,
+      "exactShare": 0.0185,
+      "worstLate": 8,
+      "lateLimit": 8,
       "lateLimitFrom": "entry ca.cautious",
       "overLimit": 0
     },
@@ -185,17 +185,17 @@
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 3650,
+        "checked": 7607,
         "early": 0,
         "late": {
           "0": 141,
           "1": 439,
           "2": 136,
-          "3+": 2934
+          "3+": 6891
         },
-        "exactShare": 0.0386,
-        "worstLate": 6,
-        "lateLimit": 6,
+        "exactShare": 0.0185,
+        "worstLate": 8,
+        "lateLimit": 8,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
@@ -228,17 +228,6 @@
         "lateLimit": 39,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
-      }
-    }
-  },
-  "maghribCap": {
-    "uncheckedDays": 0,
-    "members": {
-      "ca.eighteen": {
-        "days": 3650,
-        "cappedDays": 3650,
-        "leastGap": 0,
-        "mostGap": 6
       }
     }
   },
@@ -343,8 +332,12 @@
       "events": ["sunrise"]
     },
     "entry ca.cautious: 6 min": {
-      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Each keeps its own tables' minutes (Al Farooq's Zuhr + 5, Al Omari's Maghrib + 6 from August): Zuhr and Maghrib up to 5 min after the others' at their mosques; within a minute's reach of a family's table its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 6.",
-      "events": ["dhuhr", "maghrib"]
+      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Each keeps its own tables' minutes (Al Farooq's Zuhr + 5): Zuhr up to 5 min after the others' at their mosques; within a minute's reach of a family's table its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 6.",
+      "events": ["dhuhr"]
+    },
+    "entry ca.cautious: 8 min": {
+      "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Maghrib is the latest family's like every start (ruling R155), most days the 18° family's (Al Omari's Maghrib + 6 from August): up to 7 min after Calgary Islamic Centre SW's at its mosque and 6 after the others' at theirs; within a minute's reach of a family's table its point rides beside the user's (rulings R30 and R44), and at the app's own cities near them, east, west, north or south of the mosque, up to 8 (Evergreen and Tuscany, Calgary).",
+      "events": ["maghrib"]
     },
     "entry ca.cautious: 36 min": {
       "reason": "Canada's mosques outside Toronto, Montreal and Ottawa follow three families, each with its own summer rule (the Edmonton mosques' 18°, Imam Malik's 15° with Isha 16.5°, Calgary Islamic Centre SW's 15° with Isha = Maghrib + 90); the app is never before any of them. Fajr, the 15° families', never before theirs, runs up to 36 min after the 18° family's.",

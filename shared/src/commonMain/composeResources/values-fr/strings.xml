@@ -362,7 +362,8 @@
     <string name="about_majority_unchecked_body">La plupart des mosquées à %2$s suivent la méthode %1$s. Taqwa calcule les horaires selon cette méthode, avec une marge de sécurité.</string>
     <string name="about_nearby_heading">Calendriers que suivent plutôt certaines mosquées d’ici</string>
     <string name="about_cautious_body">À %1$s, les mosquées suivent de bonne foi des calendriers différents, et aucun n’est suivi par la plupart. Taqwa combine %2$s : chaque prière s’affiche une fois que tous l’ont commencée.</string>
-    <string name="about_cautious_maghrib_cap">Le Maghrib fait exception aujourd’hui : il suit %1$s, le calendrier le plus suivi, plutôt que le Maghrib plus tardif de %2$s.</string>
+    <string name="about_cautious_maghrib_guard">Le Maghrib fait exception aujourd’hui : il suit le soleil, comme le calcule %1$s, plutôt que le Maghrib plus tardif de %2$s, fixé par une règle des hautes latitudes.</string>
+    <string name="about_cautious_maghrib_no_sunset">Le Maghrib fait exception aujourd’hui, faute de coucher du soleil ici : il suit %1$s, le calendrier le plus suivi, plutôt que le Maghrib plus tardif de %2$s.</string>
     <string name="about_which_decides">Quel calendrier fixe chaque horaire aujourd’hui</string>
     <string name="about_stat_never_before_decider">débuts avant le calendrier qui le fixe</string>
     <string name="about_cautious_checked">Vérifiés d’après les calendriers suivis ici.</string>

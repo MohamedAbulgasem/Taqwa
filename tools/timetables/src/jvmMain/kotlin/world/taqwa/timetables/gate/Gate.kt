@@ -10,7 +10,6 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.DayPipeline
-import world.taqwa.app.prayer.engine.day.Cautious
 import world.taqwa.app.prayer.engine.day.Ends
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.AsrSchool
@@ -28,7 +27,6 @@ import java.io.File
 import java.util.Locale
 import java.util.SortedMap
 import java.util.SortedSet
-import kotlin.time.Duration
 import kotlin.time.Instant
 
 /**
@@ -51,14 +49,16 @@ import kotlin.time.Instant
  * A cautious (class C) entry's rows are its members' printed tables, each naming its `member`
  * (ruling R38). Rows at the same point and date are one place-day. Each start is checked against
  * every member's printed time and is late by its minutes after the latest; each end against every
- * member's, early by its minutes before the earliest. Maghrib is the exception: where the members'
- * printed Maghribs that date spread beyond [Cautious.MAGHRIB_AGREEMENT], the engine caps it at the
- * most-followed member's, so it is checked against that member's printed time alone, and a spread
- * date without the most-followed member's table is unchecked, which breaks the gate. With a single
- * member's table held, the engine's own members' Maghribs decide whether the date is a spread one.
- * The cap's gap to each member's printed Maghrib is recorded (spec §3.6). A gate file's `@excuse`
- * lines ([Excuse], ruling R117) record the days a member's rows leave out because its table does
- * not publish them or publishes them wrongly; they excuse no cell, only say why a day is missing.
+ * member's, early by its minutes before the earliest. Maghrib too (ruling R155: the latest time any
+ * member gives from the sun), but for the far-north guard (ruling R156, [MaghribBar]): on a day a
+ * member that is not the most followed has its Maghrib set by its own day-length rule (Diyanet's
+ * five-hour winter day: [PrayerDay.maghribHeld]), the shown Maghrib is checked against that
+ * member's Maghrib from the sun instead of its printed one; where a rule sets it outright (a polar
+ * day's borrowed time, a clock rule's estimate) or the real sun does not set at the point, against
+ * the other members' alone. Each such cell is recorded, with the gap to the member's printed
+ * Maghrib, in the report and the stamp. A gate file's `@excuse` lines ([Excuse], ruling R117)
+ * record the days a member's rows leave out because its table does not publish them or publishes
+ * them wrongly; they excuse no cell, only say why a day is missing.
  *
  * Nothing unread passes. Without the archive root (CI) every row is skipped and counted; with it,
  * a table that is not there, or one that yields no day, is a mistake in the gate file, and a date a
@@ -148,7 +148,7 @@ class Gate(
                         val observation = Observation(official.date, event, shown, at, resolution.entryClass, row, limits.getValue(event), unit)
                         if (cautious) {
                             (if (promiseOnly) promiseCells else cells).getOrPut("$group|${official.date}|${event.key}") {
-                                CautiousCell(s, mostFollowed!!, promiseOnly) { days.memberSpread(official.date) }
+                                CautiousCell(s, mostFollowed!!, promiseOnly) { days.maghribBars(official.date) }
                             }.add(observation)
                         } else {
                             s.account(observation)
@@ -218,27 +218,37 @@ class Gate(
 
         fun day(date: LocalDate): PrayerDay = Ends.withNextDay(unended(date), unended(date.plus(1, DateTimeUnit.DAY)))
 
-        /** A cautious resolution's own members' Maghribs on [date]: how far apart the engine found them. */
-        fun memberSpread(date: LocalDate): Duration =
-            DayPipeline.members(resolution, date, zone).map { it.maghrib }.let { it.max() - it.min() }
+        /**
+         * A cautious resolution's members on [date], by id: what each one's printed Maghrib is checked as
+         * (ruling R156, [maghribBar]), from the engine's own members' days and the real sunset at the point,
+         * as [world.taqwa.app.prayer.engine.day.Cautious.combine] reads them.
+         */
+        fun maghribBars(date: LocalDate): Map<String, MaghribBar> {
+            val members = resolution.members
+            val mostFollowed = members.minBy { it.shareRank }.id
+            val sunSets = DayPipeline.realSunset(resolution.point, date, zone) != null
+            return members.zip(DayPipeline.members(resolution, date, zone)).associate { (member, day) ->
+                member.id to maghribBar(day, member.id == mostFollowed, sunSets)
+            }
+        }
     }
 
     /**
      * One event of a cautious place-day, with each member's printed time (ruling R38): a start is
-     * measured against the latest member's, an end against the earliest's, and a Maghrib whose
-     * members spread beyond the agreement against the most-followed member's alone. Where a single
-     * member's table is held, nothing printed shows the spread, and where the most-followed member's
-     * is not held, members that agree in print do not show the engine left Maghrib uncapped: then
-     * the engine's own members' Maghribs ([engineSpread]) tell whether it capped too. A capped date
-     * without the most-followed member's table is unchecked, never early against a member the cap
-     * does not follow.
+     * measured against the latest member's, an end against the earliest's. Maghrib is a start like
+     * any other (ruling R155), each member's printed time read as its [MaghribBar] says (ruling R156):
+     * its printed time where its Maghrib counts, its Maghrib from the sun where its own day-length
+     * rule held the printed one later, nothing where a rule sets it. Each member read otherwise than
+     * as printed is recorded with its gap ([EntryStats.maghribGuards]); a date no member's time
+     * checks is recorded too ([EntryStats.maghribGuardUnchecked]), never early against a time the
+     * engine does not follow.
      */
     private class CautiousCell(
         private val stats: EntryStats,
         private val mostFollowed: String,
-        /** A promise-only file's cell ([GateRow.promiseOnly]): no Maghrib gap recorded, an unchecked Maghrib not counted. */
+        /** A promise-only file's cell ([GateRow.promiseOnly]): no guard recorded, a date no member's time checks not counted. */
         private val promiseOnly: Boolean,
-        private val engineSpread: () -> Duration,
+        private val maghribBars: () -> Map<String, MaghribBar>,
     ) {
         /** Each member's observation; a member printing the date twice keeps its stricter line. */
         private val byMember = LinkedHashMap<String, Observation>()
@@ -257,22 +267,26 @@ class Gate(
                 stats.account(if (first.event.isStart) all.maxBy { it.official } else all.minBy { it.official })
                 return
             }
-            val printed = if (all.size >= 2) all.maxOf { it.official } - all.minOf { it.official } else null
-            val capped = if (mostFollowed in byMember) {
-                (printed ?: engineSpread()) > Cautious.MAGHRIB_AGREEMENT
-            } else {
-                // Without the most-followed member's table, members that agree in print do not show
-                // the engine left Maghrib uncapped: its own members' spread may still have capped it.
-                (printed != null && printed > Cautious.MAGHRIB_AGREEMENT) || engineSpread() > Cautious.MAGHRIB_AGREEMENT
+            // The most-followed member's Maghrib always counts: the engine's members are computed only where another's is held.
+            val bars = if (byMember.keys.all { it == mostFollowed }) emptyMap() else maghribBars()
+            val checked = byMember.mapNotNull { (member, o) ->
+                when (val bar = bars[member] ?: MaghribBar.Printed) {
+                    MaghribBar.Printed -> o
+                    is MaghribBar.Sun -> {
+                        if (!promiseOnly) stats.maghribGuard(member, o, atSun = true)
+                        Observation(o.date, o.event, o.shown, bar.at, o.entryClass, o.row, o.limit, o.unit)
+                    }
+                    MaghribBar.None -> {
+                        if (!promiseOnly) stats.maghribGuard(member, o, atSun = false)
+                        null
+                    }
+                }
             }
-            if (!promiseOnly) for ((member, o) in byMember) stats.maghribGap(member, (o.shown - o.official).inWholeMinutes.toInt(), capped)
             when {
-                !capped -> stats.account(all.maxBy { it.official })
-                mostFollowed in byMember -> stats.account(byMember.getValue(mostFollowed))
-                // A table the place does not follow, on a date the members spread: its Maghrib is capped at the
-                // most-followed member's there, which another file's rows check.
+                checked.isNotEmpty() -> stats.account(checked.maxBy { it.official })
+                // A table the place does not follow: nothing of the entry's own proof.
                 promiseOnly -> Unit
-                else -> stats.maghribUnchecked(first, mostFollowed)
+                else -> stats.maghribGuardUnchecked(first)
             }
         }
     }
@@ -496,15 +510,24 @@ class EntryStats(val entry: RegistryEntry) {
         private set
     val outOfOrderSamples = mutableListOf<String>()
 
-    /** Cautious entries: the Maghrib cap's gap to each member's printed Maghrib, and spread dates left unchecked. */
-    val maghribGaps = sortedMapOf<String, MaghribGap>()
-    var maghribUnchecked = 0
-        private set
-    val maghribUncheckedSamples = mutableListOf<String>()
+    /**
+     * Cautious entries, ruling R156: by member, the Maghrib cells its printed time was not the bar for (the
+     * far-north guard, [MaghribBar]), with the shown Maghrib's gap to that printed time.
+     */
+    val maghribGuards = sortedMapOf<String, MaghribGuard>()
 
-    /** The most-followed member whose table was missing on the unchecked days (the monitor names it). */
-    var maghribUncheckedMember: String? = null
+    /** Cautious Maghrib cells no member's time checked (every member held there guarded, none at its sun), and their dates. */
+    var maghribGuardUnchecked = 0
         private set
+    val maghribGuardUncheckedDates = sortedSetOf<LocalDate>()
+
+    /**
+     * Cautious entries, ruling R158: the entry's own place-days that show no Maghrib end, as no end in play is after the
+     * Maghrib shown (a member's Isha has begun by then), and their dates. Recorded, never broken.
+     */
+    var maghribNoEnd = 0
+        private set
+    val maghribNoEndDates = sortedSetOf<LocalDate>()
     var first: LocalDate? = null
         private set
     var last: LocalDate? = null
@@ -519,11 +542,8 @@ class EntryStats(val entry: RegistryEntry) {
     /** Every date checked, whatever the point (a one-row manifest's coverage; the monitor names the holes). */
     val dates: Set<LocalDate> get() = placeDays.mapTo(sortedSetOf()) { LocalDate.fromEpochDays((it and 0xFFFFFFFFL).toInt()) }
 
-    /**
-     * Early starts, late ends, cells over the limit, days out of order and cautious Maghribs that
-     * could not be checked: 0 when the entry is green.
-     */
-    val broken: Int get() = events.values.sumOf { it.early + it.lateEnd + it.over } + outOfOrder + maghribUnchecked
+    /** Early starts, late ends, cells over the limit and days out of order: 0 when the entry is green. */
+    val broken: Int get() = events.values.sumOf { it.early + it.lateEnd + it.over } + outOfOrder
 
     /** Early starts, late ends and days out of order: the promise itself, never excused. */
     val neverEarlyBroken: Int get() = events.values.sumOf { it.early + it.lateEnd } + outOfOrder
@@ -531,16 +551,15 @@ class EntryStats(val entry: RegistryEntry) {
     /** Cells over the late limit. */
     val overLimit: Int get() = events.values.sumOf { it.over }
 
-    internal fun maghribGap(member: String, minutes: Int, capped: Boolean) {
-        maghribGaps.getOrPut(member) { MaghribGap() }.add(minutes, capped)
+    /** Ruling R156: [member]'s printed Maghrib [o] was read as its Maghrib from the sun ([atSun]) or not at all. */
+    internal fun maghribGuard(member: String, o: Observation, atSun: Boolean) {
+        maghribGuards.getOrPut(member) { MaghribGuard() }.add(o.date, (o.shown - o.official).inWholeMinutes.toInt(), atSun)
     }
 
-    internal fun maghribUnchecked(o: Observation, mostFollowed: String) {
-        maghribUnchecked++
-        maghribUncheckedMember = mostFollowed
-        if (maghribUncheckedSamples.size < SAMPLES) {
-            maghribUncheckedSamples += "${o.date}: members spread beyond the agreement and $mostFollowed's table is not held (${o.row.path})"
-        }
+    /** Ruling R156: a cautious Maghrib cell on [o]'s date that no member's time checked. */
+    internal fun maghribGuardUnchecked(o: Observation) {
+        maghribGuardUnchecked++
+        maghribGuardUncheckedDates += o.date
     }
 
     fun event(event: Event): EventStats = events.getOrPut(event) { EventStats() }
@@ -602,6 +621,11 @@ class EntryStats(val entry: RegistryEntry) {
             if (outOfOrderSamples.size < SAMPLES) {
                 outOfOrderSamples += "$date: " + (if (day.repaired) "repaired into order" else "Isha not before the next end of eating") + " ($group)"
             }
+        }
+        // Ruling R158: a cautious day whose Maghrib no end in play follows shows none.
+        if (entry.members.isNotEmpty() && Prayer.MAGHRIB !in day.ends) {
+            maghribNoEnd++
+            maghribNoEndDates += date
         }
     }
 
@@ -699,24 +723,62 @@ private fun describeExceptions(events: Map<Event, EventStats>): String =
     exceptionsIn(events).entries.joinToString(", ") { (limit, evs) -> "${evs.joinToString("/") { it.key }} ${limit.minutes} from ${limit.source}" }
 
 /**
- * The shown (capped) Maghrib less one member's printed Maghrib, in whole minutes: over how many
- * days, how many of them capped (the members spread beyond the agreement), and the least and most.
+ * Ruling R156, the far-north guard as the gate reads a cautious member's printed Maghrib on one date (ruling R155:
+ * a Maghrib a member's own far-north or winter rule sets, rather than the sun, counts only when that member is
+ * the most followed):
+ *
+ * - [Printed]: as printed, like any start: its Maghrib counts (it follows the sun there, or it is the most followed);
+ * - [Sun]: its own day-length rule held its Maghrib later than the sun gives it ([PrayerDay.maghribHeld], Diyanet's
+ *   five-hour winter day), and it is not the most followed: the shown Maghrib is checked against [at], its Maghrib
+ *   from the sun as the engine gives it ([PrayerDay.maghribBySun]; no table prints it);
+ * - [None]: a rule sets its Maghrib outright (a polar day's borrowed time, a clock rule's estimate) or the real
+ *   sun does not set at the point, and it is not the most followed: no time of its own to check against.
  */
-class MaghribGap {
+sealed interface MaghribBar {
+    data object Printed : MaghribBar
+
+    data class Sun(val at: Instant) : MaghribBar
+
+    data object None : MaghribBar
+}
+
+/**
+ * [member]'s [MaghribBar] on its date (ruling R156): [mostFollowed] when it is the cautious entry's most-followed
+ * member, [sunSets] when the real sun sets at the point that day ([DayPipeline.realSunset]), as
+ * [world.taqwa.app.prayer.engine.day.Cautious.combine] counts each member.
+ */
+fun maghribBar(member: PrayerDay, mostFollowed: Boolean, sunSets: Boolean): MaghribBar {
+    val bySun = member.maghribBySun
+    return when {
+        mostFollowed -> MaghribBar.Printed
+        sunSets && bySun == member.maghrib -> MaghribBar.Printed
+        sunSets && member.maghribHeld && bySun != null -> MaghribBar.Sun(bySun)
+        else -> MaghribBar.None
+    }
+}
+
+/**
+ * Ruling R156: one member's Maghrib cells the far-north guard read otherwise than as printed ([MaghribBar.Sun] or
+ * [MaghribBar.None]): how many, on which dates, how many checked against its Maghrib from the sun, and the shown
+ * Maghrib less its printed one, in whole minutes, least and most (below zero: shown before its printed time).
+ */
+class MaghribGuard {
     var days = 0
         private set
-    var capped = 0
+    val dates = sortedSetOf<LocalDate>()
+    var atSun = 0
         private set
     var least = Int.MAX_VALUE
         private set
     var most = Int.MIN_VALUE
         private set
 
-    internal fun add(minutes: Int, isCapped: Boolean) {
+    internal fun add(date: LocalDate, gap: Int, atSun: Boolean) {
         days++
-        if (isCapped) capped++
-        least = minOf(least, minutes)
-        most = maxOf(most, minutes)
+        dates += date
+        if (atSun) this.atSun++
+        least = minOf(least, gap)
+        most = maxOf(most, gap)
     }
 }
 
@@ -733,10 +795,10 @@ class GateResult(
     val promisePlaceDays: Int get() = entries.values.sumOf { it.promisePlaceDayCount }
 
     /**
-     * Every broken promise: early starts, late ends and days out of order ([neverEarly]), lateness
-     * over the limit ([overLimit]) and cautious Maghribs left unchecked ([unchecked]), in that order.
+     * Every broken promise: early starts, late ends and days out of order ([neverEarly]), then
+     * lateness over the limit ([overLimit]).
      */
-    fun violations(): List<String> = entries.values.flatMap { s -> neverEarly(s) + overLimit(s) + unchecked(s) }
+    fun violations(): List<String> = entries.values.flatMap { s -> neverEarly(s) + overLimit(s) }
 
     /** The promise itself, for one entry: early starts, late ends, days out of order (never excused). */
     fun neverEarly(s: EntryStats): List<String> = s.events.flatMap { (event, e) ->
@@ -753,10 +815,24 @@ class GateResult(
         ("${s.entry.id} ${event.key}: ${e.over} over the late limit" + lines(e.overLimit)).takeIf { e.over > 0 }
     }
 
-    /** Capped Maghribs left unchecked (the most-followed member's table not held), for one entry. */
-    fun unchecked(s: EntryStats): List<String> = listOfNotNull(
-        "${s.entry.id} maghrib: ${s.maghribUnchecked} capped days unchecked${lines(s.maghribUncheckedSamples)}".takeIf { s.maghribUnchecked > 0 },
+    /**
+     * Ruling R156, for one entry: each member whose printed Maghrib the far-north guard read otherwise, and the cells
+     * no member's time checked. Recorded, never broken.
+     */
+    fun guarded(s: EntryStats): List<String> = s.maghribGuards.map { (member, g) ->
+        "${s.entry.id} maghrib: $member's printed Maghrib not its own from the sun on ${g.days} days " +
+            "(${dateRanges(g.dates).joinToString(", ")}; its far-north or winter rule, or no real sunset there): checked " +
+            "against its Maghrib from the sun on ${g.atSun}, shown ${g.least}..${g.most} min after its printed time (ruling R156)"
+    } + listOfNotNull(
+        ("${s.entry.id} maghrib: ${s.maghribGuardUnchecked} cells no member's time checks " +
+            "(${dateRanges(s.maghribGuardUncheckedDates).joinToString(", ")}; ruling R156)").takeIf { s.maghribGuardUnchecked > 0 },
     )
+
+    /** Ruling R158, for one entry: its place-days that show no Maghrib end, and their dates. Recorded, never broken. */
+    fun maghribNoEnd(s: EntryStats): String? =
+        ("${s.entry.id} maghrib: no end shown on ${s.maghribNoEnd} place-days " +
+            "(${dateRanges(s.maghribNoEndDates).joinToString(", ")}; ruling R158: no end in play after the Maghrib shown)")
+            .takeIf { s.maghribNoEnd > 0 }
 
     private fun lines(samples: List<String>) = samples.joinToString("") { "\n    $it" }
 
@@ -821,9 +897,8 @@ class GateResult(
                 append("  lines: ${s.unreadable} unreadable (skipped), ${s.duplicates} repeating a date (each checked)\n")
             }
             if (s.outOfOrder > 0) append("  out of order: ${s.outOfOrder} days\n")
-            for ((member, g) in s.maghribGaps) {
-                append("  Maghrib cap against $member: ${g.days} days (${g.capped} capped), shown ${g.least}..${g.most} min after its printed time\n")
-            }
+            for (line in guarded(s)) append("  ${line.removePrefix("${s.entry.id} ")}\n")
+            maghribNoEnd(s)?.let { append("  ${it.removePrefix("${s.entry.id} ")}\n") }
             for ((member, points) in s.memberExcused) {
                 for (kind in ExcuseKind.entries) {
                     val at = points.values.mapNotNull { it[kind] }

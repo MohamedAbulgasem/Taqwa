@@ -21,10 +21,10 @@ import java.io.File
  * copied as it is to `archive/tables/pinned/<source>/<date>/` (a member row's days cut as its
  * recipe says, in a file of its own beside it), the recipe's rows are appended to their gate files,
  * and the WHOLE gate runs. A new row that breaks a promise (an early start, a late end, lateness
- * over its limit, a capped Maghrib unchecked, a day out of order) or that the gate refuses is
- * removed again and reported, never loosened, and the gate runs again until it is green. Then the
- * gate files and the stamps are written. A gate that is red before anything is added stops it
- * (nothing is written). Running it again adds nothing: every capture's days are then held.
+ * over its limit, a day out of order) or that the gate refuses is removed again and reported,
+ * never loosened, and the gate runs again until it is green. Then the gate files and the stamps
+ * are written. A gate that is red before anything is added stops it (nothing is written). Running
+ * it again adds nothing: every capture's days are then held.
  *
  * Every row takes what it reads from its family, never from the recipe: the latest row of the same
  * gate file, entry, member and point that reads an earlier capture of the same source and key;
@@ -262,7 +262,7 @@ class Prove(
     private fun fail(why: String, manifest: GateManifest, result: GateResult? = null) =
         Outcome(why, emptyList(), emptyList(), emptyList(), manifest.rows.size, manifest.rows.size, result?.placeDays ?: 0, result?.placeDays ?: 0, result)
 
-    private fun GateResult.violations(s: world.taqwa.timetables.gate.EntryStats): List<String> = neverEarly(s) + overLimit(s) + unchecked(s)
+    private fun GateResult.violations(s: world.taqwa.timetables.gate.EntryStats): List<String> = neverEarly(s) + overLimit(s)
 
     /** Why [rows] of one entry break a promise on their own (the new row with the entry's committed rows), or null. */
     private fun alone(rows: List<GateRow>, excuses: List<Excuse>, sources: List<String>): String? = try {

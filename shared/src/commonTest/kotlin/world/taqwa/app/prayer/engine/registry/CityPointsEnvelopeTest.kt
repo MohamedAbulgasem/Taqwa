@@ -2,6 +2,7 @@ package world.taqwa.app.prayer.engine.registry
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.AsrSchool
@@ -187,6 +188,7 @@ class CityPointsEnvelopeTest {
             val theirs = day(ownAtHelsinki, helsinki, date, zone)
             assertTrue(shown.endOfEating <= theirs.endOfEating && shown.sunrise <= theirs.sunrise, "north of Lohja on $date")
             assertTrue(shown.fajr >= theirs.fajr && shown.isha >= theirs.isha && shown.dhuhr >= theirs.dhuhr, "north of Lohja on $date")
+            assertTrue(shown.maghrib >= theirs.maghrib, "north of Lohja on $date: Maghrib before Helsinki's own day")
         }
     }
 

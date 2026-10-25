@@ -4,15 +4,17 @@
 # - Stockholm: Islamiska Förbundet's (IFIS, Diyanet Stockholm) December 2025-September 2026 pages and Diyanet's own
 #   Stockholm table (September 2026-December 2027), both the member tr.diyanet.europe; their Fajr is also their imsak.
 # - Copenhagen: Diyanet's Copenhagen table (tr.diyanet.europe).
-# - Helsinki: Rabita's 2026 calendar (se.rabita; 31 March left out, its Asr an hour off). Maghrib is not checked:
-#   the members' Maghribs spread beyond 2 min and the cap follows the most-followed member, Diyanet, whose table is
-#   not held at Helsinki.
-# Every row is held out (a cautious entry has no margins of its own).
+# - Helsinki: Rabita's 2026 calendar (se.rabita; 31 March left out, its Asr an hour off). Maghrib is checked like every
+#   start (ruling R155; until then the 26 Sep cap followed Diyanet's, the most followed, and left it unchecked here).
+# Every row is held out (a cautious entry has no margins of its own). Rabita's calendar does not hold its member out,
+#   though: se.rabita is fitted on it (its Fajr curve and Isha, Task 7g; the region's margins, the city-point round 2
+#   review; its Maghrib month by month, rulings R155 and R42), so its Helsinki rows are no held-out check of that member:
+#   its Maghrib there is fitted to be at or after the calendar's, as no.irn's curves are read from IRN's calendars in
+#   no-cautious.tsv.
 # - Helsinki and Copenhagen, Diyanet (the monitor round, brief D): Diyanet's own tables, the member tr.diyanet.europe
-#   at its new units there; Maghrib is checked, the cap following Diyanet itself, the most-followed member.
+#   at its new units there.
 # - The monitor round's fourteen Nordic tables (step c): Diyanet's own for Malmö, Aarhus, Aalborg, Göteborg, Uppsala, Turku,
-#   Tampere, Sundsvall, Umeå, Oulu and Luleå, the member tr.diyanet.europe at its units there; Maghrib checked, the cap
-#   following Diyanet itself.
+#   Tampere, Sundsvall, Umeå, Oulu and Luleå, the member tr.diyanet.europe at its units there.
 # - Stockholm, Diyanet (the monitor's capture of 28 Sep 2026, the member tr.diyanet.europe): 29 Sep – 29 Oct 2026
 #   and 2027; it adds 26–29 October to Diyanet's own Stockholm table above.
 # - The monitor's captures are read from copies pinned as they were (archive/tables/pinned/tr-diyanet-europe/<date>/):
@@ -25,16 +27,16 @@ path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/nordic/off-ifis-stockholm-all.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	IFIS Stockholm	tr.diyanet.europe
 archive/tables/moral-auth-world/europe/verify/dy-stockholm.txt	se.cautious	59.32938	18.06871	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Stockholm	tr.diyanet.europe
 archive/tables/moral-auth-world/europe/verify/dy-cph.txt	se.cautious	55.6761	12.5683	Europe/Copenhagen	F+E S D A M I	daily	standard	test	Diyanet Copenhagen	tr.diyanet.europe
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.1699	24.9384	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita Helsinki	se.rabita
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.15896	24.86797	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita's Helsinki calendar at the app's Lauttasaari, 4.1 km, the region's margins (round 2 review)	se.rabita
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.25174	24.88111	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita's Helsinki calendar at the app's Kaarela, 9.6 km, the region's margins (round 2 review)	se.rabita
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.17239	24.72713	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita's Helsinki calendar at the app's Olari, 11.7 km, the region's margins (round 2 review)	se.rabita
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.15885	24.74241	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita's Helsinki calendar at the app's Matinkylä, 10.9 km, the region's margins (round 2 review)	se.rabita
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.15054	24.65307	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita's Helsinki calendar at the app's Espoonlahti, 15.9 km, the region's margins (round 2 review)	se.rabita
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.37752	25.26906	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita's Helsinki calendar at the app's Sibbo, 29.4 km, the region's margins (round 2 review)	se.rabita
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.40338	25.10500	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita's Helsinki calendar at the app's Kerava, 27.5 km, the region's margins (round 2 review)	se.rabita
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.46407	24.80730	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita's Helsinki calendar at the app's Nurmijärvi, 33.5 km, the region's margins (round 2 review)	se.rabita
-archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.47369	25.08992	Europe/Helsinki	F+E S D A - I	daily	standard	test	Rabita's Helsinki calendar at the app's Järvenpää, 34.8 km, the region's margins (round 2 review)	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.1699	24.9384	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita Helsinki	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.15896	24.86797	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita's Helsinki calendar at the app's Lauttasaari, 4.1 km, the region's margins (round 2 review)	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.25174	24.88111	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita's Helsinki calendar at the app's Kaarela, 9.6 km, the region's margins (round 2 review)	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.17239	24.72713	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita's Helsinki calendar at the app's Olari, 11.7 km, the region's margins (round 2 review)	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.15885	24.74241	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita's Helsinki calendar at the app's Matinkylä, 10.9 km, the region's margins (round 2 review)	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.15054	24.65307	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita's Helsinki calendar at the app's Espoonlahti, 15.9 km, the region's margins (round 2 review)	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.37752	25.26906	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita's Helsinki calendar at the app's Sibbo, 29.4 km, the region's margins (round 2 review)	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.40338	25.10500	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita's Helsinki calendar at the app's Kerava, 27.5 km, the region's margins (round 2 review)	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.46407	24.80730	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita's Helsinki calendar at the app's Nurmijärvi, 33.5 km, the region's margins (round 2 review)	se.rabita
+archive/tables/moral-auth-world/europe/split-7g/rabita-2026.txt	se.cautious	60.47369	25.08992	Europe/Helsinki	F+E S D A M I	daily	standard	test	Rabita's Helsinki calendar at the app's Järvenpää, 34.8 km, the region's margins (round 2 review)	se.rabita
 archive/tables/pinned/tr-diyanet-europe/2026-09-28/helsinki.txt	se.cautious	60.1699	24.9384	Europe/Helsinki	F+E S D A M I	daily	standard	test	Diyanet Helsinki (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
 archive/tables/pinned/tr-diyanet-europe/2026-09-28/copenhagen.txt	se.cautious	55.6761	12.5683	Europe/Copenhagen	F+E S D A M I	daily	standard	test	Diyanet Copenhagen (the monitor capture of 28 Sep 2026)	tr.diyanet.europe
 archive/tables/pinned/tr-diyanet-europe/2026-09-28/malmo.txt	se.cautious	55.60587	13.00073	Europe/Stockholm	F+E S D A M I	daily	standard	test	Diyanet Malmö (the monitor round's capture of 29 Sep 2026)	tr.diyanet.europe

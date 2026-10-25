@@ -23,9 +23,9 @@ import kotlin.system.exitProcess
  *
  * Four ways a release must not go out:
  *
- * - **red**: the stamp's own `broken` is over 0 (an early start, a late end, a cell over its limit,
- *   a day out of order or an unchecked cautious Maghrib the last time `gate` ran — already the one
- *   figure the stamp keeps, [EntryStats.broken]).
+ * - **red**: the stamp's own `broken` is over 0 (an early start, a late end, a cell over its limit
+ *   or a day out of order the last time `gate` ran — already the one figure the stamp keeps,
+ *   [EntryStats.broken]).
  * - **stale**: the stamp's `engineHash` no longer matches what the current engine core and this
  *   entry's current methods give at the points the manifest's rows check it at.
  * - **missing**: the manifest has rows for an entry with no `official/stamps/<entry>.json` at all

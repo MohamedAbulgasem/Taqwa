@@ -151,7 +151,7 @@ and the first member neither checked nor excused on it (or the entry, "every mem
 page says so in one sentence (`checks_gate_excused`, seven languages). Recorded on 2 October:
 `ca-toronto.tsv` — IFT keeps standard time 8–12 March, repeats a Fajr minute on 28 March, keeps daylight
 time 1–6 November, prints Isha 5 min after its neighbours 28–30 November; IIT's and MAC's member rows leave
-the same days out (a capped Maghrib follows IFT's table), IIT's Asr also 8 March — so from 2 October
+the same days out (a capped Maghrib followed IFT's table until ruling R155 of 24 Oct 2026), IIT's Asr also 8 March — so from 2 October
 **Toronto and Mississauga show October and November** (and on 1 November, November and December, where
 before R117 both would have been held), IIT's and MAC's own tables being checked whole at their units on
 those days; `ca-cautious.tsv` (the Edmonton tables' clock-change and Asr misprints, Imam Malik's November–
@@ -353,19 +353,23 @@ hidden (`summary::-webkit-details-marker { display: none }`).
    Jamiatul Ulama: each prayer once all have begun it."), then the members as a list (`.members`: name
    in 700, the first tagged "the most followed"), then `not_affiliated_any`.
 2. **How Taqwa combines them** (site heading `combine_heading`) — `combine_body`: "Taqwa rebuilds each of
-   them and combines them: each prayer once all have begun it, sunrise and the end of eating at the
-   earliest of them, and Maghrib capped at the most-followed timetable's own minutes." On a day the cap
-   decided Maghrib, the app's `about_cautious_maghrib_cap` sentence follows (live per day). Then B's
+   them and combines them: each prayer once all have begun it, and sunrise and the end of eating at the
+   earliest of them." (Maghrib too, since the engine's ruling R155 of 24 Oct 2026; until then "and Maghrib
+   capped at the most-followed timetable's own minutes" followed.) On a day the far-north guard set a later
+   Maghrib aside, the app's `about_cautious_maghrib_guard` sentence follows, or
+   `about_cautious_maghrib_no_sunset` where the real sun does not set there (live per day, the engine's
+   ruling R157; never south of about 62.6°, so on no page city yet). Then B's
    **Fajr ruler** for today (§3.3.1, cautious form). Then **"Which timetable decides each time today"**
    (`about_which_decides`): six rows (`.decides`), each the prayer name, the shown time (700, tabular) and
-   chips — filled chips for the members that decide it (the latest to begin it; for sunrise the earliest),
+   chips — filled chips for the members that decide it (the latest to begin it; for sunrise the earliest;
+   for Maghrib also a member whose Maghrib from the sun is the one shown),
    outlined chips "MJC 5:04" for the others; the legend line `decides_legend` under it, then the app's
    `about_stop_eating` for today; then `match_prompt` + "**Match my mosque ›**" (`timetable_match_mosque`)
    → `#app`.
 3. **How it was checked** — `replays_cautious` ("Then Taqwa replays every checked day against each of the
    published timetables."); two tiles with the cautious labels: `1400` / "days at 6 places" (Toronto);
    `0` / "starts before the timetable that decides it" (`about_stat_never_before_decider`, §10; ruling
-   R111: "before any of them" is false where the Maghrib cap decides); no "at most" tile (ruling R105:
+   R111: "before any of them" is false where the far-north guard decides Maghrib); no "at most" tile (ruling R105:
    a cautious entry's worst is entry-wide and would misattribute another place's spread); the link to
    the checks page.
 
@@ -468,7 +472,7 @@ blocks carry the same keys (the build fails otherwise). New site keys and their 
 | `fajr_ruler_caption` / `fajr_ruler_stop` / `fajr_ruler_not_all` / `fajr_ruler_shown` | "{fajr} today, minute by minute" / "Stop eating by" / "not all have begun it" / "{fajr} shown by Taqwa" |
 | `fajr_ruler_text` | "Stop eating by {eat} · {list} · Taqwa shows {fajr} at {shown}, once all have begun it." (`{list}` = "MJC and Jamiatul Ulama begin {fajr} at 5:04 · Cape community calendar at 5:11", built from `begins_at` "{names} at {time}") |
 | `members_intro` / `most_followed` | "The timetables followed here:" / "the most followed" |
-| `combine_heading` / `combine_body` | "How Taqwa combines them" / "Taqwa rebuilds each of them and combines them: each prayer once all have begun it, sunrise and the end of eating at the earliest of them, and Maghrib capped at the most-followed timetable's own minutes." |
+| `combine_heading` / `combine_body` | "How Taqwa combines them" / "Taqwa rebuilds each of them and combines them: each prayer once all have begun it, sunrise and the end of eating at the earliest of them." (until ruling R155 of 24 Oct 2026, "and Maghrib capped at the most-followed timetable's own minutes" ended it) |
 | `decides_legend` | "decides today, the latest to begin it (for sunrise, the earliest)." |
 | `match_prompt` | "Your mosque follows one of them? The app can follow it alone:" |
 | `how_checks_link` | "How Taqwa checks every city" |
@@ -491,7 +495,7 @@ Removed keys: `method`, `asr`, `why`, `note`, `high_latitude`, `cta_label`, `cta
 `about_who_publishes`, `about_who_publishes_body`, `about_how_reproduces`, `about_method_intro` (+ the
 `about_method_*` parts), `about_how_checked`, `about_stat_days_at_places`, `about_stat_never_before`,
 `about_stat_never_before_decider`, `about_stat_minutes_value`, `about_stat_at_most_after`,
-`about_cautious_body`, `about_cautious_maghrib_cap`,
+`about_cautious_body`, `about_cautious_maghrib_guard`, `about_cautious_maghrib_no_sunset`,
 `about_which_decides`, `about_stop_eating`, `timetable_match_mosque`, `prayer_set_by_rule`,
 `prayer_polar_line`, `prayer_next_in`, `prayer_jumuah`, `madhab_standard`, `madhab_hanafi`, the prayer names
 and the authority short names. Translations of new site sentences follow the app's terms (Cautious times =
@@ -606,13 +610,15 @@ cautious: bool}` where `atMost` is the worst lateness over the starts at the uni
 units, else the entry's (the app's `measuredStartsWorst`), and per day, added: `asrOther`, `endOfEating`,
 `imsak` (epoch or null), `sunset` (epochs), `setByRule` (prayer indices), `polar`; for a cautious entry
 per day `members` = one list per member of seven epochs (six prayers + end of eating) in the resolution's
-order, and `capped` (a member's Maghrib is later than the shown one: the cap decided it). Per page
+order, `guard` (a member's Maghrib is later than the shown one: the far-north guard decided it, ruling
+R155; `capped`, the cap's, until 24 Oct 2026), `maghribBySun` (each member's Maghrib from the sun, null
+where a rule sets it or the real sun does not set there) and `sunSets` (which guard sentence). Per page
 language, added: `otherSchool` (the other school's name), `strings` (every app sentence of §3.6 filled
 for this city: `whoseTitle`, `whoseLine` pieces, `notAffiliated`, `checkedThrough`, `whoPublishes`,
 `whoPublishesBody`, `howReproduces`, `methodIntro` (the description generated as `methodDescription`
 does: daily sun, Fajr angle or curve range, Isha angle/curve/after-Maghrib, horizon dip, the authority's
 minutes, the rounding note, joined with the language's list comma), `howChecked`, `statDays`,
-`statNever`, `statMinutes`, `statAtMost`, `cautiousBody`, `whichDecides`, `matchMosque`, `setByRule`,
+`statNever`, `statMinutes`, `statAtMost`, `cautiousBody`, `maghribGuard` (the built day's guard sentence, or "") with `maghribGuardTemplate` and `maghribNoSunsetTemplate`, `whichDecides`, `matchMosque`, `setByRule`,
 `polarLine`, `stopEating` per day is built from `about_stop_eating` + the day's clock), `members`
 (names), and per day `asrOther`, `endOfEating`, `imsak`, and for cautious pages `members` clocks; `days[i]`
 also carries `setByRule` as localized prayer names.
