@@ -204,6 +204,30 @@ class DuhaIqamaPlanTest {
     }
 
     @Test
+    fun `a late iqama reminder is never posted once the next adhan is in`() {
+        // Isha drawn to 8 minutes after Maghrib, confirmed under London's own timetable so the
+        // engine does not pause it: Maghrib's iqama at 5 minutes rings 3 minutes before Isha, and
+        // a late post past Isha's adhan would land in the next prayer's time.
+        val londonEntry = engine.dayFor(london, sixth, PrayerSettings()).effectiveEntry.id
+        val plain = engine.timesFor(london, sixth, PrayerSettings())
+        val naturalGap = (plain.time(Prayer.ISHA) - plain.time(Prayer.MAGHRIB)).inWholeMinutes.toInt()
+        val squeezed = PrayerSettings(
+            minuteAdjustments = mapOf(Prayer.ISHA to 8 - naturalGap),
+            confirmedAdjustments = mapOf(Prayer.ISHA to londonEntry),
+        )
+        val times = engine.timesFor(london, sixth, squeezed)
+        // Precondition: without this the assertions below would pass for the wrong reason.
+        assertEquals(8.minutes, times.time(Prayer.ISHA) - times.time(Prayer.MAGHRIB))
+
+        val entry = planFor(
+            iqamaOn.copy(iqamaMinutes = NotificationSettings.IqamaDefaults + (Prayer.MAGHRIB to 5)),
+            settings = squeezed,
+        ).single { it.id == "MAGHRIB-IQAMA-$sixth" }
+        assertEquals(times.time(Prayer.MAGHRIB) + 5.minutes, entry.instant)
+        assertEquals(times.time(Prayer.ISHA), entry.windowEnd)
+    }
+
+    @Test
     fun `Fajr's iqama reminder must come before sunrise and not merely before Dhuhr`() {
         // Reykjavik in late May: Fajr's time lasts a quarter of an hour, so the default gap lands
         // on sunrise, when Fajr's time is over and prayer is forbidden until the sun is up.

@@ -30,7 +30,7 @@ Smaller choices the Lead made while writing this spec. Mohamed can veto any of t
 - **Gaps kept while off.** Each prayer's gap stays stored while Iqama is off. Turning it back on brings back the person's own minutes. A gap never set reads as its default.
 - **Only chosen gaps are stored.** A gap is written only when it differs from `IqamaDefaults`, and its key is removed when it is set back to its default. Absent means its default, so a later change to the defaults reaches everyone who never chose a gap.
 - **Iqama is skipped** where adhan + gap reaches the end of the prayer's time (sunrise for Fajr; for the others the next prayer's start or the next Fajr, whichever comes first), and wherever the prayer itself is skipped (R83).
-- **Late-delivery guards on Android** (§3.4). Duha's window ends at its end time and the iqama's 10 minutes after it rings. A late inexact alarm is then dropped, never posted wrong.
+- **Late-delivery guards on Android** (§3.4). Duha's window ends at its end time and the iqama's 10 minutes after it rings, or at the next adhan if that comes first. A late inexact alarm is then dropped, never posted wrong.
 - **Polar skip.** Duha is also skipped on a day with no true sunrise (polar night or midnight sun), since there is no rising to count from.
 - **Friday note.** Dhuhr's sheet, while Iqama is on, says there is no iqama reminder on Fridays.
 - **One reveal for the whole screen.** Tahajjud and adhkar adopt the reveal of §4.3, so all four cards move alike.
@@ -146,7 +146,7 @@ New `NotificationKind` entries:
   - It carries `Prayer.SUNRISE` as a stand-in. Sunrise is never notified, so it cannot be mistaken for an adhan.
   - id `DUHA-<date>`, `windowEnd = END`, and the body's `{time}` is END.
 - **`IQAMA`** carries its own prayer.
-  - id `<PRAYER>-IQAMA-<date>`, at adhan + gap, `windowEnd = instant + 10 min`.
+  - id `<PRAYER>-IQAMA-<date>`, at adhan + gap, `windowEnd = min(instant + 10 min, the bound the instant respects)`: sunrise for Fajr, else the next obligatory start or the next Fajr, whichever comes first.
   - The body's count is the gap, passed as `minutesBefore`.
 
 Copy goes in `EnglishNotificationCopy` and in the `Words` of `LocalizedNotificationCopy`, in all
@@ -237,7 +237,7 @@ days, so re-arming stays as it is at today's maximum.
   - **Duha** is inexact while at least 60 minutes of its window are left when it rings. Under that, which happens only in far-north winters, it is exact, so where the platform allows exact alarms it is never dropped for lateness.
 - **Late-delivery guard.** The receiver already drops any entry that arrives at or after its `windowEnd`, and times it out there (`AdhkarReminderDelivery`, which reads `windowEnd` for every kind). So:
   - a late Duha is never posted after its end;
-  - a late iqama, possible only with exact alarms revoked, is never posted more than 10 minutes on;
+  - a late iqama, possible only with exact alarms revoked, is never posted more than 10 minutes on, nor once the next adhan (or sunrise after Fajr) is in;
   - only the adhkar reminder is tagged.
 - **Channels.**
   - Bases `duha_<sound>` and `iqama_<sound>`, through `NotificationChannels.base`.

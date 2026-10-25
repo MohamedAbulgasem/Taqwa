@@ -300,7 +300,9 @@ object NotificationPlanner {
                                 voice = notifications.voice,
                                 title = copy.title(prayer, NotificationKind.IQAMA),
                                 body = copy.body(prayer, NotificationKind.IQAMA, clock, gap),
-                                windowEnd = iqamaAt + IQAMA_WINDOW,
+                                // A late post stops where the iqama itself had to: at the next
+                                // adhan (or sunrise, or the next Fajr), never in the next prayer's time.
+                                windowEnd = minOf(iqamaAt + IQAMA_WINDOW, next),
                             )
                         }
                     }
