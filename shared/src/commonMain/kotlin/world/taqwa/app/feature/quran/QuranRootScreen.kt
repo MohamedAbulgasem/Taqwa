@@ -52,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -142,6 +143,10 @@ fun QuranRootScreen(
     onOpenReader: (surah: Int, ayah: Int) -> Unit,
     onOpenMushaf: (page: Int) -> Unit,
     onRemoveBookmark: (surah: Int, ayah: Int) -> Unit,
+    /** The player bar's room at the foot of the list ([world.taqwa.app.feature.recitation.playerBarSpace]):
+     * the bar is laid over the list, so without it the last surah, juz, bookmark or hit sat
+     * under the bar and could not be scrolled out from beneath it. Zero while there is no bar. */
+    barSpace: Dp = 0.dp,
 ) {
     val colors = LocalTaqwaColors.current
     val format = LocalPlatformFormat.current
@@ -264,7 +269,8 @@ fun QuranRootScreen(
             }
         }
 
-        item(key = "bottom-spacer") { Spacer(Modifier.height(40.dp)) }
+        // The usual 40 dp below the last row, with the bar's own height on top while it is shown.
+        item(key = "bottom-spacer") { Spacer(Modifier.height(40.dp + barSpace)) }
     }
 }
 

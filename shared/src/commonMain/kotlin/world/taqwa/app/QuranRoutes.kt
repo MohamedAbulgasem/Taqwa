@@ -42,6 +42,7 @@ internal fun QuranRootRoute(
     platformFormat: PlatformFormat,
     quranQueryState: MutableState<TextFieldValue>,
     navigator: Navigator,
+    barSpace: Dp,
 ) {
     var quranQuery by quranQueryState
     val viewModel = remember {
@@ -93,6 +94,7 @@ internal fun QuranRootRoute(
         onOpenReader = { surah, ayah -> navigator.push(Screen.Reader(surah, ayah)) },
         onOpenMushaf = { page -> navigator.push(Screen.Mushaf(page)) },
         onRemoveBookmark = viewModel::removeBookmark,
+        barSpace = barSpace,
     )
 }
 

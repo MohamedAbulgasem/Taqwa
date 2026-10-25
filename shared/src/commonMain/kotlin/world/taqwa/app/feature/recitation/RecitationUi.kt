@@ -229,3 +229,15 @@ fun playerBarHeight(bar: BarState?): Dp = when {
     bar.incoming != null -> PlayerBarHeight + IncomingStripHeight
     else -> PlayerBarHeight
 }
+
+/** Whether the bar is drawn: while there is one, and only on the Quran tab (spec §5.3). */
+fun playerBarShown(bar: BarState?, onQuranTab: Boolean): Boolean = bar != null && onQuranTab
+
+/**
+ * The room a screen keeps clear at its foot for the bar, on top of its own bottom gap: the bar's
+ * height while it is drawn, and nothing at all while it is not, so a screen without the bar is
+ * laid out exactly as it was before the bar existed. The surah, juz and bookmark lists, the search
+ * results, the reader and the Mushaf all add it.
+ */
+fun playerBarSpace(bar: BarState?, onQuranTab: Boolean): Dp =
+    if (playerBarShown(bar, onQuranTab)) playerBarHeight(bar) else 0.dp

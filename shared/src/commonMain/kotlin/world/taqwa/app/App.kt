@@ -62,7 +62,8 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.ui_language
 import world.taqwa.app.feature.quran.QuranRootScreen
 import world.taqwa.app.feature.recitation.PlayerBar
-import world.taqwa.app.feature.recitation.playerBarHeight
+import world.taqwa.app.feature.recitation.playerBarShown
+import world.taqwa.app.feature.recitation.playerBarSpace
 import world.taqwa.app.feature.recitation.PlayerBarHost
 import world.taqwa.app.resources.recitation_a11y_next_ayah
 import world.taqwa.app.resources.recitation_a11y_previous_ayah
@@ -349,7 +350,8 @@ fun App(container: AppContainer) {
                 val bar = recitationState.bar
                 val barSurahName = rememberSurahName(bar?.surah) { container.quranRepository.surah(it) }
                 val incomingSurahName = rememberSurahName(bar?.incoming?.surah) { container.quranRepository.surah(it) }
-                val barSpace = playerBarHeight(bar)
+                val barShown = playerBarShown(bar, quranTab)
+                val barSpace = playerBarSpace(bar, quranTab)
                 // A surah skip (spec §15.1) takes the page with the voice: a reader on the surah
                 // that was playing is moved to the one now playing, at its first ayah, as the
                 // "Next" row at the foot of a surah would move them. A reader on some other surah
@@ -371,7 +373,7 @@ fun App(container: AppContainer) {
                     tab,
                     navigator::selectTab,
                     bar = {
-                        PlayerBarHost(visible = bar != null && quranTab) {
+                        PlayerBarHost(visible = barShown) {
                             if (bar != null) {
                                 PlayerBar(
                                     bar = bar,
@@ -423,6 +425,7 @@ fun App(container: AppContainer) {
                                 platformFormat = platformFormat,
                                 quranQueryState = quranQueryState,
                                 navigator = navigator,
+                                barSpace = barSpace,
                             )
                         }
 
