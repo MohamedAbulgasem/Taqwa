@@ -107,7 +107,7 @@ private fun readStamp(file: File): ReadStamp {
     val lateLimitPattern = Regex("^(.*): (\\d+) min(?: \\(.+\\))?$")
     val lateLimits = lateLimitsRaw.entries.mapNotNull { (label, value) ->
         val match = lateLimitPattern.matchEntire(label) ?: return@mapNotNull null
-        val minutes = match.groupValues[2].toInt()
+        val minutes = match.groupValues[2].toIntOrNull()?.takeIf { it <= 9999 } ?: error("a late limit of ${match.groupValues[2]} min")
         val entry = value as Map<String, Any?>
         val reason = entry["reason"] as? String
         val events2 = (entry["events"] as? List<Any?>)?.map { it as String } ?: emptyList()
@@ -198,10 +198,24 @@ private fun render(stamps: List<ReadStamp>): String = buildString {
 /** At most this many units' rows in one generated function (see [render]). */
 private const val UNITS_PER_FUNCTION = 40
 
+/** The only entry ids a function name is made from: anything else in a stamp is refused, never written as code. */
+private val ENTRY_ID = Regex("[a-z][a-z0-9]*([._-][a-z0-9]+)*")
+
+/** Names an entry's function may not take: Kotlin's hard keywords, and another entry's helpers (`…Units`, `…Checked`). */
+private val KEYWORDS = setOf(
+    "as", "break", "class", "continue", "do", "else", "false", "for", "fun", "if", "in", "interface", "is", "null",
+    "object", "package", "return", "super", "this", "throw", "true", "try", "typealias", "typeof", "val", "var",
+    "when", "while",
+)
+private val HELPER = Regex(".*(Units|Checked)[0-9]*")
+
 /** An entry id as a function name: "ae.iacad.dubai" → "aeIacadDubai". */
 private fun functionName(entryId: String): String {
+    require(ENTRY_ID.matches(entryId)) { "an entry id that is not lower-case letters, digits and . - _: ${literal(entryId)}" }
     val words = entryId.split('.', '-', '_').filter { it.isNotEmpty() }
-    return words.first() + words.drop(1).joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
+    val name = words.first() + words.drop(1).joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
+    require(name !in KEYWORDS && !HELPER.matches(name)) { "an entry id whose function name is a Kotlin keyword or a helper's: ${literal(entryId)}" }
+    return name
 }
 
 private fun worstLiteral(worst: Map<String, Int>): String =
@@ -210,7 +224,27 @@ private fun worstLiteral(worst: Map<String, Int>): String =
 private fun runsLiteral(runs: List<String>): String =
     if (runs.isEmpty()) "emptyList()" else "listOf(" + runs.joinToString(", ") { literal(it) } + ")"
 
-private fun literal(s: String): String = "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+/**
+ * A Kotlin string literal for any text a stamp holds: the backslash, the quote, the dollar (a template otherwise) and
+ * every control character escaped, so a stamp's text can never end the literal or run as code (finding D9). The
+ * monitor's publish job writes the same bytes with tools/timetables/monitor/ci/proof_stamps.py (ProofStampsPortTest).
+ */
+private fun literal(s: String): String = buildString {
+    append('"')
+    for (ch in s) {
+        when {
+            ch == '\\' -> append("\\\\")
+            ch == '"' -> append("\\\"")
+            ch == '$' -> append("\\$")
+            ch == '\n' -> append("\\n")
+            ch == '\r' -> append("\\r")
+            ch == '\t' -> append("\\t")
+            ch.code < 0x20 || ch == ' ' || ch == ' ' -> append("\\u%04x".format(ch.code))
+            else -> append(ch)
+        }
+    }
+    append('"')
+}
 
 private val HEADER = """
     // GENERATED FILE — do not edit by hand.

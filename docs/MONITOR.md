@@ -114,13 +114,14 @@ restricted archive and the monitor's state. Setting it up, once:
 Each run (Mondays 03:00 UTC, the 1st of each month 03:17 UTC, the days a new Hijri month is due, and
 on request) checks out the
 private repository at its branch's head and the public one at `main` into `taqwa/` (neither
-checkout keeps a token; the commit step alone is given one), installs Temurin 21
+checkout keeps a token, and this job holds none that can write), installs Temurin 21
 (with Gradle caching keyed on `gradle/libs.versions.toml` too) and Python, runs
-`taqwa/scripts/monitor.sh --verbose` with `TAQWA_OFFICIAL` set to the workspace, then commits what
-the run added or changed under `archive/` and `monitor/` (new captures, the state, the report) and
-nothing else, rebases it onto whatever arrived meanwhile (a run by hand, a queued run) and pushes,
-retrying once; when the push still fails the changes are kept as the artifact
-`monitor-run-changes-<run id>` and the job fails, so nothing captured is lost. The job fails
+`taqwa/scripts/monitor.sh --verbose` with `TAQWA_OFFICIAL` set to the workspace, then hands what
+the run added or changed under `archive/` and `monitor/` (new captures, the state, the report) to the
+clean `publish` job ("Publishing", below), which commits it and nothing else, rebases it onto whatever
+arrived meanwhile (a run by hand, a queued run) and pushes, retrying once; the handoff is kept as the
+artifact `monitor-handoff-<run id>` for 90 days, so nothing captured is lost when the push fails, and
+the run fails then. The run fails
 whenever the monitor itself failed: an exit other than 0 or 1, or a result record
 (`monitor/last-run.json`) missing or older than the run's start. Every action is pinned by commit.
 
@@ -287,23 +288,56 @@ to prove, or one that puts its rows back, commits no stamps and measures nothing
 entry's own rows changed (watch the twelve curve entries: `be.emb`, `fr.gmp`, `ie.icci`, `no.irn`,
 `kz.qmdb` and the cautious entries of Belgium, Canada, Germany, France, Ireland, Norway and Sweden).
 
-**Publishing.** The private repository's commit step then commits the pinned copies with the run's
-other changes. Only when that push landed, its rebase brought in no change under `archive/tables/`
-from elsewhere (tables the proof may read; otherwise the proof is not published and the next run
-proves again), and prove's checks were green does the next step commit the public changes (gate
-files, stamps, `ProofStamps.kt`) in `taqwa/` and push them to `MohamedAbulgasem/Taqwa` `main`.
-Before the commit it refuses a staged change that touches any other file, or that adds a line with a
-clock time's shape (`h:mm`, ruling R69; a signed offset such as `UTC+02:00` is not one); the message
-comes from `tools/timetables/monitor/proof.py message` (counts, gate files, entries and city slugs
-only; no time, no table date, no AI attribution; refused, exit 3, if it ever had a time's shape). The
-secret `TAQWA_PUSH_TOKEN` is given to that step alone; it is turned into a masked HTTP header and
-unset at once, and the header reaches git through `GIT_CONFIG_*` on the push and fetch commands
-alone (never on a command line, in a URL, or in the environment of Python or Gradle; never echoed).
-A rejected push is retried once, rebased onto `main`, **only when main's new commits touch nothing
-the proof depends on** (`tools/`, `shared/`, `widgetcore/`, `scripts/`, `site/`, `gradle/`, the build
-files): a change there (a stricter gate limit, an engine fix) means the rows were judged by rules
-`main` no longer has, so nothing is pushed and the next run proves again on the new `main`. A push
-GitHub refuses for the token (401 or 403: revoked, expired, without Contents write) is not retried.
+**Publishing.** Since 27 October 2026 (security review D1) the run is four jobs, so the token that
+pushes to Taqwa never sits on a runner that ran a fetcher, pip or Gradle (anything those run could plant
+a git hook or a background process and read it). `due` and `monitor` are read-only (D10): `monitor`
+fetches, checks and proves, commits nothing, and ends with `tools/timetables/monitor/ci/handoff.py pack`,
+which copies what the run changed under `archive/` and `monitor/`, and the gate files, stamps and
+`ProofStamps.kt` prove changed, each with its sha256 in a manifest, into the artifact
+`monitor-handoff-<run id>` (kept 90 days, so a run whose push fails loses nothing). `publish` runs on
+a clean runner and runs nothing but git and `handoff.py` from its own checkout of Taqwa (the Python
+standard library alone: no pip, no Gradle, no fetcher, no other script). `handoff.py check` refuses a
+path that is not plain, a file the manifest does not list or whose hash differs, a symlink; on the
+archive side any path outside `archive/` and `monitor/`; on the public side any path that is not a
+line of `tools/timetables/monitor/ci/bot-paths.txt` (the gate files, the stamps, `ProofStamps.kt`), a
+deletion, a stamp that is not JSON, an added line with a clock time's shape (`h:mm`, ruling R69; a
+signed offset such as `UTC+02:00` is not one), and a `ProofStamps.kt` that is not exactly what
+`ci/proof_stamps.py` writes from the resulting stamps: the publish job rebuilds the generated Kotlin
+itself, so the proving job can never ship code through it (`ProofStampsPortTest` holds the Python port
+byte-identical to `GenerateProofStamps`, whose string literals escape the backslash, the quote, the
+dollar and every control character, finding D9, and both refuse an entry id that is not plain, since
+it becomes a function name).
+
+The job then commits as `taqwa-monitor` with hooks off (`git -c core.hooksPath=/dev/null`): first the
+archive's changes to the branch the run started on (rebased onto whatever arrived meanwhile, one
+retry); only when that push landed, its rebase brought in no change under `archive/tables/` from
+elsewhere (tables the proof may read; otherwise the proof is not published and the next run proves
+again), and prove's checks were green, the proof to `MohamedAbulgasem/Taqwa` `main`, with the message
+`tools/timetables/monitor/proof.py message` wrote in the proving job (counts, gate files, entries and
+city slugs only; no time, no table date, no AI attribution; refused, exit 3, if it ever had a time's
+shape). Before that commit, **main's commits since the proving job's checkout must touch nothing the
+proof depends on** (`tools/`, `shared/`, `widgetcore/`, `scripts/`, `site/`, `gradle/`, the build
+files): a change there (a stricter gate limit, an engine fix, a hand-added row) means the rows were
+judged by rules `main` no longer has, so nothing is pushed and the next run proves again on the new
+`main`. The push is fast-forward only (main's ruleset refuses force pushes and deletions); a rejected
+one is retried once on `main` as it is then, under the same rule. Each token (the job's own
+`GITHUB_TOKEN`, Contents: write on this repository alone; the secret `TAQWA_PUSH_TOKEN`) is turned
+into a masked HTTP header and unset at once, and reaches git through `GIT_CONFIG_*` on the commands
+that push alone (never on a command line, in a URL, or in any other program's environment; never
+echoed). A push GitHub refuses for the token (401 or 403: revoked, expired, without Contents write)
+is not retried. `report` (Issues: write) writes the issue and the run's verdict.
+
+**Bot commits at a release cut.** `scripts/check-bot-commits.sh <the last cut's tag>` lists every
+commit by `taqwa-monitor` since it and fails when one touched a path outside `bot-paths.txt` (the
+publish job's own list) or is a merge.
+
+**A rehearsal.** After any change to the publish path, prove it end to end before it carries a real
+push: push the private workflow to a branch of `Taqwa-official` (never `main`) and the Taqwa code it
+runs to a branch of Taqwa, then `gh workflow run monitor-weekly.yml -R MohamedAbulgasem/Taqwa-official
+--ref <that branch> -f rehearsal=true -f taqwa_ref=<the Taqwa branch>`. A rehearsal fetches nothing and
+does not prove: it adds one comment line to one gate file in prove's place, commits the archive's
+changes to its own branch, and pushes the proof to a new Taqwa branch `monitor-rehearsal-<run id>`
+(never `main`); it never touches the issue. Check the run, then delete both branches.
 
 **The issue.** Its body gains a `## Proof` section (rows added, rows left out with the reason,
 cities newly proven or newly held, and what happened to the push), also written to the step summary;
@@ -312,7 +346,7 @@ What prove found counts as attention even on a green week: a row left out (above
 or a late end against the table: the comment says so in capitals), prove stopped or put back, a city
 newly held, or a push that did not land (the secret missing included). The body carries a fingerprint
 of those findings (`<!-- proof: … -->`, blind to dates and numbers); the issue is opened or updated
-when the fingerprint changes, and a green week closes it only when prove found nothing. The job
+when the fingerprint changes, and a green week closes it only when prove found nothing. The run
 fails when prove could not run, a check failed after rows were added, or the public push failed (a
 push skipped because `main` or the archive moved meanwhile does not fail it: the next run proves
 again).

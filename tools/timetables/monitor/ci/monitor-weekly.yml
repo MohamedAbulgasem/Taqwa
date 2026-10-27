@@ -14,33 +14,47 @@
 # day its tables hold until three days after). Only then does the full run follow, a normal one like
 # the 1st's; on every other day nothing runs past that check and nothing is touched.
 #
-# Each run checks out the archive repository at its branch's head and the public Taqwa repository
-# at main into taqwa/ (neither checkout keeps a token; the commit step alone is given one), runs
-# scripts/monitor.sh, commits and pushes whatever the run added or changed under archive/ and
-# monitor/ (nothing else; rebased onto what arrived meanwhile, retried once, and kept as an artifact
-# when the push still fails), and keeps one issue "Taqwa monitor" (label monitor-attention) open
-# while something needs attention: created or updated only when the attention set changed (always
-# when the monitor itself failed), its body rewritten from the report with a "Recovered" comment on
-# the first sound full run after a failure, closed with a one-line comment when a full run is green
-# and prove found nothing for the owner (a green run opens one only for prove's findings). A partial run (--only) adds a comment at most, whether it succeeded
-# or failed. Refused dispatch options stop the job before anything runs, and nothing else is touched.
-# The job fails when the monitor itself failed: an exit other than 0 or 1, a result record missing
-# or older than the run's start, or a push that could not land.
+# Four jobs, so the token that pushes to Taqwa never sits on a runner that ran a fetcher, pip or Gradle
+# (security review D1, 27 Oct 2026; docs/MONITOR.md, "Publishing"):
+# - "due" (read-only) asks the monitor's state whether the daily check's new month is due (below).
+# - "monitor" (read-only, no push token) checks out the archive repository at its branch's head and the public
+#   Taqwa repository at main into taqwa/ (neither checkout keeps a token), runs scripts/monitor.sh and, after a
+#   full run that is green or needs attention (never a partial run, never when the monitor itself failed),
+#   scripts/prove.sh, which turns the new captures into proof (docs/MONITOR.md, "Prove"): pinned copies, the
+#   recipes' rows, the whole gate green, the stamps, ProofStamps.kt, the golden vector byte-identical and every
+#   check, the app's own tests last (on the Android SDK platform tests.yml installs, installed just before prove
+#   the same way). It commits nothing: tools/timetables/monitor/ci/handoff.py packs what the run changed under
+#   archive/ and monitor/, and the gate files, stamps and ProofStamps.kt prove changed, each with its sha256, into
+#   the artifact monitor-handoff-<run id> (kept 90 days, so a run whose push fails loses nothing).
+# - "publish" (contents: write here; the secret TAQWA_PUSH_TOKEN) runs on a clean runner and runs nothing but
+#   git and handoff.py from its own checkout of Taqwa main (the Python standard library alone: no pip, no Gradle,
+#   no fetcher). It checks the handoff (only plain paths under archive/ and monitor/ here, only the paths of
+#   tools/timetables/monitor/ci/bot-paths.txt there, every hash, no clock time's shape, ruling R69) and writes
+#   ProofStamps.kt itself from the stamps (proof_stamps.py: the proving job's copy must equal it), then commits as
+#   taqwa-monitor with hooks off: the archive's changes to this branch (rebased onto what arrived meanwhile, retried
+#   once) and, when prove changed the public checkout with every check green and that commit landed, the proof to
+#   MohamedAbulgasem/Taqwa main, fast-forward only (a token GitHub refuses is not retried; skipped with a notice
+#   while the secret is not set). Each token reaches git as a masked header on the commands that push alone.
+# - "report" (issues: write) keeps one issue "Taqwa monitor" (label monitor-attention) open while something needs
+#   attention: created or updated only when the attention set changed (always when the monitor itself failed), its
+#   body rewritten from the report with a "Recovered" comment on the first sound full run after a failure, closed
+#   with a one-line comment when a full run is green and prove found nothing for the owner (a green run opens one
+#   only for prove's findings). A partial run (--only) adds a comment at most, whether it succeeded or failed; the
+#   issue gains a "Proof" section. Refused dispatch options stop the run before anything runs, and nothing else is
+#   touched. The run fails when the monitor itself failed (an exit other than 0 or 1, a result record missing or
+#   older than the run's start), a push could not land, the handoff was refused, or prove failed.
 #
-# After a full run that is green or needs attention (never a partial run, never when the monitor itself
-# failed), scripts/prove.sh turns the new captures into proof (docs/MONITOR.md, "Prove"): pinned copies,
-# the recipes' rows, the whole gate green, the stamps, ProofStamps.kt, the golden vector byte-identical and
-# every check, the app's own tests last (on the Android SDK platform tests.yml installs, installed just
-# before prove the same way); the pinned copies are committed here with the run's other changes, and only
-# then, when prove changed the public checkout, the change is pushed to MohamedAbulgasem/Taqwa main with
-# the secret TAQWA_PUSH_TOKEN (skipped with a notice while it is not set). The issue gains a "Proof" section.
+# A run by hand may be a rehearsal (rehearsal: true, never on main): no fetch and no prove, a comment line added to
+# one gate file in prove's place, the archive's changes committed to the branch the run was started on, and the
+# proof pushed to a new Taqwa branch monitor-rehearsal-<run id> instead of main; the issue is not touched. Delete
+# both branches afterwards.
 #
 # No secret is ever echoed: LPT_API_KEY (London Prayer Times, optional) reaches the fetcher through the
-# environment alone, TAQWA_PUSH_TOKEN reaches git as a masked HTTP header in the push step alone, and
-# every URL and message the monitor writes is masked. The push retries once, rebased, only when main's new
-# commits touch nothing the proof depends on; the issue raises prove's findings (rows left out, cities newly
-# held, a push that did not land) even on a green week, once each time they change.
-# Every action is pinned by commit (its version beside it, as the public workflows do).
+# environment alone, and every URL and message the monitor writes is masked. The push retries once, rebased,
+# only when main's new commits touch nothing the proof depends on; the issue raises prove's findings (rows left
+# out, cities newly held, a push that did not land) even on a green week, once each time they change.
+# Every action is pinned by commit (its version beside it, as the public workflows do); no step's script reads
+# an expression directly: what a job hands on reaches the next one's scripts through the environment alone.
 name: Taqwa monitor
 
 on:
@@ -54,10 +68,17 @@ on:
         description: "Options for scripts/monitor.sh: --no-fetch, --check-all, --verbose, --only <a source id of sources.tsv> (a partial run)"
         required: false
         default: ""
+      rehearsal:
+        description: "true: a rehearsal of the publish path (no fetch, no prove; the proof goes to a new Taqwa branch monitor-rehearsal-<run id>, never main; refused on main)"
+        required: false
+        default: "false"
+      taqwa_ref:
+        description: "A rehearsal only: the Taqwa branch whose monitor code it runs (else always main)"
+        required: false
+        default: "main"
 
-permissions:
-  contents: write
-  issues: write
+# Nothing by default; each job names what it needs.
+permissions: {}
 
 concurrency:
   group: taqwa-monitor
@@ -70,6 +91,8 @@ jobs:
     # run follows only when it prints one. Mondays, the 1st and a run by hand go ahead without asking.
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
     outputs:
       run: ${{ steps.decide.outputs.run }}
     steps:
@@ -120,10 +143,26 @@ jobs:
     if: ${{ !cancelled() && (needs.due.outputs.run == 'true' || github.event_name != 'schedule' || github.event.schedule != '23 1 * * *') }}
     runs-on: ubuntu-latest
     timeout-minutes: 170
+    # Read-only: this job runs third-party fetchers, pip and Gradle, so it holds no token that can write anywhere.
+    permissions:
+      contents: read
+    outputs:
+      options: ${{ steps.options.outcome }}
+      partial: ${{ steps.options.outputs.partial }}
+      code: ${{ steps.run.outputs.code }}
+      valid: ${{ steps.result.outputs.valid }}
+      changed: ${{ steps.result.outputs.changed }}
+      date: ${{ steps.result.outputs.date }}
+      summary: ${{ steps.result.outputs.summary }}
+      prove_code: ${{ steps.prove.outputs.code }}
+      prove_changed: ${{ steps.prove.outputs.changed }}
+      packed: ${{ steps.pack.outputs.packed }}
+      archive_sha: ${{ steps.pack.outputs.archive_sha }}
+      taqwa_sha: ${{ steps.pack.outputs.taqwa_sha }}
     env:
       TAQWA_OFFICIAL: ${{ github.workspace }}
       BRANCH: ${{ github.ref_name }}
-      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      REHEARSAL: ${{ github.event.inputs.rehearsal == 'true' }}
     steps:
       - name: Check out the archive at the branch's head
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
@@ -135,7 +174,7 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           repository: MohamedAbulgasem/Taqwa
-          ref: main
+          ref: ${{ github.event.inputs.rehearsal == 'true' && github.event.inputs.taqwa_ref || 'main' }}
           path: taqwa
           persist-credentials: false
 
@@ -164,6 +203,7 @@ jobs:
         id: options
         env:
           OPTIONS: ${{ github.event.inputs.options }}
+          TAQWA_REF: ${{ github.event.inputs.taqwa_ref }}
         run: |
           # Only --no-fetch, --check-all, --verbose and --only <a source id listed in sources.tsv> pass;
           # anything else stops the job before the monitor runs. The words are split with globbing off
@@ -195,6 +235,13 @@ jobs:
             esac
           done
           if [ "$expect_source" = true ]; then echo "::error::--only needs a source id"; exit 1; fi
+          if [ "$REHEARSAL" = true ]; then
+            # A rehearsal of the publish path: never on main, never a partial run, and nothing fetched.
+            if [ "$BRANCH" = main ]; then echo "::error::a rehearsal never runs on main: start it on another branch"; exit 1; fi
+            if [[ ! "$TAQWA_REF" =~ ^[A-Za-z0-9._/-]+$ ]]; then echo "::error::taqwa_ref is not a branch name"; exit 1; fi
+            if [ "$partial" = true ]; then echo "::error::a rehearsal is never a partial run"; exit 1; fi
+            args+=(--no-fetch)
+          fi
           : > .monitor-args
           for a in ${args[@]+"${args[@]}"}; do printf '%s\n' "$a" >> .monitor-args; done
           echo "partial=$partial" >> "$GITHUB_OUTPUT"
@@ -312,8 +359,24 @@ jobs:
         run: |
           set +e
           rm -rf monitor/proof
-          # The site's checks need what the public Pages workflow installs (tzdata unpinned there too: the newest zones).
-          python3 -m pip install --quiet markdown==3.10.3 tzdata
+          if [ "$REHEARSAL" = true ]; then
+            # The rehearsal's stand-in for prove: one comment line in one gate file, nothing else.
+            mkdir -p monitor/proof
+            gate="$(ls taqwa/tools/timetables/official/gate/*.tsv | head -1)"
+            printf '# Rehearsal of the monitor'"'"'s publish job (run %s): this branch is deleted afterwards.\n' "$GITHUB_RUN_ID" >> "$gate"
+            echo true > monitor/proof/changed
+            echo "code=0" >> "$GITHUB_OUTPUT"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Rehearsal: $(basename "$gate") gained a comment line"
+            exit 0
+          fi
+          # The site's checks need what the public Pages workflow installs, pinned with their hashes here (tzdata: the
+          # newest zones when this was written; raise it with the Pages workflow's).
+          printf '%s\n' \
+            'markdown==3.10.3 --hash=sha256:fa6c92a00a4a3c98b22728c64a935ae1928250ae65058a6ded814d2cc29a4cea --hash=sha256:3589362618f743188b4d955b874402bc814f4f83f544dc207719f4baa7d9c45f' \
+            'tzdata==2026.5 --hash=sha256:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac --hash=sha256:8cc73c0a0bfca7dbfa59235d60b2eff82231dee33f53d206db1acd9173cfc0a7' \
+            > "$RUNNER_TEMP/site-requirements.txt"
+          python3 -m pip install --quiet --require-hashes --no-deps -r "$RUNNER_TEMP/site-requirements.txt"
           taqwa/scripts/prove.sh --date "$RUN_DATE"
           code=$?
           changed="$(cat monitor/proof/changed 2>/dev/null || echo false)"
@@ -322,73 +385,168 @@ jobs:
           echo "Prove exited $code (public change: $changed)"
           exit 0
 
-      - name: Commit what the run added or changed
-        id: commit
+      - name: Pack what the run changed for the publish job
+        id: pack
+        # Whatever happened after the options passed: the archive's changes always (a failed monitor's log and
+        # record too), the public files only when prove changed them with every check green. Nothing is committed
+        # here; the publish job checks every path and hash before it commits anything.
         if: always() && steps.options.outcome == 'success'
+        env:
+          PROVE_CODE: ${{ steps.prove.outputs.code }}
+          PROVE_CHANGED: ${{ steps.prove.outputs.changed }}
+        run: |
+          set -euo pipefail
+          rm -rf monitor/lock
+          out="$RUNNER_TEMP/handoff"
+          rm -rf "$out"
+          mkdir -p "$out"
+          echo "archive_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "taqwa_sha=$(git -C taqwa rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # The archive's side first and always: what the run captured is never lost to a failure on the public side.
+          python3 taqwa/tools/timetables/monitor/ci/handoff.py pack --archive . --out "$out" | tee "$RUNNER_TEMP/pack.log"
+          grep -q '^packed=true$' "$RUNNER_TEMP/pack.log"
+          if [ "${PROVE_CODE:-}" = 0 ] && [ "${PROVE_CHANGED:-}" = true ]; then
+            # The public side when prove changed it with every check green. A failure here leaves the public half out:
+            # the publish job then refuses the push with the reason (no public.manifest) and the run fails.
+            if [ "$REHEARSAL" = true ]; then
+              printf 'Rehearsal of the monitor'"'"'s publish job (run %s), never on main\n' "$GITHUB_RUN_ID" > "$out/proof-message.txt"
+            else
+              python3 taqwa/tools/timetables/monitor/proof.py message monitor/proof > "$out/proof-message.txt" || rm -f "$out/proof-message.txt"
+            fi
+            if ! python3 taqwa/tools/timetables/monitor/ci/handoff.py pack --taqwa taqwa --out "$out"; then
+              rm -rf "$out/public" "$out/public.manifest"
+              echo "::warning::the public side could not be packed; the proof is not pushed this run"
+            fi
+          fi
+          # What the report job reads: the issue's body and prove's own report (also committed under monitor/).
+          if [ -f issue-body.md ]; then cp issue-body.md "$out/issue-body.md"; fi
+          if [ -d monitor/proof ]; then cp -R monitor/proof "$out/proof"; fi
+          echo "packed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Keep the handoff
+        if: always() && steps.pack.outputs.packed == 'true'
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: monitor-handoff-${{ github.run_id }}
+          path: ${{ runner.temp }}/handoff
+          retention-days: 90
+          if-no-files-found: error
+
+  publish:
+    needs: monitor
+    # A clean runner that runs nothing but git and handoff.py (the Python standard library alone) from its own
+    # checkout of Taqwa: no pip, no Gradle, no fetcher, nothing from the monitor job but the handoff's data.
+    if: ${{ !cancelled() && needs.monitor.outputs.packed == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    outputs:
+      archive: ${{ steps.archive.outputs.state }}
+      archivefailed: ${{ steps.archive.outputs.pushfailed }}
+      state: ${{ steps.publish.outputs.state }}
+      pushfailed: ${{ steps.publish.outputs.pushfailed }}
+    env:
+      BRANCH: ${{ github.ref_name }}
+      REHEARSAL: ${{ github.event.inputs.rehearsal == 'true' }}
+    steps:
+      - name: Check out the archive where the run checked it out
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          ref: ${{ needs.monitor.outputs.archive_sha }}
+          persist-credentials: false
+
+      - name: Check out Taqwa at main
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: MohamedAbulgasem/Taqwa
+          ref: ${{ github.event.inputs.rehearsal == 'true' && github.event.inputs.taqwa_ref || 'main' }}
+          path: taqwa
+          persist-credentials: false
+
+      - name: Fetch the handoff
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        with:
+          name: monitor-handoff-${{ github.run_id }}
+          path: ${{ runner.temp }}/handoff
+
+      - name: Check the archive's changes and apply them
+        id: apply
+        # Only plain paths under archive/ and monitor/, each file the manifest's hash, nothing it does not list.
+        run: |
+          set -uo pipefail
+          if [ "$REHEARSAL" = true ] && [ "$BRANCH" = main ]; then echo "::error::a rehearsal never commits to main"; exit 1; fi
+          code=0
+          python3 taqwa/tools/timetables/monitor/ci/handoff.py check --kind private --from "$RUNNER_TEMP/handoff" --into . > "$RUNNER_TEMP/check.log" || code=$?
+          cat "$RUNNER_TEMP/check.log"
+          if [ "$code" != 0 ]; then echo "::error::the archive's changes were refused: $(tail -1 "$RUNNER_TEMP/check.log")"; exit 1; fi
+
+      - name: Commit what the run added or changed
+        id: archive
+        # As taqwa-monitor, hooks off, rebased onto whatever arrived meanwhile (a run by hand, a queued run), one
+        # retry; when the push still fails the job says so (the handoff artifact keeps the changes 90 days). The
+        # token is turned into a masked header at once, and reaches git on the pull and push commands alone. When the
+        # rebase brought in changes under archive/tables/ (tables the proof may read, changed after the run checked
+        # them out), archivemoved=true keeps the proof from the public repository: the next run proves again.
+        if: steps.apply.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          # Only archive/ and monitor/, rebased onto whatever arrived meanwhile (a run by hand, a queued
-          # run), one retry; when the push still fails the changes are kept as an artifact and the job
-          # fails. The token is given to this step alone, on the remote URL. When the rebase brought in
-          # changes under archive/tables/ (tables the proof may read, changed after this run checked them
-          # out), archivemoved=true keeps the proof from the public repository: the next run proves again.
           set -uo pipefail
-          git config user.name "taqwa-monitor"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          rm -rf monitor/lock
-          checked_out="$(git rev-parse HEAD)"
-          git add -A archive monitor
-          if git diff --cached --quiet; then
+          basic="$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 | tr -d '\n')"
+          unset GITHUB_TOKEN
+          echo "::add-mask::$basic"
+          G() { git -c core.hooksPath=/dev/null "$@"; }
+          authed() {
+            GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic" G "$@"
+          }
+          G config user.name "taqwa-monitor"
+          G config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          checked_out="$(G rev-parse HEAD)"
+          G add -A archive monitor
+          if G diff --cached --quiet; then
             echo "Nothing to commit"
+            echo "state=nothing to commit" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git commit -q -m "Monitor: run of $(date -u +%Y-%m-%d)"
-          git diff -z --name-only --diff-filter=d HEAD~1 HEAD -- archive monitor > changed-files.z
-          remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          G commit -q -m "Monitor: run of $(date -u +%Y-%m-%d)"
+          remote="https://github.com/${GITHUB_REPOSITORY}.git"
           for attempt in 1 2; do
-            if git pull --rebase "$remote" "$BRANCH" && git push "$remote" "HEAD:$BRANCH"; then
+            if authed pull -q --rebase "$remote" "$BRANCH" && authed push -q "$remote" "HEAD:$BRANCH"; then
               echo "Pushed"
+              echo "state=pushed" >> "$GITHUB_OUTPUT"
               # HEAD~1 is the branch's head this run's commit now sits on; what it changed under archive/tables/
               # since the checkout is what another run or a hand commit brought in meanwhile.
-              if [ -n "$(git diff --name-only "$checked_out" HEAD~1 -- archive/tables | head -1)" ]; then
+              if [ -n "$(G diff --name-only "$checked_out" HEAD~1 -- archive/tables | head -1)" ]; then
                 echo "The rebase brought in changes under archive/tables/; the proof is not published this run"
                 echo "archivemoved=true" >> "$GITHUB_OUTPUT"
               fi
               exit 0
             fi
-            git rebase --abort 2>/dev/null || true
+            G rebase --abort 2>/dev/null || true
             echo "The push did not land (attempt $attempt)"
             sleep 20
           done
-          tar --null -T changed-files.z -czf monitor-run-changes.tgz
-          echo "::error::the push was rejected twice; this run's changes are kept as the artifact monitor-run-changes"
+          echo "::error::the push was rejected twice; this run's changes are kept as the artifact monitor-handoff-$GITHUB_RUN_ID"
           echo "pushfailed=true" >> "$GITHUB_OUTPUT"
-
-      - name: Keep the changes when the push failed
-        if: always() && steps.commit.outputs.pushfailed == 'true'
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        with:
-          name: monitor-run-changes-${{ github.run_id }}
-          path: monitor-run-changes.tgz
-          retention-days: 90
 
       - name: Push the proof to Taqwa's main
         id: publish
         # Only when prove changed the public checkout with every check green AND this run's archive commit (the
-        # pinned copies the new rows read) landed without bringing in other changes under archive/tables/. The token
-        # (TAQWA_PUSH_TOKEN, a fine-grained token with Contents: write on MohamedAbulgasem/Taqwa alone) is given to
-        # this step only: it is turned into a masked header and unset at once, and the header reaches git through
-        # GIT_CONFIG_* on the push and fetch commands alone (never on a command line, in a URL, or in the environment
-        # of python or Gradle). Without the secret the step skips with a notice. Before the commit, the staged change
-        # must touch only the gate files, the stamps and ProofStamps.kt, and no added line may carry a clock time
-        # (ruling R69). A rejected push is retried once, rebased onto main, only when main's new commits touch nothing
-        # the proof depends on (the engine, the gate, the generator, the site, the scripts, the build); otherwise
-        # nothing is pushed and the next run proves again on the new main. A token GitHub refuses is not retried.
-        if: always() && steps.prove.outputs.code == '0' && steps.prove.outputs.changed == 'true' && steps.commit.outcome == 'success' && steps.commit.outputs.pushfailed != 'true'
+        # pinned copies the new rows read) landed without bringing in other changes under archive/tables/. On Taqwa
+        # as it is now: when main's commits since the run's own checkout touch what the proof depends on (the engine,
+        # the gate, the generator, the site, the scripts, the build), nothing is pushed and the next run proves again.
+        # handoff.py (from this job's own checkout) refuses any path outside bot-paths.txt, a deletion, a hash that
+        # differs, a clock time's shape (ruling R69), and a ProofStamps.kt that is not what proof_stamps.py writes from
+        # the stamps. The token (TAQWA_PUSH_TOKEN, a fine-grained token with Contents: write on MohamedAbulgasem/Taqwa
+        # alone) is turned into a masked header at once and reaches git on the push commands alone; the push is
+        # fast-forward only (main's ruleset refuses anything else), retried once on a main that moved elsewhere. A
+        # token GitHub refuses is not retried. Without the secret the step skips with a notice.
+        if: ${{ !cancelled() && needs.monitor.outputs.prove_code == '0' && needs.monitor.outputs.prove_changed == 'true' && steps.archive.outcome == 'success' && steps.archive.outputs.pushfailed != 'true' }}
         env:
           TAQWA_PUSH_TOKEN: ${{ secrets.TAQWA_PUSH_TOKEN }}
-          ARCHIVE_MOVED: ${{ steps.commit.outputs.archivemoved }}
+          ARCHIVE_MOVED: ${{ steps.archive.outputs.archivemoved }}
+          PROVEN_ON: ${{ needs.monitor.outputs.taqwa_sha }}
         run: |
           set -uo pipefail
           if [ -z "${TAQWA_PUSH_TOKEN:-}" ]; then
@@ -400,9 +558,9 @@ jobs:
           basic="$(printf 'x-access-token:%s' "$TAQWA_PUSH_TOKEN" | base64 | tr -d '\n')"
           unset TAQWA_PUSH_TOKEN
           echo "::add-mask::$basic"
-          # git with the header, for the commands that talk to GitHub; nothing else sees it.
+          G() { git -c core.hooksPath=/dev/null "$@"; }
           authed() {
-            GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic" git "$@"
+            GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic" G "$@"
           }
           refused() {
             echo "state=not pushed: $1" >> "$GITHUB_OUTPUT"
@@ -415,67 +573,109 @@ jobs:
             echo "state=not pushed: the archive's tables changed upstream while this run proved (another run or a hand commit); the next run proves again" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          [[ "$PROVEN_ON" =~ ^[0-9a-f]{40}$ ]] || refused "the monitor job named no Taqwa commit"
+          target=main
+          if [ "$REHEARSAL" = true ]; then target="monitor-rehearsal-$GITHUB_RUN_ID"; fi
           remote="https://github.com/MohamedAbulgasem/Taqwa.git"
+          # handoff.py check reads the message before anything is committed: short plain text, no time's shape, no trailer.
+          message="$RUNNER_TEMP/handoff/proof-message.txt"
           cd taqwa
-          checked_out="$(git rev-parse HEAD)"
-          git config user.name "taqwa-monitor"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A tools/timetables/official/gate tools/timetables/official/stamps shared/src/commonMain/kotlin/world/taqwa/app/prayer/engine/registry/data/ProofStamps.kt
-          if git diff --cached --quiet; then
-            echo "state=nothing to push" >> "$GITHUB_OUTPUT"
+          G config user.name "taqwa-monitor"
+          G config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # On the current HEAD: main's commits since the run's checkout must leave the proof's ground alone, then the
+          # handoff is checked, applied and committed. Prints nothing secret; "moved" when main moved under the proof.
+          commit_proof() {
+            G fetch -q --depth=1 "$remote" "$PROVEN_ON" || refused "the run's Taqwa commit could not be fetched"
+            moved="$(G diff --name-only "$PROVEN_ON" HEAD | grep -E '^(tools/|shared/|widgetcore/|scripts/|site/|gradle/|buildSrc/|[^/]+\.gradle\.kts$|gradle\.properties$)' || true)"
+            if [ -n "$moved" ]; then
+              printf '%s\n' "$moved" | head -20
+              return 1
+            fi
+            local code=0
+            python3 tools/timetables/monitor/ci/handoff.py check --kind public --from "$RUNNER_TEMP/handoff" --into . > "$RUNNER_TEMP/check.log" || code=$?
+            cat "$RUNNER_TEMP/check.log"
+            [ "$code" = 0 ] || refused "the handoff was refused: $(tail -1 "$RUNNER_TEMP/check.log")"
+            G add -A tools/timetables/official/gate tools/timetables/official/stamps shared/src/commonMain/kotlin/world/taqwa/app/prayer/engine/registry/data/ProofStamps.kt
+            if G diff --cached --quiet; then
+              echo "state=nothing to push" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            G commit -q -F "$message" || refused "git commit failed"
+          }
+          not_moved_or_stop() {
+            echo "::warning::main changed what the proof depends on while this run proved; not pushed, the next run proves again on the new main"
+            echo "state=not pushed: main changed the engine, the gate, the generator, the site or the build while this run proved; the next run proves again on the new main" >> "$GITHUB_OUTPUT"
             exit 0
-          fi
-          # Defence in depth (ruling R69): only the files prove writes, and no added line with a clock time's shape.
-          stray="$(git diff --cached --name-only | grep -v -E '^(tools/timetables/official/gate/[^/]+\.tsv|tools/timetables/official/stamps/[^/]+\.json|shared/src/commonMain/kotlin/world/taqwa/app/prayer/engine/registry/data/ProofStamps\.kt)$' || true)"
-          [ -z "$stray" ] || refused "the staged change touches files prove never writes: $(printf '%s' "$stray" | head -5 | tr '\n' ' ')"
-          if git diff --cached -U0 | grep -E '^\+' | grep -v -E '^\+\+\+ ' | sed 's/^+//' | grep -q -E '(^|[^0-9+-])[0-2]?[0-9]:[0-5][0-9]([^0-9]|$)'; then
-            refused "an added line has a clock time's shape (ruling R69); nothing was committed (see monitor/proof/ in the archive)"
-          fi
-          python3 tools/timetables/monitor/proof.py message "$GITHUB_WORKSPACE/monitor/proof" > "$RUNNER_TEMP/proof-message.txt" || refused "proof.py could not write the commit message"
-          git commit -q -F "$RUNNER_TEMP/proof-message.txt" || refused "git commit failed"
-          if authed push -q "$remote" HEAD:main 2> "$RUNNER_TEMP/push.err"; then
-            echo "state=pushed to main ($(git rev-parse --short HEAD))" >> "$GITHUB_OUTPUT"
-            echo "Pushed $(git rev-parse --short HEAD) to Taqwa main"
+          }
+          commit_proof || not_moved_or_stop
+          if authed push -q "$remote" "HEAD:refs/heads/$target" 2> "$RUNNER_TEMP/push.err"; then
+            echo "state=pushed to $target ($(G rev-parse --short HEAD))" >> "$GITHUB_OUTPUT"
+            echo "Pushed $(G rev-parse --short HEAD) to Taqwa $target"
             exit 0
           fi
           cat "$RUNNER_TEMP/push.err" >&2
           if grep -q -i -E 'error: 40[13]|returned error: 40[13]|authentication failed|invalid username or (password|token)|permission to .* denied|write access to repository not granted' "$RUNNER_TEMP/push.err"; then
             refused "GitHub refused the token (revoked, expired, or without Contents: write on Taqwa): replace the secret TAQWA_PUSH_TOKEN (docs/MONITOR.md)"
           fi
-          echo "The push was rejected; looking at what main gained since this run checked it out"
-          authed fetch -q "$remote" main || refused "the push was rejected and main could not be fetched"
-          moved="$(git diff --name-only "$checked_out" FETCH_HEAD | grep -E '^(tools/|shared/|widgetcore/|scripts/|site/|gradle/|buildSrc/|[^/]+\.gradle\.kts$|gradle\.properties$)' || true)"
-          if [ -n "$moved" ]; then
-            echo "::warning::main changed what the proof depends on while this run proved; not pushed, the next run proves again on the new main"
-            printf '%s\n' "$moved" | head -20
-            echo "state=not pushed: main changed the engine, the gate, the generator, the site or the build while this run proved; the next run proves again on the new main" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if ! git rebase -q FETCH_HEAD; then
-            git rebase --abort 2>/dev/null || true
-            refused "the rebase onto main failed"
-          fi
-          if authed push -q "$remote" HEAD:main; then
-            echo "state=pushed to main after a rebase ($(git rev-parse --short HEAD))" >> "$GITHUB_OUTPUT"
-            echo "Pushed $(git rev-parse --short HEAD) to Taqwa main (rebased onto commits that touch nothing the proof depends on)"
+          [ "$target" = main ] || refused "the push to $target was rejected"
+          echo "The push was rejected; trying once more on main as it is now"
+          G fetch -q --depth=1 "$remote" main || refused "the push was rejected and main could not be fetched"
+          G reset -q --hard FETCH_HEAD
+          commit_proof || not_moved_or_stop
+          if authed push -q "$remote" "HEAD:refs/heads/$target"; then
+            echo "state=pushed to main after a retry ($(G rev-parse --short HEAD))" >> "$GITHUB_OUTPUT"
+            echo "Pushed $(G rev-parse --short HEAD) to Taqwa main (main had moved, touching nothing the proof depends on)"
             exit 0
           fi
           refused "the push to Taqwa main was rejected twice; the pinned copies are committed and the next run proves again"
 
+  report:
+    needs: [monitor, publish]
+    # The issue and the run's verdict. Runs whenever the options passed, whatever the publish job did.
+    if: ${{ !cancelled() && needs.monitor.outputs.options == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    env:
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      REHEARSAL: ${{ github.event.inputs.rehearsal == 'true' }}
+    steps:
+      - name: Check out Taqwa's monitor code
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          repository: MohamedAbulgasem/Taqwa
+          ref: ${{ github.event.inputs.rehearsal == 'true' && github.event.inputs.taqwa_ref || 'main' }}
+          path: taqwa
+          persist-credentials: false
+          sparse-checkout: tools/timetables/monitor
+
+      - name: Fetch the handoff
+        if: needs.monitor.outputs.packed == 'true'
+        continue-on-error: true
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        with:
+          name: monitor-handoff-${{ github.run_id }}
+          path: ${{ runner.temp }}/handoff
+
       - name: Write the proof section
         id: proofsection
-        if: always() && steps.options.outcome == 'success' && steps.options.outputs.partial != 'true'
+        if: needs.monitor.outputs.partial != 'true'
         env:
-          PUSHED: ${{ steps.publish.outputs.state }}
-          PROVE_CODE: ${{ steps.prove.outputs.code }}
-          PROVE_CHANGED: ${{ steps.prove.outputs.changed }}
+          PUSHED: ${{ needs.publish.outputs.state }}
+          ARCHIVE_FAILED: ${{ needs.publish.outputs.archivefailed }}
+          PROVE_CODE: ${{ needs.monitor.outputs.prove_code }}
+          PROVE_CHANGED: ${{ needs.monitor.outputs.prove_changed }}
         run: |
           # The issue body (restricted repository) gains "## Proof": rows added, rows left out with the reason, cities
           # newly proven (the generator's notices before and after), and whether the public push landed. A week where
           # prove did not run says so (never last week's report). The attention lines (fingerprint, tier1, summary) let
           # the issue step raise what prove found even on a green week.
           state="$PUSHED"
-          dir=monitor/proof
+          dir="$RUNNER_TEMP/handoff/proof"
+          cp "$RUNNER_TEMP/handoff/issue-body.md" issue-body.md 2>/dev/null || printf '<!-- monitor-failed -->\n**Taqwa monitor.** The monitor job left no handoff (see the run).\n' > issue-body.md
+          if [ "$ARCHIVE_FAILED" = true ]; then state="not pushed: this run's archive commit did not land (its changes are kept as the artifact monitor-handoff-$GITHUB_RUN_ID)"; fi
           if [ -z "$PROVE_CODE" ]; then dir="$RUNNER_TEMP/prove-did-not-run"; state="not run"; fi
           if [ -z "$state" ] && [ "$PROVE_CODE" = 1 ]; then state="not pushed: a check failed after rows were added, everything was put back (see the log)"; fi
           if [ -z "$state" ] && [ "$PROVE_CODE" = 0 ] && [ "$PROVE_CHANGED" = true ]; then state="not pushed: this run's archive commit did not land, so the rows' pinned copies are not in the archive repository"; fi
@@ -488,15 +688,14 @@ jobs:
           cat proof-section.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Open, update or close the issue
-        if: always() && steps.options.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
-          CODE: ${{ steps.run.outputs.code }}
-          VALID: ${{ steps.result.outputs.valid }}
-          PARTIAL: ${{ steps.options.outputs.partial }}
-          CHANGED: ${{ steps.result.outputs.changed }}
-          RUN_DATE: ${{ steps.result.outputs.date }}
-          SUMMARY: ${{ steps.result.outputs.summary }}
+          CODE: ${{ needs.monitor.outputs.code }}
+          VALID: ${{ needs.monitor.outputs.valid }}
+          PARTIAL: ${{ needs.monitor.outputs.partial }}
+          CHANGED: ${{ needs.monitor.outputs.changed }}
+          RUN_DATE: ${{ needs.monitor.outputs.date }}
+          SUMMARY: ${{ needs.monitor.outputs.summary }}
           PROOF_FP: ${{ steps.proofsection.outputs.fingerprint }}
           PROOF_TIER1: ${{ steps.proofsection.outputs.tier1 }}
           PROOF_SUMMARY: ${{ steps.proofsection.outputs.summary }}
@@ -505,6 +704,13 @@ jobs:
           # stopped or put back; a city newly held; a public push that did not land), even on a green week: the body
           # carries its fingerprint, and the issue is opened or updated when the fingerprint changes.
           set -euo pipefail
+          if [ "$REHEARSAL" = true ]; then
+            echo "Rehearsal: the issue is not touched"
+            exit 0
+          fi
+          if [ ! -f issue-body.md ]; then
+            cp "$RUNNER_TEMP/handoff/issue-body.md" issue-body.md 2>/dev/null || printf '<!-- monitor-failed -->\n**Taqwa monitor.** The monitor job left no handoff (see the run).\n' > issue-body.md
+          fi
           number="$(gh issue list --state open --label monitor-attention --limit 20 --json number,title --jq '[.[] | select(.title == "Taqwa monitor")][0].number // empty')"
           body=""
           if [ -n "$number" ]; then body="$(gh issue view "$number" --json body --jq .body || true)"; fi
@@ -559,14 +765,22 @@ jobs:
             echo "Opened the issue"
           fi
 
-      - name: Fail the job when the options were refused, the monitor itself failed, its changes did not land, or prove failed
-        if: always() && (steps.options.outcome != 'success' || steps.result.outputs.valid != 'true' || steps.commit.outputs.pushfailed == 'true' || (steps.prove.outputs.code != '' && steps.prove.outputs.code != '0') || steps.publish.outputs.pushfailed == 'true')
+      - name: Fail the run when the monitor itself failed, a push did not land, the handoff was refused, or prove failed
+        if: ${{ !cancelled() && (needs.monitor.outputs.valid != 'true' || needs.monitor.outputs.packed != 'true' || needs.publish.result == 'failure' || needs.publish.outputs.archivefailed == 'true' || (needs.monitor.outputs.prove_code != '' && needs.monitor.outputs.prove_code != '0') || needs.publish.outputs.pushfailed == 'true') }}
+        env:
+          CODE: ${{ needs.monitor.outputs.code }}
+          VALID: ${{ needs.monitor.outputs.valid }}
+          PACKED: ${{ needs.monitor.outputs.packed }}
+          PUBLISH: ${{ needs.publish.result }}
+          ARCHIVE_FAILED: ${{ needs.publish.outputs.archivefailed }}
+          PROVE_CODE: ${{ needs.monitor.outputs.prove_code }}
+          PUSH_FAILED: ${{ needs.publish.outputs.pushfailed }}
         run: |
-          if [ "${{ steps.options.outcome }}" != "success" ]; then
-            echo "::error::the dispatch options were refused (see the 'Check the options' step); nothing ran and nothing was touched"
-          elif [ "${{ steps.result.outputs.valid }}" != "true" ] || [ "${{ steps.commit.outputs.pushfailed }}" = "true" ]; then
-            echo "::error::the monitor itself failed (exit ${{ steps.run.outputs.code }}, result valid: ${{ steps.result.outputs.valid }}, push failed: ${{ steps.commit.outputs.pushfailed }})"
+          if [ "$VALID" != true ]; then
+            echo "::error::the monitor itself failed (exit $CODE, result valid: $VALID)"
+          elif [ "$PACKED" != true ] || [ "$PUBLISH" = failure ] || [ "$ARCHIVE_FAILED" = true ]; then
+            echo "::error::the run's changes did not land (packed: $PACKED, publish job: $PUBLISH, archive push failed: $ARCHIVE_FAILED); see the publish job"
           else
-            echo "::error::prove did not publish (prove exit ${{ steps.prove.outputs.code }}, Taqwa push failed: ${{ steps.publish.outputs.pushfailed }}); the issue's Proof section says why"
+            echo "::error::prove did not publish (prove exit $PROVE_CODE, Taqwa push failed: $PUSH_FAILED); the issue's Proof section says why"
           fi
           exit 1

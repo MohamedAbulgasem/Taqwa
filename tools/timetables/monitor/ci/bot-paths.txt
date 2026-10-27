@@ -1,0 +1,8 @@
+# The only paths the weekly monitor's bot (taqwa-monitor) may commit to Taqwa: one extended regular expression per line,
+# matched against the whole path. The publish job refuses a handoff that names any other path
+# (tools/timetables/monitor/ci/handoff.py), and scripts/check-bot-commits.sh fails a release cut on any bot commit
+# that touched one (docs/MONITOR.md, "Publishing"). Data only: the gate's rows, the stamps, and ProofStamps.kt, which
+# the publish job writes itself from the stamps (proof_stamps.py) rather than trusting the proving job's copy.
+tools/timetables/official/gate/[a-z0-9][a-z0-9._-]*\.tsv
+tools/timetables/official/stamps/[a-z0-9][a-z0-9._-]*\.json
+shared/src/commonMain/kotlin/world/taqwa/app/prayer/engine/registry/data/ProofStamps\.kt

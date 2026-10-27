@@ -205,11 +205,79 @@ class Workflow(unittest.TestCase):
         unset = [i for i, line in enumerate(publish.split("\n")) if "unset TAQWA_PUSH_TOKEN" in line]
         self.assertTrue(unset)
         self.assertTrue(all(i < max(unset) for i in uses), uses)
-        self.assertNotIn("git -c", publish)
+        self.assertIn('G() { git -c core.hooksPath=/dev/null "$@"; }', publish)
         self.assertNotIn("gradlew", publish)
         self.assertIn("GIT_CONFIG_VALUE_0", publish)
-        # A retry only when main's new commits leave what the proof depends on alone.
-        self.assertIn("git diff --name-only \"$checked_out\" FETCH_HEAD", publish)
+        # The header reaches git on the push commands alone.
+        authed = [line.strip() for line in publish.split("\n") if "authed " in line and "authed()" not in line]
+        self.assertTrue(authed)
+        self.assertTrue(all(line.startswith("if authed push ") for line in authed), authed)
+        # Pushed only when main's commits since the run's checkout leave what the proof depends on alone.
+        self.assertIn('G diff --name-only "$PROVEN_ON" HEAD', publish)
+        self.assertIn("handoff.py check --kind public", publish)
+
+    def job(self, name):
+        with open(self.PATH, encoding="utf-8") as f:
+            text = f.read()
+        start = text.index("\n  %s:\n" % name)
+        ends = [text.index("\n  %s:\n" % other, start + 1) for other in ("due", "monitor", "publish", "report")
+                if "\n  %s:\n" % other in text[start + 1:]]
+        return text[start:min(ends)] if ends else text[start:]
+
+    def test_each_job_holds_only_what_it_needs(self):
+        # Security review D10: nothing by default, read-only where third-party code runs.
+        import re
+        with open(self.PATH, encoding="utf-8") as f:
+            self.assertIn("\npermissions: {}\n", f.read())
+        def permissions(job):
+            m = re.search(r"\n    permissions:\n((?:      .*\n)+)", self.job(job))
+            return sorted(line.strip() for line in m.group(1).splitlines())
+        self.assertEqual(["contents: read"], permissions("due"))
+        self.assertEqual(["contents: read"], permissions("monitor"))
+        self.assertEqual(["contents: write"], permissions("publish"))
+        self.assertEqual(["contents: read", "issues: write"], permissions("report"))
+
+    def test_the_push_token_lives_on_a_clean_runner_that_runs_no_fetcher_pip_or_gradle(self):
+        # Security review D1: what ran before the push (the fetchers, pip, Gradle) could read a token on its runner.
+        with open(self.PATH, encoding="utf-8") as f:
+            text = f.read()
+        publish = self.job("publish")
+        self.assertEqual(text.count("secrets.TAQWA_PUSH_TOKEN"), publish.count("secrets.TAQWA_PUSH_TOKEN"))
+        self.assertEqual(1, publish.count("secrets.TAQWA_PUSH_TOKEN"))
+        for word in ("pip ", "gradlew", "setup-java", "setup-python", "prove.sh", "monitor.sh", "fetch.py", "--taqwa"):
+            self.assertNotIn(word, publish, word)
+        self.assertNotIn("TAQWA_PUSH_TOKEN", self.job("monitor"))
+        self.assertNotIn("contents: write", self.job("monitor"))
+        # Every git command in the publish job runs with hooks off (G), never a bare git.
+        for name, script in self.steps():
+            if name in ("Commit what the run added or changed", "Push the proof to Taqwa's main"):
+                bare = [line for line in script.split("\n") if line.strip().startswith("git ")]
+                self.assertEqual([], bare, name)
+
+    def test_pip_installs_are_pinned_with_their_hashes(self):
+        with open(self.PATH, encoding="utf-8") as f:
+            installs = [line for line in f.read().splitlines() if "pip install" in line]
+        self.assertTrue(installs)
+        for line in installs:
+            self.assertIn("--require-hashes", line)
+
+    def test_no_script_reads_an_expression_directly(self):
+        # What a job hands on (a summary, a commit, a date) reaches a script through the environment alone.
+        import re
+        with open(self.PATH, encoding="utf-8") as f:
+            lines = f.read().split("\n")
+        i = 0
+        while i < len(lines):
+            m = re.match(r"^(\s*)run: (.*)$", lines[i])
+            if m and not lines[i].lstrip().startswith("run: ${{ steps."):
+                indent, body = len(m.group(1)), [m.group(2)]
+                i += 1
+                while i < len(lines) and (not lines[i].strip() or len(lines[i]) - len(lines[i].lstrip()) > indent):
+                    body.append(lines[i])
+                    i += 1
+                self.assertNotIn("${{", "\n".join(body))
+                continue
+            i += 1
 
     def test_prove_runs_the_apps_tests_on_the_platform_the_app_compiles_against(self):
         # prove.sh's last check is the app's own tests on the new ProofStamps.kt (the proof of 12 October 2026's
@@ -236,6 +304,133 @@ class Workflow(unittest.TestCase):
         self.assertRegex(script, r'\nCI=true "\$GRADLE" --no-daemon -q :shared:testAndroidHostTest \|\| put_back ')
         self.assertLess(script.index("site/test_timetables.py ||"), script.index(":shared:testAndroidHostTest ||"))
         self.assertLess(script.index(":shared:testAndroidHostTest ||"), script.index('echo true > "$OUT/changed"'))
+
+
+class Handoff(unittest.TestCase):
+    """ci/handoff.py: the proving job packs, the publish job checks before anything is committed (docs/MONITOR.md)."""
+
+    STAMPS = "tools/timetables/official/stamps"
+    GATE = "tools/timetables/official/gate"
+
+    def setUp(self):
+        import shutil
+        import subprocess
+        sys.path.insert(0, os.path.join(HERE, "ci"))
+        import handoff
+        import proof_stamps
+        self.handoff, self.proof_stamps, self.run = handoff, proof_stamps, subprocess.run
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp)
+        self.base = self.repo("base")
+        self.write(self.base, self.GATE + "/xx-test.tsv", "path\tentry\n# a comment\n")
+        self.write(self.base, self.STAMPS + "/xx.test.json", json.dumps({"entry": "xx.test", "places": 1, "placeDays": 30}))
+        self.stamps(self.base)
+        self.write(self.base, "archive/tables/a.txt", "a\n")
+        self.git(self.base, "add", "-A")
+        self.git(self.base, "commit", "-q", "-m", "base")
+
+    def git(self, repo, *args):
+        self.run(["git", "-C", repo, "-c", "user.name=t", "-c", "user.email=t@t", *args], check=True, capture_output=True)
+
+    def repo(self, name):
+        path = os.path.join(self.tmp, name)
+        self.run(["git", "init", "-q", path], check=True)
+        return path
+
+    def clone(self, name):
+        path = os.path.join(self.tmp, name)
+        self.run(["git", "clone", "-q", self.base, path], check=True)
+        return path
+
+    def write(self, repo, rel, text):
+        os.makedirs(os.path.dirname(os.path.join(repo, rel)), exist_ok=True)
+        with open(os.path.join(repo, rel), "w", encoding="utf-8") as f:
+            f.write(text)
+
+    def stamps(self, repo):
+        self.write(repo, self.handoff_path(), self.proof_stamps.generate(os.path.join(repo, self.STAMPS)))
+
+    def handoff_path(self):
+        return "shared/src/commonMain/kotlin/world/taqwa/app/prayer/engine/registry/data/ProofStamps.kt"
+
+    def proved(self):
+        """A run that adds a gate row and changes a stamp, and the pack of it."""
+        work = self.clone("work")
+        self.write(work, self.GATE + "/xx-test.tsv", "path\tentry\n# a comment\nnew-row\txx.test\n")
+        self.write(work, self.STAMPS + "/xx.test.json", json.dumps({"entry": "xx.test", "places": 1, "placeDays": 60}))
+        self.stamps(work)
+        self.write(work, "monitor/reports/r.md", "report\n")
+        out = os.path.join(self.tmp, "out")
+        self.assertEqual(0, self.handoff.main(["pack", "--archive", work, "--taqwa", work, "--out", out]))
+        self.write(out, "proof-message.txt", "Gate: the weekly monitor's captures proven (1 row)\n")
+        return out
+
+    def check(self, out, kind="public"):
+        target = self.clone("target-%s-%d" % (kind, len(os.listdir(self.tmp))))
+        return self.handoff.main(["check", "--kind", kind, "--from", out, "--into", target]), target
+
+    def tamper(self, out, rel, text, kind="public"):
+        """Rewrites a packed file and its manifest line, as a compromised proving job could."""
+        import hashlib
+        self.write(os.path.join(out, kind), rel, text)
+        digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+        manifest = os.path.join(out, kind + ".manifest")
+        with open(manifest, encoding="utf-8") as f:
+            lines = [line for line in f.read().splitlines() if not line.endswith("\t" + rel)]
+        lines.append("A\t%s\t%s" % (digest, rel))
+        with open(manifest, "w", encoding="utf-8") as f:
+            f.write("\n".join(lines) + "\n")
+
+    def test_a_proof_packed_by_one_job_is_applied_whole_by_the_other(self):
+        out = self.proved()
+        code, target = self.check(out)
+        self.assertEqual(0, code)
+        with open(os.path.join(target, self.handoff_path()), encoding="utf-8") as f:
+            self.assertIn("placeDays = 60,", f.read())
+        code, target = self.check(out, "private")
+        self.assertEqual(0, code)
+        self.assertTrue(os.path.isfile(os.path.join(target, "monitor/reports/r.md")))
+
+    def test_kotlin_the_stamps_do_not_make_is_refused(self):
+        out = self.proved()
+        self.tamper(out, self.handoff_path(), self.proof_stamps.generate(os.path.join(self.tmp, "work", self.STAMPS)) + "fun x() = 1\n")
+        self.assertEqual(3, self.check(out)[0])
+
+    def test_a_path_outside_the_allowlist_or_a_clock_time_or_a_wrong_hash_is_refused(self):
+        for rel, text in [("site/index.html", "x"), ("tools/timetables/official/gate/x.kts", "x"), ("scripts/prove.sh", "x"),
+                          (self.GATE + "/xx-test.tsv", "path\tentry\nrow at 05:12\n")]:
+            out = self.proved()
+            self.tamper(out, rel, text)
+            self.assertEqual(3, self.check(out)[0], rel)
+            import shutil
+            shutil.rmtree(out)
+            shutil.rmtree(os.path.join(self.tmp, "work"))
+        out = self.proved()
+        self.write(os.path.join(out, "public"), self.GATE + "/xx-test.tsv", "changed after packing\n")
+        self.assertEqual(3, self.check(out)[0], "a hash the manifest does not have")
+
+    def test_the_commit_message_is_plain_text_without_a_time_or_a_trailer(self):
+        import shutil
+        for text in ["Gate: proven at 05:12\n", "Gate: proven\n\nCo-Authored-By: someone <a@b>\n", "Gate\x07\n", ""]:
+            out = self.proved()
+            self.write(out, "proof-message.txt", text)
+            self.assertEqual(3, self.check(out)[0], repr(text))
+            shutil.rmtree(out)
+            shutil.rmtree(os.path.join(self.tmp, "work"))
+
+    def test_a_binary_gate_file_is_refused_even_where_git_shows_no_lines(self):
+        out = self.proved()
+        self.tamper(out, self.GATE + "/xx-test.tsv", "path\tentry\n\0row at 05:12\n")
+        self.assertEqual(3, self.check(out)[0])
+
+    def test_the_archive_side_takes_archive_and_monitor_alone(self):
+        for rel in [".github/workflows/monitor-weekly.yml", "archive/../x", "README.md", "monitor/.gitattributes", "archive/.x/y"]:
+            out = self.proved()
+            self.tamper(out, rel, "x", kind="private")
+            self.assertEqual(3, self.check(out, "private")[0], rel)
+            import shutil
+            shutil.rmtree(out)
+            shutil.rmtree(os.path.join(self.tmp, "work"))
 
 
 class RecipesCatalogue(unittest.TestCase):
