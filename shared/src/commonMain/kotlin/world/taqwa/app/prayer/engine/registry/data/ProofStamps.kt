@@ -2519,9 +2519,9 @@ object ProofStamps {
     private fun zaCape() = ProofStamp(
         entryId = "za.cape",
         places = 1,
-        placeDays = 61,
+        placeDays = 91,
         ramadanDays = 0,
-        lastChecked = "2026-10-31",
+        lastChecked = "2026-11-30",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = emptyMap(),
         lateLimits = listOf(
@@ -2529,7 +2529,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 2, reason = "The three tables print Maghrib from sunset to sunset + 3; Maghrib is the latest member's like every start (ruling R155), never before any, each member with its own margins: up to 2 min after the latest table's.", events = listOf("maghrib")),
             ProofLateLimit(minutes = 2, reason = "Sunrise is the earliest of the three members', each a little before its own table's: up to 2 min before the MJC's printed sunrise.", events = listOf("sunrise")),
         ),
-        checked = listOf("2026-09-01..2026-10-31"),
+        checked = listOf("2026-09-01..2026-11-30"),
     )
 
     private fun zaJamiat() = ProofStamp(
