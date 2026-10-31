@@ -288,7 +288,7 @@ object ProofStamps {
     private fun beCautious() = ProofStamp(
         entryId = "be.cautious",
         places = 3,
-        placeDays = 1273,
+        placeDays = 1288,
         ramadanDays = 87,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 65, "fajr" to 4, "isha" to 53, "maghrib" to 1, "sunrise" to 1),
@@ -299,7 +299,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 53, reason = "Isha is the later member's, EMB's (18°, in summer its clock cap and proportion from 45°): up to 53 min after Diyanet's Antwerpen and Gent tables in July, whose takdir Isha is earlier.", events = listOf("isha")),
             ProofLateLimit(minutes = 65, reason = "The end of eating is the earlier member's, EMB's own dawns (ruling R39): up to 65 min before Diyanet's Antwerpen and Gent imsak in late April and May, when Diyanet's takdir has moved its dawn later.", events = listOf("endOfEating")),
         ),
-        checked = listOf("2026-09-25..2026-11-25", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-30", "2027-01-01..2027-12-31"),
     )
 
     private fun beEmb() = ProofStamp(
@@ -499,7 +499,7 @@ object ProofStamps {
     private fun chFids() = ProofStamp(
         entryId = "ch.fids",
         places = 1,
-        placeDays = 427,
+        placeDays = 432,
         ramadanDays = 29,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 3, "isha" to 3, "maghrib" to 1, "sunrise" to 1),
@@ -507,7 +507,7 @@ object ProofStamps {
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        checked = listOf("2026-09-25..2026-11-25", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-30", "2027-01-01..2027-12-31"),
     )
 
     private fun chFidsUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -664,7 +664,7 @@ object ProofStamps {
     private fun frCautious() = ProofStamp(
         entryId = "fr.cautious",
         places = 3,
-        placeDays = 1211,
+        placeDays = 1221,
         ramadanDays = 88,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 4, "dhuhr" to 2, "endOfEating" to 77, "fajr" to 56, "isha" to 88, "maghrib" to 6, "sunrise" to 8),
@@ -1434,7 +1434,7 @@ object ProofStamps {
     private fun otherTurkey() = ProofStamp(
         entryId = "other.turkey",
         places = 9,
-        placeDays = 2655,
+        placeDays = 2685,
         ramadanDays = 174,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 3, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
@@ -1442,7 +1442,7 @@ object ProofStamps {
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        checked = listOf("2026-09-25..2026-11-25", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-30", "2027-01-01..2027-12-31"),
     )
 
     private fun pkKarachi() = ProofStamp(
@@ -2072,7 +2072,7 @@ object ProofStamps {
     private fun seCautious() = ProofStamp(
         entryId = "se.cautious",
         places = 23,
-        placeDays = 9358,
+        placeDays = 9368,
         ramadanDays = 717,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 7, "dhuhr" to 5, "endOfEating" to 154, "fajr" to 111, "isha" to 170, "maghrib" to 126, "sunrise" to 129),
@@ -2158,7 +2158,7 @@ object ProofStamps {
     private fun trDiyanet() = ProofStamp(
         entryId = "tr.diyanet",
         places = 22,
-        placeDays = 9394,
+        placeDays = 9504,
         ramadanDays = 638,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 2, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
@@ -2167,7 +2167,7 @@ object ProofStamps {
             ProofLateLimit(minutes = 1, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        checked = listOf("2026-09-25..2026-11-25", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-30", "2027-01-01..2027-12-31"),
     )
 
     private fun trDiyanetUnits(): Map<String, Map<String, Int>> = mapOf(
@@ -2189,7 +2189,7 @@ object ProofStamps {
     private fun trDiyanetEurope() = ProofStamp(
         entryId = "tr.diyanet.europe",
         places = 34,
-        placeDays = 14053,
+        placeDays = 14153,
         ramadanDays = 986,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 70, "fajr" to 7, "isha" to 7, "maghrib" to 126, "sunrise" to 129),
@@ -2293,34 +2293,34 @@ object ProofStamps {
             ProofLateLimit(minutes = 126, reason = "From late May to late July Diyanet holds this table's day to about nineteen hours around Dhuhr and prints its Maghrib before the sun sets; Maghrib never comes before the real sunset (the sun's plus Diyanet's 7 min): up to 126 min after Diyanet's.", events = listOf("maghrib")),
             ProofLateLimit(minutes = 129, reason = "From late May to late July Diyanet holds this table's day to about nineteen hours around Dhuhr and prints its sunrise after the sun's own; the app keeps the sun's, the safe side: up to 129 min before Diyanet's.", events = listOf("sunrise")),
         ),
-        checked = listOf("2026-09-25..2026-11-25", "2027-01-01..2027-12-31"),
+        checked = listOf("2026-09-25..2026-11-30", "2027-01-01..2027-12-31"),
         checkedByUnit = trDiyanetEuropeChecked(),
     )
 
     private fun trDiyanetEuropeChecked(): Map<String, List<String>> = mapOf(
         "tr.diyanet.europe.aalborg" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.aarhus" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.antwerpen" to listOf("2026-09-29..2026-11-25", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.antwerpen" to listOf("2026-09-29..2026-11-30", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.bergen" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.copenhagen" to listOf("2026-09-26..2026-11-25", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.gent" to listOf("2026-09-29..2026-11-25", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.copenhagen" to listOf("2026-09-26..2026-11-30", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.gent" to listOf("2026-09-29..2026-11-30", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.goteborg" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.helsinki" to listOf("2026-09-29..2026-11-25", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.helsinki" to listOf("2026-09-29..2026-11-30", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.kristiansand" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.lille" to listOf("2026-09-29..2026-11-25", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.lille" to listOf("2026-09-29..2026-11-30", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.lulea" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.lyon" to listOf("2026-09-29..2026-11-25", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.lyon" to listOf("2026-09-29..2026-11-30", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.malmo" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.oulu" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.stavanger" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.sundsvall" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.tampere" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.trondheim" to listOf("2026-09-29..2026-11-25", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.trondheim" to listOf("2026-09-29..2026-11-30", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.turku" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.umea" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
         "tr.diyanet.europe.uppsala" to listOf("2026-09-29..2026-10-29", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.wien" to listOf("2026-09-26..2026-11-25", "2027-01-01..2027-12-31"),
-        "tr.diyanet.europe.zurich" to listOf("2026-09-26..2026-11-25", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.wien" to listOf("2026-09-26..2026-11-30", "2027-01-01..2027-12-31"),
+        "tr.diyanet.europe.zurich" to listOf("2026-09-26..2026-11-30", "2027-01-01..2027-12-31"),
     )
 
     private fun trDiyanetEuropeUnits(): Map<String, Map<String, Int>> = mapOf(

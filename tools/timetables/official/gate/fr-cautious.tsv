@@ -31,3 +31,6 @@ archive/tables/pinned/tr-diyanet-europe/2026-10-19/lyon.txt	fr.cautious	45.764	4
 # prove, 2026-10-26: the monitor's captures pinned as they were under archive/tables/pinned/{tr-diyanet-europe}/2026-10-26/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
 archive/tables/pinned/tr-diyanet-europe/2026-10-26/lille.txt	fr.cautious	50.6292	3.0573	Europe/Paris	F+E S D A M I	daily	standard	test	Diyanet Lille (the monitor capture of 26 Oct 2026)	tr.diyanet.europe
 archive/tables/pinned/tr-diyanet-europe/2026-10-26/lyon.txt	fr.cautious	45.764	4.8357	Europe/Paris	F+E S D A M I	daily	standard	test	Diyanet Lyon (the monitor capture of 26 Oct 2026)	tr.diyanet.europe
+# prove, 2026-10-31: the monitor's captures pinned as they were under archive/tables/pinned/{tr-diyanet-europe}/2026-10-31/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/tr-diyanet-europe/2026-10-31/lille.txt	fr.cautious	50.6292	3.0573	Europe/Paris	F+E S D A M I	daily	standard	test	Diyanet Lille (the monitor capture of 31 Oct 2026)	tr.diyanet.europe
+archive/tables/pinned/tr-diyanet-europe/2026-10-31/lyon.txt	fr.cautious	45.764	4.8357	Europe/Paris	F+E S D A M I	daily	standard	test	Diyanet Lyon (the monitor capture of 31 Oct 2026)	tr.diyanet.europe
