@@ -11,8 +11,12 @@ import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.CheckMark
 import world.taqwa.app.design.components.TaqwaRow
+import world.taqwa.app.notifications.canOpenAppLanguageSettings
+import world.taqwa.app.notifications.openAppLanguageSettings
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.appearance_language_label
 import world.taqwa.app.resources.appearance_note
+import world.taqwa.app.resources.language_name
 import world.taqwa.app.resources.appearance_theme_label
 import world.taqwa.app.resources.settings_appearance
 import world.taqwa.app.resources.theme_dark
@@ -29,7 +33,7 @@ internal fun themeDisplayName(mode: ThemeMode): String = stringResource(
 )
 
 /**
- * The app's theme and nothing else: the widgets, their background and the ways to add them have
+ * The app's theme and its language: the widgets, their background and the ways to add them have
  * their own screen, Settings › Widgets, where a reader who skipped onboarding's widget step can
  * find them again.
  */
@@ -55,5 +59,18 @@ fun AppearanceSettingsScreen(
         }
         Spacer(Modifier.height(14.dp))
         SettingsNote(stringResource(Res.string.appearance_note))
+
+        // The language is the device's, not a setting of ours — `language_name` is each
+        // translation naming itself. Where the system has a per-app language page (Android 13
+        // and later, iOS) the row opens it, so a reader on an English phone can put Taqwa in Urdu
+        // without knowing where that page lives; older Android only states it.
+        Spacer(Modifier.height(28.dp))
+        SectionLabel(stringResource(Res.string.appearance_language_label))
+        SettingsCard {
+            TaqwaRow(
+                label = stringResource(Res.string.language_name),
+                onClick = if (canOpenAppLanguageSettings()) ({ openAppLanguageSettings() }) else null,
+            )
+        }
     }
 }

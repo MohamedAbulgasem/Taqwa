@@ -120,6 +120,7 @@
     <string name="settings_prayer_times">Namaz vakitleri</string>
     <string name="settings_notifications">Bildirimler</string>
     <string name="settings_appearance">Görünüm</string>
+    <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">Dil</string>
     <string name="settings_about">Taqwa hakkında</string>
     <string name="settings_attribution">Kaynaklar ve lisanslar</string>
@@ -219,6 +220,7 @@
 
     <!-- Görünüm -->
     <string name="appearance_theme_label">TEMA</string>
+    <string name="appearance_language_label">DİL</string>
     <string name="theme_system">Sistem</string>
     <string name="theme_light">Açık</string>
     <string name="theme_dark">Koyu</string>

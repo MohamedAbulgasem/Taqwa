@@ -115,6 +115,7 @@
     <string name="settings_prayer_times">نماز کے اوقات</string>
     <string name="settings_notifications">اطلاعات</string>
     <string name="settings_appearance">ظاہری شکل</string>
+    <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">زبان</string>
     <string name="settings_about">تقویٰ کے بارے میں</string>
     <string name="settings_attribution">اعتراف اور لائسنس</string>
@@ -206,6 +207,7 @@
 
     <!-- Appearance -->
     <string name="appearance_theme_label">تھیم</string>
+    <string name="appearance_language_label">زبان</string>
     <string name="theme_system">نظام کے مطابق</string>
     <string name="theme_light">روشن</string>
     <string name="theme_dark">تاریک</string>

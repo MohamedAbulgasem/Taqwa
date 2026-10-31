@@ -38,8 +38,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.design.LocalTaqwaColors
-import world.taqwa.app.notifications.canOpenAppLanguageSettings
-import world.taqwa.app.notifications.openAppLanguageSettings
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.contentWidth
 import world.taqwa.app.design.components.CardDivider
@@ -53,12 +51,12 @@ import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.settings_about
 import world.taqwa.app.resources.settings_appearance
+import world.taqwa.app.resources.settings_appearance_value
 import world.taqwa.app.resources.settings_group_about
 import world.taqwa.app.resources.settings_group_app
 import world.taqwa.app.resources.settings_group_prayer
 import world.taqwa.app.resources.settings_group_quran
 import world.taqwa.app.resources.settings_recitation
-import world.taqwa.app.resources.settings_language
 import world.taqwa.app.resources.settings_location
 import world.taqwa.app.resources.settings_not_set
 import world.taqwa.app.resources.settings_notifications
@@ -293,9 +291,12 @@ fun SettingsRootScreen(
         GroupGap()
         SectionLabel(stringResource(Res.string.settings_group_app))
         SettingsCard {
+            // The language lives inside Appearance (it is set once, if ever: Taqwa follows the
+            // phone's), and this row names it beside the theme, so a reader who picked a language
+            // they cannot read still finds their own language's name on the first screen.
             TaqwaRow(
                 stringResource(Res.string.settings_appearance),
-                value = themeName,
+                value = stringResource(Res.string.settings_appearance_value, themeName, stringResource(Res.string.language_name)),
                 onClick = onOpenAppearance,
             )
             CardDivider()
@@ -305,16 +306,6 @@ fun SettingsRootScreen(
                 stringResource(Res.string.settings_widgets),
                 value = widgetsValue,
                 onClick = onOpenWidgets,
-            )
-            CardDivider()
-            // The language is the device's, not a setting of ours — `language_name` is each
-            // translation naming itself. Where the system has a per-app language page (Android
-            // 13 and later, iOS) the row opens it, so a reader on an English phone can put
-            // Taqwa in Urdu without knowing where that page lives; older Android only states it.
-            TaqwaRow(
-                stringResource(Res.string.settings_language),
-                value = stringResource(Res.string.language_name),
-                onClick = if (canOpenAppLanguageSettings()) ({ openAppLanguageSettings() }) else null,
             )
         }
 

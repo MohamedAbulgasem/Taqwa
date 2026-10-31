@@ -123,6 +123,7 @@
     <string name="settings_prayer_times">مواقيت الصلاة</string>
     <string name="settings_notifications">الإشعارات</string>
     <string name="settings_appearance">المظهر</string>
+    <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">اللغة</string>
     <string name="settings_about">عن تقوى</string>
     <string name="settings_attribution">الإسناد والتراخيص</string>
@@ -214,6 +215,7 @@
 
     <!-- Appearance -->
     <string name="appearance_theme_label">السمة</string>
+    <string name="appearance_language_label">اللغة</string>
     <string name="theme_system">حسب النظام</string>
     <string name="theme_light">فاتح</string>
     <string name="theme_dark">داكن</string>

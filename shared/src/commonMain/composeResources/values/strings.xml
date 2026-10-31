@@ -137,6 +137,7 @@
     <string name="settings_prayer_times">Prayer times</string>
     <string name="settings_notifications">Notifications</string>
     <string name="settings_appearance">Appearance</string>
+    <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">Language</string>
     <string name="settings_about">About Taqwa</string>
     <string name="settings_attribution">Attribution &amp; licences</string>
@@ -241,6 +242,7 @@
 
     <!-- Appearance -->
     <string name="appearance_theme_label">THEME</string>
+    <string name="appearance_language_label">LANGUAGE</string>
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>

@@ -113,6 +113,7 @@
     <string name="settings_prayer_times">Waktu salat</string>
     <string name="settings_notifications">Notifikasi</string>
     <string name="settings_appearance">Tampilan</string>
+    <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">Bahasa</string>
     <string name="settings_about">Tentang Taqwa</string>
     <string name="settings_attribution">Atribusi &amp; lisensi</string>
@@ -206,6 +207,7 @@
 
     <!-- Appearance -->
     <string name="appearance_theme_label">TEMA</string>
+    <string name="appearance_language_label">BAHASA</string>
     <string name="theme_system">Sistem</string>
     <string name="theme_light">Terang</string>
     <string name="theme_dark">Gelap</string>

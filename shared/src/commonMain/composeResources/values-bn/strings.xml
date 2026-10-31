@@ -115,6 +115,7 @@
     <string name="settings_prayer_times">নামাজের সময়</string>
     <string name="settings_notifications">নোটিফিকেশন</string>
     <string name="settings_appearance">চেহারা</string>
+    <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">ভাষা</string>
     <string name="settings_about">তাকওয়া সম্পর্কে</string>
     <string name="settings_attribution">কৃতজ্ঞতা ও লাইসেন্স</string>
@@ -206,6 +207,7 @@
 
     <!-- Appearance -->
     <string name="appearance_theme_label">থিম</string>
+    <string name="appearance_language_label">ভাষা</string>
     <string name="theme_system">সিস্টেম অনুযায়ী</string>
     <string name="theme_light">হালকা</string>
     <string name="theme_dark">গাঢ়</string>
