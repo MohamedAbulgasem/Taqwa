@@ -465,7 +465,7 @@ jobs:
           persist-credentials: false
 
       - name: Fetch the handoff
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: monitor-handoff-${{ github.run_id }}
           path: ${{ runner.temp }}/handoff
@@ -639,6 +639,9 @@ jobs:
       contents: read
       issues: write
     env:
+      # gh acts on this (the private) repository: the job's only checkout is Taqwa's monitor code under taqwa/,
+      # so there is no git repository at the root for gh to infer one from.
+      GH_REPO: ${{ github.repository }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       REHEARSAL: ${{ github.event.inputs.rehearsal == 'true' }}
     steps:
@@ -654,7 +657,7 @@ jobs:
       - name: Fetch the handoff
         if: needs.monitor.outputs.packed == 'true'
         continue-on-error: true
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: monitor-handoff-${{ github.run_id }}
           path: ${{ runner.temp }}/handoff

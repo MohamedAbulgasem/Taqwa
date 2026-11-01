@@ -181,6 +181,12 @@ class Workflow(unittest.TestCase):
         for line in lines:
             if "uses:" in line:
                 self.assertRegex(line, r"uses: [\w.-]+/[\w.-]+@[0-9a-f]{40} # v", line)
+        # download-artifact v7.0.0 is the first on Node 24 (v6.0.0 ran on Node 20); upload-artifact v6.0.0 hands it
+        # the handoff over the same artifact backend.
+        downloads = [line.strip() for line in lines if "actions/download-artifact@" in line]
+        self.assertEqual(["uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0"] * 2, downloads)
+        uploads = [line.strip() for line in lines if "actions/upload-artifact@" in line]
+        self.assertEqual(["uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0"], uploads)
 
     def test_the_daily_check_names_its_own_cron_and_gates_only_that_cron(self):
         import re
@@ -236,6 +242,27 @@ class Workflow(unittest.TestCase):
         self.assertEqual(["contents: read"], permissions("monitor"))
         self.assertEqual(["contents: write"], permissions("publish"))
         self.assertEqual(["contents: read", "issues: write"], permissions("report"))
+
+    def test_gh_knows_which_repository_it_acts_on(self):
+        # The first live run's issue step died with "fatal: not a git repository": the report job's only checkout is
+        # Taqwa's monitor code under taqwa/, so gh had no repository at the root to infer. GH_REPO names it.
+        import re
+        def env(job):
+            m = re.search(r"\n    env:\n((?:      .*\n)+)", self.job(job))
+            return [line.strip() for line in m.group(1).splitlines()] if m else []
+        self.assertIn("GH_REPO: ${{ github.repository }}", env("report"))
+        users = []
+        for job in ("due", "monitor", "publish", "report"):
+            text = self.job(job)
+            code = "\n".join(line for line in text.split("\n") if not line.strip().startswith("#"))
+            if not re.search(r"(?<![\w.-])gh ", code):
+                continue
+            users.append(job)
+            steps = re.split(r"\n      - ", text)
+            at_root = any("actions/checkout@" in step and "path:" not in step for step in steps)
+            named = any(line.startswith("GH_REPO: ") for line in env(job))
+            self.assertTrue(named or at_root, "%s runs gh with neither GH_REPO nor a checkout at the root" % job)
+        self.assertIn("report", users)
 
     def test_the_push_token_lives_on_a_clean_runner_that_runs_no_fetcher_pip_or_gradle(self):
         # Security review D1: what ran before the push (the fetchers, pip, Gradle) could read a token on its runner.

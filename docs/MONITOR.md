@@ -162,7 +162,9 @@ monitor itself failed, whose body names the run's own log and report); on the fi
 after a failure the body is rewritten from the report and a "Recovered" comment added; a green full
 run closes it with a one-line comment and never opens one; a partial run (`--only`), sound or
 failed, adds a comment at most; refused dispatch options stop the job before anything runs and
-touch nothing. The same body is the job's step summary. When the private repository's
+touch nothing. The same body is the job's step summary. The report job names its repository to `gh`
+(`GH_REPO`), since its only checkout is Taqwa's monitor code under `taqwa/` and `gh` cannot infer one
+(the first live run's issue step failed on that). When the private repository's
 `.github/workflows/monitor-weekly.yml` differs from the public template, the report says so under
 Informational. A Claude routine fired by that issue prepares fixes as pull requests (not set up
 yet).
