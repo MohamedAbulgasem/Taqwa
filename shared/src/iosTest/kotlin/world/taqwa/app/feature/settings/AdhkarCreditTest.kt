@@ -15,7 +15,7 @@ import world.taqwa.app.resources.credit_adhkar_detail
 import kotlin.test.Test
 
 /**
- * Settings › Attribution & licences credits the adhkar (adhkar spec §4.2): Hisn al-Muslim, the
+ * Settings › About Taqwa › Attribution & licences credits the adhkar (adhkar spec §4.2): Hisn al-Muslim, the
  * OpenDua dataset and its CC BY 4.0, with the source the row opens. The words are the resources',
  * in whatever language the simulator runs.
  */

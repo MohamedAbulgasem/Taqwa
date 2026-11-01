@@ -3,7 +3,7 @@
     <!-- Bu dosyadaki metinlerin dili; “arayüz Arapça mı?” kararlarının okuduğu tek bilgi. -->
     <string name="ui_language">tr</string>
 
-    <!-- Bu dosyanın kendi dilinin adı; Ayarlar › Dil altında görünür. -->
+    <!-- Bu dosyanın kendi dilinin adı; Ayarlar › Görünüm › Dil altında görünür. -->
     <string name="language_name">Türkçe</string>
 
     <!-- Navigation: what a screen reader calls the drawn back chevron. -->
