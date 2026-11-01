@@ -84,6 +84,7 @@ A language also has text in a few other places:
 
 - **Android-only strings:** `androidApp/src/main/res/values-<lang>/strings.xml`.
 - **iOS permission prompts:** `iosApp/iosApp/<lang>.lproj/InfoPlist.strings`.
+- **The widget names:** the Android picker's (`widget_medium_label`, `widget_ayah_label` in the Android-only strings) and the iPhone gallery's (`home_widget_name`, `ayah_widget_name` in `iosApp/TaqwaWidget/<lang>.lproj/Localizable.strings`) must match the Widgets screen's `widgets_prayer_name` and `widgets_ayah_name`; `scripts/check-strings.sh` fails when they do not.
 - **The website:** `site/pages/<lang>/`.
 - **The privacy policy:** `PRIVACY.<lang>.md`.
 - **The store listings:** `docs/store/listing/<lang>.md`.
@@ -102,4 +103,4 @@ your contribution is licensed under the same terms.
 
 Third-party material (text, audio, fonts, data) needs a licence that lets Taqwa bundle and
 redistribute it. It must be credited in [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md), in
-[NOTICE](NOTICE) and in the app under Settings › Attribution & licences.
+[NOTICE](NOTICE) and in the app under Settings › About Taqwa › Attribution & licences.
