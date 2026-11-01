@@ -40,3 +40,5 @@ archive/tables/moral-auth-world/africaoceania/split-7g/wembley-S-nov2026.txt	za.
 # prove, 2026-11-01: the monitor's captures pinned as they were under archive/tables/pinned/{za-jamiat,za-mjc}/2026-11-01/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
 archive/tables/pinned/za-mjc/2026-11-01/cape-town-2026-11.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	F+E S D A M I	daily	standard	test	Cape Town, November 2026, the monitor capture of 1 Nov 2026 (prove)	za.mjc
 archive/tables/pinned/za-jamiat/2026-11-01/cpt-2026.month-2026-11.txt	za.cape	-33.92584	18.42322	Africa/Johannesburg	E F S D A - M I -	daily	standard	test	Cape Town 2026, the monitor capture of 1 Nov 2026 (prove)	za.jamiat.shafii
+# prove, 2026-11-01: the monitor's captures pinned as they were under archive/tables/pinned/{za-mjc}/2026-11-01/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/za-mjc/2026-11-01/cape-town-2026-11.txt	za.mjc/za.mjc			Africa/Johannesburg	F+E S D A M I	daily	standard	test	Cape Town, November 2026, the monitor capture of 1 Nov 2026 (prove)

@@ -2573,19 +2573,19 @@ object ProofStamps {
     private fun zaMjc() = ProofStamp(
         entryId = "za.mjc",
         places = 1,
-        placeDays = 61,
+        placeDays = 91,
         ramadanDays = 0,
-        lastChecked = "2026-10-31",
-        worstLateMinutes = mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        lastChecked = "2026-11-30",
+        worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
         worstLateByUnit = zaMjcUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        checked = listOf("2026-09-01..2026-10-31"),
+        checked = listOf("2026-09-01..2026-11-30"),
     )
 
     private fun zaMjcUnits(): Map<String, Map<String, Int>> = mapOf(
-        "za.mjc" to mapOf("asrStandard" to 1, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
+        "za.mjc" to mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 1),
     )
 
     private fun zaVoc() = ProofStamp(

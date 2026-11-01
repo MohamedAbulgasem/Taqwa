@@ -82,12 +82,20 @@ object SouthAfrica {
      * Dhuhr + 1 (Radio 786 documents MWL with an 18° Fajr, Shafi'i Asr, Fajr the end of sehri), rounded
      * to the nearest minute, its Asr about a minute before the exact one. One month (September 2026) is
      * held, so the margins are nearest rounding's bounds rather than that month's tighter fit (Task 7g).
+     * Its Asr margin is 0 s, the model's own Asr with no early margin, not −60 (ruling R161): the MJC's Asr moves
+     * later against the exact one by about 1.0 s a day through October and November 2026 (the worst need of each
+     * seven days −98..−81 s in September, −103..−87 in October, −73..−53 in November, about ±35 s of rounding
+     * scatter), and projected forward the worst need is about −24 s by 15 December and −8 s by 31 December, so
+     * 0 s with the Conventions' 5 s covers the trend through 31 December 2026; −48 would very likely leave
+     * December's Asr a minute early. The cost: za.mjc's Asr up to 2 min after the MJC's (limit 3). The MJC's
+     * December capture (~1 Dec) refits it on September–December and projects January; if January needs more
+     * than 0, a patch ships before 1 January 2027.
      */
     val mjc: RegistryEntry = single(
         id = "za.mjc", nameKey = "authority_mjc", entryClass = EntryClass.D_AUTHORITY,
         method = TimetableMethod(
             id = "za.mjc", fajrAngle = 18.0, isha = IshaRule.Angle(17.0),
-            margins = margins(start = -10, sunrise = 10, asr = -60),
+            margins = margins(start = -10, sunrise = 10, asr = 0),
         ),
         school = AsrSchool.STANDARD, scope = Scope.GLOBAL, countries = setOf("ZA"),
     )

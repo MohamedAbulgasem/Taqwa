@@ -1,7 +1,7 @@
 {
   "entry": "za.cape",
   "class": "C",
-  "engineHash": "ed5b0ea8846d621e",
+  "engineHash": "272671c8d5ce9008",
   "broken": 0,
   "places": 1,
   "first": "2026-09-01",
@@ -63,12 +63,12 @@
       "checked": 91,
       "early": 0,
       "late": {
-        "0": 29,
-        "1": 62,
+        "0": 21,
+        "1": 70,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.3187,
+      "exactShare": 0.2308,
       "worstLate": 1,
       "lateLimit": 1,
       "lateLimitFrom": "class C",
@@ -173,12 +173,12 @@
         "checked": 91,
         "early": 0,
         "late": {
-          "0": 29,
-          "1": 62,
+          "0": 21,
+          "1": 70,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.3187,
+        "exactShare": 0.2308,
         "worstLate": 1,
         "lateLimit": 1,
         "lateLimitFrom": "class C",

@@ -792,3 +792,24 @@ R155–R157 R130–R132.)
   in 2026. `GulfEgyptProofTest` holds every day of 2026–2028 against the sun at ESA's point with its allowance (5 s
   after at Rafah's dawn, 3 s after at Sidi Barrani's dusk, 4 s before at its dawn), to the nearest minute, with no
   printed time (R69): red at the national margins, green from +8, from +14 and at −20.
+- **R161** (not the owner's; found by `prove` of 1 Nov 2026, which left za.mjc's own November row out; the margin
+  is the Lead's measured decision of 1 Nov 2026): za.mjc's Asr margin is 0 s, the model's own Asr with no early
+  margin, not −60 (Task 7g's one month). The MJC states no method. Its Asr ran about a minute before the exact one
+  in September 2026, but it moves later against the exact one by about 1.0 s a day through October and November
+  (1.02 s fitted over those 61 days), so −60 showed Asr a minute before the MJC's on 15 and 30 November 2026. A
+  day's need is the least margin that keeps Asr at or after the MJC's; the worst need of each seven days from the
+  1st is −98..−81 s in September, −103..−87 in October and −73..−53 in November, with about ±35 s of rounding
+  scatter about the trend. Projected forward, the worst need is about −24 s by 15 December and about −8 s by
+  31 December, so 0 s, with the Conventions' 5 s, covers the trend through 31 December 2026; −48 (the 91 days'
+  −53 plus 5 s) would very likely leave December Asr times a minute early. The same line passes −5 s about
+  3 January 2027. What 0 s costs: za.mjc's own row (91 days) goes from 49 exact and 42 a minute late at −48 to
+  2 exact, 63 a minute late and 26 two minutes late, its worst 2 min against a late limit of 3. za.cape (Cape
+  Town's page) keeps its worst: its Asr goes from 29 exact and 62 a minute late to 21 exact and 70 a minute late,
+  worst 1, at its limit. No other entry moves. No sun model could project instead, as R159 projected Kharga's: none
+  tried puts the MJC's Asr within one rounding window over the 91 days (an MWL sun at the Cape Town point, tried
+  with the Asr's sun taken at any hour, a latitude from 36° to 33° S, a declination bias up to 1°, a shadow factor
+  from 0.97 to 1.03 or any year's phase from 2019 to 2030, each alone: the best spreads 82 s), though its Dhuhr is
+  the noon there to the nearest minute. Follow-up: when the MJC's December capture arrives (~1 Dec), refit on
+  September–December and project January; if January needs more than 0, a patch must ship before 1 January 2027.
+  If the MJC publishes a 2027 year calendar, fit on that. `MjcAsrTest` holds every day of the pinned November 2026
+  at or after the MJC's printed Asr, with no printed time (R69).
