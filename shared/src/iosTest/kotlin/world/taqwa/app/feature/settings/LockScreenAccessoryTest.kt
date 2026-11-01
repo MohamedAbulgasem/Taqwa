@@ -29,6 +29,7 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.widgets_lock_then
 import world.taqwa.app.widget.WidgetContent
 import world.taqwa.app.widget.WidgetPrayerRow
+import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -68,6 +69,22 @@ class LockScreenAccessoryTest {
         assertTrue(prayer.right <= time.left, "the time is not after the prayer on its line")
         assertTrue(time.top < prayer.bottom && prayer.top < time.bottom, "the prayer and its time are not on one line")
         assertTrue(then.top >= prayer.bottom && then.top >= time.bottom, "the prayer after it is not under the first line")
+    }
+
+    /**
+     * The owner's decision of 1 November: the second line gives the prayer after the next its time, at
+     * the line's end under the first line's time, where it once named the prayer alone.
+     */
+    @Test
+    fun thePrayerAfterTheNextHasItsTimeAtTheEndOfItsLine() = runComposeUiTest {
+        setContent { CompositionLocalProvider(LocalTaqwaColors provides LightColors) { LockScreenAccessory(maghrib) } }
+        val then = onNodeWithText(getString(Res.string.widgets_lock_then, "Isha · العشاء")).getUnclippedBoundsInRoot()
+        val thenTime = onNodeWithText("19:50").getUnclippedBoundsInRoot()
+        val firstTime = onNodeWithText("18:32").getUnclippedBoundsInRoot()
+        assertTrue(then.right <= thenTime.left, "Isha's time is not after its name")
+        assertTrue(thenTime.top < then.bottom && then.top < thenTime.bottom, "Isha and its time are not on one line")
+        assertTrue(thenTime.top >= firstTime.bottom, "Isha's time is not under the first line")
+        assertTrue(abs((thenTime.right - firstTime.right).value) < 1f, "Isha's time does not end where Maghrib's does")
     }
 
     @Test

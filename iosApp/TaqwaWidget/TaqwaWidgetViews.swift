@@ -483,12 +483,19 @@ struct TaqwaLockScreenWidgetView: View {
                             .font(.headline)
                             .monospacedDigit()
                     }
+                    // The prayer after the next, with its time at the line's end under the next
+                    // prayer's (the owner's decision of 1 November: a name with no time said little).
                     if let then = Self.prayerAfterNext(content) {
-                        Text(TaqwaWidgetStrings.then(then.displayName))
-                            .font(.caption2)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
-                            .opacity(0.7)
+                        HStack {
+                            Text(TaqwaWidgetStrings.then(then.displayName))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
+                            Spacer(minLength: 4)
+                            Text(then.clockTime)
+                                .monospacedDigit()
+                        }
+                        .font(.caption2)
+                        .opacity(0.7)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)

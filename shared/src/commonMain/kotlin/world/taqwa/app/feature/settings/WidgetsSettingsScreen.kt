@@ -923,7 +923,8 @@ private fun LockScreenStage(content: WidgetContent, modifier: Modifier) {
 /**
  * The rectangular Lock Screen widget as TaqwaWidgetViews.swift draws it: a first line with the
  * next prayer's "Maghrib in" phrase at the start and its time at the end ([lockScreenHeadline]),
- * and a smaller, fainter line under it naming the prayer after that ("then Isha · العشاء"). The
+ * and a smaller, fainter line under it naming the prayer after that with its time at the end
+ * ("then Isha · العشاء", 19:50: the owner's decision of 1 November, where it once had no time). The
  * real accessory shows no countdown, so the picture shows none either; it once drew "in 0:21"
  * there, which the widget never says. At least the accessory's width on a Lock Screen, so the time
  * sits apart from the phrase as it does there. Each line is set as the accessory sets it at large
@@ -953,10 +954,18 @@ internal fun LockScreenAccessory(content: WidgetContent) {
             )
         }
         prayerAfterNext(content)?.let { then ->
-            AccessoryLine(
-                stringResource(Res.string.widgets_lock_then, then.displayName),
-                TaqwaText.caption.copy(fontSize = 11.sp, color = ink.copy(alpha = 0.7f)),
-            )
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                AccessoryLine(
+                    stringResource(Res.string.widgets_lock_then, then.displayName),
+                    TaqwaText.caption.copy(fontSize = 11.sp, color = ink.copy(alpha = 0.7f)),
+                    Modifier.weight(1f),
+                )
+                Spacer(Modifier.width(10.dp))
+                AccessoryLine(
+                    then.clockTime,
+                    TaqwaText.rowTime.copy(fontSize = 11.sp, color = ink.copy(alpha = 0.7f)),
+                )
+            }
         }
     }
 }
