@@ -96,6 +96,8 @@ internal val SettingsGutter = 24.dp
 internal fun SettingsScaffold(
     title: String,
     onBack: (() -> Unit)?,
+    /** Given, the screen scrolls with it, so a row it anchors stays put; see [ScrollAnchor]. */
+    anchor: ScrollAnchor? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = LocalTaqwaColors.current
@@ -106,7 +108,8 @@ internal fun SettingsScaffold(
             // safeDrawing, not systemBars: held sideways the navigation bar and the camera cutout
             // move to the edges, and only safeDrawing reports those horizontal insets.
             .windowInsetsPadding(WindowInsets.safeDrawing)
-            .verticalScroll(rememberScrollState()),
+            .then(anchor?.scroller ?: Modifier)
+            .verticalScroll(anchor?.scroll ?: rememberScrollState()),
     ) {
         // The scroller stays full-bleed so the background reaches both edges; only the column of
         // chrome and cards inside it is capped, chevron and title included — a title pinned to

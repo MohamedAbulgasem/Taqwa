@@ -738,4 +738,5 @@
     <string name="notifications_section_sound">SON</string>
     <string name="notifications_section_iqama">RAPPEL DE L’IQAMA</string>
     <string name="notifications_iqama_not_friday">Pas de rappel de l’iqama le vendredi : la khoutba vient d’abord.</string>
+    <string name="notifications_voluntary_label">ACTES SURÉROGATOIRES</string>
 </resources>

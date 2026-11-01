@@ -77,6 +77,7 @@ import world.taqwa.app.resources.notifications_section_when
 import world.taqwa.app.resources.notifications_tahajjud
 import world.taqwa.app.resources.notifications_tahajjud_sound
 import world.taqwa.app.resources.notifications_tahajjud_subtitle
+import world.taqwa.app.resources.notifications_voluntary_label
 import world.taqwa.app.resources.settings_notifications
 import world.taqwa.app.design.components.TaqwaBottomSheet
 
@@ -129,10 +130,11 @@ private fun duhaTimingDetail(timing: DuhaTiming): String = when (timing) {
 }
 
 /**
- * Master toggle, "Remind me before" (default Never), the adhan voice and one row per obligatory
- * prayer — Sunrise is never notified, so it gets no row. Every control writes through
- * [onToggleEnabled], [onPickLead], [onPickVoice] or [onPickSound] the moment it is touched; there
- * is no save button, matching every other settings screen in the app.
+ * Master toggle, then PRAYERS: one row per obligatory prayer — Sunrise is never notified, so it
+ * gets no row — and under them what applies to all five, "Remind me before" (default Never), the
+ * adhan voice and Iqama. Then VOLUNTARY: Tahajjud, Duha and the adhkar (Duha and Iqama spec §4.6).
+ * Every control writes through [onToggleEnabled], [onPickLead], [onPickVoice] or [onPickSound] the
+ * moment it is touched; there is no save button, matching every other settings screen in the app.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -180,6 +182,9 @@ fun NotificationSettingsScreen(
     onToggleIqama: (Boolean) -> Unit = {},
     onPickIqamaMinutes: (Prayer, Int) -> Unit = { _, _ -> },
     onPickIqamaSound: (PrayerSound) -> Unit = {},
+    /** Read once for the screen (spec §4.3): every reveal on it stands still under reduced motion.
+     * Passed only by a test, which cannot switch the simulator's setting. */
+    reducedMotion: Boolean = remember { reduceMotion() },
 ) {
     var soundSheetFor by remember { mutableStateOf<Prayer?>(null) }
     var tahajjudSheetOpen by remember { mutableStateOf(false) }
@@ -189,8 +194,12 @@ fun NotificationSettingsScreen(
     var duhaWhenSheetOpen by remember { mutableStateOf(false) }
     var duhaSoundSheetOpen by remember { mutableStateOf(false) }
     var iqamaSoundSheetOpen by remember { mutableStateOf(false) }
-    // Read once for the screen (spec §4.3): every reveal on it stands still under reduced motion.
-    val reducedMotion = remember { reduceMotion() }
+    // Layout B's one cost (spec §4.6): the Iqama switch sits under the five, and turning it on or
+    // off adds or takes away a line under each of them. The anchor keeps its row under the finger.
+    // A prayer's own row disarms it, because a pick in its sheet adds or takes away one line and
+    // that moves the rows below, as it always has; so does the master switch, which takes the five
+    // away altogether.
+    val anchor = rememberScrollAnchor()
 
     // Turning the master switch on while the OS permission is missing asks for it first: on
     // Android 13+ that is the system dialog (or an immediate refusal once it has been declined
@@ -203,11 +212,12 @@ fun NotificationSettingsScreen(
     }
 
     CompositionLocalProvider(LocalReduceMotion provides reducedMotion) {
-        SettingsScaffold(stringResource(Res.string.settings_notifications), onBack) {
+        SettingsScaffold(stringResource(Res.string.settings_notifications), onBack, anchor) {
             SettingsCard {
                 TaqwaRow(
                     stringResource(Res.string.notifications_master_toggle),
                     toggle = RowToggle(settings.enabled) { enabled ->
+                        anchor.armed = false
                         if (enabled && !notificationsGranted) requestPermission() else onToggleEnabled(enabled)
                     },
                 )
@@ -218,152 +228,157 @@ fun NotificationSettingsScreen(
                 SettingsNote(stringResource(Res.string.notifications_blocked))
                 SettingsLink(stringResource(Res.string.notifications_open_settings), onOpenNotificationSettings)
             }
-            if (exactAlarmsUnavailable) {
-                Spacer(Modifier.height(10.dp))
-                SettingsNote(stringResource(Res.string.notifications_exact_alarms_off))
-                SettingsLink(stringResource(Res.string.notifications_allow_exact_alarms), onRequestExactAlarms)
-            }
-
-            Spacer(Modifier.height(28.dp))
-            SettingsCard {
-                TaqwaRow(
-                    stringResource(Res.string.notifications_remind_before),
-                    value = leadLabel(settings.remindBeforeMinutes),
-                    onClick = { remindSheetOpen = true },
-                )
-            }
-
-            // Off, one quiet row and nothing anywhere else (Duha and Iqama spec §4.2). On, its sound,
-            // the note under the card, a line under each prayer and the minutes in each prayer's
-            // sheet: the minutes belong to the prayers, so they are set there, not here.
-            Spacer(Modifier.height(28.dp))
-            SettingsCard {
-                TaqwaRow(
-                    stringResource(Res.string.notifications_iqama),
-                    subtitle = stringResource(Res.string.notifications_iqama_subtitle),
-                    revealSubtitle = settings.iqama,
-                    toggle = RowToggle(settings.iqama, onToggleIqama),
-                )
-                SettingsReveal(settings.iqama) {
-                    Column {
-                        CardDivider()
-                        TaqwaRow(
-                            stringResource(Res.string.notifications_tahajjud_sound),
-                            value = soundDisplayName(settings.iqamaSound),
-                            onClick = { iqamaSoundSheetOpen = true },
-                        )
-                    }
-                }
-            }
-            SettingsReveal(settings.iqama) {
+            // Off, nothing below it rings (NotificationPlanner.plan returns nothing), so nothing
+            // below it is shown as if it would (Duha and Iqama spec §4.6). Put away, not reset:
+            // every value is still in the settings and comes back as it was when it goes on again.
+            SettingsReveal(settings.enabled) {
                 Column {
-                    Spacer(Modifier.height(10.dp))
-                    SettingsNote(stringResource(Res.string.notifications_iqama_note))
-                }
-            }
-
-            Spacer(Modifier.height(28.dp))
-            SettingsCard {
-                // Its own card rather than a row inside the per-prayer one: it is the single choice
-                // that applies to all five, and sitting among them would read as a sixth prayer.
-                TaqwaRow(
-                    stringResource(Res.string.adhan_voice_row),
-                    value = adhanVoiceDisplayName(settings.voice),
-                    onClick = { voiceSheetOpen = true },
-                )
-            }
-
-            Spacer(Modifier.height(28.dp))
-            SectionLabel(stringResource(Res.string.notifications_prayers_label))
-            SettingsCard {
-                ObligatoryPrayers.forEachIndexed { i, prayer ->
-                    if (i > 0) CardDivider()
-                    val iqamaMinutes = settings.iqamaMinutesFor(prayer)
-                    TaqwaRow(
-                        // The name alone here, not the Arabic-alone/paired display rule: this is a
-                        // settings row, not one of the places the spec names (timeline, widget,
-                        // notification), and a doubled name would crowd the sound value beside it.
-                        label = localizedPrayerName(prayer),
-                        value = soundDisplayName(settings.soundFor(prayer)),
-                        // While Iqama is on, the prayer's gap under its name; none for an Off prayer.
-                        // One element to a screen reader, as the row always was: name, line, sound.
-                        subtitle = if (iqamaMinutes > 0) iqamaLine(iqamaMinutes) else null,
-                        revealSubtitle = settings.iqama && iqamaMinutes > 0,
-                        onClick = { soundSheetFor = prayer },
-                    )
-                }
-            }
-
-            // A card of its own, below the five and off until asked for (spec §17.6): a voluntary
-            // prayer is offered, not assumed, and it is not one of the prayers the card above is
-            // about. Its subtitle and sound row exist only while it is on, as Duha's and Iqama's do,
-            // so the screen a person who never wants it sees has grown by exactly one quiet row.
-            Spacer(Modifier.height(28.dp))
-            SettingsCard {
-                TaqwaRow(
-                    stringResource(Res.string.notifications_tahajjud),
-                    subtitle = stringResource(Res.string.notifications_tahajjud_subtitle),
-                    revealSubtitle = settings.tahajjud,
-                    toggle = RowToggle(checked = settings.tahajjud, onCheckedChange = onToggleTahajjud),
-                )
-                SettingsReveal(settings.tahajjud) {
-                    Column {
-                        CardDivider()
-                        TaqwaRow(
-                            stringResource(Res.string.notifications_tahajjud_sound),
-                            value = soundDisplayName(settings.tahajjudSound),
-                            onClick = { tahajjudSheetOpen = true },
-                        )
+                    if (exactAlarmsUnavailable) {
+                        Spacer(Modifier.height(10.dp))
+                        SettingsNote(stringResource(Res.string.notifications_exact_alarms_off))
+                        SettingsLink(stringResource(Res.string.notifications_allow_exact_alarms), onRequestExactAlarms)
                     }
-                }
-            }
 
-            // Duha (Duha and Iqama spec §4.2), built as Tahajjud's card is: off, the row and its switch
-            // and nothing else; on, the chosen timing's detail, When and Sound.
-            Spacer(Modifier.height(28.dp))
-            SettingsCard {
-                TaqwaRow(
-                    stringResource(Res.string.notifications_duha),
-                    subtitle = duhaTimingDetail(settings.duhaTiming),
-                    revealSubtitle = settings.duha,
-                    toggle = RowToggle(settings.duha, onToggleDuha),
-                )
-                SettingsReveal(settings.duha) {
-                    Column {
-                        CardDivider()
-                        TaqwaRow(
-                            stringResource(Res.string.notifications_duha_when),
-                            value = duhaTimingName(settings.duhaTiming),
-                            onClick = { duhaWhenSheetOpen = true },
-                        )
-                        CardDivider()
-                        TaqwaRow(
-                            stringResource(Res.string.notifications_tahajjud_sound),
-                            value = soundDisplayName(settings.duhaSound),
-                            onClick = { duhaSoundSheetOpen = true },
-                        )
+                    // The five first (Duha and Iqama spec §4.6): they are what the screen is for.
+                    Spacer(Modifier.height(28.dp))
+                    SectionLabel(stringResource(Res.string.notifications_prayers_label))
+                    SettingsCard(anchor.above) {
+                        ObligatoryPrayers.forEachIndexed { i, prayer ->
+                            if (i > 0) CardDivider()
+                            val iqamaMinutes = settings.iqamaMinutesFor(prayer)
+                            TaqwaRow(
+                                // The name alone here, not the Arabic-alone/paired display rule:
+                                // this is a settings row, not one of the places the spec names
+                                // (timeline, widget, notification), and a doubled name would crowd
+                                // the sound value beside it.
+                                label = localizedPrayerName(prayer),
+                                value = soundDisplayName(settings.soundFor(prayer)),
+                                // While Iqama is on, the prayer's gap under its name; none for an
+                                // Off prayer. One element to a screen reader, as the row always
+                                // was: name, line, sound.
+                                subtitle = if (iqamaMinutes > 0) iqamaLine(iqamaMinutes) else null,
+                                revealSubtitle = settings.iqama && iqamaMinutes > 0,
+                                onClick = { anchor.armed = false; soundSheetFor = prayer },
+                            )
+                        }
                     }
-                }
-            }
 
-            // The adhkar reminder (adhkar spec §5), built as the Tahajjud card is and for the same
-            // reasons: off until asked for, and its subtitle and sound row there only while it is on.
-            Spacer(Modifier.height(28.dp))
-            SettingsCard {
-                TaqwaRow(
-                    stringResource(Res.string.notifications_adhkar),
-                    subtitle = stringResource(Res.string.notifications_adhkar_subtitle),
-                    revealSubtitle = settings.adhkar,
-                    toggle = RowToggle(settings.adhkar, onToggleAdhkar),
-                )
-                SettingsReveal(settings.adhkar) {
-                    Column {
+                    // Still PRAYERS, so 14 dp and no label, as Prayer times sets its Asr switches
+                    // under the school: the three choices that apply to all five. The voice is the
+                    // single one, and here, outside the five's card, it still cannot read as a
+                    // sixth prayer.
+                    Spacer(Modifier.height(14.dp))
+                    SettingsCard {
+                        TaqwaRow(
+                            stringResource(Res.string.notifications_remind_before),
+                            value = leadLabel(settings.remindBeforeMinutes),
+                            onClick = { remindSheetOpen = true },
+                        )
                         CardDivider()
                         TaqwaRow(
-                            stringResource(Res.string.notifications_tahajjud_sound),
-                            value = soundDisplayName(settings.adhkarSound),
-                            onClick = { adhkarSheetOpen = true },
+                            stringResource(Res.string.adhan_voice_row),
+                            value = adhanVoiceDisplayName(settings.voice),
+                            onClick = { voiceSheetOpen = true },
                         )
+                        CardDivider()
+                        // Off, one quiet row and nothing anywhere else (Duha and Iqama spec §4.2).
+                        // On, its subtitle and sound, the note under the card, a line under each
+                        // prayer and the minutes in each prayer's sheet: the minutes belong to the
+                        // prayers, so they are set there, not here.
+                        TaqwaRow(
+                            stringResource(Res.string.notifications_iqama),
+                            subtitle = stringResource(Res.string.notifications_iqama_subtitle),
+                            revealSubtitle = settings.iqama,
+                            toggle = RowToggle(settings.iqama) { on ->
+                                anchor.armed = true
+                                onToggleIqama(on)
+                            },
+                        )
+                        SettingsReveal(settings.iqama) {
+                            Column {
+                                CardDivider()
+                                TaqwaRow(
+                                    stringResource(Res.string.notifications_tahajjud_sound),
+                                    value = soundDisplayName(settings.iqamaSound),
+                                    onClick = { iqamaSoundSheetOpen = true },
+                                )
+                            }
+                        }
+                    }
+                    SettingsReveal(settings.iqama) {
+                        Column {
+                            Spacer(Modifier.height(10.dp))
+                            SettingsNote(stringResource(Res.string.notifications_iqama_note))
+                        }
+                    }
+
+                    // The voluntary reminders, one card under their own label (§4.6), each off
+                    // until asked for (spec §17.6): a voluntary prayer is offered, not assumed, and
+                    // none is one of the five. What each needs appears under its own row only while
+                    // it is on, so the screen a person who never wants them sees has grown by three
+                    // quiet rows.
+                    Spacer(Modifier.height(28.dp))
+                    SectionLabel(stringResource(Res.string.notifications_voluntary_label))
+                    SettingsCard {
+                        // Tahajjud: on, its subtitle and Sound.
+                        TaqwaRow(
+                            stringResource(Res.string.notifications_tahajjud),
+                            subtitle = stringResource(Res.string.notifications_tahajjud_subtitle),
+                            revealSubtitle = settings.tahajjud,
+                            toggle = RowToggle(checked = settings.tahajjud, onCheckedChange = onToggleTahajjud),
+                        )
+                        SettingsReveal(settings.tahajjud) {
+                            Column {
+                                CardDivider()
+                                TaqwaRow(
+                                    stringResource(Res.string.notifications_tahajjud_sound),
+                                    value = soundDisplayName(settings.tahajjudSound),
+                                    onClick = { tahajjudSheetOpen = true },
+                                )
+                            }
+                        }
+                        CardDivider()
+                        // Duha (Duha and Iqama spec §4.2): on, its timing's detail, When and Sound.
+                        TaqwaRow(
+                            stringResource(Res.string.notifications_duha),
+                            subtitle = duhaTimingDetail(settings.duhaTiming),
+                            revealSubtitle = settings.duha,
+                            toggle = RowToggle(settings.duha, onToggleDuha),
+                        )
+                        SettingsReveal(settings.duha) {
+                            Column {
+                                CardDivider()
+                                TaqwaRow(
+                                    stringResource(Res.string.notifications_duha_when),
+                                    value = duhaTimingName(settings.duhaTiming),
+                                    onClick = { duhaWhenSheetOpen = true },
+                                )
+                                CardDivider()
+                                TaqwaRow(
+                                    stringResource(Res.string.notifications_tahajjud_sound),
+                                    value = soundDisplayName(settings.duhaSound),
+                                    onClick = { duhaSoundSheetOpen = true },
+                                )
+                            }
+                        }
+                        CardDivider()
+                        // The adhkar reminder (adhkar spec §5): on, its subtitle and Sound.
+                        TaqwaRow(
+                            stringResource(Res.string.notifications_adhkar),
+                            subtitle = stringResource(Res.string.notifications_adhkar_subtitle),
+                            revealSubtitle = settings.adhkar,
+                            toggle = RowToggle(settings.adhkar, onToggleAdhkar),
+                        )
+                        SettingsReveal(settings.adhkar) {
+                            Column {
+                                CardDivider()
+                                TaqwaRow(
+                                    stringResource(Res.string.notifications_tahajjud_sound),
+                                    value = soundDisplayName(settings.adhkarSound),
+                                    onClick = { adhkarSheetOpen = true },
+                                )
+                            }
+                        }
                     }
                 }
             }

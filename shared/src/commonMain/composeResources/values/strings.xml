@@ -773,4 +773,5 @@
     <string name="notifications_section_sound">SOUND</string>
     <string name="notifications_section_iqama">IQAMA REMINDER</string>
     <string name="notifications_iqama_not_friday">No iqama reminder on Fridays: the khutbah comes first.</string>
+    <string name="notifications_voluntary_label">VOLUNTARY</string>
 </resources>

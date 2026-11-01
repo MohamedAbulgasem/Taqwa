@@ -5796,3 +5796,62 @@ three would move them by 1 to 3 s.
 **Next on ESA's page.** The other 27 towns' months of 2026 are in the archive with no rows. Kharga's other starts
 (0 to 3 s spare in November, before November 2027) and Taba (thin days through the year) can take their rows and
 refits from them, as R159's entry above lists.
+
+## Notifications, prayers first (27–28 October) — layout B, for the Watch release
+
+Branch `notifications-layout-b`, off main 9d3ba3ef. Not pushed.
+
+Mohamed chose layout B from the layout round: "I like the highlight on the prayers first as that's the main
+thing", and "with the master switch off, the rows below mustn't look active". Duha and Iqama spec §4.6 has the
+whole of it; §4.1's order is replaced.
+
+- **Order.** The master switch and its notes; PRAYERS and the five; 14 dp below, in the same group and with no
+  label (as Prayer times sets its Asr switches under the school), one card of Remind me before, Adhan and Iqama
+  reminder, with Iqama's subtitle, Sound and note while it is on; then the new label VOLUNTARY
+  (`notifications_voluntary_label`, seven languages) over one card of Tahajjud, Duha and the adhkar, each
+  revealing what it always did under its own row. Same rows, sheets, strings, callbacks and scheduling.
+- **French.** ACTES SURÉROGATOIRES (30 Oct, the Lead's call, which Mohamed left to it), replacing the first
+  draft FACULTATIF. *Surérogatoire* is French's word for nafl, and *actes* covers the two prayers and the adhkar.
+  FACULTATIF read as OPTIONAL. Three judges (francophone usage, French UI writing, meaning) and a skeptic all
+  chose it over NAWAFIL ET ADHKAR. The reasons are in the spec, under the label's table.
+- **Master switch off.** Everything under its card goes with the screen's `SettingsReveal` (reduced motion
+  included), the exact-alarms note with it. Nothing is reset; the values come back when it goes on.
+- **The Iqama row stays put.** B's one cost: Iqama on or off adds or removes the five lines above its row.
+  `ScrollAnchor` measures the five's card and scrolls by what it gains or loses in the same frame, dispatched
+  from a layout step on `SettingsScaffold`'s scroller once the scroll has measured its new range, so a screen
+  that fitted, or the end of the range, can follow too. Dispatching from inside the content was tried first:
+  the row moved on a screen that fitted (the frame-by-frame test failed at frame 5). The Iqama switch arms it;
+  a prayer's row and the master switch disarm it, so a pick in a prayer's sheet moves the rows below as before.
+  At the top of the range, with Iqama on, turning it off cannot be followed and the row moves up by the lines.
+  At the end, turning it off shrinks the range under the offset, and the scroller has already pulled the offset
+  in by the whole shrink while it measured, the five lines included. The first version dispatched the five lines
+  again on top of that, and the review (28 October) caught it: under reduced motion the row dropped a further
+  five lines, 240 px on the Pixel 8 Pro. The anchor now reads the offset before the scroller measures and
+  dispatches only what is still missing, so at the end it adds nothing and the row moves down by exactly what
+  went below it (Iqama's subtitle, its Sound row and the note).
+
+Commits: c36e8941 (the label), 2db4bd2f (the order), 775b8e36 (master off), 0f3f6499 (comments rewrapped),
+cadd10fb (the anchor), 1dda7455 (the spec section and this entry), then after the review 7e77daa2 (the anchor
+at the end of the range, with its tests) and the corrections to this entry and the spec.
+
+**Screenshots.** `docs/screenshots/notifications.png` (README) and store screenshot 2 (`en-02.png` and its six
+languages, Play and App Store) show the old layout. They are re-shot at the 1.4.0 cut, not now.
+
+Checked for this entry: `NotificationLayoutTest` (iosTest, 7 tests: the order and the 14 and 28 dp gaps; master
+off and back with its values; the Iqama row's top on every frame of both flips mid-screen and on a screen that
+fitted; at the end of the range, on, then down to the new end and off, where on every frame the row must have
+moved down by exactly what has gone below it so far and the scroll settles on the new end; the mid-screen and
+end tests again under reduced motion, which the screen now takes as a parameter defaulting to the system's
+setting) beside the Iqama, Duha, Tahajjud and adhkar card tests. The first version's end test never turned
+Iqama off at the end: after the on flip the offset sat above the new end, so it never met the clamp. Both end
+tests failed against that version (frame 3 with the reveal, 85 dp under reduced motion) and pass now.
+`scripts/check-strings.sh` clean; `scripts/test.sh` and `scripts/ios-build.sh` green.
+
+On emulator-5556 (Pixel 8 Pro, API 36, debug build of 7e77daa2): the order; master off leaves only its card, and
+on brings back Iqama's five lines and Duha's timing, When and Sound; from the top of the scroll the Iqama row's
+top stays at 2192 px across on and off; at the end of the range on keeps it at 1831 px, and from the true end
+(row at 1568 px) off brings it down to 1831 px, 263 px, exactly what went below it, the VOLUNTARY label staying
+at 2119 px; the same numbers with animations removed
+(animator duration scale 0); Duha's When and Sound inside the VOLUNTARY card; Arabic right to left. The first
+round (cadd10fb) also saw a Fajr minutes pick move the rows below. Settings, the animator scale and the app
+locale put back to their defaults afterwards.

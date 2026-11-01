@@ -738,4 +738,5 @@
     <string name="notifications_section_sound">SES</string>
     <string name="notifications_section_iqama">KAMET HATIRLATMASI</string>
     <string name="notifications_iqama_not_friday">Cuma günleri kamet hatırlatması yok: önce hutbe okunur.</string>
+    <string name="notifications_voluntary_label">NAFİLE İBADETLER</string>
 </resources>

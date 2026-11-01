@@ -30,7 +30,7 @@ internal fun revealExit(reduceMotion: Boolean): ExitTransition =
 
 /**
  * Every row, subtitle, line and note that depends on a switch comes and goes through this (Duha
- * and Iqama spec §4.3), so the four reminder cards in Settings › Notifications move alike. Hidden,
+ * and Iqama spec §4.3), so every reminder in Settings › Notifications moves alike. Hidden,
  * the content leaves the semantics tree too, so a screen reader meets nothing a switch has put away.
  */
 @Composable

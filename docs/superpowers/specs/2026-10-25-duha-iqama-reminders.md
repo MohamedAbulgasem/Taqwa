@@ -274,6 +274,8 @@ owner's call, not built.
 
 Cards stay 28 dp apart.
 
+Replaced on 27 October 2026 by layout B, prayers first (§4.6).
+
 ### 4.2 The cards
 
 **Duha.**
@@ -382,6 +384,75 @@ Formatting rules:
 - Bengali is in NFC.
 - Indonesian is edited in `values-id`, then `python3 tools/sync-indonesian.py` copies it to `values-in`.
 - `scripts/check-strings.sh` must come out clean.
+
+### 4.6 Prayers first (27 October 2026)
+
+Mohamed chose layout B from the layout round (scratchpad `notif-canvas`: today's screen, A, A with
+the reminders on, B): "I like the highlight on the prayers first as that's the main thing." It
+replaces the order of §4.1. The rows, sheets, reveals, strings and scheduling of §4.2 to §4.5 are
+unchanged, apart from one new label. Ships with the Watch release (1.4.0).
+
+Order, top to bottom:
+
+1. Prayer notifications, alone in its card, with the system notes under it.
+2. PRAYERS and the five rows, as §4.2 has them, the iqama line under each name included.
+3. 14 dp below, still PRAYERS and with no label of its own (as Prayer times sets its Asr switches
+   under the school): one card of Remind me before, Adhan and Iqama reminder, a divider apart.
+   While Iqama is on, its subtitle and then a divider and its Sound row are inside this card, and
+   the Iqama note is under it. The note is still true: the prayers' rows sit just above.
+4. 28 dp below, the new label VOLUNTARY over one card of Tahajjud, Duha and Morning and evening
+   adhkar, a `CardDivider` apart. Off, each is its name and switch. On, what it reveals appears
+   inside the card directly under its own row: Tahajjud's subtitle and Sound; Duha's timing
+   detail, When and Sound; the adhkar's subtitle and Sound.
+
+`notifications_voluntary_label`, written as each language writes `notifications_prayers_label`:
+
+| en | ar | ur | tr | id | bn | fr |
+|---|---|---|---|---|---|---|
+| VOLUNTARY | النوافل والأذكار | نوافل اور اذکار | NAFİLE İBADETLER | IBADAH SUNAH | নফল ইবাদত | ACTES SURÉROGATOIRES |
+
+French is ACTES SURÉROGATOIRES (Mohamed left the word to the Lead, 30 Oct). *Surérogatoire* is the
+French word for nafl: French renders the hadith of the wali's *bi-n-nawāfil* as "par les actes
+surérogatoires", and French writing on nafila says *prière* or *jeûne surérogatoire*. *Actes* covers
+the two prayers and the adhkar without calling dhikr a prayer, and it says what the Turkish,
+Indonesian and Bengali labels say (voluntary worship). The first draft, FACULTATIF, was a bare
+adjective that read as OPTIONAL, which is what the store listing and the site mean by *facultatif*.
+It also marks an optional form field in French UI, and in French fiqh it can mean merely permitted.
+NAWAFIL ET ADHKAR, the Arabic and Urdu label's twin, lost: every other French category heading is
+French (PRIÈRES, SON, QUAND), *nawafil* is the learned Arabic plural many francophone readers don't
+know, and ADHKAR would repeat in the row just below. The label is the screen's widest (about 169 dp
+against 268 dp of text width on a 320 dp phone). Past about 1.5x font scale it wraps at the space,
+and SectionLabel has no maxLines, so nothing is cut.
+
+**The master switch off.** `NotificationPlanner.plan` returns nothing while it is off, so no row
+below it rings, and none should look as if it would. Everything below its card goes with the same
+`SettingsReveal` (§4.3, reduced motion included): both PRAYERS cards, the Iqama note, the VOLUNTARY
+label and card, and the exact-alarms note. The blocked-notifications note already shows only while
+it is on. Nothing is reset: the values stay stored and come back unchanged when it is turned on,
+and turning it on still asks for the permission first.
+
+**The Iqama row stays put.** Layout B's one cost: turning Iqama on or off adds or removes the five
+lines in the card above its row. While they come or go, the screen scrolls by the height that card
+gains or loses, in the same frame, so the row stays under the finger through the 220 ms reveal or,
+under reduced motion, the jump. `ScrollAnchor` measures the five's card; a layout step outside the
+scroller's `verticalScroll` dispatches the change after the scroller has measured its new range and
+before it places the content, so even the room the screen has just gained at its end can be used.
+The Iqama switch arms it, and a tap on a prayer's row disarms it: a pick in that prayer's sheet can
+add or remove its one line, and that moves the rows below, as it always has. Where the range cannot
+follow, the row moves: at the top when the lines go, and at the end when they go. There the end
+comes up by everything that goes, and the scroller pulls its offset in by all of it while it
+measures, the five lines included; the anchor reads the offset before that measure and dispatches
+only what is still missing, so at the end it adds nothing and the row moves down by exactly what
+went below it (Iqama's subtitle, its Sound row and the note), as it would with no anchor. Any other
+change to the five's height while it is armed, a rotation or a new font size, is followed too.
+
+Tests (`NotificationLayoutTest`, iosTest): the order and the 14 and 28 dp gaps; the master switch
+off hides all of it, and on brings it back with its values; the Iqama row's place on every frame of
+Iqama on and off mid-screen and on a screen that did not scroll before, and of Iqama on at the end
+of the range; then Iqama off from the new end, where on every frame the row must have moved down by
+exactly what has gone below it so far, and the scroll settle on the end. The mid-screen and end tests
+also run under reduced motion, which the screen takes as a parameter (defaulting to the system's
+setting) because a test cannot switch the simulator's.
 
 ## 5. Tests
 

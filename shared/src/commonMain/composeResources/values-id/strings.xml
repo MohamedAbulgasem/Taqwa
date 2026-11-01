@@ -712,4 +712,5 @@
     <string name="notifications_section_sound">SUARA</string>
     <string name="notifications_section_iqama">PENGINGAT IQAMAH</string>
     <string name="notifications_iqama_not_friday">Tidak ada pengingat iqamah pada hari Jumat: khotbah lebih dulu.</string>
+    <string name="notifications_voluntary_label">IBADAH SUNAH</string>
 </resources>
