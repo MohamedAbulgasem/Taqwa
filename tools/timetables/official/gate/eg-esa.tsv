@@ -111,3 +111,5 @@ archive/tables/manual/eg-esa/2026-10-26/sidi-barrani-2026-11.txt	eg.esa/sidi-bar
 archive/tables/manual/eg-esa/2026-10-26/siwa-2026-11.txt	eg.esa/siwa			Africa/Cairo	F+E S D A M I	daily	standard	test	Siwa, November 2026, ESA's own daily page read by hand on 2026-10-26
 archive/tables/manual/eg-esa/2026-10-26/suez-2026-11.txt	eg.esa/suez			Africa/Cairo	F+E S D A M I	daily	standard	test	Suez, November 2026, ESA's own daily page read by hand on 2026-10-26
 archive/tables/manual/eg-esa/2026-10-26/taba-2026-11.txt	eg.esa/taba			Africa/Cairo	F+E S D A M I	daily	standard	test	Taba, November 2026, ESA's own daily page read by hand on 2026-10-26
+# prove, 2026-11-01: the monitor's captures pinned as they were under archive/tables/pinned/{eg-esa}/2026-11-01/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/eg-esa/2026-11-01/mut.txt	eg.esa/mut			Africa/Cairo	F+E S D A M I	daily	standard	test	Mut, the monitor capture of 1 Nov 2026 (prove)

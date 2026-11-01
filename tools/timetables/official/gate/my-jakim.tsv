@@ -36,3 +36,10 @@ archive/tables/round/data-wide-band/off-jakim-SWK08-2025-mirror.txt	my.jakim/SWK
 archive/tables/round/data-wide-band/off-jakim-SWK08.txt	my.jakim/SWK08			Asia/Kuching	F+E S D A M I	daily	standard	test	e-solat 2026, Kuching
 archive/tables/round/data-wide-band/off-jakim-WLY02-2025-mirror.txt	my.jakim/WLY02			Asia/Kuching	F+E S D A M I	daily	standard	fit	e-solat mirror 2025, Labuan
 archive/tables/round/data-wide-band/off-jakim-WLY02.txt	my.jakim/WLY02			Asia/Kuching	F+E S D A M I	daily	standard	test	e-solat 2026, Labuan
+# prove, 2026-11-01: the monitor's captures pinned as they were under archive/tables/pinned/{my-jakim}/2026-11-01/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/my-jakim/2026-11-01/JHR01-2027.txt	my.jakim/JHR01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Pulau Aur JHR01 2027 (mirror), the monitor capture of 1 Nov 2026 (prove)
+archive/tables/pinned/my-jakim/2026-11-01/JHR02-2027.txt	my.jakim/JHR02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Johor Bahru JHR02 2027 (mirror), the monitor capture of 1 Nov 2026 (prove)
+archive/tables/pinned/my-jakim/2026-11-01/KTN01-2027.txt	my.jakim/KTN01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kota Bharu KTN01 2027 (mirror), the monitor capture of 1 Nov 2026 (prove)
+archive/tables/pinned/my-jakim/2026-11-01/PHG01-2027.txt	my.jakim/PHG01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Pulau Tioman PHG01 2027 (mirror), the monitor capture of 1 Nov 2026 (prove)
+archive/tables/pinned/my-jakim/2026-11-01/PHG06-2027.txt	my.jakim/PHG06			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Cameron Highlands PHG06 2027 (mirror), the monitor capture of 1 Nov 2026 (prove)
+archive/tables/pinned/my-jakim/2026-11-01/SWK08-2027.txt	my.jakim/SWK08			Asia/Kuching	F+E S D A M I	daily	standard	test	Kuching SWK08 2027 (mirror), the monitor capture of 1 Nov 2026 (prove)

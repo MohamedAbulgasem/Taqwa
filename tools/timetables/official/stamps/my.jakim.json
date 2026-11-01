@@ -5,115 +5,115 @@
   "broken": 0,
   "places": 13,
   "first": "2025-01-01",
-  "last": "2026-12-31",
-  "checked": ["2025-01-01..2026-12-31"],
-  "placeDays": 9489,
-  "heldOutDays": 4745,
-  "ramadanDays": 766,
+  "last": "2027-12-31",
+  "checked": ["2025-01-01..2027-12-31"],
+  "placeDays": 11648,
+  "heldOutDays": 6904,
+  "ramadanDays": 932,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 9489,
+      "checked": 11648,
       "early": 0,
       "late": {
-        "0": 6218,
-        "1": 3194,
-        "2": 77,
+        "0": 7635,
+        "1": 3934,
+        "2": 79,
         "3+": 0
       },
-      "exactShare": 0.6553,
+      "exactShare": 0.6555,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 9489,
+      "checked": 11648,
       "lateEnd": 0,
       "late": {
-        "0": 5485,
-        "1": 3247,
+        "0": 6868,
+        "1": 4023,
         "2": 545,
         "3+": 212
       },
-      "exactShare": 0.578,
+      "exactShare": 0.5896,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class B, unit PLS01",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 9489,
+      "checked": 11648,
       "early": 0,
       "late": {
-        "0": 7322,
-        "1": 2167,
+        "0": 8788,
+        "1": 2860,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7716,
+      "exactShare": 0.7545,
       "worstLate": 1,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 9489,
+      "checked": 11648,
       "early": 0,
       "late": {
-        "0": 5577,
-        "1": 3846,
-        "2": 66,
+        "0": 6622,
+        "1": 4942,
+        "2": 84,
         "3+": 0
       },
-      "exactShare": 0.5877,
+      "exactShare": 0.5685,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 9489,
+      "checked": 11648,
       "early": 0,
       "late": {
-        "0": 5780,
-        "1": 3107,
-        "2": 602,
+        "0": 6907,
+        "1": 3865,
+        "2": 876,
         "3+": 0
       },
-      "exactShare": 0.6091,
+      "exactShare": 0.593,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
       "overLimit": 0
     },
     "isha": {
-      "checked": 9489,
+      "checked": 11648,
       "early": 0,
       "late": {
-        "0": 6195,
-        "1": 3226,
-        "2": 68,
+        "0": 7570,
+        "1": 4009,
+        "2": 69,
         "3+": 0
       },
-      "exactShare": 0.6529,
+      "exactShare": 0.6499,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 9489,
+      "checked": 11648,
       "lateEnd": 0,
       "late": {
-        "0": 171,
-        "1": 3456,
-        "2": 4353,
-        "3+": 1509
+        "0": 213,
+        "1": 4259,
+        "2": 5259,
+        "3+": 1917
       },
-      "exactShare": 0.018,
+      "exactShare": 0.0183,
       "worstLate": 4,
       "lateLimit": 4,
       "lateLimitFrom": "entry my.jakim",
@@ -121,109 +121,109 @@
     }
   },
   "heldOut": {
-    "placeDays": 4745,
-    "ramadanDays": 390,
+    "placeDays": 6904,
+    "ramadanDays": 556,
     "events": {
       "fajr": {
-        "checked": 4745,
+        "checked": 6904,
         "early": 0,
         "late": {
-          "0": 3069,
-          "1": 1639,
-          "2": 37,
+          "0": 4486,
+          "1": 2379,
+          "2": 39,
           "3+": 0
         },
-        "exactShare": 0.6468,
+        "exactShare": 0.6498,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 4745,
+        "checked": 6904,
         "lateEnd": 0,
         "late": {
-          "0": 2747,
-          "1": 1617,
+          "0": 4130,
+          "1": 2393,
           "2": 276,
           "3+": 105
         },
-        "exactShare": 0.5789,
+        "exactShare": 0.5982,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class B, unit PLS01",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 4745,
+        "checked": 6904,
         "early": 0,
         "late": {
-          "0": 3644,
-          "1": 1101,
+          "0": 5110,
+          "1": 1794,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.768,
+        "exactShare": 0.7402,
         "worstLate": 1,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 4745,
+        "checked": 6904,
         "early": 0,
         "late": {
-          "0": 2795,
-          "1": 1916,
-          "2": 34,
+          "0": 3840,
+          "1": 3012,
+          "2": 52,
           "3+": 0
         },
-        "exactShare": 0.589,
+        "exactShare": 0.5562,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 4745,
+        "checked": 6904,
         "early": 0,
         "late": {
-          "0": 2891,
-          "1": 1547,
-          "2": 307,
+          "0": 4018,
+          "1": 2305,
+          "2": 581,
           "3+": 0
         },
-        "exactShare": 0.6093,
+        "exactShare": 0.582,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
       },
       "isha": {
-        "checked": 4745,
+        "checked": 6904,
         "early": 0,
         "late": {
-          "0": 3092,
-          "1": 1623,
-          "2": 30,
+          "0": 4467,
+          "1": 2406,
+          "2": 31,
           "3+": 0
         },
-        "exactShare": 0.6516,
+        "exactShare": 0.647,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 4745,
+        "checked": 6904,
         "lateEnd": 0,
         "late": {
-          "0": 103,
-          "1": 1725,
-          "2": 2162,
-          "3+": 755
+          "0": 145,
+          "1": 2528,
+          "2": 3068,
+          "3+": 1163
         },
-        "exactShare": 0.0217,
+        "exactShare": 0.021,
         "worstLate": 4,
         "lateLimit": 4,
         "lateLimitFrom": "entry my.jakim",
@@ -247,8 +247,8 @@
   "units": {
     "JHR01": {
       "name": "JHR01",
-      "placeDays": 730,
-      "checked": ["2025-01-01..2026-12-31"],
+      "placeDays": 1095,
+      "checked": ["2025-01-01..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -261,41 +261,86 @@
       },
       "events": {
         "fajr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 525,
-            "1": 205,
+            "0": 779,
+            "1": 316,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7192,
+          "exactShare": 0.7114,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
-            "0": 453,
-            "1": 277,
+            "0": 676,
+            "1": 419,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6205,
+          "exactShare": 0.6174,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 462,
-            "1": 268,
+            "0": 688,
+            "1": 407,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6283,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "asrStandard": {
+          "checked": 1095,
+          "early": 0,
+          "late": {
+            "0": 466,
+            "1": 628,
+            "2": 1,
+            "3+": 0
+          },
+          "exactShare": 0.4256,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "maghrib": {
+          "checked": 1095,
+          "early": 0,
+          "late": {
+            "0": 667,
+            "1": 428,
+            "2": 0,
+            "3+": 0
+          },
+          "exactShare": 0.6091,
+          "worstLate": 1,
+          "lateLimit": 2,
+          "lateLimitFrom": "class B",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 1095,
+          "early": 0,
+          "late": {
+            "0": 693,
+            "1": 402,
             "2": 0,
             "3+": 0
           },
@@ -305,58 +350,13 @@
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
-        "asrStandard": {
-          "checked": 730,
-          "early": 0,
-          "late": {
-            "0": 315,
-            "1": 415,
-            "2": 0,
-            "3+": 0
-          },
-          "exactShare": 0.4315,
-          "worstLate": 1,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
-          "overLimit": 0
-        },
-        "maghrib": {
-          "checked": 730,
-          "early": 0,
-          "late": {
-            "0": 443,
-            "1": 287,
-            "2": 0,
-            "3+": 0
-          },
-          "exactShare": 0.6068,
-          "worstLate": 1,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
-          "overLimit": 0
-        },
-        "isha": {
-          "checked": 730,
-          "early": 0,
-          "late": {
-            "0": 460,
-            "1": 270,
-            "2": 0,
-            "3+": 0
-          },
-          "exactShare": 0.6301,
-          "worstLate": 1,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
-          "overLimit": 0
-        },
         "endOfEating": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
             "0": 0,
-            "1": 135,
-            "2": 594,
+            "1": 202,
+            "2": 892,
             "3+": 1
           },
           "exactShare": 0,
@@ -369,8 +369,8 @@
     },
     "JHR02": {
       "name": "JHR02",
-      "placeDays": 730,
-      "checked": ["2025-01-01..2026-12-31"],
+      "placeDays": 1095,
+      "checked": ["2025-01-01..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -383,103 +383,103 @@
       },
       "events": {
         "fajr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 397,
-            "1": 333,
+            "0": 594,
+            "1": 501,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5438,
+          "exactShare": 0.5425,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
-            "0": 314,
-            "1": 416,
+            "0": 470,
+            "1": 625,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.4301,
+          "exactShare": 0.4292,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 461,
-            "1": 269,
+            "0": 699,
+            "1": 396,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6315,
+          "exactShare": 0.6384,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 129,
-            "1": 560,
-            "2": 41,
+            "0": 196,
+            "1": 842,
+            "2": 57,
             "3+": 0
           },
-          "exactShare": 0.1767,
+          "exactShare": 0.179,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 328,
-            "1": 402,
+            "0": 494,
+            "1": 601,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.4493,
+          "exactShare": 0.4511,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "isha": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 284,
-            "1": 446,
+            "0": 425,
+            "1": 670,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.389,
+          "exactShare": 0.3881,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
             "0": 0,
-            "1": 144,
-            "2": 539,
-            "3+": 47
+            "1": 216,
+            "2": 807,
+            "3+": 72
           },
           "exactShare": 0,
           "worstLate": 3,
@@ -491,8 +491,8 @@
     },
     "KTN01": {
       "name": "KTN01",
-      "placeDays": 730,
-      "checked": ["2025-01-01..2026-12-31"],
+      "placeDays": 1064,
+      "checked": ["2025-01-01..2027-02-28", "2027-04-01..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -505,103 +505,103 @@
       },
       "events": {
         "fajr": {
-          "checked": 730,
+          "checked": 1064,
           "early": 0,
           "late": {
-            "0": 510,
-            "1": 220,
+            "0": 743,
+            "1": 321,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6986,
+          "exactShare": 0.6983,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 730,
+          "checked": 1064,
           "lateEnd": 0,
           "late": {
-            "0": 508,
-            "1": 222,
+            "0": 732,
+            "1": 332,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6959,
+          "exactShare": 0.688,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 730,
+          "checked": 1064,
           "early": 0,
           "late": {
-            "0": 642,
-            "1": 88,
+            "0": 921,
+            "1": 143,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8795,
+          "exactShare": 0.8656,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 730,
+          "checked": 1064,
           "early": 0,
           "late": {
-            "0": 529,
-            "1": 201,
+            "0": 765,
+            "1": 299,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7247,
+          "exactShare": 0.719,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 730,
+          "checked": 1064,
           "early": 0,
           "late": {
-            "0": 541,
-            "1": 189,
+            "0": 796,
+            "1": 268,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7411,
+          "exactShare": 0.7481,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "isha": {
-          "checked": 730,
+          "checked": 1064,
           "early": 0,
           "late": {
-            "0": 535,
-            "1": 195,
+            "0": 785,
+            "1": 279,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7329,
+          "exactShare": 0.7378,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 730,
+          "checked": 1064,
           "lateEnd": 0,
           "late": {
             "0": 0,
-            "1": 37,
-            "2": 620,
-            "3+": 73
+            "1": 49,
+            "2": 906,
+            "3+": 109
           },
           "exactShare": 0,
           "worstLate": 3,
@@ -613,8 +613,8 @@
     },
     "PHG01": {
       "name": "PHG01",
-      "placeDays": 730,
-      "checked": ["2025-01-01..2026-12-31"],
+      "placeDays": 1095,
+      "checked": ["2025-01-01..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -627,105 +627,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 578,
-            "1": 152,
+            "0": 872,
+            "1": 223,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7918,
+          "exactShare": 0.7963,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
-            "0": 590,
-            "1": 140,
+            "0": 886,
+            "1": 209,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8082,
+          "exactShare": 0.8091,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 430,
-            "1": 300,
+            "0": 633,
+            "1": 462,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.589,
+          "exactShare": 0.5781,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 475,
-            "1": 255,
+            "0": 703,
+            "1": 392,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6507,
+          "exactShare": 0.642,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 597,
-            "1": 133,
+            "0": 902,
+            "1": 193,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8178,
+          "exactShare": 0.8237,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "isha": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 596,
-            "1": 134,
+            "0": 895,
+            "1": 200,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8164,
+          "exactShare": 0.8174,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
-            "0": 4,
-            "1": 675,
-            "2": 51,
+            "0": 7,
+            "1": 1004,
+            "2": 84,
             "3+": 0
           },
-          "exactShare": 0.0055,
+          "exactShare": 0.0064,
           "worstLate": 2,
           "lateLimit": 4,
           "lateLimitFrom": "entry my.jakim",
@@ -735,8 +735,8 @@
     },
     "PHG06": {
       "name": "PHG06",
-      "placeDays": 730,
-      "checked": ["2025-01-01..2026-12-31"],
+      "placeDays": 1095,
+      "checked": ["2025-01-01..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -749,72 +749,72 @@
       },
       "events": {
         "fajr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 580,
-            "1": 150,
+            "0": 866,
+            "1": 229,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7945,
+          "exactShare": 0.7909,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
-            "0": 635,
-            "1": 95,
+            "0": 948,
+            "1": 147,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8699,
+          "exactShare": 0.8658,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 421,
-            "1": 309,
+            "0": 621,
+            "1": 474,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5767,
+          "exactShare": 0.5671,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 472,
-            "1": 258,
+            "0": 712,
+            "1": 383,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6466,
+          "exactShare": 0.6502,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
             "0": 0,
-            "1": 176,
-            "2": 554,
+            "1": 267,
+            "2": 828,
             "3+": 0
           },
           "exactShare": 0,
@@ -824,30 +824,30 @@
           "overLimit": 0
         },
         "isha": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 582,
-            "1": 148,
+            "0": 874,
+            "1": 221,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7973,
+          "exactShare": 0.7982,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
-            "0": 56,
-            "1": 666,
-            "2": 8,
+            "0": 95,
+            "1": 989,
+            "2": 11,
             "3+": 0
           },
-          "exactShare": 0.0767,
+          "exactShare": 0.0868,
           "worstLate": 2,
           "lateLimit": 4,
           "lateLimitFrom": "entry my.jakim",
@@ -1471,8 +1471,8 @@
     },
     "SWK08": {
       "name": "SWK08",
-      "placeDays": 730,
-      "checked": ["2025-01-01..2026-12-31"],
+      "placeDays": 1095,
+      "checked": ["2025-01-01..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
@@ -1485,41 +1485,41 @@
       },
       "events": {
         "fajr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 309,
-            "1": 416,
-            "2": 5,
+            "0": 462,
+            "1": 626,
+            "2": 7,
             "3+": 0
           },
-          "exactShare": 0.4233,
+          "exactShare": 0.4219,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
-            "0": 344,
-            "1": 386,
+            "0": 515,
+            "1": 580,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.4712,
+          "exactShare": 0.4703,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 640,
-            "1": 90,
+            "0": 960,
+            "1": 135,
             "2": 0,
             "3+": 0
           },
@@ -1530,26 +1530,26 @@
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 259,
-            "1": 468,
-            "2": 3,
+            "0": 382,
+            "1": 709,
+            "2": 4,
             "3+": 0
           },
-          "exactShare": 0.3548,
+          "exactShare": 0.3489,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 354,
-            "1": 376,
+            "0": 531,
+            "1": 564,
             "2": 0,
             "3+": 0
           },
@@ -1560,28 +1560,28 @@
           "overLimit": 0
         },
         "isha": {
-          "checked": 730,
+          "checked": 1095,
           "early": 0,
           "late": {
-            "0": 298,
-            "1": 427,
-            "2": 5,
+            "0": 458,
+            "1": 631,
+            "2": 6,
             "3+": 0
           },
-          "exactShare": 0.4082,
+          "exactShare": 0.4183,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 730,
+          "checked": 1095,
           "lateEnd": 0,
           "late": {
             "0": 0,
             "1": 0,
-            "2": 34,
-            "3+": 696
+            "2": 52,
+            "3+": 1043
           },
           "exactShare": 0,
           "worstLate": 4,
