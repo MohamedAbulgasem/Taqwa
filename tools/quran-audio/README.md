@@ -10,6 +10,32 @@ about 59 MB together, almost all of it Al-Baqarah), for example:
 
     TAQWA_AUDIO_WORK=$HOME/taqwa-audio-work python3 -I adhkar_clips.py
 
+## A published release is never changed
+
+Every installed app holds the `manifest.json` it was built with, and refuses a fetched manifest
+that moves `base` or gives a release it shipped (the same reciter id and release name) any other
+size or SHA-256 for any surah (security review, 26 October 2026). So once a release has been
+published, its containers stay exactly as they are. Changed audio for a reciter, even one surah
+repaired, goes out under a **new release name**: add the reciter to `RELEASES` in `common.py`
+(for example `"ar.alafasy": "audio-ar.alafasy-v2"`), which `publish.py`, `manifest.py` and
+`status.py` all read, remove `<WORK>/state/<id>.done`, then run `publish.py` and `finalize.py` as
+for a new reciter. Never reuse a release name, including one a withdrawn reciter used: older
+builds still carry its hashes.
+
+Two guards hold to this. Before it creates or uploads anything, `publish.py` refuses a reciter
+whose release is already in a published manifest (the Taqwa-data clone's `manifest.json` or the
+app's own copy, the two `finalize.py` writes) if any container on disk differs from it in size or
+SHA-256, because `--clobber` would replace a file that apps then refuse as corrupted. As a second
+signal, for a release no manifest names yet, it also refuses when `state/<id>.done` exists and a
+container differs from the release's assets. `manifest.py` refuses to write a manifest that
+changes the base or any published release, comparing with each copy already at its output paths
+(the same two copies).
+
+Taqwa-data has release immutability on, so a published release takes no more uploads. `publish.py`
+creates each new release as a draft, uploads every container to it, checks them, and only then
+publishes it. Releases published before immutability was turned on are not locked by GitHub; the
+apps' own check above is what holds those.
+
 ## Adhkar first-run clips
 
 The four Quranic items of the Morning & Evening Adhkar (2:255 and Surahs 112, 113, 114) are

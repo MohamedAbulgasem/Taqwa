@@ -2,6 +2,7 @@ package world.taqwa.app.recitation
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.os.Bundle
@@ -251,6 +252,13 @@ class RecitationService : MediaSessionService() {
             mediaSession: MediaSession,
             controller: MediaSession.ControllerInfo,
         ): MediaSession.ConnectionResult {
+            val access = controllerAccess(
+                isMediaNotificationController = mediaSession.isMediaNotificationController(controller),
+                isThisApp = controller.packageName == this@RecitationService.packageName,
+                isTrusted = controller.isTrusted,
+                isVisible = { canSee(controller.packageName) },
+            )
+            if (access == ControllerAccess.REFUSED) return MediaSession.ConnectionResult.reject()
             val commands = MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
                 // The notification's two ayah buttons, which the system's own controller presses.
                 .add(SessionCommand(COMMAND_PREVIOUS_AYAH, Bundle.EMPTY))
@@ -268,20 +276,27 @@ class RecitationService : MediaSessionService() {
                 .build()
             val accepted = MediaSession.ConnectionResult.AcceptedResultBuilder(mediaSession)
                 .setAvailableSessionCommands(commands)
-            // The media notification controller's commands are what Media3 gives the *platform*
-            // session, and without COMMAND_GET_TIMELINE it publishes no queue there at all
-            // (spec §18.2). A surah's queue is its ayahs and the silences between them, up to
-            // 571 rows that all read "Al-Baqarah": nothing a car, a watch or the system's player
-            // can use, and every change of it is a transaction to each of them. The app's own
-            // controller keeps the timeline — it is how the bar knows which ayah is playing.
-            if (mediaSession.isMediaNotificationController(controller)) {
+            // The app's own controller keeps the timeline — it is how the bar knows which ayah is
+            // playing. See ControllerAccess for what the others go without.
+            if (access.withheld.isNotEmpty()) {
                 accepted.setAvailablePlayerCommands(
                     MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS.buildUpon()
-                        .remove(Player.COMMAND_GET_TIMELINE)
+                        .removeAll(*access.withheld.toIntArray())
                         .build(),
                 )
             }
             return accepted.build()
+        }
+
+        /**
+         * Whether this app can see [packageName]: the same lookup Media3's trust check starts
+         * with, so a package it cannot see is one whose `isTrusted` proves nothing.
+         */
+        private fun canSee(packageName: String): Boolean = try {
+            packageManager.getApplicationInfo(packageName, 0)
+            true
+        } catch (e: PackageManager.NameNotFoundException) {
+            false
         }
 
         override fun onCustomCommand(
@@ -466,6 +481,76 @@ class RecitationService : MediaSessionService() {
          */
         internal const val MEDIA_NOTIFICATION_ID = 770_100
     }
+}
+
+/** What a controller connecting to [RecitationService] is given; see [controllerAccess]. */
+internal enum class ControllerAccess(
+    /** The player commands it does not get, out of Media3's defaults. */
+    val withheld: List<Int>,
+) {
+    FULL(emptyList()),
+
+    /**
+     * The media notification controller's commands are what Media3 gives the *platform* session,
+     * and without COMMAND_GET_TIMELINE it publishes no queue there at all (spec §18.2). A surah's
+     * queue is its ayahs and the silences between them, up to 571 rows that all read
+     * "Al-Baqarah": nothing a car, a watch or the system's player can use, and every change of it
+     * is a transaction to each of them.
+     */
+    NOTIFICATION(listOf(Player.COMMAND_GET_TIMELINE)),
+
+    /** Play, pause and seek, but nothing of the queue, read or written. */
+    LIMITED(
+        listOf(
+            Player.COMMAND_GET_TIMELINE,
+            Player.COMMAND_GET_METADATA,
+            Player.COMMAND_GET_CURRENT_MEDIA_ITEM,
+            Player.COMMAND_SET_MEDIA_ITEM,
+            Player.COMMAND_CHANGE_MEDIA_ITEMS,
+        ),
+    ),
+
+    REFUSED(emptyList()),
+}
+
+/**
+ * Who may connect to the recitation session, and with what (security review A1/C4, 26 October).
+ * The service is exported without a permission so the system, Bluetooth and watches can find it,
+ * and until this any app on the phone could bind a controller to it, replace the queue with
+ * downloaded ayahs, pause or seek, and read what is being recited, by whom and when.
+ *
+ * Only this app, the media notification controller and controllers Media3 trusts are given
+ * everything. The rest turns on what Media3 1.11.1 does, read from its bytecode:
+ *  - SystemUI never reaches `onConnect` while the media notification controller is connected:
+ *    `MediaSessionImpl.onConnectOnHandler` answers for it with that controller's commands.
+ *  - A media button is not a connection: a headset, a car's or headset's play and pause over
+ *    Bluetooth (AVRCP pass-through arrives as a key event) and `cmd media_session dispatch` are
+ *    all applied through the media notification controller.
+ *  - Every other controller of the platform session (a watch companion's or another
+ *    notification listener's transport controls, Bluetooth's) reaches `onConnect` as a legacy
+ *    controller, and Media3 works out `isTrusted` for it in this process. It looks the package up
+ *    first, and from Android 11 a package this app has no reason to see (nothing is in its
+ *    `<queries>` but TTS engines) reads as not installed, so a watch companion that is an enabled
+ *    notification listener still comes out untrusted; on Android 8 the package can be missing
+ *    altogether. Refusing those would break watch controls, so they are [ControllerAccess.LIMITED].
+ *  - An app that binds to the service, with a Media3 controller or a MediaBrowserCompat aimed at
+ *    it by name, is visible to this app because it bound, so `isTrusted` is a real verdict for it,
+ *    and an untrusted one is [ControllerAccess.REFUSED]. Fewer commands would not do: Media3
+ *    hands every controller it accepts the platform session's token, and the platform session's
+ *    metadata can be read from that with no further check.
+ *
+ * [isVisible] is asked only when the rest has not decided.
+ */
+internal fun controllerAccess(
+    isMediaNotificationController: Boolean,
+    isThisApp: Boolean,
+    isTrusted: Boolean,
+    isVisible: () -> Boolean,
+): ControllerAccess = when {
+    isMediaNotificationController -> ControllerAccess.NOTIFICATION
+    isThisApp || isTrusted -> ControllerAccess.FULL
+    isVisible() -> ControllerAccess.REFUSED
+    else -> ControllerAccess.LIMITED
 }
 
 /**

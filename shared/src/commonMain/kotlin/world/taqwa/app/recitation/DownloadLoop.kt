@@ -88,6 +88,16 @@ internal fun stillToLand(states: Map<DownloadKey, DownloadState>, sizeOf: (Downl
         }
     }
 
+/**
+ * Whether an iOS background task has sent more than the surah's [expected] size, [written] bytes
+ * into its body (security review C2): on top of the part it resumed from ([startedAt]) when the
+ * server honoured the Range with 206, from zero when it ignored it and is sending the whole file,
+ * which replaces the part. A task with no response yet counts as the latter, so it is never
+ * cancelled for a part it may not be continuing.
+ */
+internal fun ranPastSurah(status: Int, startedAt: Long, written: Long, expected: Long): Boolean =
+    (if (status == 206) startedAt + written else written) > expected
+
 /** What iOS's start() does with one surah of a request ([admit]). */
 internal sealed interface Admission {
     /** Already on its way: left to the task carrying it. */
@@ -195,6 +205,15 @@ class DownloadLoop(
     }
 
     /**
+     * [ranPastSurah] for a file iOS has landed with no size to hold it to: in a cold background
+     * wake the catalogue may not have been read yet. The bound is the headroom, which is kept
+     * larger than the largest surah, so this refuses only a file no surah could be; anything
+     * smaller is left to the hash in [finish].
+     */
+    internal fun ranPastAnySurah(status: Int, startedAt: Long, written: Long): Boolean =
+        ranPastSurah(status, startedAt, written, HEADROOM_BYTES)
+
+    /**
      * Hashes the finished `.part` against the manifest and, if it matches, makes it the surah the
      * reader owns. A mismatch has already deleted the part (see `RecitationLibrary.commit`), which
      * is why [DownloadFailure.CHECKSUM] is the one failure a Retry starts over from zero.
@@ -280,6 +299,10 @@ class DownloadLoop(
                         if (read == -1L) break
                         out.write(buffer, read)
                         written += read
+                        // Past the surah is not the surah, however much more is coming: stop now
+                        // rather than at EOF, which for a body with no end is a full disk
+                        // (security review C2). The check below deletes the part.
+                        if (written > asset.bytes) break
                         val at = now()
                         if (written - lastBytes >= PROGRESS_BYTES) {
                             out.flush()

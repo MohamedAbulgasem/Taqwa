@@ -7,7 +7,7 @@ import world.taqwa.app.resources.Res
 
 /**
  * Which catalogue the app is working from (spec 3a §4): the copy fetched from the data repository
- * if there is one and it still reads, otherwise the copy bundled with the build.
+ * if there is one, it still reads and it is [admissible], otherwise the copy bundled with the build.
  *
  * The bundled copy is what makes the picker work on a device that has never been online, and the
  * fetched copy is what lets a reciter be added — or withdrawn, if an estate ever asks — without an
@@ -34,6 +34,8 @@ class ManifestProvider(
      * Replaces the cached catalogue with [bytes], which are **parsed before anything is written**:
      * a truncated download or a manifest from a newer schema must not be able to take the app's
      * catalogue away, and the file on disk is only ever a manifest that this build could read.
+     * It must also be [admissible] — the rule [load] applies at the next start — so what is put
+     * in force now is never something a restart would take back.
      *
      * @return true if the bytes were a catalogue and are now the one in force.
      */
@@ -45,6 +47,7 @@ class ManifestProvider(
         } catch (e: Exception) {
             return false
         }
+        if (!admissible(parsed, shipped())) return false
         return lock.withLock {
             try {
                 fs.createDirectories(paths.manifestCache().parent!!)
@@ -82,10 +85,25 @@ class ManifestProvider(
                 null
             }
         }
-        val shipped = ManifestJson.parse(bundled().decodeToString())
-        return if (fetched != null && newer(fetched, shipped)) fetched else shipped
+        val shipped = shipped()
+        return if (fetched != null && admissible(fetched, shipped)) fetched else shipped
     }
+
+    /** The bundled catalogue, parsed once: the copy every fetched or cached one is held to. */
+    private var shippedCopy: RecitationManifest? = null
+
+    private suspend fun shipped(): RecitationManifest =
+        shippedCopy ?: ManifestJson.parse(bundled().decodeToString()).also { shippedCopy = it }
 }
+
+/**
+ * Whether [candidate], fetched now or cached by an earlier fetch, may be the catalogue in force
+ * rather than [shipped]: it keeps everything the build vouches for
+ * ([RecitationManifest.isFaithfulTo]) and it is [newer]. One rule for both, so a manifest the
+ * cache could never be read back as is never put in force by the fetch either.
+ */
+internal fun admissible(candidate: RecitationManifest, shipped: RecitationManifest): Boolean =
+    candidate.isFaithfulTo(shipped) && newer(candidate, shipped)
 
 /**
  * Which of two catalogues is in force: **the one generated later**, not simply the fetched one.
@@ -94,12 +112,16 @@ class ManifestProvider(
  * ordinary way a reciter is added — would otherwise be masked by whatever the last refresh
  * happened to fetch, for up to a day after the update, on exactly the launch where the reader
  * goes looking for the new voice. [RecitationManifest.generated] is an ISO-8601 instant in UTC
- * written by one pipeline, so comparing the two as text orders them; anything that does not look
- * like one leaves the fetched copy in force, which is the behaviour a manifest from the network
- * has always had.
+ * written by one pipeline, so comparing the two as text orders them.
+ *
+ * A fetched copy whose time does not look like one is **never** newer. It used to stay in force,
+ * which let a manifest that names no time outrank the build's own for good (security review C1);
+ * the pipeline has only ever written instants. A build whose own copy names no time — none has —
+ * gives way to any fetched copy that does.
  */
 internal fun newer(fetched: RecitationManifest, shipped: RecitationManifest): Boolean {
-    if (!isInstant(fetched.generated) || !isInstant(shipped.generated)) return true
+    if (!isInstant(fetched.generated)) return false
+    if (!isInstant(shipped.generated)) return true
     return fetched.generated >= shipped.generated
 }
 

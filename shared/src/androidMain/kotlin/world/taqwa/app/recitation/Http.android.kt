@@ -4,7 +4,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okio.Source
 import okio.source
+import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -19,13 +21,32 @@ actual suspend fun httpGet(url: String): ByteArray? = withContext(Dispatchers.IO
             connectTimeout = TIMEOUT_MILLIS
             readTimeout = TIMEOUT_MILLIS
             requestMethod = "GET"
+            // Not the system's, which names the phone's model and build (security review A4).
+            setRequestProperty("User-Agent", HTTP_USER_AGENT)
         }
         if (connection.responseCode !in 200..299) return@withContext null
-        connection.inputStream.use { it.readBytes() }
+        // Refused unread when it says it is too large, and dropped one read past the cap when it
+        // does not say (security review A2): the whole body is held in memory.
+        if (connection.contentLengthLong > MANIFEST_MAX_BYTES) return@withContext null
+        connection.inputStream.use { it.readAtMost(MANIFEST_MAX_BYTES) }
     } catch (e: IOException) {
         null
     } finally {
         connection?.disconnect()
+    }
+}
+
+/** The whole stream, or null as soon as it runs past [limit] bytes. */
+private fun InputStream.readAtMost(limit: Long): ByteArray? {
+    val out = ByteArrayOutputStream()
+    val buffer = ByteArray(8 * 1024)
+    var total = 0L
+    while (true) {
+        val read = read(buffer)
+        if (read == -1) return out.toByteArray()
+        total += read
+        if (total > limit) return null
+        out.write(buffer, 0, read)
     }
 }
 
@@ -52,6 +73,8 @@ class HttpByteSource(
                 // redirecting to its CDN; a cross-protocol redirect would land on a null stream
                 // and be reported as SERVER, which is the honest answer for one.
                 instanceFollowRedirects = true
+                // Carried through that redirect too, as every header set here is.
+                setRequestProperty("User-Agent", HTTP_USER_AGENT)
                 if (fromByte > 0L) setRequestProperty("Range", "bytes=$fromByte-")
             }
             val status = connection.responseCode

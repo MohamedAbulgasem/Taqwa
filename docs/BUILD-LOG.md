@@ -5678,3 +5678,71 @@ With this branch nothing is early or late on ESA's page from now to the end of 2
   October, Maghrib 13 October, Fajr and Isha in November 2026).
 
 The review of R159 (25 October) checked both lists and left them here as they stand.
+
+## Download safety (26–27 October) — the 26 October security review, for 1.4.0
+
+Branch `security/download-hardening`, off main 125c70a5: e6ba8b05, 0471ac41, 46ba1833, ad35b946, 22f09abe,
+fc3f54f0, this entry (f5f13c69), then the fixes for the review's minors. Not pushed. The version stays
+1.3.0 (39).
+
+The review of main found four places where a download, or the recitation session, trusted more than it
+had to. Nothing changes for an honest server: the live manifest is byte-identical to the bundled one and
+passes every new rule.
+
+- **The bundled manifest is the trust anchor** (C1, A3, D8). A fetched manifest was trusted whole, and the
+  size and SHA-256 each download is held to come from that same file, so whoever could push to Taqwa-data
+  could swap a shipped reciter's audio for every reader within a day. Now a fetched manifest, and a cached
+  one when it is read back, must keep the bundled base and, for every reciter whose id and release the build
+  also ships, every surah's size and SHA-256 (`isFaithfulTo`); otherwise it is refused whole and the
+  catalogue in force stays. Withdrawing a reciter, adding one, or a new release name are allowed. A
+  `generated` that is not an ISO instant is never newer any more, and `store()` applies the same rule as the
+  next start's `load()` (`admissible`). A shipped release's names, gap, bitrate and total are left open on
+  purpose, so a name or a gap can be corrected without a new release; its audio cannot change. Still open: a
+  new release name may carry any hashes, so an account takeover can still point a shipped voice at a new
+  release. Only an offline signature closes that. A narrow window too: on Android, a download queued before
+  the update keeps the size and SHA-256 it was enqueued with, so work an older build queued from a tampered
+  manifest still runs to that hash.
+- **The pipeline never changes a published release.** `publish.py` and `manifest.py` both hard-coded
+  `audio-<id>-v1`, and `publish.py` uploads with `--clobber`, so re-packing a repaired reciter would have
+  replaced live containers and written a manifest every app now refuses. The release name is now
+  `common.release(rid)` (`RELEASES` names a reciter's next one). Before it creates or uploads anything,
+  `publish.py` refuses a reciter whose release is already in a published manifest (the Taqwa-data clone's or
+  the app's own copy) when any container on disk differs from it in size or SHA-256, and it still refuses
+  one whose local `state/<id>.done` exists when a container differs from the release's assets. `manifest.py`
+  refuses a manifest that moves the base or changes a published release. The README's rule says how to ship
+  changed audio.
+- **Size caps** (A2, C2). The manifest GET refuses a body over 2 MiB (13 times today's 154 KB), unread
+  when it says so, one read past the cap when it does not. iOS moves from the shared session's completion
+  handler to a delegate of its own for that. A surah download stops on the read that runs past its size.
+  On iOS that is `didWriteData`, which cancels the background task (reported as SERVER, the part deleted),
+  but it is called only while the app runs: a transfer that goes on while the app is suspended is checked
+  only when it lands, at the hand-over. In a cold background wake (`handleEventsForBackgroundURLSession`,
+  then `attach()`) the catalogue may not have been read, so there is no size to check against: the hand-over
+  then refuses only a file larger than any surah could be (over the 200 MiB headroom, `ranPastAnySurah`),
+  and a smaller oversized one is appended and refused by the hash in `commit()`. Until it lands, such a
+  transfer is bounded only by the base pin, to what one GitHub release asset can be. Resume is unchanged.
+- **Who may use the recitation session** (A1, C4). It is exported so the system, Bluetooth and watches can
+  find it, and it gave every app every command. Media3 1.11.1's bytecode shows SystemUI and media buttons
+  never reach `onConnect` as themselves, while every other platform-session controller does, with an
+  `isTrusted` worked out in this process that fails from Android 11 for any package Taqwa cannot see. On
+  the API 36 emulator Taqwa sees SystemUI but not Bluetooth. So: this app, the notification controller and
+  trusted controllers keep everything; an untrusted app Taqwa can see (every app that binds to the service)
+  is refused, because Media3 hands every accepted controller the platform session's token; a controller
+  Media3 could not check keeps play, pause and seek but nothing of the queue.
+- **Requests carry nothing extra** (A4, C3, B2). Every request's User-Agent is `Taqwa` (Android sent
+  Dalvik with the phone's model and build). On iOS no session keeps or sends a cookie, every session's
+  Accept-Language is `*` rather than the reader's own languages, and the manifest GET has an ephemeral
+  session with no cache. The background sessions keep their identifiers exactly.
+  PRIVACY.md is unchanged.
+
+Checked for this entry: `scripts/test.sh` (4,465 tests, none failed) and `scripts/ios-build.sh` green;
+`scripts/check-versions.sh` is only on the watch branches, so the version was checked by hand. On a Pixel 8
+Pro emulator (API 36) the debug build stored the live manifest and refused four tampered copies (a hash, the
+base, no timestamp, 3 MiB). The manifest request reached a loopback server as `User-Agent: Taqwa`. Surah 108
+downloaded from the live host and matched the bundled size and hash, and `cmd media_session dispatch` paused
+and resumed it. On iOS only the unit tests and a loopback probe (`Taqwa`, a set cookie not sent back) ran:
+the DEBUG harness cannot start a download, so a surah download and the daily check on a real iPhone are
+still to be seen. For the minors (27 October), `scripts/test.sh` (4,468 tests, none failed) and
+`scripts/ios-build.sh` green again; the new `HttpTest` case fails after 20 s, the read timeout, with the
+Content-Length pre-check taken out, and `publish.py`'s refusal was run against fake work dirs with `gh`
+stubbed, so nothing reached GitHub.

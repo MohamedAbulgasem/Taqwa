@@ -79,7 +79,7 @@ class DownloadLoopTest {
     private fun sizeOf(path: okio.Path): Long? = fs.metadataOrNull(path)?.size
 
     private fun loop(
-        server: FakeServer = FakeServer(content),
+        server: ByteSource = FakeServer(content),
         conditions: FakeConditions = FakeConditions(),
     ) = DownloadLoop(library, server, conditions, fs) { 0L }
 
@@ -240,6 +240,57 @@ class DownloadLoopTest {
         assertEquals(DownloadOutcome.Failed(DownloadFailure.SERVER), outcome)
         assertEquals(content.size.toLong() - 100, sizeOf(part))
         assertFalse(fs.exists(file))
+    }
+
+    @Test
+    fun aBodyThatRunsPastTheSurahIsStoppedAsSoonAsItDoes() = runTest {
+        // Security review C2: the loop read to EOF and only then compared, so a body with no end
+        // filled the disk before the oversized part was deleted.
+        val server = EndlessServer()
+        val outcome = loop(server).run(key, URL, asset(), allowMetered = false) {}
+
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.SERVER), outcome)
+        assertTrue(server.served <= content.size + LOOP_CHUNK, "read ${server.served} bytes of a ${content.size}-byte surah")
+        assertFalse(fs.exists(part))
+        assertFalse(fs.exists(file))
+    }
+
+    @Test
+    fun aResumedBodyThatRunsPastTheSurahIsStoppedToo() = runTest {
+        val already = (content.size * 4) / 10
+        writePart(content.copyOfRange(0, already))
+        val server = EndlessServer()
+        val outcome = loop(server).run(key, URL, asset(), allowMetered = false) {}
+
+        assertEquals(DownloadOutcome.Failed(DownloadFailure.SERVER), outcome)
+        // The Range is asked for from the part exactly as before.
+        assertEquals(already.toLong(), server.lastFrom)
+        assertTrue(server.served <= content.size - already + LOOP_CHUNK, "read ${server.served} bytes past a $already-byte part")
+        assertFalse(fs.exists(part))
+    }
+
+    @Test
+    fun iosCountsAResumedBodyOnTopOfItsPartAndAWholeOneFromZero() {
+        // 206: the body continues the part, so the part counts.
+        assertFalse(ranPastSurah(status = 206, startedAt = 100, written = 20, expected = 120))
+        assertTrue(ranPastSurah(status = 206, startedAt = 100, written = 21, expected = 120))
+        // 200: the server ignored the Range and sends the whole file, which replaces the part.
+        assertFalse(ranPastSurah(status = 200, startedAt = 100, written = 120, expected = 120))
+        assertTrue(ranPastSurah(status = 200, startedAt = 100, written = 121, expected = 120))
+        // No response yet reads as a whole file: never cancelled for a part it may not continue.
+        assertFalse(ranPastSurah(status = 0, startedAt = 100, written = 120, expected = 120))
+    }
+
+    @Test
+    fun iosRefusesALandedFileNoSurahCouldBeWhenNothingSizesIt() {
+        // A cold background wake: the catalogue has not been read, so the only bound is the
+        // headroom, which is kept larger than the largest surah.
+        val loop = loop()
+        assertFalse(loop.ranPastAnySurah(status = 200, startedAt = 0, written = HEADROOM))
+        assertTrue(loop.ranPastAnySurah(status = 200, startedAt = 0, written = HEADROOM + 1))
+        // A 206 continues the part, so the part counts; a 200 replaces it.
+        assertTrue(loop.ranPastAnySurah(status = 206, startedAt = 100 * MIB, written = 100 * MIB + 1))
+        assertFalse(loop.ranPastAnySurah(status = 200, startedAt = 100 * MIB, written = 100 * MIB + 1))
     }
 
     @Test
@@ -501,6 +552,9 @@ class DownloadLoopTest {
     private companion object {
         const val URL = "https://example.test/ar.alafasy-112.taqa"
         const val MIB = 1024L * 1024L
+
+        /** The most the loop asks a source for at once (DownloadLoop's CHUNK_BYTES). */
+        const val LOOP_CHUNK = 64L * 1024L
         const val HEADROOM = 200L * MIB
 
         /** Another reciter's downloads: 70 MiB still to come of one, 50 MiB of a queued one, nothing of the rest. */
@@ -544,6 +598,41 @@ private class FakeServer(
         served = slice.size.toLong()
         val status = if (honourRange && fromByte > 0L) 206 else 200
         return ByteResponse.Body(status, slice.size.toLong(), ChunkedSource(slice, chunk, onChunk))
+    }
+}
+
+/**
+ * A body with no end, as a hostile or broken host could send: 206 from wherever it is asked, 200
+ * from zero. It gives up with an AssertionError — which the loop does not catch — well past any
+ * surah here, so a loop that reads to EOF fails the test rather than hanging it.
+ */
+private class EndlessServer : ByteSource {
+
+    var lastFrom: Long = -1L
+        private set
+
+    var served: Long = 0L
+        private set
+
+    override suspend fun open(url: String, fromByte: Long): ByteResponse {
+        lastFrom = fromByte
+        return ByteResponse.Body(if (fromByte > 0L) 206 else 200, -1L, object : Source {
+            override fun read(sink: Buffer, byteCount: Long): Long {
+                if (served > GIVE_UP) throw AssertionError("the loop kept reading: $served bytes")
+                val count = minOf(byteCount, 4096L)
+                sink.write(ByteArray(count.toInt()) { 0x55 })
+                served += count
+                return count
+            }
+
+            override fun timeout(): Timeout = Timeout.NONE
+
+            override fun close() = Unit
+        })
+    }
+
+    private companion object {
+        const val GIVE_UP = 8L * 1024L * 1024L
     }
 }
 

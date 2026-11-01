@@ -27,6 +27,10 @@ DATA = os.path.join(WORK, "Taqwa-data")
 RES = os.path.join(APP, "shared/src/commonMain/composeResources/files/recitation")
 ASSETS = os.path.join(APP, "assets/audio/recitation-previews")
 
+# The published manifests: the Taqwa-data clone's, which installed apps fetch, and the app's own,
+# which the next build ships. publish.py reads the same two before it touches a release.
+MANIFESTS = [os.path.join(DATA, "manifest.json"), os.path.join(RES, "manifest.json")]
+
 
 def published():
     state = os.path.join(WORK, "state")
@@ -37,9 +41,7 @@ def published():
 def main():
     ids = published()
     rc = subprocess.run(
-        [sys.executable, os.path.join(HERE, "manifest.py"),
-         os.path.join(DATA, "manifest.json"),
-         os.path.join(RES, "manifest.json")]).returncode
+        [sys.executable, os.path.join(HERE, "manifest.py"), *MANIFESTS]).returncode
     if rc != 0:
         return rc
 

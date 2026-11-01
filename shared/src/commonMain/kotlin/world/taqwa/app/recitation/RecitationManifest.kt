@@ -39,7 +39,8 @@ data class RecitationManifest(
      * URL has to be HTTPS (both platforms would refuse cleartext anyway, but a manifest asking for
      * it is wrong rather than unlucky), and a reciter id or release is a single plain path
      * segment: each names a directory and a file under the audio root, so `..` or a slash in one
-     * would point outside it.
+     * would point outside it. What needs the bundled copy to judge — the base and the shipped
+     * hashes — is [isFaithfulTo], which [ManifestProvider] asks next.
      *
      * @throws IllegalArgumentException, which [ManifestProvider.store] turns into "keep the
      * catalogue already in force".
@@ -50,6 +51,41 @@ data class RecitationManifest(
             require(isPlainSegment(reciter.id)) { "Recitation manifest reciter id is not a plain name: ${reciter.id}" }
             require(isPlainSegment(reciter.release)) { "Recitation manifest release is not a plain name: ${reciter.release}" }
         }
+    }
+
+    /**
+     * Whether this catalogue — fetched, or cached by an earlier fetch — leaves alone everything
+     * [shipped], the copy inside the app binary, vouches for (security review C1, 26 October).
+     *
+     * The manifest is not signed, and the hash each download is held to comes from the manifest
+     * itself, so a catalogue trusted whole would let whoever can push to the data repository
+     * replace a shipped reciter's audio for every reader within a day. The bundled copy is the
+     * trust anchor instead: the same base, and for every reciter whose id and release the build
+     * also ships, the same size and SHA-256 for every surah it lists (a surah that release never
+     * had is a file the build never vouched for). A release is published once and never changed,
+     * so new audio for a shipped voice arrives under a new release name, which — like a reciter
+     * the build has never heard of — may carry any hashes. Withdrawing a reciter contradicts
+     * nothing and is allowed.
+     *
+     * What is left open is exactly that: a new release name. Only a signature made off GitHub
+     * would close it.
+     *
+     * Nothing else of a shipped release is anchored: its presentation fields —
+     * [Reciter.nameEn], [Reciter.nameAr], [Reciter.gapMs], [Reciter.kbps] and
+     * [Reciter.totalBytes], and the style, hue and photo with them — are deliberately left open,
+     * so a name or a gap can be corrected without a new release. The audio itself cannot change.
+     */
+    fun isFaithfulTo(shipped: RecitationManifest): Boolean {
+        if (base != shipped.base) return false
+        for (reciter in reciters) {
+            val vouched = shipped.reciters.firstOrNull { it.id == reciter.id && it.release == reciter.release } ?: continue
+            for (surah in reciter.surahs) {
+                val asset = vouched.surah(surah.n) ?: return false
+                // Without regard to case, as the commit compares them.
+                if (asset.bytes != surah.bytes || !asset.sha256.equals(surah.sha256, ignoreCase = true)) return false
+            }
+        }
+        return true
     }
 
     companion object {

@@ -3,6 +3,7 @@ package world.taqwa.app.recitation
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -177,5 +178,64 @@ class RecitationManifestTest {
         val manifest = ManifestJson.parse(TWO_RECITERS)
         assertEquals("م", manifest.reciter("ar.alafasy")!!.monogram)
         assertEquals("م", manifest.reciter("ar.husary")!!.monogram)
+    }
+
+    // ── The bundled catalogue as the trust anchor (security review C1, 26 October) ────────
+
+    private val shipped = ManifestJson.parse(TWO_RECITERS)
+
+    @Test
+    fun aCatalogueIsFaithfulToItself() {
+        assertTrue(shipped.isFaithfulTo(shipped))
+    }
+
+    @Test
+    fun aShippedReleaseWhoseHashChangedIsRefused() {
+        assertFalse(ManifestJson.parse(TWO_RECITERS.replace("\"bb22\"", "\"ee55\"")).isFaithfulTo(shipped))
+    }
+
+    @Test
+    fun aShippedReleaseWhoseSizeChangedIsRefused() {
+        assertFalse(ManifestJson.parse(TWO_RECITERS.replace("\"bytes\": 22222", "\"bytes\": 22223")).isFaithfulTo(shipped))
+    }
+
+    @Test
+    fun aSurahAShippedReleaseNeverHadIsRefused() {
+        // The shipped Husary release lists only 114 here, so a 113 under the same name is a file
+        // the build never vouched for.
+        val husary = shipped.reciter("ar.husary")!!
+        val grown = shipped.copy(
+            reciters = listOf(shipped.reciters[0], husary.copy(surahs = husary.surahs + SurahAsset(113, 999, "dd44"))),
+        )
+        assertFalse(grown.isFaithfulTo(shipped))
+    }
+
+    @Test
+    fun aBaseOtherThanTheShippedOneIsRefused() {
+        val moved = TWO_RECITERS.replace(
+            "https://github.com/MohamedAbulgasem/Taqwa-data/releases/download/",
+            "https://example.invalid/releases/download/",
+        )
+        assertFalse(ManifestJson.parse(moved).isFaithfulTo(shipped))
+    }
+
+    @Test
+    fun aReciterMayBeWithdrawnAddedOrGivenANewRelease() {
+        val alafasy = shipped.reciter("ar.alafasy")!!
+        val husary = shipped.reciter("ar.husary")!!
+        // Withdrawn: nothing the build shipped is contradicted by its absence.
+        assertTrue(shipped.copy(reciters = listOf(alafasy)).isFaithfulTo(shipped))
+        // Added: a voice the build never knew carries whatever its release holds.
+        val added = husary.copy(id = "ar.minshawi", release = "audio-ar.minshawi-v1", surahs = listOf(SurahAsset(1, 5, "ff66")))
+        assertTrue(shipped.copy(reciters = shipped.reciters + added).isFaithfulTo(shipped))
+        // Re-released: new audio for a shipped voice arrives under a new release name.
+        val v2 = alafasy.copy(release = "audio-ar.alafasy-v2", surahs = listOf(SurahAsset(2, 999, "dd44")))
+        assertTrue(shipped.copy(reciters = listOf(v2, husary)).isFaithfulTo(shipped))
+    }
+
+    @Test
+    fun aHashWrittenInCapitalsIsTheSameHash() {
+        // The commit compares hashes without regard to case, so the anchor does too.
+        assertTrue(ManifestJson.parse(TWO_RECITERS.replace("\"bb22\"", "\"BB22\"")).isFaithfulTo(shipped))
     }
 }

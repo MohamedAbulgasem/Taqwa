@@ -96,6 +96,12 @@ actual class SurahDownloader actual constructor(
     private val startedAt = AtomicLongMap()
     private val sizes = AtomicLongMap()
 
+    /**
+     * The tasks `didWriteData` cancelled for sending more than their surah, with the count it saw
+     * then: their cancellation is the server's failure, not the reader's (security review C2).
+     */
+    private val overran = AtomicLongMap()
+
     actual val states: StateFlow<Map<DownloadKey, DownloadState>> = reported.asStateFlow()
 
     /**
@@ -129,7 +135,24 @@ actual class SurahDownloader actual constructor(
         ) {
             val wire = downloadTask.taskDescription ?: return
             val key = DownloadKey.parse(wire) ?: return
+            if (overran[wire] != null) return
             val base = startedAt[wire] ?: 0L
+            // More than the surah is not the surah, however much more is coming: the session
+            // would write it all to its temporary file first, so the task is cancelled here
+            // rather than left to fill the phone. This is called only while the app runs: a
+            // transfer that goes on while the app is suspended is not watched, and is checked
+            // only when it lands (the hand-over below). A relaunched process has lost the sizes
+            // and asks the catalogue this process has read, which in a cold background wake
+            // (iOS relaunching the app for the session, `attach()`) it may not have done: then
+            // nothing caps the task here. The start it has lost counts as zero, which can only
+            // let a task run longer.
+            val expected = sizes[wire] ?: manifests.reciter(key.reciterId)?.surah(key.surah)?.bytes
+            val status = (downloadTask.response as? NSHTTPURLResponse)?.statusCode?.toInt() ?: 0
+            if (expected != null && ranPastSurah(status, base, totalBytesWritten, expected)) {
+                overran[wire] = totalBytesWritten
+                downloadTask.cancel()
+                return
+            }
             val total = sizes[wire] ?: (base + totalBytesExpectedToWrite)
             report(key, DownloadState.Downloading(base + totalBytesWritten, total))
         }
@@ -158,6 +181,32 @@ actual class SurahDownloader actual constructor(
                 return
             }
             val part = library.partFor(key.reciterId, key.surah)
+            // The same rule as `didWriteData`, for a body that ran past the surah in its last
+            // chunk or finished before the cancellation landed, and the first check at all for
+            // one that ran while the app was suspended: the part on disk is what a 206
+            // continues, the landed file all of a 200. Nothing is appended and the part goes, as
+            // Android's loop deletes an oversized part; iOS deletes the temporary itself.
+            // In a cold background wake the catalogue may not have been read, so there is no
+            // size to hold the file to: one larger than any surah could be is refused all the
+            // same (`ranPastAnySurah`), and a smaller one is appended and refused by the hash in
+            // [commit]. Until it lands, such a transfer is bounded only by the base pin, to what
+            // one GitHub release asset can be.
+            val expected = sizes[wire] ?: manifests.reciter(key.reciterId)?.surah(key.surah)?.bytes
+            val have = fs.metadataOrNull(part)?.size ?: 0L
+            val landed = fs.metadataOrNull(temporary)?.size ?: 0L
+            val pastSurah = if (expected != null) {
+                ranPastSurah(status, have, landed, expected)
+            } else {
+                loop.ranPastAnySurah(status, have, landed)
+            }
+            if (overran[wire] != null || pastSurah) {
+                overran.remove(wire)
+                startedAt.remove(wire)
+                sizes.remove(wire)
+                runCatching { fs.delete(part) }
+                report(key, freshFailure(DownloadFailure.SERVER))
+                return
+            }
             val appended = runCatching {
                 part.parent?.let { fs.createDirectories(it) }
                 // 200 rather than 206 means the server ignored the Range and has sent the whole
@@ -193,6 +242,14 @@ actual class SurahDownloader actual constructor(
             val error = didCompleteWithError ?: return
             startedAt.remove(wire)
             sizes.remove(wire)
+            if (overran[wire] != null) {
+                // Cancelled by `didWriteData` for running past the surah, not by the reader: a
+                // chip with Retry, and the part it would have continued goes.
+                overran.remove(wire)
+                runCatching { fs.delete(library.partFor(key.reciterId, key.surah)) }
+                report(key, freshFailure(DownloadFailure.SERVER))
+                return
+            }
             when (error.code) {
                 // The reader cancelled it; the sheet goes back to offering the download.
                 NSURL_ERROR_CANCELLED -> clear(key)
@@ -235,12 +292,8 @@ actual class SurahDownloader actual constructor(
      */
     private val delegateQueue = NSOperationQueue().apply { maxConcurrentOperationCount = 1 }
 
-    private fun makeSession(identifier: String, allowsCellular: Boolean): NSURLSession {
-        val configuration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier(identifier)
-        configuration.setAllowsCellularAccess(allowsCellular)
-        configuration.setSessionSendsLaunchEvents(true)
-        return NSURLSession.sessionWithConfiguration(configuration, delegate, delegateQueue)
-    }
+    private fun makeSession(identifier: String, allowsCellular: Boolean): NSURLSession =
+        NSURLSession.sessionWithConfiguration(backgroundConfiguration(identifier, allowsCellular), delegate, delegateQueue)
 
     /**
      * Rebuilds both sessions so iOS can deliver the callbacks it has been holding. Called from
@@ -355,6 +408,7 @@ actual class SurahDownloader actual constructor(
         task.taskDescription = key.wire
         startedAt[key.wire] = have
         sizes[key.wire] = asset.bytes
+        overran.remove(key.wire)
         // stillToLand counts a Queued surah whole: Queued means no part of it is on disk.
         report(key, if (have > 0L) DownloadState.Downloading(have, asset.bytes) else DownloadState.Queued)
         task.resume()
@@ -393,6 +447,7 @@ actual class SurahDownloader actual constructor(
                 if (matches(wire)) {
                     startedAt.remove(wire)
                     sizes.remove(wire)
+                    overran.remove(wire)
                     download.cancel()
                 }
             }
@@ -426,6 +481,19 @@ actual class SurahDownloader actual constructor(
         const val NSURL_ERROR_DATA_NOT_ALLOWED = -1020L
     }
 }
+
+/**
+ * One of the two background sessions' configuration ([SurahDownloader.wifiSession]). The
+ * [identifier] is how iOS hands a relaunched app the downloads still in flight, so it goes in
+ * exactly as it is given; the cookie rules and the User-Agent are the manifest GET's
+ * ([carryingNothingExtra]).
+ */
+internal fun backgroundConfiguration(identifier: String, allowsCellular: Boolean): NSURLSessionConfiguration =
+    NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier(identifier).apply {
+        setAllowsCellularAccess(allowsCellular)
+        setSessionSendsLaunchEvents(true)
+        carryingNothingExtra()
+    }
 
 /**
  * Free space on the volume Application Support lives on, and whether there is a network at all.

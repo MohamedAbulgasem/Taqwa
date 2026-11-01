@@ -79,7 +79,26 @@ class ManifestRefresher(
 
 /**
  * One GET, whole body in memory, 20-second timeout, null for anything that is not a 2xx with a
- * body. `HttpURLConnection` on Android and an `NSURLSession` data task on iOS — the app still has
- * no HTTP client and one dependency for two requests is not worth it (spec §7).
+ * body, and null for a body over [MANIFEST_MAX_BYTES]. `HttpURLConnection` on Android and an
+ * `NSURLSession` data task on iOS — the app still has no HTTP client and one dependency for two
+ * requests is not worth it (spec §7).
  */
 expect suspend fun httpGet(url: String): ByteArray?
+
+/**
+ * The most [httpGet] will hold before giving up on a body (security review A2, C2): a body is
+ * refused unread when it says it is larger, and dropped one read past it when it does not say.
+ * 2 MiB is thirteen times the 154 KB the ten reciters' manifest is today, room for well over a
+ * hundred reciters before this has to move, and small enough that an endless body from a broken
+ * or hostile host costs a few megabytes rather than the app.
+ */
+internal const val MANIFEST_MAX_BYTES: Long = 2L * 1024L * 1024L
+
+/**
+ * The User-Agent of every request the app makes, the manifest and the surahs alike (security
+ * review A4, C3). PRIVACY.md says a download carries nothing that identifies the reader and the
+ * daily check reveals nothing but the IP address; the platforms' own agents name the phone's
+ * model and OS build on Android and the app's build on iOS. No version, so it stays the same for
+ * everyone.
+ */
+internal const val HTTP_USER_AGENT = "Taqwa"

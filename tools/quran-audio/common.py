@@ -50,6 +50,15 @@ RECITERS = [
 
 STYLE = "murattal"
 
+# A reciter's release when it is not the first, `audio-<id>-v1`. A published release is never
+# changed (README.md), so changed audio is given its next name here, e.g.
+# "ar.alafasy": "audio-ar.alafasy-v2"; publish.py and manifest.py both read it.
+RELEASES = {}
+
+
+def release(rid):
+    return RELEASES.get(rid, f"audio-{rid}-v1")
+
 
 def reciter(rid):
     for r in RECITERS:

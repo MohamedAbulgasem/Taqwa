@@ -7,7 +7,7 @@ import json
 import os
 import subprocess
 
-from common import RECITERS, WORK, outdir, packdir
+from common import RECITERS, WORK, outdir, packdir, release
 
 GH = "/opt/homebrew/bin/gh"
 
@@ -26,7 +26,7 @@ def main():
         if os.path.exists(sj):
             gb = json.load(open(sj))["totalBytes"] / 1e9
         r = subprocess.run(
-            [GH, "release", "view", f"audio-{rid}-v1", "--repo",
+            [GH, "release", "view", release(rid), "--repo",
              "MohamedAbulgasem/Taqwa-data", "--json", "assets"],
             capture_output=True, text=True)
         assets = len(json.loads(r.stdout)["assets"]) if r.returncode == 0 else 0
