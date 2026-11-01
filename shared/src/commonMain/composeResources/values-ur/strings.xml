@@ -135,7 +135,6 @@
     <string name="about_online_body">انٹرنیٹ صرف ایک کام کے لیے استعمال ہوتا ہے: وہ تلاوتیں جو آپ خود ڈاؤن لوڈ کرنا چاہیں، GitHub پر تقویٰ کے عوامی مخزن سے۔</string>
     <string name="about_nothing_title">نہ اکاؤنٹ، نہ اشتہار، نہ تجزیات</string>
     <string name="about_nothing_body">نہ کہیں سائن اِن کرنا ہے، نہ کچھ بیچنا ہے۔</string>
-    <string name="about_links_label">مزید</string>
     <string name="about_privacy_policy">رازداری کی پالیسی</string>
     <string name="about_source">سورس کوڈ</string>
     <string name="about_source_value">GitHub</string>
@@ -145,6 +144,58 @@
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">taqwa.world کھولیں</string>
     <string name="about_report_problem">مسئلے کی اطلاع دیں</string>
+
+    <!-- ترتیبات › ویجٹس اور تقویٰ کے بارے میں (ترتیبات کی نئی ترتیب کا خاکہ، 30 اکتوبر 2026)۔ ویجٹس کی قطار کی
+         قدر ہوم اسکرین پر موجود ویجٹ گنتی ہے: %1$s جتنے موجود ہیں، %2$s کل کتنے ہیں۔ -->
+    <string name="settings_widgets">ویجٹس</string>
+    <string name="settings_widgets_all">سب شامل ہیں</string>
+    <string name="settings_widgets_none">شامل نہیں</string>
+    <string name="settings_widgets_count">%2$s میں سے %1$s شامل</string>
+    <!-- ویجٹس کی اسکرین۔ _ios والی عبارتیں اردو iOS کے اپنے نام استعمال کرتی ہیں: ”ہوم اسکرین“، ”لاک اسکرین“،
+         ”حسب خواہش بنائیں“، ”ترمیم“، ”ویجیٹ شامل کریں“ (بٹن کے نام میں iOS ویجیٹ لکھتا ہے، اس لیے وہاں یہی
+         ہجے)۔ مراحل میں %1$s ویجٹ کا وہ نام ہے جو اس کے کارڈ پر ہے (widgets_prayer_name، widgets_ayah_name)، اور Android کی ویجٹ فہرست اور
+         iPhone کی گیلری بھی اسے اسی نام سے دکھاتی ہیں (iosApp/TaqwaWidget میں home_widget_name اور ayah_widget_name)۔ ** اور ** کے درمیان کے
+         الفاظ وہ ہیں جو قاری فون پر ڈھونڈے گا، اس لیے وہ ستاروں کے بغیر موٹے دکھائی دیتے ہیں۔ -->
+    <string name="widgets_intro">اگلی نماز اور آج کی آیت آپ کی ہوم اسکرین پر، تقویٰ کھولے بغیر۔</string>
+    <string name="widgets_intro_ios">اگلی نماز اور آج کی آیت آپ کی ہوم اسکرین اور لاک اسکرین پر، تقویٰ کھولے بغیر۔</string>
+    <string name="widgets_background_note">تقویٰ کے تمام ویجٹس کے لیے۔ ”نظام کے مطابق“ آپ کے فون کی روشن اور تاریک ترتیب کی پیروی کرتا ہے۔</string>
+    <string name="widgets_prayer_label">نماز کے اوقات</string>
+    <string name="widgets_prayer_name">نماز کے اوقات</string>
+    <string name="widgets_prayer_body">چلتی ہوئی الٹی گنتی کے ساتھ اگلی نماز، اور آج کے اوقات۔ چھوٹا یا چوڑا۔</string>
+    <string name="widgets_prayer_body_ios">چلتی ہوئی الٹی گنتی کے ساتھ اگلی نماز، اور آج کے اوقات۔ چھوٹا یا درمیانہ۔</string>
+    <string name="widgets_ayah_label">آج کی آیت</string>
+    <string name="widgets_ayah_name">آج کی آیت</string>
+    <string name="widgets_ayah_body">ہر دن ایک نئی آیت، اپنے ترجمے کے ساتھ۔ چوڑا یا بڑا۔</string>
+    <string name="widgets_ayah_body_ios">ہر دن ایک نئی آیت، اپنے ترجمے کے ساتھ۔ درمیانہ یا بڑا۔</string>
+    <string name="widgets_on_home">آپ کی ہوم اسکرین پر</string>
+    <string name="widgets_on_home_ios">آپ کی ہوم اسکرین پر</string>
+    <string name="widgets_on_lock_ios">آپ کی لاک اسکرین پر</string>
+    <string name="widgets_refused_title">آپ کی ہوم اسکرین ایپس کو ویجٹ شامل کرنے نہیں دیتی۔</string>
+    <string name="widgets_refused_body">اسے خود شامل کرنے میں بس ایک لمحہ لگتا ہے:</string>
+    <string name="widgets_step_android_1">ہوم اسکرین پر کسی خالی جگہ کو دبا کر رکھیں (یا دو انگلیاں اسکرین پر قریب لائیں)۔</string>
+    <string name="widgets_step_android_2">**ویجٹس** پر ٹیپ کریں۔</string>
+    <string name="widgets_step_android_3">**تقویٰ** تلاش کریں، پھر %1$s ویجٹ کو کھینچ کر اس کی جگہ پر رکھ دیں۔</string>
+    <string name="widgets_how_label">شامل کرنے کا طریقہ</string>
+    <string name="widgets_step_ios_hold_1">ہوم اسکرین پر **تقویٰ** کے آئیکن کو دبا کر رکھیں۔</string>
+    <string name="widgets_step_ios_hold_2">%1$s اور کوئی سائز چنیں۔</string>
+    <string name="widgets_step_ios_hold_3">یہ آپ کی ہوم اسکرین پر آ جاتا ہے۔ اسے جہاں چاہیں کھینچ کر رکھیں۔</string>
+    <string name="widgets_ios_fallback">آئیکن دبانے پر ویجٹ نظر نہیں آتے؟ ہوم اسکرین کے کسی خالی حصے کو دبا کر رکھیں، اوپر ”**ترمیم**“ پر ٹیپ کریں (iOS 27 اور اس کے بعد یہ ایک برش ہے)، پھر ”**ویجیٹ شامل کریں**“ پر، اور تقویٰ تلاش کریں۔</string>
+    <string name="widgets_step_ios_plus_1">اپنی ہوم اسکرین کے کسی خالی حصے کو دبا کر رکھیں۔</string>
+    <string name="widgets_step_ios_plus_2">اوپر کونے میں **+** کے نشان پر ٹیپ کریں۔</string>
+    <string name="widgets_step_ios_plus_3">تقویٰ تلاش کریں اور %1$s چنیں۔</string>
+    <string name="widgets_show_how">طریقہ دکھائیں</string>
+    <string name="widgets_lock_label">لاک اسکرین</string>
+    <string name="widgets_lock_name">اگلی نماز ایک نظر میں</string>
+    <string name="widgets_lock_body">آپ کی لاک اسکرین پر گھڑی کے نیچے، گول یا چوڑا۔</string>
+    <string name="widgets_lock_then">پھر %1$s</string>
+    <string name="widgets_step_lock_1">اپنی لاک اسکرین کو دبا کر رکھیں، پھر ”**حسب خواہش بنائیں**“ پر ٹیپ کریں۔</string>
+    <string name="widgets_step_lock_2">”لاک اسکرین“ چنیں، پھر گھڑی کے نیچے والی جگہ پر ٹیپ کریں۔</string>
+    <string name="widgets_step_lock_3">**تقویٰ** چنیں، پھر گول یا چوڑا ویجٹ۔</string>
+    <!-- تقویٰ کے بارے میں: ٹیگ لائن کے نیچے ورژن کی چِپ (%1$s ورژن ہے، settings_version_value) اور آخری دو
+         کارڈوں کے عنوان۔ وہاں ریٹ اور شیئر settings_rate، settings_share اور settings_share_message استعمال کرتے ہیں۔ -->
+    <string name="about_version_chip">ورژن %1$s</string>
+    <string name="about_open_source_label">اوپن سورس</string>
+    <string name="about_help_label">مدد</string>
 
     <!-- کریش رپورٹ: کریش کے بعد اگلی بار کھلنے پر دکھائی جانے والی شیٹ، اور ای میل کی وہ سطر جب بھیجنے کے لیے کوئی رپورٹ نہ ہو۔ -->
     <string name="crash_sheet_title">تقویٰ اچانک بند ہو گیا</string>
@@ -464,16 +515,12 @@
     <string name="qibla_no_sensor_title">قطب نما کا سینسر نہیں</string>
     <string name="qibla_no_sensor_body">اس آلے میں مقناطیسی سینسر نہیں ہے۔ نیچے دیے گئے رخ کے ساتھ کوئی حقیقی قطب نما استعمال کریں۔</string>
 
-    <!-- Widget background (Appearance) -->
+    <!-- Widget background (Settings › Widgets, which took it over from Appearance; the keys keep
+         their names) -->
     <string name="appearance_widget_background_label">ویجٹ کا پس منظر</string>
-    <string name="appearance_prayer_widget_preview_label">نماز کے ویجٹ</string>
-    <string name="appearance_ayah_widget_preview_label">آیت کا ویجٹ</string>
 
-    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <!-- Offering a widget that is not on the home screen (Settings › Widgets) -->
     <string name="appearance_widget_add">ہوم اسکرین پر شامل کریں</string>
-    <string name="appearance_widget_add_ios_hold">تقویٰ کے آئیکن کو دبا کر رکھیں، پھر کوئی ویجٹ چنیں۔</string>
-    <string name="appearance_widget_add_ios_plus">ہوم اسکرین کو دبا کر رکھیں، جمع کے نشان پر ٹیپ کریں، پھر تقویٰ تلاش کریں۔</string>
-    <string name="appearance_widget_add_android">ہوم اسکرین کو دبا کر رکھیں، پھر ویجٹس چنیں۔</string>
     <string name="widget_background_follow_theme">نظام کے مطابق</string>
     <string name="widget_background_light">روشن</string>
     <string name="widget_background_dark">تاریک</string>

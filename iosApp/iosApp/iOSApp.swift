@@ -184,33 +184,32 @@ struct iOSApp: App {
 		WidgetRefreshBridge.shared.onRefresh = { reloadWidgets() }
 	}
 
-	/// The Appearance screen asks which Taqwa widgets are on a home screen; `WidgetCenter` is the
-	/// only thing that knows, it is Swift-only, and it answers asynchronously — so the shared code
+	/// Settings › Widgets and the Settings root ask which Taqwa widgets are placed; `WidgetCenter` is
+	/// the only thing that knows, it is Swift-only, and it answers asynchronously, so the shared code
 	/// hands over a completion and this fills it in.
 	///
-	/// `prayer` covers both prayer kinds (home and lock screen), `ayah` the ayah card. The
-	/// `answered` guard is not defensive dressing: `getCurrentConfigurations` is not contractually
-	/// single-shot, and the Kotlin side treats a second resume as a programming error. Any failure
-	/// reports both as placed, which is the shared side's `WidgetPlacement.Unknown` — it hides the
-	/// offer rather than inviting the user to add a widget they may already have.
+	/// It hands back the kind of every placed widget, or nil when WidgetKit failed, and the shared
+	/// side decides which widget each kind is (`WidgetPlacement.ios.kt`, where that is tested): the
+	/// Lock Screen widget is a kind of its own and must never read as the prayer widget on the Home
+	/// Screen. The `answered` guard is not defensive dressing: `getCurrentConfigurations` is not
+	/// contractually single-shot, and the Kotlin side treats a second resume as a programming error.
+	/// A failure is "cannot tell", which shows no status and offers nothing, never "placed".
 	static func installWidgetPlacementHook() {
 		WidgetPlacement_iosKt.iosWidgetPlacementHook = { completion in
 			var answered = false
-			let answer: (Bool, Bool) -> Void = { prayer, ayah in
+			let answer: ([String]?) -> Void = { kinds in
 				guard !answered else { return }
 				answered = true
-				completion(KotlinBoolean(bool: prayer), KotlinBoolean(bool: ayah))
+				// A Kotlin function type returns Unit, which reaches Swift as a KotlinUnit that says
+				// nothing; it is dropped here by name so the build does not warn about it.
+				_ = completion(kinds)
 			}
 			WidgetCenter.shared.getCurrentConfigurations { result in
 				switch result {
 				case .success(let widgets):
-					let kinds = Set(widgets.map { $0.kind })
-					answer(
-						kinds.contains("TaqwaHomeWidget") || kinds.contains("TaqwaLockScreenWidget"),
-						kinds.contains("TaqwaAyahWidget")
-					)
+					answer(widgets.map { $0.kind })
 				case .failure:
-					answer(true, true)
+					answer(nil)
 				}
 			}
 		}
@@ -219,10 +218,11 @@ struct iOSApp: App {
 	/// Only ever read or written on the main thread — see `reloadWidgets()`. Covers every mirror a
 	/// widget draws from: the prayer snapshot, the background choice *and* the ayah pool. Each was
 	/// added because leaving it out made a real change invisible — the background choice used to
-	/// be missing, so picking Light or Dark in Appearance did nothing on the home screen until
-	/// WidgetKit's hourly reload happened to come round, and the ayah pool used to be missing, so
-	/// switching translation left the old one on the ayah card until its timeline ran out a week
-	/// later. Anything a widget reads out of the App Group has to be represented here.
+	/// be missing, so picking Light or Dark for the widget background (Settings › Widgets now,
+	/// Appearance then) did nothing on the home screen until WidgetKit's hourly reload happened to
+	/// come round, and the ayah pool used to be missing, so switching translation left the old one
+	/// on the ayah card until its timeline ran out a week later. Anything a widget reads out of the
+	/// App Group has to be represented here.
 	private static var lastMirrorKey: String?
 
 	/// `reloadWidgets()` is reached from a Kotlin-invoked closure (`PrayerViewModel.refresh()` runs

@@ -19,8 +19,9 @@ import kotlinx.coroutines.withTimeout
  * removing the small widget must not stop the medium one from ticking.
  *
  * `internal` rather than private because `TaqwaApplication` feeds the same answer to
- * `androidWidgetPlacementHook`: the Appearance screen's "is the prayer widget placed?" is the very
- * same query, and duplicating it would let the two drift.
+ * `androidWidgetPlacementHook`: "is the prayer widget placed?", which Settings › Widgets and the
+ * Settings root's Widgets row ask, is the very same query, and duplicating it would let the two
+ * drift.
  */
 internal fun anyWidgetPlaced(context: Context): Boolean {
     val manager = AppWidgetManager.getInstance(context) ?: return false

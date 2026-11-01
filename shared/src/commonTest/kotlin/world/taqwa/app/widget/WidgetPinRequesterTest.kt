@@ -5,7 +5,8 @@ import kotlin.test.assertEquals
 
 /**
  * The owner's rule for "Add widget": the steps by hand appear only when the app knows the request
- * did not work. Onboarding and Appearance both ask through [askToPin], so this is that rule.
+ * did not work. Onboarding and Settings › Widgets both ask through [askToPin], so this is that
+ * rule.
  */
 class WidgetPinRequesterTest {
 

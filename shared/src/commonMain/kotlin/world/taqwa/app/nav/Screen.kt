@@ -63,6 +63,9 @@ sealed interface Screen {
     data object CitySearch : Screen
     data object Appearance : Screen
 
+    /** Settings › Widgets: the widget background, each widget with its preview, and how to add it. */
+    data object Widgets : Screen
+
     /** Settings › Quran › Recitation (spec 3a §5.6): the voice, mobile data, and what is stored. */
     data object RecitationSettings : Screen
 

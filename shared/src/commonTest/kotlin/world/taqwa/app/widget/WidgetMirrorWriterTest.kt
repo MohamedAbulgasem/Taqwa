@@ -185,7 +185,7 @@ class WidgetMirrorWriterTest {
 
     // Nothing wrote `widget_background` into the KeyValueStore until this task — both widgets
     // were stuck on FOLLOW_THEME forever. This is the one write that closes that gap: the
-    // Appearance screen calls `writeBackground` beside `SettingsRepository.setWidgetBackground`,
+    // Widgets screen's route calls `writeBackground` beside `SettingsRepository.setWidgetBackground`,
     // under the exact key `TaqwaGlanceWidget.kt` (Android) and `TaqwaMirror.background()` (iOS)
     // read literally.
     @Test

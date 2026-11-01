@@ -86,6 +86,8 @@ internal fun DebugScreenRequests(
                 "settings" -> navigator.selectTab(Tab.SETTINGS)
                 "notifications" -> { navigator.selectTab(Tab.SETTINGS); navigator.push(Screen.NotificationSettings) }
                 "appearance" -> { navigator.selectTab(Tab.SETTINGS); navigator.push(Screen.Appearance) }
+                "widgets" -> { navigator.selectTab(Tab.SETTINGS); navigator.push(Screen.Widgets) }
+                "about" -> { navigator.selectTab(Tab.SETTINGS); navigator.push(Screen.About) }
                 "qibla" -> { navigator.selectTab(Tab.PRAYER); navigator.push(Screen.Qibla) }
                 "tasbeeh" -> { navigator.selectTab(Tab.PRAYER); navigator.push(Screen.Tasbeeh) }
                 "adhkar" -> { navigator.selectTab(Tab.PRAYER); navigator.push(Screen.Adhkar()) }

@@ -2,6 +2,7 @@ package world.taqwa.app.design.components
 
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -341,4 +342,77 @@ internal fun DrawScope.drawReadAloudMark(tint: Color, pointsForward: Boolean) {
         size = Size(6.8f * u, 6.8f * u),
         style = Stroke(width = size.width * 0.1f, cap = StrokeCap.Round),
     )
+}
+
+/**
+ * A five-pointed star, outlined: About Taqwa's Rate button. Not mirrored — a star has no
+ * direction to be wrong about under a right-to-left interface.
+ */
+internal fun DrawScope.drawStar(tint: Color) {
+    val u = size.width / 16f
+    val star = Path().apply {
+        moveTo(8f * u, 2.2f * u)
+        lineTo(9.8f * u, 5.9f * u)
+        lineTo(13.8f * u, 6.5f * u)
+        lineTo(10.9f * u, 9.3f * u)
+        lineTo(11.6f * u, 13.3f * u)
+        lineTo(8f * u, 11.4f * u)
+        lineTo(4.4f * u, 13.3f * u)
+        lineTo(5.1f * u, 9.3f * u)
+        lineTo(2.2f * u, 6.5f * u)
+        lineTo(6.2f * u, 5.9f * u)
+        close()
+    }
+    drawPath(star, tint, style = glyphStroke())
+}
+
+/**
+ * A phone, upright, with its home bar: the mark of About Taqwa's first promise, that what the app
+ * keeps stays on the phone. The three promise marks are one set, each the plainest picture of its
+ * promise, and none of them mirrors.
+ */
+internal fun DrawScope.drawPhone(tint: Color) {
+    val u = size.width / 16f
+    val stroke = glyphStroke()
+    drawRoundRect(
+        tint,
+        topLeft = Offset(4.4f * u, 2f * u),
+        size = Size(7.2f * u, 12f * u),
+        cornerRadius = CornerRadius(1.6f * u),
+        style = stroke,
+    )
+    drawLine(tint, Offset(7.2f * u, 11.6f * u), Offset(8.8f * u, 11.6f * u), strokeWidth = stroke.width, cap = StrokeCap.Round)
+}
+
+/**
+ * A cloud with an arrow coming down out of it: the second promise, that the app goes online only
+ * to download what the reader asked for. The cloud is three arcs — a small bump on the start
+ * side, the dome, a larger bump on the end side — and its floor is left open where the arrow
+ * passes through, so the arrow reads as leaving the cloud rather than as drawn over it.
+ */
+internal fun DrawScope.drawCloudDown(tint: Color) {
+    val u = size.width / 16f
+    val stroke = glyphStroke()
+    fun circle(cx: Float, cy: Float, r: Float) = Rect(Offset(cx * u, cy * u), r * u)
+    val cloud = Path().apply {
+        moveTo(4.8f * u, 11.6f * u)
+        lineTo(4f * u, 11.6f * u)
+        // Angles run clockwise from three o'clock; each arc starts where the last one ended.
+        arcTo(circle(3.84f, 9.2f, 2.405f), startAngleDegrees = 86.2f, sweepAngleDegrees = 180f, forceMoveTo = false)
+        arcTo(circle(7.277f, 6.651f, 3.6f), startAngleDegrees = 177.6f, sweepAngleDegrees = 165.4f, forceMoveTo = false)
+        arcTo(circle(11.36f, 8.6f, 3.067f), startAngleDegrees = 257.96f, sweepAngleDegrees = 180f, forceMoveTo = false)
+        lineTo(11.2f * u, 11.6f * u)
+    }
+    drawPath(cloud, tint, style = stroke)
+    drawLine(tint, Offset(8f * u, 7.6f * u), Offset(8f * u, 13.2f * u), strokeWidth = stroke.width, cap = StrokeCap.Round)
+    val head = Path().apply { moveTo(6.24f * u, 11.44f * u); lineTo(8f * u, 13.2f * u); lineTo(9.76f * u, 11.44f * u) }
+    drawPath(head, tint, style = stroke)
+}
+
+/** A circle with a slash across it: the third promise, no account, no ads, no analytics. */
+internal fun DrawScope.drawNoEntry(tint: Color) {
+    val u = size.width / 16f
+    val stroke = glyphStroke()
+    drawCircle(tint, radius = 5.6f * u, center = Offset(8f * u, 8f * u), style = stroke)
+    drawLine(tint, Offset(4.16f * u, 4.16f * u), Offset(11.84f * u, 11.84f * u), strokeWidth = stroke.width, cap = StrokeCap.Round)
 }

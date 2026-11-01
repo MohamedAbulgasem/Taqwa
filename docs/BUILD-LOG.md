@@ -5855,3 +5855,263 @@ at 2119 px; the same numbers with animations removed
 (animator duration scale 0); Duha's When and Sound inside the VOLUNTARY card; Arabic right to left. The first
 round (cadd10fb) also saw a Fajr minutes pick move the rows below. Settings, the animator scale and the app
 locale put back to their defaults afterwards.
+
+## Settings: Widgets and About Taqwa (30–31 October)
+
+Branch `feature/settings-redesign`, off main 9d3ba3ef: the spec and plan (4476305e), the Widgets row (1d7060d0),
+the Widgets screen with Appearance keeping the theme (1ef41aa8, 750d8841), About Taqwa as a profile (cd488c55),
+the six other languages (0bb68ca0, 2edbca4b), then this entry. Not pushed.
+
+**Checks.** `scripts/test.sh` green: `:shared` 2,112 tests on the iOS simulator and 2,122 on the Android host,
+`:widgetcore` 109 and 111. `scripts/check-strings.sh` clean (669 strings in every language).
+`scripts/ios-build.sh` builds for an iPhone 17 Pro simulator on iOS 27.0 (the extension 3 MB of its 15).
+
+**On devices.** A Pixel 8 Pro emulator (Android 16) at 384 dp and 360 dp, and an iPhone 17 Pro simulator
+(iOS 27.0). Settings, Widgets and About in all seven languages light, English and Arabic dark, English and
+Bengali at font scale 1.3; Widgets at 360 dp in English, and in Indonesian, Bengali and Urdu at 360 dp and 1.3
+together; the iPhone screens in English and Arabic, light and dark.
+- The root's Widgets row reads "Not added", then "1 of 2 added" (Arabic "1 من 2 مضافة") once a widget is on the
+  home screen. The Widgets card then shows the check and "On your home screen".
+- A launcher that refuses (a local, uncommitted `requestPin` that returns false) turns that card's button
+  into the by-hand panel at once, in English and Arabic, and the panel is still there after a rotation and back.
+- On the iPhone the Prayer times card shows the steps and the fallback line; Ayah of the day and the Lock
+  Screen card show "Show me how".
+- Arabic and Urdu mirror the step numbers, the link glyphs and the About pills, as the rest of Settings does.
+  The share and star glyphs do not.
+- The background choice is complete in every language at both widths and at 1.3. At 360 dp and 1.3 the
+  Indonesian labels do not fit on one row, so the four become two rows of two (the spec's fallback), with
+  "Tembus pandang" on two lines. Bengali and Urdu at 360 dp and 1.3 keep one row, with the System label on two
+  lines.
+
+**Open for the review** (seen on the screenshots, not changed here):
+- The widget previews are narrower inside their cards, 24 dp less than in Appearance. At 360 dp the wide prayer
+  preview's Arabic names run into its times (المغرب over 18:22). At 1.3 its Isha row is cut, names overlap
+  times, and Bengali labels end in an ellipsis. The ayah preview's translation is cut mid-line.
+- After the launcher's pin sheet is accepted, Taqwa is only paused, so there is no ON_START. The card keeps
+  "Add to home screen" until Taqwa is left and opened again, and a second tap adds a second widget. That is the
+  spec's "the next ON_START read flips it" and what Appearance did, but here the button sits under the
+  preview it just added.
+- Some About pills wrap to two lines: Bengali and Turkish both pills, French Share, Indonesian Rate, and English
+  Share at 1.3. They are complete, but uneven beside each other.
+- The background options are as wide as their labels, not the canvas's equal segments. "Translucent" and
+  "Tembus pandang" run close to the pill's end.
+- The canvas sets the UI words of the steps in bold ("Tap **Widgets**", "the **Taqwa** icon", "**Edit**",
+  "**Add Widget**"). The build sets only the widget's name in bold.
+- The version chip reads "Version 1.3.0", where the canvas has small capitals.
+- The iPhone lock-screen accessory reads "Fajr in 2:14 · 4:24". The spec and canvas order is the prayer, its
+  time, then "in h:mm".
+- On iOS 27 `simctl openurl` asks "Open in “Taqwa”?" for every `taqwa://` link, so the harness URLs no longer
+  run without a tap (`tools/store/capture-ios.sh` included). These shots were taken with local launch-argument
+  and scroll hooks that were never committed. The simulator's onboarding was skipped with a hand-written
+  `taqwa.preferences_pb`: onboarding complete, Cape Town.
+
+**Final review fixes** (31 October), checked on the same emulator at 384 dp and 360 dp:
+- The Widgets screen reads placement on every ON_RESUME, not ON_START. Pixel Launcher's sheet that confirms
+  "Add to home screen" is translucent, so it only pauses Taqwa. Accepting it now turns the button into the check
+  at once. This one line differs from the spec's "the next ON_START read flips it". The root's row stays on
+  ON_START, since the root is never behind that sheet.
+- On this screen the previews are drawn as pictures: laid out at least 312 dp wide (their width in Appearance
+  at 360 dp) at 100 % font size, then shrunk to the card. At 360 dp and font scale 1.3 the names no longer run
+  into the times in English, Bengali, Indonesian or Urdu. No Isha row is cut, no Bengali label ends in "…", and
+  the ayah translations are whole. Onboarding is unchanged.
+- About's Rate and Share sit side by side only when both labels fit half the row on one line, as in English,
+  Arabic and Urdu. Otherwise they stack at full width, one line each: Bengali, Turkish, French, Indonesian, and
+  English at 1.3.
+- The steps set the UI words in bold, as the canvas has them (**Widgets**, **Taqwa**, **Edit**, **Add Widget**,
+  **Customize**), marked with `**` in every language's strings. `tools/i18n-check.py` checks that the marks come
+  in pairs, and that a string English marks is marked in every translation.
+- The iPhone's widget gallery lists the prayer widget as "Taqwa" (`home_widget_name`), not "Prayer times". So the
+  iPhone steps now name it by a new key, `widgets_prayer_gallery_ios`, equal to `home_widget_name` in each
+  language. `tools/i18n-check.py` now holds every name the steps use to what the Android picker and the iPhone
+  gallery list. The plainer fix is the owner's to choose: renaming the gallery entry to "Prayer times" in the
+  seven `iosApp/TaqwaWidget/*.lproj` files would let the key go. That is a WidgetKit change, which the spec leaves
+  out.
+- Android's picker lists the small prayer widget as "Next prayer" and the wide one as "Prayer times". The steps
+  name "Prayer times", which is the wide one, and was left as it is.
+- Checks after these fixes, from the review's own run on c58b32df: `scripts/test.sh` green with `:shared` 2,116
+  tests on the iOS simulator and 2,126 on the Android host, `:widgetcore` 109 and 111, and 670 strings in every
+  language (the new `widgets_prayer_gallery_ios`). These fixes were shot on the emulator only; their iPhone side
+  was first photographed in review round 2.
+
+**Review round 2** (31 October), on the Lead's findings for c58b32df:
+- The iPhone's Lock Screen widget is no longer read as the prayer widget, and a placement read that cannot tell
+  shows nothing and keeps the last answer (b2d3d53d).
+- The iPhone's corner button, seen on Dev 1's simulators in edit mode: on iOS 26.2 it shows its title, "Edit" in
+  English but "+" in French and Turkish (VoiceOver still says "Modifier" and "Düzenle"); on iOS 27.0 (iPhone 17
+  Pro) and 27.1 (iPhone Duo) it is a brush in every language. Its menu is Add Widget, Customize, Edit Wallpaper,
+  Edit Pages. The fallback line in all seven languages now names that language's title and the brush ("tap
+  **Edit** at the top (on iOS 27 and later, a brush), then **Add Widget**"), and the iOS 16 and 17 step names
+  only the "+", which opens the gallery with no menu. `tools/i18n-check.py` holds both to the SpringBoardHome
+  titles (`EDIT`, `EDIT_MENU_ADD_WIDGET`) read from the runtimes. iOS 16 to 18 could not be run here.
+- "Show me how" keeps 14 dp above its hairline, as the open steps do, so the description no longer sits on it
+  (Arabic's descenders touched it).
+- `TaqwaPrimaryButton`'s label keeps 20 dp from each end of the pill and wraps centred. Onboarding and the Widgets
+  cards were walked before and after on the emulator in all seven languages at 360 dp, and in English at 448 dp,
+  at font scale 1.0: no label wraps, and every label's bounds are the same. Arabic, Urdu and Bengali are
+  pixel-identical. Latin labels draw 1 px (0.27 dp) to the right, nearer the pill's centre, which comes from the
+  centred alignment. At 360 dp and 1.3 the Indonesian "Tambahkan ke layar utama" now wraps to two centred lines.
+- The Lock Screen picture reads like the rectangular accessory: the prayer and its time on the first line, then
+  "in 0:21" under them (new key `widgets_lock_in` in every language). Round 2's copy-and-layout pass found the
+  second line wrong too, below.
+- The comments that still named Appearance as the widget background's or the placement query's home now name
+  Settings › Widgets.
+- Checks: `:shared` 2,140 tests on the iOS simulator (Dev 1's iPhone 17 Pro, iOS 27.0) and 2,133 on the Android
+  host, `:widgetcore` 109 on the simulator, 0 failures; `scripts/check-strings.sh` clean with 672 strings;
+  `scripts/ios-build.sh` and `:androidApp:assembleDebug` build.
+
+**Review round 2, copy and layout** (31 October), on the reviewers' findings for f005c223 (ec26a203, whose
+subject says "round 3"; the Lead counts these findings in round 2):
+- The Lock Screen picture's second line is now the accessory's own. The real rectangular accessory
+  (TaqwaWidgetViews.swift, about line 470) draws no countdown: its second line is "then" and the prayer after
+  the next one ("then Isha · العشاء", `lock_widget_then`, `prayerAfterNext`). Round 2's "in 0:21" was a line
+  the widget never shows. The picture now draws "then Isha · العشاء" (new key `widgets_lock_then` in every
+  language, worded as each language's `lock_widget_then`; `widgets_lock_in` goes), chosen by the same rule
+  as the Swift: the row after the next prayer's, wrapping past Isha to Fajr. **Open, for the owner:** the
+  accessory's first line is the "Maghrib in" phrase beside the clock time ("Maghrib in 18:32"), which reads as
+  a countdown; the picture names the prayer alone there ("Maghrib 18:32"). Making the two agree means
+  changing the accessory, WidgetKit work the spec leaves out.
+- `TaqwaPrimaryButton`'s 20 dp label inset and centred wrap now hold only with text larger than the default.
+  At font scale 1.0 the pill is drawn exactly as before round 2, so nothing moves at the default size
+  (Mohamed's rule for accessibility work). At every size, the inset had wrapped default-size labels in the
+  timetable confirm sheets that fit on one line before. Measured on emulator-5572 (Dhaka; the sheet that opens
+  when an earlier timetable is chosen), at 360, 411 and 448 dp, in English, French, Indonesian, Bengali and
+  Urdu:
+  - French "Garder Comité d’observation du croissant": one line at 411 dp (345 dp of the 363 dp pill, 9 dp
+    from each end) and at 448 dp; two lines at 360 dp. With the inset at every size it wrapped at 411 dp.
+  - "Keep University of Islamic Sciences, Karachi": one line at 448 dp, 16 dp from each end (wrapped with the
+    inset); at 411 dp one line from end to end, its first and last letters on the pill's rounding; two lines
+    at 360 dp, from the pill's start, as in French (all three widths), Indonesian and Bengali at 360 dp.
+    Indonesian and Bengali fit at 411 dp with 8 dp each side; Urdu fits everywhere.
+  - At font scale 1.3 every long label wraps centred inside the inset, 20 dp from each end, at all three
+    widths; the short ones (Bengali, Urdu, "Tetap Komite Rukyatul Hilal" at 411 and 448 dp) stay on one line.
+  **Open, for Mohamed:** at the default size these labels still run to the pill's ends, and a label that wraps
+  is set from its start, as they always were. If he wants the inset and the centring at every size, that is
+  one condition in `TaqwaButton.kt`; the labels listed above then wrap where they do not today.
+- Checks: `:shared` 2,147 tests on the iOS simulator and 2,137 on the Android host, 0 failures (new:
+  `LockScreenThenTest`, two default-size cases in `PrimaryButtonLabelTest` and the no-countdown case in
+  `LockScreenAccessoryTest`, each seen failing first); `scripts/check-strings.sh` clean with 672 strings;
+  `:androidApp:assembleDebug` builds. The picture's new line was checked by those tests, not yet on the
+  simulator.
+
+**Review round 2, screen readers** (31 October, bce8c6cf), the last of the Lead's findings for c58b32df:
+- The emulator's TalkBack 16 (emulator-5572) was run over the refused path and "Show me how". The refusal's
+  panel was announced, but the tapped button was gone and TalkBack put its focus on another card's title or
+  on Back. While a screen reader runs, a panel the reader's own tap opened now takes focus instead: a refused
+  button's at its first words, a "Show me how" panel at its first step, 250 ms after it appears, because
+  Android's bridge reports focus only on a node it has already seen. Without a screen reader nothing takes
+  focus, since moving focus scrolls, and the screen stays as it was. VoiceOver could not be heard: the
+  simulator has none.
+- "Show me how" carries the expand action, which TalkBack speaks as "collapsed"; the prayer card's preview is
+  hidden from screen readers, as the Lock Screen's picture is; the step number's disc grows with its digit, so
+  the digit is whole at font scale 2.0, and it is the 22 dp it was at the default size.
+- Android's refused path has a host test, `WidgetsByHandAndroidTest`, which follows Android's own add path
+  from a refusal to the by-hand panel (`stepsPanel`); `WidgetOfferAreaTest` draws that panel on the simulator.
+- Re-shot at bce8c6cf, 85 screenshots: iPhone (iOS 27.0) English and Arabic in light and dark, with "Show me
+  how" open on the Ayah and Lock Screen cards, and French and Turkish; Android with both widgets refused in
+  English (light and dark), Arabic, Bengali, Urdu and Indonesian; French, Turkish and English with one widget
+  placed. No clipping, overlap or text on a hairline. The Lock Screen picture's "then" line is now seen on
+  the simulator ("Dhuhr 12:35", "then Asr · العصر"). Left as they are, all from before this round: the
+  medium prayer preview's countdown label runs to two lines in every language but English ("Maghrib / dans");
+  the Bengali refused heading leaves its last word alone on the second line.
+- Final checks on bce8c6cf: `scripts/test.sh` green, `:shared` 2,155 tests on the iOS simulator and 2,142 on
+  the Android host, `:widgetcore` 109 and 111, 0 failures; `scripts/check-strings.sh` clean with 672 strings
+  in every language; `scripts/ios-build.sh` builds on Dev 1's iPhone 17 Pro (iOS 27.0), the widget extension
+  3 MB.
+
+**Follow-ups after the owner's answers** (31 October, afternoon):
+- The owner's decision: the iPhone's widget gallery lists the prayer widget as "Prayer times", so that the steps
+  read naturally. `home_widget_name` in the seven `iosApp/TaqwaWidget/*.lproj` files is now each language's
+  `widgets_prayer_name` ("Horaires de prière", "مواقيت الصلاة", "নামাজের সময়", ...), the iPhone steps name the
+  widget by `widgets_prayer_name` as Android's do, and `widgets_prayer_gallery_ios` is gone from every
+  language with its code. `tools/i18n-check.py` holds `widgets_prayer_name` to both Android's picker label and
+  the iPhone's gallery name; tightened first, it failed in all seven languages until the gallery names changed.
+  `WidgetsRefusalTest.theIPhoneStepsNameThePrayerWidgetByItsCardsName` failed first too ("Choose Prayer times
+  and a size." was not on the screen). Android's picker names stay as they are: the steps name the wide
+  "Prayer times", which the owner called the more important one.
+- The Lead's follow-up 4, French and Turkish on iOS 26.2: run on Dev 1's iPhone 17 Pro (iOS 26.2) with a
+  scratch XCUITest probe that was never part of Taqwa. In edit mode the corner shows "+" (VoiceOver
+  "Modifier", "Düzenle") and no menu, as in every language; tapping the "+" opens the same menu as English's
+  Edit: "Ajouter un widget", "Personnaliser", "Modifier le fond d’écran", "Modifier les pages", and "Araç
+  Takımı Ekle", "Özelleştir", "Duvar Kâğıdını Düzenle", "Sayfaları Düzenle". So "touchez **+** en haut de
+  l’écran ..., puis **Ajouter un widget**" is what the phone does, and the French and Turkish lines stay as
+  they are; no other language shows a "+" there.
+- The Lead's follow-up 5, balanced heading lines: `LineBreak.Heading` on the refused heading and on "How to
+  add it" was shot before and after on emulator-5572 (Pixel 8 Pro, 448 dp, font scale 1.0) in all seven
+  languages. Bengali's "না।" no longer stood alone, but French, Indonesian and Turkish moved too, since their
+  headings wrap as well ("... ne permet pas / aux applications ...", "... tidak mengizinkan / aplikasi ...",
+  "... uygulamaların / widget eklemesine ..."); English, Arabic and Urdu were pixel-identical. By the rule
+  set for it, the change was taken out and the headings are as they were. **Open, for the owner:** balanced
+  lines would also fix Turkish's "vermiyor." alone on its second line, at the price of moving the French and
+  Indonesian breaks.
+- The Lead's follow-up 6: the 142-character comment line in `WidgetRedraw.kt` is wrapped; the findings
+  recorded above as "review round 3" are the Lead's round 2 (here, in `TaqwaButton`'s KDoc and in the spec);
+  `iOSApp.swift` drops the `KotlinUnit` that the placement hook's completion returns, so the build no longer
+  warns about it.
+- Seen on Dev 1's iPhone 17 Pro simulator (iOS 27.0) with this build: the widget gallery's Taqwa page titles
+  the prayer widget "Prayer times" over "Next prayer, countdown and today’s times."
+- Checks: `:shared` 2,156 tests on the iOS simulator (Dev 1's iPhone 17 Pro, iOS 27.0) and 2,142 on the Android
+  host, `:widgetcore` 109 and 111, 0 failures; `scripts/check-strings.sh` clean with 671 strings in every
+  language; `:androidApp:assembleDebug` builds, and `scripts/ios-build.sh` builds with the widget extension at
+  3 MB and no `KotlinUnit` warning.
+
+**The Lead's follow-ups 1 to 3** (31 October, afternoon):
+- Screen readers and the steps' live region. A refused panel that had taken TalkBack's focus had no live region,
+  and gained one as soon as another card's refusal or "Show me how" moved the focus on, since the region was
+  `announce && focus == null` worked out again on every recomposition. The rule is now one pure decision,
+  `stepsOpening`: under a screen reader steps are made known only by moving its focus into them, when the
+  reader's own tap opened them, and never by a live region; without one, steps that replace a refused button are
+  a polite live region and nothing takes focus. A panel decides how it opens once, as it appears, and the screen
+  forgets the tap (`openedByTap`) once focus has moved, so steps that go and come back later (the widget added by
+  hand, then removed) take no focus. `StepsOpeningTest` failed first on exactly that case (read out under a
+  screen reader once the tap had moved on), and three screen tests failed first on the simulator: two refusals in
+  a row, and a refusal then the Lock Screen card's "Show me how", each left the first panel a live region; and
+  steps that came back after the widget was added and removed took focus again.
+- Heard on emulator-5572's TalkBack 16 (verbose log), with a local, uncommitted `requestPin` that refuses, before
+  and after the change: two refusals in a row, and a refusal then "Show me how" on the other card. Both builds
+  said the same: "Your home screen doesn't let apps add widgets." after each refusal (after a short "Back" or
+  "1", where TalkBack lands as the tapped button goes), and "1, Touch and hold an empty spot on your home screen
+  (or pinch it)." after "Show me how". The first panel was never read out, before either: TalkBack 16 got no event
+  from it when it became a live region (every content change it saw had `nodeLiveRegion=0`). So the old region
+  was a latent fault, there in the semantics tree, not heard on this TalkBack.
+- The Lock Screen picture at large text. Its name, time and "then …" lines were single lines cut at the
+  accessory's edge. Each is now set as the accessory sets it (`.minimumScaleFactor(0.6)`): one line at its size
+  while it fits, otherwise shrunk in half points to the largest size that fits, never below 60 %, and wrapped at
+  60 % where even that is too long, so it is whole (`accessoryLineSize`, `AccessoryLineSizeTest`). It stays a
+  `BasicText` given its style alone, as the `Text` before it was; merging `LocalTextStyle` in, as AyahActions
+  does, gave the lines the body text's line height and another Arabic face, and was taken out after the
+  screenshots showed it. `LockScreenAccessoryTest` failed first with the old lines at 3.2 times the text in a
+  200 dp accessory ("Maghrib" was cut). On Dev 1's iPhone 17 Pro (iOS 27.0) the picture after the change is
+  pixel-identical to the one before, outside the clocks: in English at Large (light and dark), xxxL, AX Medium,
+  AX XL and AX XXXL, and at AX XXXL in the six other languages. On a 402 pt phone no line had needed cutting, so
+  nothing shrinks there; the rule matters on narrower phones and longer names.
+- The dark theme's Lock Screen step drawings. Measured on the simulator: the phone's slate (34, 38, 42) on its
+  dark tile (27, 31, 29) is 1.09:1, on the light tile (243, 242, 238) 13.60:1, the same figures
+  `LockScreenOutlineTest` computes from the palette (it failed first at 1.09 against 13.60). Where the slate
+  is under WCAG's 3:1 for graphics against its tile, the phone is now outlined, inside its edge, in the dark
+  theme's ink (241, 243, 241), the ink of the marks on it: 14.94:1 against the dark tile. The light theme's
+  drawings are pixel-identical.
+- Screenshots and the TalkBack captures are in the session scratchpad, `settings-shots/round3/g1-*`. The local
+  hooks (a refusing `requestPin` read from `debug.taqwa.pin`, and launch arguments for the screen, the open cards
+  and the scroll on the iPhone) were reverted before the commit.
+- Checks: `:shared` 2,173 tests on the iOS simulator (Dev 1's iPhone 17 Pro, iOS 27.0) and 2,154 on the Android
+  host, 0 failures; `scripts/check-strings.sh` clean with 671 strings in every language; `:androidApp:assembleDebug`
+  and `scripts/ios-build.sh` build, the widget extension at 3 MB.
+
+**Follow-ups (31 Oct)**, the last check on 855c528a, after the owner's three answers:
+- Done: the gallery rename to "Prayer times" (07b91e8c), the Lead's follow-ups 1 to 3 (855c528a) and 6 (b08302d3),
+  and 4, checked on iOS 26.2, where the French and Turkish lines stay as they are. Follow-up 5 was tried and
+  taken out, as recorded above, so the heading breaks are as they were. Android's picker names stay as they are,
+  by the owner's answer.
+- Re-shot only what changed, with the same local hooks, reverted before this commit. On Dev 1's iPhone 17 Pro
+  (iOS 27.0), 20 screenshots: the Widgets screen in English and Arabic, light and dark, at the top, with the
+  prayer card's steps ("Choose **Prayer times** and a size.", "اختر **مواقيت الصلاة** والحجم الذي تريده."), the
+  Lock Screen card, its steps (the dark phones outlined), and the Lock Screen card at AX XXXL, where every line of
+  the picture is whole. On emulator-5572 (448 dp, light), the prayer card's refused panel in all seven
+  languages. No clipping, overlap or text on a hairline. Left as they were: the Bengali refused heading's "না।"
+  and the Turkish "vermiyor." alone on the second line.
+- Checks: `scripts/test.sh` green, `:shared` 2,173 tests on the iOS simulator (Dev 1's iPhone 17 Pro, iOS 27.0,
+  rerun fresh) and 2,154 on the Android host, `:widgetcore` 109 and 111, 0 failures; `scripts/check-strings.sh`
+  clean with 671 strings in every language, and `values-in` unchanged by the sync; `scripts/ios-build.sh` and
+  `:androidApp:assembleDebug` build, the widget extension at 3 MB. The emulator and the simulator are back to
+  their settings, and both are stopped.
+- The owner's decision (31 Oct): the Lock Screen picture's first line now says what the real accessory says, the "Maghrib in" phrase (`lockScreenHeadline` = `WidgetCountdown.headline`, the accessory's `entry.headline`, so the same words in all seven languages), closing the Open item above; `LockScreenHeadlineTest` failed first, `LockScreenAccessoryTest` adds Arabic at 3.2 times; host 2,157 and the iOS compile, strings and `ios-build.sh` green; Dev 1's iPhone 17 Pro shots in en and ar, light and dark, and all seven languages at AX XXXL, every line whole, in `settings-shots/round4`.

@@ -8,13 +8,14 @@ import androidx.compose.runtime.setValue
  * The signal that tells a *live* Glance session its mirror has changed.
  *
  * Glance's own `update()` / `updateAll()` is not that signal, which is what D1 (S23 round) was:
- * changing Settings ▸ Appearance ▸ Widget background stored the value and called `refreshWidgets()`,
- * and the widgets on the home screen kept their old background until a cold start or a system
- * dark-mode change. `GlanceAppWidget.update` is documented to "not restart `provideGlance` if it is
- * already running" — on a live session it sends `UpdateGlanceState`, which re-reads the widget's
- * *Glance state* (`stateDefinition`, which neither of these widgets has) and nothing else. Compose
- * then recomposes only what a changed snapshot state invalidated; the content lambda's parameters
- * are unchanged, so it is skipped, and the `SharedPreferences` read inside it never runs again.
+ * changing the widget background (then under Settings ▸ Appearance, now Settings ▸ Widgets) stored
+ * the value and called `refreshWidgets()`, and the widgets on the home screen kept their old
+ * background until a cold start or a system dark-mode change. `GlanceAppWidget.update` is
+ * documented to "not restart `provideGlance` if it is already running" — on a live session it
+ * sends `UpdateGlanceState`, which re-reads the widget's *Glance state* (`stateDefinition`, which
+ * neither of these widgets has) and nothing else. Compose then recomposes only what a changed
+ * snapshot state invalidated; the content lambda's parameters are unchanged, so it is skipped, and
+ * the `SharedPreferences` read inside it never runs again.
  * Everything that did work — a cold start, a locale or dark-mode change, and any update landing
  * after the session had already timed out — worked by *starting a new session*, which is why the
  * fault looked intermittent rather than absolute.

@@ -133,7 +133,6 @@
     <string name="about_online_body">Internet dipakai untuk satu hal saja: tilawah yang Anda pilih untuk diunduh, dari repositori publik Taqwa di GitHub.</string>
     <string name="about_nothing_title">Tanpa akun, tanpa iklan, tanpa analitik</string>
     <string name="about_nothing_body">Tidak ada akun untuk masuk, tidak ada data untuk dijual.</string>
-    <string name="about_links_label">LAINNYA</string>
     <string name="about_privacy_policy">Kebijakan privasi</string>
     <string name="about_source">Kode sumber</string>
     <string name="about_source_value">GitHub</string>
@@ -143,6 +142,60 @@
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">Buka taqwa.world</string>
     <string name="about_report_problem">Laporkan masalah</string>
+
+    <!-- Pengaturan › Widget dan Tentang Taqwa (spesifikasi desain ulang pengaturan, 30 Oktober 2026). Nilai
+         baris Widget menghitung widget di layar utama: %1$s yang sudah terpasang, %2$s jumlah seluruhnya. -->
+    <string name="settings_widgets">Widget</string>
+    <string name="settings_widgets_all">Semua ditambahkan</string>
+    <string name="settings_widgets_none">Belum ditambahkan</string>
+    <string name="settings_widgets_count">%1$s dari %2$s ditambahkan</string>
+    <!-- Layar Widget. Android menulis «layar utama» dengan huruf kecil; kembaran _ios memakai nama dari iOS
+         berbahasa Indonesia: Layar Utama, Layar Terkunci, Sesuaikan, Edit, Tambah Widget. Dalam langkah-langkah,
+         %1$s adalah nama widget seperti pada kartunya (widgets_prayer_name, widgets_ayah_name), yang juga
+         namanya di daftar widget Android dan di galeri iPhone (home_widget_name dan ayah_widget_name di
+         iosApp/TaqwaWidget). Kata di antara ** dan ** adalah yang akan dicari pembaca di
+         ponselnya; kata itu tampil tebal tanpa bintang. -->
+    <string name="widgets_intro">Salat berikutnya dan ayat hari ini di layar utama Anda, tanpa membuka Taqwa.</string>
+    <string name="widgets_intro_ios">Salat berikutnya dan ayat hari ini di Layar Utama dan Layar Terkunci Anda, tanpa membuka Taqwa.</string>
+    <string name="widgets_background_note">Untuk semua widget Taqwa. Pilihan Sistem mengikuti pengaturan terang dan gelap di ponsel Anda.</string>
+    <string name="widgets_prayer_label">WAKTU SALAT</string>
+    <string name="widgets_prayer_name">Waktu salat</string>
+    <string name="widgets_prayer_body">Salat berikutnya dengan hitung mundur yang terus berjalan, dan waktu salat hari ini. Kecil atau lebar.</string>
+    <string name="widgets_prayer_body_ios">Salat berikutnya dengan hitung mundur yang terus berjalan, dan waktu salat hari ini. Kecil atau sedang.</string>
+    <string name="widgets_ayah_label">AYAT HARI INI</string>
+    <string name="widgets_ayah_name">Ayat hari ini</string>
+    <string name="widgets_ayah_body">Ayat baru setiap hari, beserta terjemahannya. Lebar atau besar.</string>
+    <string name="widgets_ayah_body_ios">Ayat baru setiap hari, beserta terjemahannya. Sedang atau besar.</string>
+    <string name="widgets_on_home">Di layar utama Anda</string>
+    <string name="widgets_on_home_ios">Di Layar Utama Anda</string>
+    <string name="widgets_on_lock_ios">Di Layar Terkunci Anda</string>
+    <string name="widgets_refused_title">Layar utama Anda tidak mengizinkan aplikasi menambahkan widget.</string>
+    <string name="widgets_refused_body">Menambahkannya sendiri hanya butuh sebentar:</string>
+    <string name="widgets_step_android_1">Sentuh dan tahan area kosong di layar utama (atau cubit layar).</string>
+    <string name="widgets_step_android_2">Ketuk **Widget**.</string>
+    <string name="widgets_step_android_3">Cari **Taqwa**, lalu seret widget %1$s ke tempatnya.</string>
+    <string name="widgets_how_label">CARA MENAMBAHKANNYA</string>
+    <string name="widgets_step_ios_hold_1">Sentuh dan tahan ikon **Taqwa** di Layar Utama Anda.</string>
+    <string name="widgets_step_ios_hold_2">Pilih %1$s dan ukurannya.</string>
+    <string name="widgets_step_ios_hold_3">Widget muncul di Layar Utama. Seret ke mana pun Anda mau.</string>
+    <string name="widgets_ios_fallback">Tidak ada widget saat Anda menahan ikon? Sentuh dan tahan area kosong di Layar Utama, ketuk **Edit** di bagian atas (berupa kuas di iOS 27 dan yang lebih baru), lalu **Tambah Widget**, dan cari Taqwa.</string>
+    <string name="widgets_step_ios_plus_1">Sentuh dan tahan area kosong di Layar Utama Anda.</string>
+    <string name="widgets_step_ios_plus_2">Ketuk tanda **+** di sudut atas.</string>
+    <string name="widgets_step_ios_plus_3">Cari Taqwa, lalu pilih %1$s.</string>
+    <string name="widgets_show_how">Tunjukkan caranya</string>
+    <string name="widgets_lock_label">LAYAR TERKUNCI</string>
+    <string name="widgets_lock_name">Salat berikutnya dalam sekilas pandang</string>
+    <string name="widgets_lock_body">Di bawah jam di Layar Terkunci Anda, bulat atau lebar.</string>
+    <string name="widgets_lock_then">lalu %1$s</string>
+    <string name="widgets_step_lock_1">Sentuh dan tahan Layar Terkunci, lalu ketuk **Sesuaikan**.</string>
+    <string name="widgets_step_lock_2">Pilih Layar Terkunci, lalu ketuk ruang di bawah jam.</string>
+    <string name="widgets_step_lock_3">Pilih **Taqwa**, lalu widget bulat atau lebar.</string>
+    <!-- Tentang Taqwa: label versi di bawah slogan (%1$s adalah versinya, settings_version_value) dan judul
+         dua kartu terakhirnya. Beri nilai dan Bagikan di sana memakai settings_rate, settings_share, dan
+         settings_share_message. -->
+    <string name="about_version_chip">Versi %1$s</string>
+    <string name="about_open_source_label">SUMBER TERBUKA</string>
+    <string name="about_help_label">BANTUAN</string>
 
     <!-- Laporan kerusakan: lembar yang muncul saat aplikasi dibuka setelah rusak, dan baris email ketika tidak ada laporan untuk dikirim. -->
     <string name="crash_sheet_title">Taqwa tertutup mendadak</string>
@@ -460,16 +513,12 @@
     <string name="qibla_no_sensor_title">Tidak ada sensor kompas</string>
     <string name="qibla_no_sensor_body">Perangkat ini tidak punya magnetometer. Gunakan kompas sungguhan bersama arah di bawah ini.</string>
 
-    <!-- Widget background (Appearance) -->
+    <!-- Widget background (Settings › Widgets, which took it over from Appearance; the keys keep
+         their names) -->
     <string name="appearance_widget_background_label">LATAR WIDGET</string>
-    <string name="appearance_prayer_widget_preview_label">WIDGET SALAT</string>
-    <string name="appearance_ayah_widget_preview_label">WIDGET AYAT</string>
 
-    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <!-- Offering a widget that is not on the home screen (Settings › Widgets) -->
     <string name="appearance_widget_add">Tambahkan ke layar utama</string>
-    <string name="appearance_widget_add_ios_hold">Sentuh dan tahan ikon Taqwa, lalu pilih widget.</string>
-    <string name="appearance_widget_add_ios_plus">Sentuh dan tahan layar utama, ketuk tanda plus, lalu cari Taqwa.</string>
-    <string name="appearance_widget_add_android">Sentuh dan tahan layar utama, lalu pilih Widget.</string>
     <string name="widget_background_follow_theme">Sistem</string>
     <string name="widget_background_light">Terang</string>
     <string name="widget_background_dark">Gelap</string>

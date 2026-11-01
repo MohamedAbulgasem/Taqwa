@@ -81,6 +81,7 @@ class NavigatorTest {
             Screen.LocationSettings,
             Screen.CitySearch,
             Screen.Appearance,
+            Screen.Widgets,
             Screen.Attribution,
             // Iteration 8: the compass is pushed from the Prayer screen's Qibla card.
             Screen.Qibla,

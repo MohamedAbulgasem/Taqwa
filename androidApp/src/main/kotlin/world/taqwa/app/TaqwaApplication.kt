@@ -31,10 +31,11 @@ class TaqwaApplication : Application() {
         // A device with no app-widget host at all — a kiosk launcher, some work profiles — has no
         // AppWidgetManager, and the two queries below answer "not placed" for want of anywhere to
         // look. That is the one answer this must never give: it would offer to add a widget the
-        // launcher cannot hold. Unknown, which offers nothing, is the honest reading.
+        // launcher cannot hold. Null, "cannot tell", which shows no status and offers nothing, is
+        // the honest reading. Android has no Lock Screen widget, so it never reports one.
         androidWidgetPlacementHook = {
             if (AppWidgetManager.getInstance(applicationContext) == null) {
-                WidgetPlacement.Unknown
+                null
             } else {
                 WidgetPlacement(
                     prayer = anyWidgetPlaced(applicationContext),

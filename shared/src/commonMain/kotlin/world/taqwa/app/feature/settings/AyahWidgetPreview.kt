@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,6 +67,8 @@ fun AyahWidgetPreview(
     background: WidgetBackground,
     systemIsDark: Boolean,
     modifier: Modifier = Modifier,
+    /** The swatch's corners, as for [WidgetPreview]. */
+    corner: Dp = 18.dp,
 ) {
     val colors = WidgetPalette.colorsFor(background, systemIsDark)
     // Read once per composition, like the prayer preview: the mirror only changes when the Prayer
@@ -99,7 +102,7 @@ fun AyahWidgetPreview(
     Box(
         modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(corner))
             .background(PreviewWallpaper)
             .padding(14.dp),
     ) {
@@ -296,8 +299,8 @@ private fun translationSizeFor(translation: String) =
 
 /**
  * Ar-Ra'd 13:28, its Saheeh International translation, for when the mirror has not been written
- * yet: onboarding runs before the Prayer screen has ever shown, and Appearance can be opened on a
- * fresh install before the pool exists.
+ * yet: onboarding runs before the Prayer screen has ever shown, and Settings › Widgets can be opened
+ * on a fresh install before the pool exists.
  */
 private val SampleEntry = AyahPoolEntry(
     surah = 13,

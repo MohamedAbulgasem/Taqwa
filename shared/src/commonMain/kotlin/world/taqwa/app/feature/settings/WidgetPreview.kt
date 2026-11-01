@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
@@ -48,7 +49,8 @@ private val CardHeight = 100.dp
 /**
  * Both home-screen widgets, small and wide, side by side over a neutral wallpaper swatch, drawn
  * with the same [WidgetPalette] colours the real widgets resolve. Onboarding shows it to say
- * "this exists"; Appearance shows it to say "this is what your background choice looks like".
+ * "this exists"; Settings › Widgets shows it to say "this is what your background choice looks
+ * like".
  * The cards are Compose stand-ins, not the widgets themselves, so they only need to be faithful
  * in proportion, colour and content.
  */
@@ -58,13 +60,16 @@ fun WidgetPreview(
     systemIsDark: Boolean,
     content: WidgetContent?,
     modifier: Modifier = Modifier,
+    /** The swatch's corners: Settings › Widgets sets it inside a card, where it is inset and
+     * rounds less than the card around it. */
+    corner: Dp = 18.dp,
 ) {
     val colors = WidgetPalette.colorsFor(background, systemIsDark)
-    val shown = content ?: sampleContent()
+    val shown = content ?: sampleWidgetContent()
     Row(
         modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(corner))
             .background(PreviewWallpaper)
             .padding(14.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -96,7 +101,7 @@ private fun SmallCard(content: WidgetContent, colors: WidgetPaletteColors, modif
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                countdown(content.countdownMinutes),
+                previewCountdown(content.countdownMinutes),
                 style = TaqwaText.countdown.copy(fontSize = 30.sp, fontWeight = FontWeight.Normal),
                 color = Color(colors.textArgb),
                 maxLines = 1,
@@ -132,7 +137,7 @@ private fun WideCard(content: WidgetContent, colors: WidgetPaletteColors, modifi
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    countdown(content.countdownMinutes),
+                    previewCountdown(content.countdownMinutes),
                     style = TaqwaText.countdown.copy(fontSize = 26.sp, fontWeight = FontWeight.Normal),
                     color = Color(colors.textArgb),
                     maxLines = 1,
@@ -180,7 +185,7 @@ private fun WideCard(content: WidgetContent, colors: WidgetPaletteColors, modifi
  * would be a new disagreement in the place whose whole job is to show what the widget looks like.
  */
 @Composable
-private fun countdown(minutes: Long): String = WidgetDigits.localize(
+internal fun previewCountdown(minutes: Long): String = WidgetDigits.localize(
     "${minutes / 60}:${(minutes % 60).toString().padStart(2, '0')}",
     LocalPlatformFormat.current.usesNativeDigits(),
     LocalPlatformFormat.current.languageTag(),
@@ -204,12 +209,13 @@ private fun PlatformFormat.sampleTime(prayer: Prayer): String =
 
 /**
  * A representative afternoon, in the UI's own language, for when the mirror has not been written
- * yet: onboarding runs before the Prayer screen has ever been shown, and Appearance can be opened
- * on a fresh install before a location exists. Names go through the same [PrayerNaming] rule as the
- * real widget, so an Arabic UI previews Arabic-alone names and an English one the bilingual pair.
+ * yet: onboarding runs before the Prayer screen has ever been shown, and Settings › Widgets can be
+ * opened on a fresh install before a location exists; its lock-screen preview reads it too. Names
+ * go through the same [PrayerNaming] rule as the real widget, so an Arabic UI previews Arabic-alone
+ * names and an English one the bilingual pair.
  */
 @Composable
-private fun sampleContent(): WidgetContent {
+internal fun sampleWidgetContent(): WidgetContent {
     val format = LocalPlatformFormat.current
     val languageTag = format.languageTag()
     val rows = ObligatoryPrayers.map { prayer ->
@@ -227,5 +233,8 @@ private fun sampleContent(): WidgetContent {
         rows = rows,
         ringProgress = 0.86f,
         countdownLabel = WidgetMirrorWriter.countdownLabel(Prayer.MAGHRIB, languageTag),
+        // The name alone, as the mirror writes it for the Lock Screen ring, so the sample has the
+        // mirror's shape; left out, it would be the pair with the Arabic.
+        nextPrayerShortName = PrayerNaming.shortName(Prayer.MAGHRIB, languageTag),
     )
 }

@@ -143,7 +143,6 @@
     <string name="about_online_body">يُستخدم الإنترنت لشيء واحد: التلاوات التي تختار تنزيلها، من مستودع تقوى العام على GitHub.</string>
     <string name="about_nothing_title">بلا حساب، بلا إعلانات، بلا تحليلات</string>
     <string name="about_nothing_body">لا شيء لتسجيل الدخول إليه، ولا شيء للبيع.</string>
-    <string name="about_links_label">المزيد</string>
     <string name="about_privacy_policy">سياسة الخصوصية</string>
     <string name="about_source">الشفرة المصدرية</string>
     <string name="about_source_value">GitHub</string>
@@ -153,6 +152,58 @@
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">افتح taqwa.world</string>
     <string name="about_report_problem">الإبلاغ عن مشكلة</string>
+
+    <!-- الإعدادات › الأدوات، وصفحة «عن تقوى» (مواصفة إعادة تصميم الإعدادات، 30 أكتوبر 2026). قيمة صف
+         الأدوات تعدّ ما على الشاشة الرئيسية منها: %1$s عدد المضاف، و%2$s عددها كله. -->
+    <string name="settings_widgets">الأدوات</string>
+    <string name="settings_widgets_all">كلها مضافة</string>
+    <string name="settings_widgets_none">غير مضافة</string>
+    <string name="settings_widgets_count">%1$s من %2$s مضافة</string>
+    <!-- شاشة الأدوات. «أداة» كما في شاشة الترحيب وكما يسمّيها iOS العربي؛ وخطوات iPhone تسمّي أزرار iOS
+         بأسمائها فيه: «الشاشة الرئيسية» و«شاشة القفل» و«تخصيص» و«تعديل» و«إضافة أداة». وفي الخطوات، %1$s اسم
+         الأداة كما تذكره بطاقتها (widgets_prayer_name، widgets_ayah_name)، وهو اسمها نفسه في قائمة أدوات Android
+         وفي معرض أدوات iPhone (home_widget_name وayah_widget_name في iosApp/TaqwaWidget).
+         والكلمات بين ** و** هي ما سيبحث عنه القارئ على هاتفه، فتظهر بخط عريض بلا النجمتين. -->
+    <string name="widgets_intro">الصلاة القادمة وآية اليوم على شاشتك الرئيسية، من دون فتح تقوى.</string>
+    <string name="widgets_intro_ios">الصلاة القادمة وآية اليوم على شاشتك الرئيسية وشاشة القفل، من دون فتح تقوى.</string>
+    <string name="widgets_background_note">لكل أدوات تقوى. يتبع خيار «حسب النظام» إعداد الوضع الفاتح والداكن في هاتفك.</string>
+    <string name="widgets_prayer_label">مواقيت الصلاة</string>
+    <string name="widgets_prayer_name">مواقيت الصلاة</string>
+    <string name="widgets_prayer_body">الصلاة القادمة مع عدّ تنازلي مباشر، ومواقيت اليوم. بحجم صغير أو عريض.</string>
+    <string name="widgets_prayer_body_ios">الصلاة القادمة مع عدّ تنازلي مباشر، ومواقيت اليوم. بحجم صغير أو متوسط.</string>
+    <string name="widgets_ayah_label">آية اليوم</string>
+    <string name="widgets_ayah_name">آية اليوم</string>
+    <string name="widgets_ayah_body">آية جديدة كل يوم، مع ترجمتها. بحجم عريض أو كبير.</string>
+    <string name="widgets_ayah_body_ios">آية جديدة كل يوم، مع ترجمتها. بحجم متوسط أو كبير.</string>
+    <string name="widgets_on_home">على شاشتك الرئيسية</string>
+    <string name="widgets_on_home_ios">على شاشتك الرئيسية</string>
+    <string name="widgets_on_lock_ios">على شاشة القفل</string>
+    <string name="widgets_refused_title">شاشتك الرئيسية لا تسمح للتطبيقات بإضافة الأدوات.</string>
+    <string name="widgets_refused_body">إضافتها يدويًا لا تستغرق سوى لحظة:</string>
+    <string name="widgets_step_android_1">اضغط مطولًا على مكان فارغ في الشاشة الرئيسية (أو اضمم إصبعيك عليها).</string>
+    <string name="widgets_step_android_2">اضغط «**الأدوات**» أو «**التطبيقات المصغّرة**».</string>
+    <string name="widgets_step_android_3">ابحث عن **تقوى**، ثم اسحب أداة %1$s إلى مكانها.</string>
+    <string name="widgets_how_label">طريقة الإضافة</string>
+    <string name="widgets_step_ios_hold_1">اضغط مطولًا على أيقونة **تقوى** في الشاشة الرئيسية.</string>
+    <string name="widgets_step_ios_hold_2">اختر %1$s والحجم الذي تريده.</string>
+    <string name="widgets_step_ios_hold_3">تظهر على شاشتك الرئيسية. اسحبها إلى حيث تشاء.</string>
+    <string name="widgets_ios_fallback">لا تظهر الأدوات حين تضغط على الأيقونة؟ اضغط مطولًا على جزء فارغ من الشاشة الرئيسية، ثم اضغط «**تعديل**» في الأعلى (وهو فرشاة في iOS 27 وما بعده) ثم «**إضافة أداة**»، وابحث عن تقوى.</string>
+    <string name="widgets_step_ios_plus_1">اضغط مطولًا على جزء فارغ من شاشتك الرئيسية.</string>
+    <string name="widgets_step_ios_plus_2">اضغط علامة **+** في الزاوية العلوية.</string>
+    <string name="widgets_step_ios_plus_3">ابحث عن تقوى واختر %1$s.</string>
+    <string name="widgets_show_how">أرني الطريقة</string>
+    <string name="widgets_lock_label">شاشة القفل</string>
+    <string name="widgets_lock_name">الصلاة التالية في لمحة</string>
+    <string name="widgets_lock_body">تحت الساعة على شاشة القفل، دائرية أو عريضة.</string>
+    <string name="widgets_lock_then">ثم %1$s</string>
+    <string name="widgets_step_lock_1">اضغط مطولًا على شاشة القفل، ثم اضغط «**تخصيص**».</string>
+    <string name="widgets_step_lock_2">اختر «شاشة القفل»، ثم اضغط المساحة التي تحت الساعة.</string>
+    <string name="widgets_step_lock_3">اختر **تقوى**، ثم الأداة الدائرية أو العريضة.</string>
+    <!-- صفحة «عن تقوى»: الشريحة تحت الشعار (%1$s رقم الإصدار، settings_version_value) وعنوانا آخر بطاقتين
+         فيها. التقييم والمشاركة هناك يستعملان settings_rate وsettings_share وsettings_share_message. -->
+    <string name="about_version_chip">الإصدار %1$s</string>
+    <string name="about_open_source_label">مفتوح المصدر</string>
+    <string name="about_help_label">المساعدة</string>
 
     <!-- تقرير الأعطال: الورقة التي تظهر عند التشغيل بعد عطل، وسطر البريد حين لا يوجد تقرير. -->
     <string name="crash_sheet_title">أُغلق تقوى بشكل غير متوقع</string>
@@ -480,23 +531,19 @@
     <string name="qibla_no_sensor_title">لا توجد بوصلة في هذا الجهاز</string>
     <string name="qibla_no_sensor_body">لا يحتوي هذا الجهاز على مقياس مغناطيسي. استعن ببوصلة حقيقية مع الاتجاه الموضّح أدناه.</string>
 
-    <!-- Widget background (Appearance) -->
-    <string name="appearance_widget_background_label">خلفية الودجت</string>
-    <string name="appearance_prayer_widget_preview_label">ودجات الصلاة</string>
-    <string name="appearance_ayah_widget_preview_label">ودجة الآية</string>
+    <!-- Widget background (Settings › Widgets, which took it over from Appearance; the keys keep
+         their names) -->
+    <string name="appearance_widget_background_label">خلفية الأدوات</string>
 
-    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <!-- Offering a widget that is not on the home screen (Settings › Widgets) -->
     <string name="appearance_widget_add">إضافة إلى الشاشة الرئيسية</string>
-    <string name="appearance_widget_add_ios_hold">اضغط مطولًا على أيقونة تقوى ثم اختر ودجة.</string>
-    <string name="appearance_widget_add_ios_plus">اضغط مطولًا على الشاشة الرئيسية ثم اضغط على علامة الزائد وابحث عن تقوى.</string>
-    <string name="appearance_widget_add_android">اضغط مطولًا على الشاشة الرئيسية ثم اختر الودجات.</string>
     <string name="widget_background_follow_theme">حسب النظام</string>
     <string name="widget_background_light">فاتح</string>
     <string name="widget_background_dark">داكن</string>
     <string name="widget_background_translucent_title">شفاف</string>
     <string name="widget_background_translucent_subtitle">تندمج مع خلفية الشاشة.</string>
     <string name="widget_background_frosted_title">زجاجي</string>
-    <string name="widget_background_frosted_subtitle">تستخدم خامة النظام للودجت.</string>
+    <string name="widget_background_frosted_subtitle">تستخدم خامة النظام للأدوات.</string>
     <!-- Qibla screen (Task 22 sweep) -->
     <string name="qibla_title">القبلة</string>
     <string name="qibla_back">اليوم</string>

@@ -22,7 +22,7 @@ object WidgetMirrorWriter {
 
     /** Same key `TaqwaGlanceWidget.kt` (Android) and `TaqwaMirror.background()` (iOS) read
      * literally — the widget processes never see `SettingsRepository`/DataStore, only this
-     * mirror, so the Appearance screen's choice has to be written here too. */
+     * mirror, so the choice made in Settings › Widgets has to be written here too. */
     private const val BACKGROUND_KEY = "widget_background"
 
     fun writeBackground(store: KeyValueStore, background: WidgetBackground) {

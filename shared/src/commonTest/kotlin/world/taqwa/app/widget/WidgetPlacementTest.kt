@@ -2,32 +2,67 @@ package world.taqwa.app.widget
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlinx.coroutines.test.runTest
 
 /**
- * The branching the Appearance screen does beneath each widget preview, tested as the pure
- * function it is — no composable, no platform.
+ * The branching the Widgets screen does beneath each widget preview, tested as the pure function it
+ * is, no composable and no platform; and what a screen keeps when it reads placement again.
  *
- * The case that matters most is the first one: [WidgetPlacement.Unknown] is what every platform
- * reports when it cannot answer, and it must silence both offers. A regression there does not
- * crash or fail anywhere else; it just invites a user to add a widget already sitting on their
- * home screen.
+ * The cases that matter most are the reads that cannot tell. No AppWidgetManager, a WidgetKit
+ * failure or its two-second timeout is not an answer, so it must never put a check on a card or
+ * count a widget as added; and a read that cannot tell after one that could must not take a true
+ * answer away. A regression in either does not crash or fail anywhere else: it just tells the
+ * reader a widget is on the home screen when it is not, or flips a correct check off for a moment.
  */
 class WidgetPlacementTest {
 
+    /** A source that gives [answers] in turn, the last one for every read after. */
+    private class Answers(private vararg val answers: WidgetPlacement?) : WidgetPlacementSource {
+        var reads = 0
+            private set
+
+        override suspend fun current(): WidgetPlacement? = answers[minOf(reads++, answers.lastIndex)]
+    }
+
     @Test
-    fun `Unknown reports both widgets placed so neither is offered`() {
-        val unknown = WidgetPlacement.Unknown
-        assertTrue(unknown.prayer)
-        assertTrue(unknown.ayah)
-        assertEquals(
-            WidgetOffer.None,
-            widgetOffer(PinnableWidget.PRAYER, unknown.prayer, pinnable = true, addPath = WidgetAddPath.ANDROID_PIN),
-        )
-        assertEquals(
-            WidgetOffer.None,
-            widgetOffer(PinnableWidget.AYAH, unknown.ayah, pinnable = true, addPath = WidgetAddPath.ANDROID_PIN),
-        )
+    fun `a first read that cannot tell leaves nothing shown`() = runTest {
+        assertNull(Answers(null).reread(shown = null))
+    }
+
+    @Test
+    fun `a read that cannot tell keeps the answer already shown`() = runTest {
+        val shown = WidgetPlacement(prayer = true, ayah = false, lockScreen = true)
+        assertEquals(shown, Answers(null).reread(shown = shown))
+    }
+
+    @Test
+    fun `a read that answers replaces the answer shown even when a widget has gone`() = runTest {
+        val shown = WidgetPlacement(prayer = true, ayah = true, lockScreen = true)
+        val now = WidgetPlacement(prayer = false, ayah = true, lockScreen = false)
+        assertEquals(now, Answers(now).reread(shown = shown))
+    }
+
+    @Test
+    fun `answers then a read that cannot tell then answers again shows each answer in turn`() = runTest {
+        val first = WidgetPlacement(prayer = true, ayah = false)
+        val second = WidgetPlacement(prayer = false, ayah = false)
+        val source = Answers(first, null, second)
+        var shown: WidgetPlacement? = null
+        shown = source.reread(shown)
+        assertEquals(first, shown)
+        shown = source.reread(shown)
+        assertEquals(first, shown)
+        shown = source.reread(shown)
+        assertEquals(second, shown)
+        assertEquals(3, source.reads)
+    }
+
+    @Test
+    fun `the Lock Screen widget is not reported unless a platform says so`() {
+        // Android has no Lock Screen widget and builds its answer from the two home-screen ones.
+        assertFalse(WidgetPlacement(prayer = true, ayah = true).lockScreen)
     }
 
     @Test

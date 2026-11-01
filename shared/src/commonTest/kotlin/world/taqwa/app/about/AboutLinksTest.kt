@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * The links, one place; a typo here is a dead row on the About screen or the Settings root on both
+ * The links, one place; a typo here is a dead row or button on the About screen on both
  * platforms. A store link that names the wrong id opens someone else's listing, or none.
  */
 class AboutLinksTest {
@@ -65,12 +65,6 @@ class AboutLinksTest {
             ),
             AboutLinks.rateLinks(isIos = false),
         )
-    }
-
-    @Test
-    fun theRateRowNamesEachPlatformsOwnStore() {
-        assertEquals("App Store", AboutLinks.storeName(isIos = true))
-        assertEquals("Google Play", AboutLinks.storeName(isIos = false))
     }
 
     @Test

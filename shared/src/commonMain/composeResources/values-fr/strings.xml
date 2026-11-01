@@ -139,7 +139,6 @@
     <string name="about_online_body">Internet ne sert qu’à une chose : les récitations que vous choisissez de télécharger, depuis le dépôt public de Taqwa sur GitHub.</string>
     <string name="about_nothing_title">Sans compte, sans publicité, sans suivi</string>
     <string name="about_nothing_body">Rien où se connecter, rien à vendre.</string>
-    <string name="about_links_label">PLUS</string>
     <string name="about_privacy_policy">Politique de confidentialité</string>
     <string name="about_source">Code source</string>
     <string name="about_source_value">GitHub</string>
@@ -149,6 +148,66 @@
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">Ouvrir taqwa.world</string>
     <string name="about_report_problem">Signaler un problème</string>
+
+    <!-- Paramètres › Widgets et À propos de Taqwa (spécification de la refonte des paramètres, 30 octobre
+         2026). La valeur de la ligne Widgets compte les widgets présents sur un écran d’accueil : %1$s ceux
+         qui y sont, %2$s leur nombre total. -->
+    <string name="settings_widgets">Widgets</string>
+    <string name="settings_widgets_all">Tous ajoutés</string>
+    <string name="settings_widgets_none">Aucun ajouté</string>
+    <string name="settings_widgets_count">%1$s ajouté sur %2$s</string>
+    <!-- L’écran Widgets. Les jumeaux _ios reprennent les mots d’iOS en français : écran verrouillé,
+         Personnaliser, Ajouter un widget. Le bouton du coin de l’écran d’accueil qui ouvre ce menu s’affiche
+         « + » sous iOS 26 en français (VoiceOver dit « Modifier ») et en pinceau à partir d’iOS 27 ;
+         widgets_ios_fallback nomme donc les deux, comme les six autres langues nomment leur mot et le pinceau.
+         Les étapes du signe + ne servent qu’avant iOS 18, où ce + ouvre directement la galerie, sans menu :
+         widgets_step_ios_plus_2 ne nomme donc que lui. Vu sur les simulateurs iOS 26.2, 27.0 et 27.1 le
+         31 octobre 2026. widgets_lock_then est la seconde ligne de l’écran verrouillé, %1$s la prière d’après, comme lock_widget_then du widget. Dans les
+         étapes, %1$s est le nom du widget tel que sa carte le donne (widgets_prayer_name, widgets_ayah_name),
+         qui est aussi celui de la liste des widgets d’Android et de la galerie de l’iPhone (home_widget_name et
+         ayah_widget_name dans iosApp/TaqwaWidget). Les mots entre ** et **
+         sont ceux que le lecteur cherchera sur son téléphone : ils s’affichent en gras, sans les étoiles. -->
+    <string name="widgets_intro">La prochaine prière et le verset du jour sur votre écran d’accueil, sans ouvrir Taqwa.</string>
+    <string name="widgets_intro_ios">La prochaine prière et le verset du jour sur votre écran d’accueil et votre écran verrouillé, sans ouvrir Taqwa.</string>
+    <string name="widgets_background_note">Pour tous les widgets Taqwa. « Système » suit le mode clair ou sombre de votre téléphone.</string>
+    <string name="widgets_prayer_label">HORAIRES DE PRIÈRE</string>
+    <string name="widgets_prayer_name">Horaires de prière</string>
+    <string name="widgets_prayer_body">La prochaine prière avec un compte à rebours en direct, et les horaires du jour. Petit ou large.</string>
+    <string name="widgets_prayer_body_ios">La prochaine prière avec un compte à rebours en direct, et les horaires du jour. Petit ou moyen.</string>
+    <string name="widgets_ayah_label">VERSET DU JOUR</string>
+    <string name="widgets_ayah_name">Verset du jour</string>
+    <string name="widgets_ayah_body">Un nouveau verset chaque jour, avec sa traduction. Large ou grand.</string>
+    <string name="widgets_ayah_body_ios">Un nouveau verset chaque jour, avec sa traduction. Moyen ou grand.</string>
+    <string name="widgets_on_home">Sur votre écran d’accueil</string>
+    <string name="widgets_on_home_ios">Sur votre écran d’accueil</string>
+    <string name="widgets_on_lock_ios">Sur votre écran verrouillé</string>
+    <string name="widgets_refused_title">Votre écran d’accueil ne permet pas aux applications d’ajouter des widgets.</string>
+    <string name="widgets_refused_body">Il suffit d’un instant pour l’ajouter à la main :</string>
+    <string name="widgets_step_android_1">Appuyez longuement sur un espace vide de votre écran d’accueil (ou pincez-le).</string>
+    <string name="widgets_step_android_2">Touchez **Widgets**.</string>
+    <string name="widgets_step_android_3">Trouvez **Taqwa**, puis faites glisser le widget %1$s à sa place.</string>
+    <string name="widgets_how_label">COMMENT L’AJOUTER</string>
+    <string name="widgets_step_ios_hold_1">Appuyez longuement sur l’icône **Taqwa** de votre écran d’accueil.</string>
+    <string name="widgets_step_ios_hold_2">Choisissez %1$s et une taille.</string>
+    <string name="widgets_step_ios_hold_3">Il apparaît sur votre écran d’accueil. Faites-le glisser où vous voulez.</string>
+    <string name="widgets_ios_fallback">Pas de widgets quand vous appuyez sur l’icône ? Appuyez longuement sur une zone vide de l’écran d’accueil, touchez **+** en haut de l’écran (un pinceau à partir d’iOS 27), puis **Ajouter un widget**, et recherchez Taqwa.</string>
+    <string name="widgets_step_ios_plus_1">Appuyez longuement sur une zone vide de votre écran d’accueil.</string>
+    <string name="widgets_step_ios_plus_2">Touchez le **+** dans le coin supérieur.</string>
+    <string name="widgets_step_ios_plus_3">Recherchez Taqwa et choisissez %1$s.</string>
+    <string name="widgets_show_how">Voir comment faire</string>
+    <string name="widgets_lock_label">ÉCRAN VERROUILLÉ</string>
+    <string name="widgets_lock_name">La prochaine prière en un coup d’œil</string>
+    <string name="widgets_lock_body">Sous l’heure de votre écran verrouillé, rond ou large.</string>
+    <string name="widgets_lock_then">puis %1$s</string>
+    <string name="widgets_step_lock_1">Appuyez longuement sur votre écran verrouillé, puis touchez **Personnaliser**.</string>
+    <string name="widgets_step_lock_2">Choisissez Écran verrouillé, puis touchez l’espace sous l’heure.</string>
+    <string name="widgets_step_lock_3">Choisissez **Taqwa**, puis le widget rond ou large.</string>
+    <!-- À propos de Taqwa : la pastille sous le slogan (%1$s est la version, settings_version_value) et les
+         titres de ses deux dernières cartes. Noter et Partager y reprennent settings_rate, settings_share et
+         settings_share_message. -->
+    <string name="about_version_chip">Version %1$s</string>
+    <string name="about_open_source_label">LOGICIEL LIBRE</string>
+    <string name="about_help_label">AIDE</string>
 
     <!-- Rapport de plantage : la feuille au lancement qui suit un plantage, et la ligne de l’e-mail quand il n’y a aucun rapport à envoyer. -->
     <string name="crash_sheet_title">Taqwa s’est fermée de manière inattendue</string>
@@ -473,16 +532,12 @@
     <string name="qibla_no_sensor_title">Pas de capteur de boussole</string>
     <string name="qibla_no_sensor_body">Cet appareil n’a pas de magnétomètre. Servez-vous d’une boussole classique avec l’azimut indiqué ci-dessous.</string>
 
-    <!-- Widget background (Appearance) -->
+    <!-- Widget background (Settings › Widgets, which took it over from Appearance; the keys keep
+         their names) -->
     <string name="appearance_widget_background_label">FOND DU WIDGET</string>
-    <string name="appearance_prayer_widget_preview_label">WIDGETS DE PRIÈRE</string>
-    <string name="appearance_ayah_widget_preview_label">WIDGET DU VERSET</string>
 
-    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <!-- Offering a widget that is not on the home screen (Settings › Widgets) -->
     <string name="appearance_widget_add">Ajouter à l’écran d’accueil</string>
-    <string name="appearance_widget_add_ios_hold">Appuyez longuement sur l’icône Taqwa, puis choisissez un widget.</string>
-    <string name="appearance_widget_add_ios_plus">Appuyez longuement sur l’écran d’accueil, touchez le signe plus, puis recherchez Taqwa.</string>
-    <string name="appearance_widget_add_android">Appuyez longuement sur l’écran d’accueil, puis choisissez Widgets.</string>
     <string name="widget_background_follow_theme">Système</string>
     <string name="widget_background_light">Clair</string>
     <string name="widget_background_dark">Sombre</string>

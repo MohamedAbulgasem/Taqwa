@@ -35,7 +35,6 @@ import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.PrayerSettings
 import world.taqwa.app.feature.onboarding.OnboardingStep
-import world.taqwa.app.feature.settings.AboutScreen
 import world.taqwa.app.i18n.ClockFormat
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.createPlatformFormat
@@ -477,6 +476,7 @@ fun App(container: AppContainer) {
                             prayerSettingsState = prayerSettingsState,
                             themeModeState = themeModeState,
                             notificationSettingsState = notificationSettingsState,
+                            container = container,
                             navigator = navigator,
                             recitationStateState = recitationStateState,
                         )
@@ -605,6 +605,12 @@ fun App(container: AppContainer) {
 
                         Screen.Appearance -> AppearanceRoute(
                             themeModeState = themeModeState,
+                            scope = scope,
+                            settings = settings,
+                            navigator = navigator,
+                        )
+
+                        Screen.Widgets -> WidgetsRoute(
                             container = container,
                             scope = scope,
                             settings = settings,
@@ -612,7 +618,7 @@ fun App(container: AppContainer) {
                             navigator = navigator,
                         )
 
-                        Screen.About -> AboutScreen(onBack = { navigator.pop() })
+                        Screen.About -> AboutRoute(navigator = navigator)
 
                         Screen.Attribution -> {
                             AttributionRoute(

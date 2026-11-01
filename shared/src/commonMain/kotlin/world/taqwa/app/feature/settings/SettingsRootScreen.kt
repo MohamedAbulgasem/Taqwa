@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -38,7 +37,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import world.taqwa.app.about.AboutLinks
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.notifications.canOpenAppLanguageSettings
 import world.taqwa.app.notifications.openAppLanguageSettings
@@ -48,16 +46,13 @@ import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.TaqwaCard
 import world.taqwa.app.design.components.TaqwaRow
 import world.taqwa.app.design.components.drawExternalLink
-import world.taqwa.app.design.components.drawShare
 import world.taqwa.app.domain.NotificationSettings
 import world.taqwa.app.domain.ObligatoryPrayers
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.i18n.LocalPlatformFormat
-import world.taqwa.app.i18n.uiLanguage
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.settings_about
 import world.taqwa.app.resources.settings_appearance
-import world.taqwa.app.resources.settings_attribution
 import world.taqwa.app.resources.settings_group_about
 import world.taqwa.app.resources.settings_group_app
 import world.taqwa.app.resources.settings_group_prayer
@@ -70,14 +65,10 @@ import world.taqwa.app.resources.settings_notifications
 import world.taqwa.app.resources.settings_notifications_off
 import world.taqwa.app.resources.settings_notifications_on_count
 import world.taqwa.app.resources.settings_prayer_times
-import world.taqwa.app.resources.settings_rate
-import world.taqwa.app.resources.settings_share
-import world.taqwa.app.resources.settings_share_message
 import world.taqwa.app.resources.settings_title
 import world.taqwa.app.resources.settings_version_value
+import world.taqwa.app.resources.settings_widgets
 import world.taqwa.app.resources.language_name
-import world.taqwa.app.share.shareText
-import world.taqwa.app.widget.isIosPlatform
 import world.taqwa.app.resources.nav_a11y_back
 
 /** The horizontal inset every settings screen shares with the Prayer screen's cards. */
@@ -207,9 +198,8 @@ internal fun SettingsCard(modifier: Modifier = Modifier, content: @Composable Co
 }
 
 /**
- * A row that leaves the app: the external-link glyph in the trailing slot says so before the tap.
- * About's links and the root's Rate row share it, so a row that opens a browser or a store looks
- * the same wherever it sits.
+ * A row that leaves the app: the external-link glyph in the trailing slot says so before the tap,
+ * so a row that opens a browser or a store looks the same wherever it sits.
  */
 @Composable
 internal fun LinkRow(label: String, value: String?, forward: Boolean, onClick: () -> Unit) {
@@ -228,7 +218,7 @@ internal fun LinkRow(label: String, value: String?, forward: Boolean, onClick: (
  * the web listing; a phone with nothing for any of them stays where it is, as About's links do
  * (privacy spec §6.3).
  */
-private fun UriHandler.openFirst(links: List<String>) {
+internal fun UriHandler.openFirst(links: List<String>) {
     for (link in links) if (runCatching { openUri(link) }.isSuccess) return
 }
 
@@ -245,8 +235,11 @@ fun SettingsRootScreen(
     onOpenPrayerTimes: () -> Unit,
     onOpenNotifications: () -> Unit,
     onOpenAppearance: () -> Unit,
+    /** How many of the widgets are on a home screen; null until placement has been read, so the
+     * row shows nothing rather than a guess that changes a moment later. */
+    widgetsValue: String?,
+    onOpenWidgets: () -> Unit,
     onOpenAbout: () -> Unit,
-    onOpenAttribution: () -> Unit,
     /** The voice the reader listens in, for the Recitation row's value; blank until the
      * catalogue has loaded, which is a frame. */
     reciterName: String,
@@ -261,13 +254,6 @@ fun SettingsRootScreen(
         val on = ObligatoryPrayers.count { notificationSettings.soundFor(it) != PrayerSound.SILENT }
         stringResource(Res.string.settings_notifications_on_count, format.localizedDigits(on))
     }
-    // The Rate and Share rows read what they need from the composition and the platform: nothing
-    // about them is state the caller holds, so nothing is passed in for them.
-    val colors = LocalTaqwaColors.current
-    val uriHandler = LocalUriHandler.current
-    val forward = LocalLayoutDirection.current == LayoutDirection.Ltr
-    val shareLine = stringResource(Res.string.settings_share_message)
-    val languageCode = uiLanguage().code
 
     SettingsScaffold(stringResource(Res.string.settings_title), onBack = null) {
         SectionLabel(stringResource(Res.string.settings_group_prayer))
@@ -313,6 +299,14 @@ fun SettingsRootScreen(
                 onClick = onOpenAppearance,
             )
             CardDivider()
+            // Its own row, so a reader who skipped onboarding's widget step finds the widgets
+            // again. The value is plain information, never a badge or a dot: the quiet-app rule.
+            TaqwaRow(
+                stringResource(Res.string.settings_widgets),
+                value = widgetsValue,
+                onClick = onOpenWidgets,
+            )
+            CardDivider()
             // The language is the device's, not a setting of ours — `language_name` is each
             // translation naming itself. Where the system has a per-app language page (Android
             // 13 and later, iOS) the row opens it, so a reader on an English phone can put
@@ -326,31 +320,13 @@ fun SettingsRootScreen(
 
         GroupGap()
         SectionLabel(stringResource(Res.string.settings_group_about))
+        // One row: Rate, Share and Attribution & licences live on About Taqwa, the app's profile
+        // page, so the root stays a list of settings with one way in to everything about the app.
         SettingsCard {
             TaqwaRow(
                 stringResource(Res.string.settings_about),
                 value = stringResource(Res.string.settings_version_value),
                 onClick = onOpenAbout,
-            )
-            CardDivider()
-            TaqwaRow(stringResource(Res.string.settings_attribution), onClick = onOpenAttribution)
-            // Rating and sharing are rows the reader comes to, never a prompt that comes to the
-            // reader: an in-app review prompt breaks the premise of a quiet app. So there is no
-            // review API, no launch counter deciding when to ask, and nothing stored; until one
-            // of these two rows is tapped, nothing happens (privacy spec §6.5).
-            CardDivider()
-            // The value names the store the row opens. Its glyph is the external link's, because
-            // the tap leaves the app for the store's own page.
-            LinkRow(stringResource(Res.string.settings_rate), AboutLinks.storeName(isIosPlatform), forward) {
-                uriHandler.openFirst(AboutLinks.rateLinks(isIosPlatform))
-            }
-            CardDivider()
-            // The share glyph is a tray with an arrow rising out of it, the same in both reading
-            // directions, so unlike the link glyph it is not mirrored.
-            TaqwaRow(
-                stringResource(Res.string.settings_share),
-                onClick = { shareText(AboutLinks.shareMessage(shareLine, languageCode)) },
-                trailing = { Canvas(Modifier.size(16.dp)) { drawShare(colors.textTertiary) } },
             )
         }
     }

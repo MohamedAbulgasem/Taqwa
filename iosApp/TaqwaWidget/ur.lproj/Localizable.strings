@@ -8,8 +8,10 @@
 /* Spoken only: the ayah widget's reference for VoiceOver. %1$@ the surah, %2$@ the ayah number. */
 "ayah_widget_a11y_reference" = "%1$@، آیت %2$@";
 
-/* The two prayer widgets as they appear in the widget gallery. */
-"home_widget_name" = "تقویٰ";
+/* The two prayer widgets as they appear in the widget gallery. The Home Screen widget is listed under
+   the name its card in Settings › Widgets gives it (widgets_prayer_name), so that the steps there
+   name what the gallery shows; tools/i18n-check.py holds the two together. */
+"home_widget_name" = "نماز کے اوقات";
 "home_widget_description" = "اگلی نماز، الٹی گنتی اور آج کے اوقات۔";
 "lock_widget_name" = "تقویٰ لاک اسکرین";
 "lock_widget_description" = "اگلی نماز ایک نظر میں۔";

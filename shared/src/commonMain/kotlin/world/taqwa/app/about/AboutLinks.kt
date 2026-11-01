@@ -5,8 +5,8 @@ package world.taqwa.app.about
  * repository moves or taqwa.world hosts the policy. The repository has been public since
  * 13 September 2026, so all of them resolve; the store forms carry the policy one.
  *
- * Also where the Settings root's "Rate Taqwa" and "Share Taqwa" rows go (privacy spec §6.5):
- * the store pages and the line the share sheet carries.
+ * Also where About Taqwa's "Rate Taqwa" and "Share Taqwa" buttons go (privacy spec §6.5): the
+ * store pages and the line the share sheet carries.
  */
 object AboutLinks {
     /** Where "Report a problem" and the crash sheet address their email; the site and the policy say the same. */
@@ -23,17 +23,6 @@ object AboutLinks {
     const val PLAY_PACKAGE = "world.taqwa.app"
 
     /**
-     * The stores' own names, shown as the Rate row's value. Proper names, the same in every
-     * language and in Latin script under Arabic and Urdu too, as the stores print them on their
-     * own badges, so they are constants here rather than strings for translators to vary.
-     */
-    const val APP_STORE_NAME = "App Store"
-    const val GOOGLE_PLAY_NAME = "Google Play"
-
-    /** The platform's own store: Taqwa is listed on one per platform, and the row names that one. */
-    fun storeName(isIos: Boolean): String = if (isIos) APP_STORE_NAME else GOOGLE_PLAY_NAME
-
-    /**
      * Where "Rate Taqwa" goes, in the order to try; the caller opens the first that opens.
      *
      * On iOS one link: the listing with `action=write-review`, Apple's documented way in, which the
@@ -42,7 +31,7 @@ object AboutLinks {
      * with no store app at all (an emulator image without Play) has nothing that answers that
      * scheme, so the listing's web address follows, which any browser opens. Other stores
      * (F-Droid, Aurora, AppGallery) also answer `market://`, so on a phone with one of those
-     * instead of Play the row opens that store's page for Taqwa.
+     * instead of Play the button opens that store's page for Taqwa.
      */
     fun rateLinks(isIos: Boolean): List<String> = if (isIos) {
         listOf("https://apps.apple.com/app/id$APP_STORE_ID?action=write-review")

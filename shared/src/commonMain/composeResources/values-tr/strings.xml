@@ -140,7 +140,6 @@
     <string name="about_online_body">İnternet tek bir şey için kullanılır: Taqwa’nın GitHub’daki herkese açık deposundan indirmeyi seçtiğiniz tilavetler.</string>
     <string name="about_nothing_title">Hesap yok, reklam yok, analiz yok</string>
     <string name="about_nothing_body">Giriş yapılacak bir şey yok, satılacak bir şey yok.</string>
-    <string name="about_links_label">DAHA FAZLASI</string>
     <string name="about_privacy_policy">Gizlilik politikası</string>
     <string name="about_source">Kaynak kodu</string>
     <string name="about_source_value">GitHub</string>
@@ -150,6 +149,66 @@
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">taqwa.world adresini aç</string>
     <string name="about_report_problem">Sorun bildir</string>
+
+    <!-- Ayarlar › Widget’lar ve Taqwa hakkında (ayarların yeniden tasarım belirtimi, 30 Ekim 2026). Widget’lar
+         satırının değeri ana ekrandaki widget’ları sayar: %1$s eklenenler, %2$s toplam. -->
+    <string name="settings_widgets">Widget’lar</string>
+    <string name="settings_widgets_all">Hepsi eklendi</string>
+    <string name="settings_widgets_none">Eklenmedi</string>
+    <string name="settings_widgets_count">%1$s / %2$s eklendi</string>
+    <!-- Widget’lar ekranı. _ios ikizleri iOS’un Türkçe adlarını kullanır: Ana Ekran, Kilitli Ekran, Özelleştir,
+         Araç Takımı Ekle. Ana Ekranın köşesindeki bu menüyü açan düğme Türkçe iOS 26’da “+” olarak
+         görünür (VoiceOver “Düzenle” der), iOS 27’den itibaren ise bir fırçadır; widgets_ios_fallback bu yüzden
+         ikisini de anar, diğer altı dil de kendi sözcüğünü ve fırçayı anar. + işaretli adımlar yalnızca iOS
+         18’den önce çıkar; orada köşedeki “+” galeriyi menüsüz doğrudan açar, bu yüzden widgets_step_ios_plus_2
+         yalnızca onu anar. iOS 26.2, 27.0 ve 27.1 simülatörlerinde 31 Ekim 2026’da görüldü. widgets_lock_then
+         Kilitli Ekran resminin ikinci satırıdır, %1$s ondan sonraki namazdır (widget’taki lock_widget_then gibi). Adımlarda
+         %1$s, widget’ın kartındaki adıdır (widgets_prayer_name, widgets_ayah_name); ek almasın diye hep
+         “widget’ını” ya da “önce … sonra” ile kullanılır. Android’in widget listesi ve iPhone’un
+         galerisi de widget’ı bu adla gösterir (iosApp/TaqwaWidget’taki home_widget_name ve
+         ayah_widget_name). ** ile ** arasındaki sözcükler okurun telefonda arayacağı sözcüklerdir; yıldızsız
+         ve kalın gösterilir. -->
+    <string name="widgets_intro">Sonraki vakit ve günün ayeti, Taqwa’yı açmadan ana ekranınızda.</string>
+    <string name="widgets_intro_ios">Sonraki vakit ve günün ayeti, Taqwa’yı açmadan Ana Ekranınızda ve Kilitli Ekranınızda.</string>
+    <string name="widgets_background_note">Tüm Taqwa widget’ları için. Sistem seçeneği, telefonunuzun açık ve koyu tema ayarını izler.</string>
+    <string name="widgets_prayer_label">NAMAZ VAKİTLERİ</string>
+    <string name="widgets_prayer_name">Namaz vakitleri</string>
+    <string name="widgets_prayer_body">Canlı geri sayımla sonraki vakit ve bugünün vakitleri. Küçük ya da geniş.</string>
+    <string name="widgets_prayer_body_ios">Canlı geri sayımla sonraki vakit ve bugünün vakitleri. Küçük ya da orta.</string>
+    <string name="widgets_ayah_label">GÜNÜN AYETİ</string>
+    <string name="widgets_ayah_name">Günün ayeti</string>
+    <string name="widgets_ayah_body">Her gün yeni bir ayet, mealiyle birlikte. Geniş ya da büyük.</string>
+    <string name="widgets_ayah_body_ios">Her gün yeni bir ayet, mealiyle birlikte. Orta ya da büyük.</string>
+    <string name="widgets_on_home">Ana ekranınızda</string>
+    <string name="widgets_on_home_ios">Ana Ekranınızda</string>
+    <string name="widgets_on_lock_ios">Kilitli Ekranınızda</string>
+    <string name="widgets_refused_title">Ana ekranınız uygulamaların widget eklemesine izin vermiyor.</string>
+    <string name="widgets_refused_body">Elle eklemek yalnızca birkaç saniye sürer:</string>
+    <string name="widgets_step_android_1">Ana ekranınızda boş bir yere basılı tutun (veya iki parmağınızla sıkıştırın).</string>
+    <string name="widgets_step_android_2">**Widget’lar** bölümüne dokunun.</string>
+    <string name="widgets_step_android_3">**Taqwa**’yı bulun, sonra %1$s widget’ını sürükleyip yerine bırakın.</string>
+    <string name="widgets_how_label">NASIL EKLENİR</string>
+    <string name="widgets_step_ios_hold_1">Ana Ekranınızdaki **Taqwa** simgesine basılı tutun.</string>
+    <string name="widgets_step_ios_hold_2">Önce %1$s, sonra bir boyut seçin.</string>
+    <string name="widgets_step_ios_hold_3">Widget Ana Ekranınıza yerleşir. Dilediğiniz yere sürükleyin.</string>
+    <string name="widgets_ios_fallback">Simgeye basılı tutunca widget çıkmıyor mu? Ana Ekranda boş bir yere basılı tutun, üstteki **+** işaretine (iOS 27 ve sonrasında bir fırça), sonra **Araç Takımı Ekle**’ye dokunun ve Taqwa’yı aratın.</string>
+    <string name="widgets_step_ios_plus_1">Ana Ekranınızda boş bir yere basılı tutun.</string>
+    <string name="widgets_step_ios_plus_2">Üst köşedeki **+** işaretine dokunun.</string>
+    <string name="widgets_step_ios_plus_3">Taqwa’yı aratın ve %1$s widget’ını seçin.</string>
+    <string name="widgets_show_how">Nasıl yapılacağını göster</string>
+    <string name="widgets_lock_label">KİLİTLİ EKRAN</string>
+    <string name="widgets_lock_name">Sonraki vakit bir bakışta</string>
+    <string name="widgets_lock_body">Kilitli Ekranınızda saatin altında, yuvarlak ya da geniş.</string>
+    <string name="widgets_lock_then">sonra %1$s</string>
+    <string name="widgets_step_lock_1">Kilitli Ekranınıza basılı tutun, sonra **Özelleştir**’e dokunun.</string>
+    <string name="widgets_step_lock_2">Kilitli Ekran’ı seçin, sonra saatin altındaki boşluğa dokunun.</string>
+    <string name="widgets_step_lock_3">**Taqwa**’yı, sonra yuvarlak ya da geniş widget’ı seçin.</string>
+    <!-- Taqwa hakkında: sloganın altındaki etiket (%1$s sürüm, settings_version_value) ve son iki kartın
+         başlıkları. Değerlendir ve Paylaş orada settings_rate, settings_share ve settings_share_message’ı
+         kullanır. -->
+    <string name="about_version_chip">Sürüm %1$s</string>
+    <string name="about_open_source_label">AÇIK KAYNAK</string>
+    <string name="about_help_label">YARDIM</string>
 
     <!-- Çökme raporu: çökmeden sonraki açılışta gösterilen sayfa ve gönderilecek rapor olmadığında e-postadaki satır. -->
     <string name="crash_sheet_title">Taqwa beklenmedik şekilde kapandı</string>
@@ -474,16 +533,12 @@
     <string name="qibla_no_sensor_title">Pusula sensörü yok</string>
     <string name="qibla_no_sensor_body">Bu cihazda manyetometre yok. Aşağıdaki açıyla birlikte gerçek bir pusula kullanın.</string>
 
-    <!-- Widget arka planı (Görünüm) -->
+    <!-- Widget arka planı (Ayarlar › Widget’lar; Görünüm’den taşındı, anahtarlar adlarını
+         korur) -->
     <string name="appearance_widget_background_label">WIDGET ARKA PLANI</string>
-    <string name="appearance_prayer_widget_preview_label">NAMAZ WIDGET’LARI</string>
-    <string name="appearance_ayah_widget_preview_label">AYET WIDGET’I</string>
 
-    <!-- Ana ekranda olmayan bir widget’ı önermek (Görünüm önizlemeleri) -->
+    <!-- Ana ekranda olmayan bir widget’ı önermek (Ayarlar › Widget’lar) -->
     <string name="appearance_widget_add">Ana ekrana ekle</string>
-    <string name="appearance_widget_add_ios_hold">Taqwa simgesine basılı tutun, sonra bir widget seçin.</string>
-    <string name="appearance_widget_add_ios_plus">Ana ekrana basılı tutun, artı işaretine dokunun, sonra Taqwa’yı aratın.</string>
-    <string name="appearance_widget_add_android">Ana ekrana basılı tutun, sonra Widget’lar bölümünü seçin.</string>
     <string name="widget_background_follow_theme">Sistem</string>
     <string name="widget_background_light">Açık</string>
     <string name="widget_background_dark">Koyu</string>

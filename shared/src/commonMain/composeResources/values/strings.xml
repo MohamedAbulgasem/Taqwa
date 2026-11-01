@@ -158,7 +158,6 @@
     <string name="about_online_body">The internet is used for one thing: recitations you choose to download, from Taqwa’s public repository on GitHub.</string>
     <string name="about_nothing_title">No account, no ads, no analytics</string>
     <string name="about_nothing_body">Nothing to sign into, nothing to sell.</string>
-    <string name="about_links_label">MORE</string>
     <string name="about_privacy_policy">Privacy policy</string>
     <string name="about_source">Source code</string>
     <string name="about_source_value">GitHub</string>
@@ -168,6 +167,69 @@
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">Open taqwa.world</string>
     <string name="about_report_problem">Report a problem</string>
+
+    <!-- Settings › Widgets and About Taqwa (settings redesign spec, approved 30 Oct 2026). The
+         Widgets row's value counts the widgets on a home screen: %1$s how many are, %2$s how many
+         there are. -->
+    <string name="settings_widgets">Widgets</string>
+    <string name="settings_widgets_all">All added</string>
+    <string name="settings_widgets_none">Not added</string>
+    <string name="settings_widgets_count">%1$s of %2$s added</string>
+    <!-- The Widgets screen. Android says "home screen" in lower case, as its own launchers do;
+         the _ios twins use Apple's names for the iPhone's UI, "Home Screen", "Lock Screen",
+         "Customize", "Edit" and "Add Widget", as iOS writes them in each language. In the steps,
+         %1$s is the widget's name as its card gives it (widgets_prayer_name, widgets_ayah_name), which is
+         also how the Android picker and the iPhone's gallery list it (home_widget_name and ayah_widget_name
+         in iosApp/TaqwaWidget). Words between ** and ** are the ones the reader will look for on the
+         phone, and show in bold without the stars; tools/i18n-check.py checks that the stars come in
+         pairs. The Home Screen's corner button,
+         which opens the menu with Add Widget, shows its title on iOS 18 and 26 (Edit; on iOS 26 "+"
+         in French and Turkish) and a brush from iOS 27 in every language, so widgets_ios_fallback
+         names both; the "+" of iOS 16 and 17 opens the gallery with no menu, so widgets_step_ios_plus_2
+         names only it (seen on the iOS 26.2, 27.0 and 27.1 simulators, 31 October 2026, and held by
+         tools/i18n-check.py). widgets_lock_then is the Lock Screen picture's second line, %1$s the prayer
+         after the next one, worded as the accessory's own lock_widget_then in iosApp/TaqwaWidget. -->
+    <string name="widgets_intro">The next prayer and today’s ayah on your home screen, without opening Taqwa.</string>
+    <string name="widgets_intro_ios">The next prayer and today’s ayah on your Home Screen and Lock Screen, without opening Taqwa.</string>
+    <string name="widgets_background_note">For every Taqwa widget. System follows your phone’s light and dark setting.</string>
+    <string name="widgets_prayer_label">PRAYER TIMES</string>
+    <string name="widgets_prayer_name">Prayer times</string>
+    <string name="widgets_prayer_body">The next prayer with a live countdown, and today’s times. Small or wide.</string>
+    <string name="widgets_prayer_body_ios">The next prayer with a live countdown, and today’s times. Small or medium.</string>
+    <string name="widgets_ayah_label">AYAH OF THE DAY</string>
+    <string name="widgets_ayah_name">Ayah of the day</string>
+    <string name="widgets_ayah_body">A new ayah each day, with its translation. Wide or large.</string>
+    <string name="widgets_ayah_body_ios">A new ayah each day, with its translation. Medium or large.</string>
+    <string name="widgets_on_home">On your home screen</string>
+    <string name="widgets_on_home_ios">On your Home Screen</string>
+    <string name="widgets_on_lock_ios">On your Lock Screen</string>
+    <string name="widgets_refused_title">Your home screen doesn’t let apps add widgets.</string>
+    <string name="widgets_refused_body">It only takes a moment by hand:</string>
+    <string name="widgets_step_android_1">Touch and hold an empty spot on your home screen (or pinch it).</string>
+    <string name="widgets_step_android_2">Tap **Widgets**.</string>
+    <string name="widgets_step_android_3">Find **Taqwa**, then drag %1$s into place.</string>
+    <string name="widgets_how_label">HOW TO ADD IT</string>
+    <string name="widgets_step_ios_hold_1">Touch and hold the **Taqwa** icon on your Home Screen.</string>
+    <string name="widgets_step_ios_hold_2">Choose %1$s and a size.</string>
+    <string name="widgets_step_ios_hold_3">It lands on your Home Screen. Drag it wherever you like.</string>
+    <string name="widgets_ios_fallback">No widgets when you hold the icon? Touch and hold an empty part of the Home Screen, tap **Edit** at the top (on iOS 27 and later, a brush), then **Add Widget**, and search for Taqwa.</string>
+    <string name="widgets_step_ios_plus_1">Touch and hold an empty part of your Home Screen.</string>
+    <string name="widgets_step_ios_plus_2">Tap the **+** in the top corner.</string>
+    <string name="widgets_step_ios_plus_3">Search for Taqwa and choose %1$s.</string>
+    <string name="widgets_show_how">Show me how</string>
+    <string name="widgets_lock_label">LOCK SCREEN</string>
+    <string name="widgets_lock_name">Next prayer at a glance</string>
+    <string name="widgets_lock_body">Under the clock on your Lock Screen, round or wide.</string>
+    <string name="widgets_lock_then">then %1$s</string>
+    <string name="widgets_step_lock_1">Touch and hold your Lock Screen, then tap **Customize**.</string>
+    <string name="widgets_step_lock_2">Choose your Lock Screen, then tap the space under the clock.</string>
+    <string name="widgets_step_lock_3">Choose **Taqwa**, then the round or wide widget.</string>
+    <!-- About Taqwa as the app's profile page: the chip under the tagline (%1$s is the version,
+         settings_version_value) and the labels of its last two cards. Rate and Share there reuse
+         settings_rate, settings_share and settings_share_message. -->
+    <string name="about_version_chip">Version %1$s</string>
+    <string name="about_open_source_label">OPEN SOURCE</string>
+    <string name="about_help_label">HELP</string>
 
     <!-- Crash report (crash spec §3): the sheet on the launch after a crash, and the email's
          line when there is no report to send. -->
@@ -505,16 +567,12 @@
     <string name="qibla_no_sensor_title">No compass sensor</string>
     <string name="qibla_no_sensor_body">This device has no magnetometer. Use a physical compass together with the bearing below.</string>
 
-    <!-- Widget background (Appearance) -->
+    <!-- Widget background (Settings › Widgets, which took it over from Appearance; the keys keep
+         their names) -->
     <string name="appearance_widget_background_label">WIDGET BACKGROUND</string>
-    <string name="appearance_prayer_widget_preview_label">PRAYER WIDGETS</string>
-    <string name="appearance_ayah_widget_preview_label">AYAH WIDGET</string>
 
-    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <!-- Offering a widget that is not on the home screen (Settings › Widgets) -->
     <string name="appearance_widget_add">Add to home screen</string>
-    <string name="appearance_widget_add_ios_hold">Touch and hold the Taqwa icon, then choose a widget.</string>
-    <string name="appearance_widget_add_ios_plus">Touch and hold the home screen, tap the plus, then search for Taqwa.</string>
-    <string name="appearance_widget_add_android">Touch and hold the home screen, then choose Widgets.</string>
     <string name="widget_background_follow_theme">System</string>
     <string name="widget_background_light">Light</string>
     <string name="widget_background_dark">Dark</string>

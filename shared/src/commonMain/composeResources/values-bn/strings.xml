@@ -135,7 +135,6 @@
     <string name="about_online_body">ইন্টারনেট একটিমাত্র কাজে লাগে: আপনি যে তিলাওয়াতগুলো ডাউনলোড করতে চান, GitHub-এ তাকওয়ার উন্মুক্ত রিপোজিটরি থেকে সেগুলো আনা।</string>
     <string name="about_nothing_title">অ্যাকাউন্ট নেই, বিজ্ঞাপন নেই, অ্যানালিটিক্স নেই</string>
     <string name="about_nothing_body">সাইন ইন করার কিছু নেই, বিক্রি করার মতোও কিছু নেই।</string>
-    <string name="about_links_label">আরও</string>
     <string name="about_privacy_policy">গোপনীয়তা নীতি</string>
     <string name="about_source">সোর্স কোড</string>
     <string name="about_source_value">GitHub</string>
@@ -145,6 +144,58 @@
     <string name="about_website_value">taqwa.world</string>
     <string name="about_icon_open_website">taqwa.world খুলুন</string>
     <string name="about_report_problem">সমস্যা জানান</string>
+
+    <!-- সেটিংস › উইজেট এবং তাকওয়া সম্পর্কে (সেটিংস নতুন নকশার স্পেসিফিকেশন, 30 অক্টোবর 2026)। উইজেট সারির
+         মান হোম স্ক্রিনে থাকা উইজেট গোনে: %1$s যতগুলো আছে, %2$s মোট কতগুলো। -->
+    <string name="settings_widgets">উইজেট</string>
+    <string name="settings_widgets_all">সব যোগ করা হয়েছে</string>
+    <string name="settings_widgets_none">যোগ করা হয়নি</string>
+    <string name="settings_widgets_count">%2$sটির মধ্যে %1$sটি যোগ করা</string>
+    <!-- উইজেট স্ক্রিন। _ios সংস্করণগুলো বাংলা iOS-এর নিজের নাম ব্যবহার করে: “হোম স্ক্রিন”, “লক স্ক্রিন”,
+         “কাস্টমাইজ করুন”, “এডিট”, “উইজেট যোগ করুন”। ধাপগুলোতে %1$s হলো উইজেটের নাম, যেমনটি তার কার্ডে আছে
+         (widgets_prayer_name, widgets_ayah_name); Android-এর উইজেট তালিকা আর iPhone-এর গ্যালারিও উইজেটটিকে এই
+         নামেই দেখায় (iosApp/TaqwaWidget-এর home_widget_name ও ayah_widget_name)। ** ও **-এর মাঝের শব্দগুলো পাঠক
+         ফোনে খুঁজবেন, তাই সেগুলো তারকাচিহ্ন ছাড়া মোটা অক্ষরে দেখায়। -->
+    <string name="widgets_intro">তাকওয়া না খুলেই আপনার হোম স্ক্রিনে পরবর্তী নামাজ ও আজকের আয়াত।</string>
+    <string name="widgets_intro_ios">তাকওয়া না খুলেই আপনার হোম স্ক্রিন ও লক স্ক্রিনে পরবর্তী নামাজ ও আজকের আয়াত।</string>
+    <string name="widgets_background_note">তাকওয়ার সব উইজেটের জন্য। “সিস্টেম অনুযায়ী” আপনার ফোনের হালকা ও গাঢ় সেটিং অনুসরণ করে।</string>
+    <string name="widgets_prayer_label">নামাজের সময়</string>
+    <string name="widgets_prayer_name">নামাজের সময়</string>
+    <string name="widgets_prayer_body">চলমান কাউন্টডাউনসহ পরবর্তী নামাজ, আর আজকের সময়সূচি। ছোট বা চওড়া।</string>
+    <string name="widgets_prayer_body_ios">চলমান কাউন্টডাউনসহ পরবর্তী নামাজ, আর আজকের সময়সূচি। ছোট বা মাঝারি।</string>
+    <string name="widgets_ayah_label">আজকের আয়াত</string>
+    <string name="widgets_ayah_name">আজকের আয়াত</string>
+    <string name="widgets_ayah_body">প্রতিদিন একটি নতুন আয়াত, তার অনুবাদসহ। চওড়া বা বড়।</string>
+    <string name="widgets_ayah_body_ios">প্রতিদিন একটি নতুন আয়াত, তার অনুবাদসহ। মাঝারি বা বড়।</string>
+    <string name="widgets_on_home">আপনার হোম স্ক্রিনে</string>
+    <string name="widgets_on_home_ios">আপনার হোম স্ক্রিনে</string>
+    <string name="widgets_on_lock_ios">আপনার লক স্ক্রিনে</string>
+    <string name="widgets_refused_title">আপনার হোম স্ক্রিন অ্যাপকে উইজেট যোগ করতে দেয় না।</string>
+    <string name="widgets_refused_body">নিজে যোগ করতে এক মুহূর্তই লাগে:</string>
+    <string name="widgets_step_android_1">হোম স্ক্রিনের ফাঁকা জায়গায় চেপে ধরে রাখুন (অথবা দুই আঙুল দিয়ে চিমটি কাটুন)।</string>
+    <string name="widgets_step_android_2">**উইজেট** অপশনে চাপ দিন।</string>
+    <string name="widgets_step_android_3">**তাকওয়া** খুঁজুন, তারপর %1$s উইজেটটি টেনে জায়গামতো রাখুন।</string>
+    <string name="widgets_how_label">যেভাবে যোগ করবেন</string>
+    <string name="widgets_step_ios_hold_1">হোম স্ক্রিনে **তাকওয়া** আইকনটি চেপে ধরে রাখুন।</string>
+    <string name="widgets_step_ios_hold_2">%1$s ও একটি আকার বেছে নিন।</string>
+    <string name="widgets_step_ios_hold_3">এটি আপনার হোম স্ক্রিনে চলে আসবে। যেখানে খুশি টেনে রাখুন।</string>
+    <string name="widgets_ios_fallback">আইকন চেপে ধরলে উইজেট দেখা যাচ্ছে না? হোম স্ক্রিনের ফাঁকা জায়গায় চেপে ধরে রাখুন, ওপরের “**এডিট**”-এ চাপ দিন (iOS 27 ও পরের সংস্করণে এটি একটি ব্রাশ), তারপর “**উইজেট যোগ করুন**”-এ, আর তাকওয়া খুঁজুন।</string>
+    <string name="widgets_step_ios_plus_1">আপনার হোম স্ক্রিনের ফাঁকা জায়গায় চেপে ধরে রাখুন।</string>
+    <string name="widgets_step_ios_plus_2">ওপরের কোণের **+** চিহ্নে চাপ দিন।</string>
+    <string name="widgets_step_ios_plus_3">তাকওয়া খুঁজুন এবং %1$s বেছে নিন।</string>
+    <string name="widgets_show_how">কীভাবে করবেন দেখুন</string>
+    <string name="widgets_lock_label">লক স্ক্রিন</string>
+    <string name="widgets_lock_name">এক নজরে পরবর্তী নামাজ</string>
+    <string name="widgets_lock_body">আপনার লক স্ক্রিনে ঘড়ির নিচে, গোল বা চওড়া।</string>
+    <string name="widgets_lock_then">তারপর %1$s</string>
+    <string name="widgets_step_lock_1">লক স্ক্রিন চেপে ধরে রাখুন, তারপর “**কাস্টমাইজ করুন**”-এ চাপ দিন।</string>
+    <string name="widgets_step_lock_2">“লক স্ক্রিন” বেছে নিন, তারপর ঘড়ির নিচের ফাঁকা জায়গায় চাপ দিন।</string>
+    <string name="widgets_step_lock_3">**তাকওয়া** বেছে নিন, তারপর গোল বা চওড়া উইজেটটি।</string>
+    <!-- তাকওয়া সম্পর্কে: ট্যাগলাইনের নিচের চিপ (%1$s হলো সংস্করণ, settings_version_value) আর শেষ দুটি কার্ডের
+         শিরোনাম। সেখানে রেটিং ও শেয়ার settings_rate, settings_share ও settings_share_message ব্যবহার করে। -->
+    <string name="about_version_chip">সংস্করণ %1$s</string>
+    <string name="about_open_source_label">ওপেন সোর্স</string>
+    <string name="about_help_label">সাহায্য</string>
 
     <!-- ক্র্যাশ রিপোর্ট: ক্র্যাশের পরের বার চালু হলে দেখানো শিট, আর পাঠানোর মতো রিপোর্ট না থাকলে ইমেইলের লাইন। -->
     <string name="crash_sheet_title">তাকওয়া হঠাৎ বন্ধ হয়ে গেছে</string>
@@ -465,16 +516,12 @@
     <string name="qibla_no_sensor_title">কম্পাস সেন্সর নেই</string>
     <string name="qibla_no_sensor_body">এই ডিভাইসে ম্যাগনেটোমিটার নেই। নিচের দিকনির্দেশের সঙ্গে একটি সত্যিকারের কম্পাস ব্যবহার করুন।</string>
 
-    <!-- Widget background (Appearance) -->
+    <!-- Widget background (Settings › Widgets, which took it over from Appearance; the keys keep
+         their names) -->
     <string name="appearance_widget_background_label">উইজেটের পটভূমি</string>
-    <string name="appearance_prayer_widget_preview_label">নামাজের উইজেট</string>
-    <string name="appearance_ayah_widget_preview_label">আয়াতের উইজেট</string>
 
-    <!-- Offering a widget that is not on the home screen (Appearance previews) -->
+    <!-- Offering a widget that is not on the home screen (Settings › Widgets) -->
     <string name="appearance_widget_add">হোম স্ক্রিনে যোগ করুন</string>
-    <string name="appearance_widget_add_ios_hold">তাকওয়া আইকনটি চেপে ধরে রাখুন, তারপর একটি উইজেট বেছে নিন।</string>
-    <string name="appearance_widget_add_ios_plus">হোম স্ক্রিন চেপে ধরে রাখুন, প্লাস চিহ্নে চাপ দিন, তারপর তাকওয়া খুঁজুন।</string>
-    <string name="appearance_widget_add_android">হোম স্ক্রিন চেপে ধরে রাখুন, তারপর উইজেট বেছে নিন।</string>
     <string name="widget_background_follow_theme">সিস্টেম অনুযায়ী</string>
     <string name="widget_background_light">হালকা</string>
     <string name="widget_background_dark">গাঢ়</string>

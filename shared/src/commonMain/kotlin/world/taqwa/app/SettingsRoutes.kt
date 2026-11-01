@@ -5,10 +5,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -31,6 +35,7 @@ import world.taqwa.app.domain.WidgetBackground
 import world.taqwa.app.feature.onboarding.OnboardingStep
 import world.taqwa.app.feature.recitation.RecitationState
 import world.taqwa.app.feature.recitation.reciterName
+import world.taqwa.app.feature.settings.AboutScreen
 import world.taqwa.app.feature.settings.AboutTimesScreen
 import world.taqwa.app.feature.settings.aboutUnitCityId
 import world.taqwa.app.feature.settings.AppearanceSettingsScreen
@@ -43,6 +48,7 @@ import world.taqwa.app.feature.settings.ManualAdjustmentsScreen
 import world.taqwa.app.feature.settings.NotificationSettingsScreen
 import world.taqwa.app.feature.settings.PrayerTimesSettingsScreen
 import world.taqwa.app.feature.settings.SettingsRootScreen
+import world.taqwa.app.feature.settings.WidgetsSettingsScreen
 import world.taqwa.app.feature.settings.TimetableCheck
 import world.taqwa.app.feature.settings.TimetableChooser
 import world.taqwa.app.feature.settings.TimetableStatus
@@ -50,7 +56,10 @@ import world.taqwa.app.feature.settings.highLatitudeNeedsCheck
 import world.taqwa.app.feature.settings.timetableName
 import world.taqwa.app.feature.settings.aboutTimesUiState
 import world.taqwa.app.feature.settings.themeDisplayName
+import world.taqwa.app.feature.settings.WidgetsRowValue
+import world.taqwa.app.feature.settings.widgetsRowValue
 import world.taqwa.app.i18n.ClockFormat
+import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.timetableDisplayName
 import world.taqwa.app.location.LocationPermission
 import world.taqwa.app.nav.Navigator
@@ -62,10 +71,15 @@ import world.taqwa.app.notifications.requestExactAlarmAccess
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.prayer_current_location
+import world.taqwa.app.resources.settings_widgets_all
+import world.taqwa.app.resources.settings_widgets_count
+import world.taqwa.app.resources.settings_widgets_none
 import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.widget.WidgetMirrorRefresher
+import world.taqwa.app.widget.WidgetPlacement
 import world.taqwa.app.widget.refreshWidgets
+import world.taqwa.app.widget.reread
 
 @Composable
 internal fun SettingsRootRoute(
@@ -74,6 +88,7 @@ internal fun SettingsRootRoute(
     prayerSettingsState: State<PrayerSettings>,
     themeModeState: State<ThemeMode>,
     notificationSettingsState: State<NotificationSettings>,
+    container: AppContainer,
     navigator: Navigator,
     recitationStateState: State<RecitationState>,
 ) {
@@ -83,6 +98,31 @@ internal fun SettingsRootRoute(
     val themeMode by themeModeState
     val notificationSettings by notificationSettingsState
     val recitationState by recitationStateState
+    // Null until a read answers, so the Widgets row shows no value rather than a guess that
+    // changes a moment later, or a count nobody knows. Read again on every ON_START, not just on
+    // entering composition, because widgets are added and removed outside the app and the reader
+    // comes back from the home screen to this tab; a read that cannot tell keeps the last answer
+    // (reread). The read hops off the main thread, since Android's answer is a binder call to the
+    // launcher and iOS's can take up to two seconds.
+    var placement by remember { mutableStateOf<WidgetPlacement?>(null) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(container.widgetPlacementSource, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            val shown = placement
+            placement = withContext(Dispatchers.Default) { container.widgetPlacementSource.reread(shown) }
+        }
+    }
+    val format = LocalPlatformFormat.current
+    val widgetsValue = when (val value = widgetsRowValue(placement)) {
+        WidgetsRowValue.Hidden -> null
+        WidgetsRowValue.AllAdded -> stringResource(Res.string.settings_widgets_all)
+        WidgetsRowValue.NoneAdded -> stringResource(Res.string.settings_widgets_none)
+        is WidgetsRowValue.Some -> stringResource(
+            Res.string.settings_widgets_count,
+            format.localizedDigits(value.placed),
+            format.localizedDigits(value.total),
+        )
+    }
     SettingsRootScreen(
         // Null only when there is no location at all — the row then reads
         // "Not set" rather than naming a city nobody chose.
@@ -98,8 +138,9 @@ internal fun SettingsRootRoute(
         onOpenPrayerTimes = { navigator.push(Screen.PrayerTimesSettings) },
         onOpenNotifications = { navigator.push(Screen.NotificationSettings) },
         onOpenAppearance = { navigator.push(Screen.Appearance) },
+        widgetsValue = widgetsValue,
+        onOpenWidgets = { navigator.push(Screen.Widgets) },
         onOpenAbout = { navigator.push(Screen.About) },
-        onOpenAttribution = { navigator.push(Screen.Attribution) },
         reciterName = recitationState.reciter?.let { reciterName(it) }.orEmpty(),
         onOpenRecitation = { navigator.push(Screen.RecitationSettings) },
     )
@@ -539,21 +580,34 @@ internal fun CitySearchRoute(
 @Composable
 internal fun AppearanceRoute(
     themeModeState: State<ThemeMode>,
+    scope: CoroutineScope,
+    settings: SettingsRepository,
+    navigator: Navigator,
+) {
+    val themeMode by themeModeState
+    AppearanceSettingsScreen(
+        current = themeMode,
+        // No pop: the whole app repaints behind this screen, and seeing that happen
+        // is the confirmation the choice took effect.
+        onPick = { scope.launch { settings.setThemeMode(it) } },
+        onBack = { navigator.pop() },
+    )
+}
+
+/**
+ * Settings › Widgets: the background every widget shares, each widget's preview, and the way to
+ * add the ones that are not on a home screen.
+ */
+@Composable
+internal fun WidgetsRoute(
     container: AppContainer,
     scope: CoroutineScope,
     settings: SettingsRepository,
     widgetBackgroundState: State<WidgetBackground>,
     navigator: Navigator,
 ) {
-    val themeMode by themeModeState
     val widgetBackground by widgetBackgroundState
-    AppearanceSettingsScreen(
-        current = themeMode,
-        widgetPinRequester = container.widgetPinRequester,
-        widgetPlacementSource = container.widgetPlacementSource,
-        // No pop: the whole app repaints behind this screen, and seeing that happen
-        // is the confirmation the choice took effect.
-        onPick = { scope.launch { settings.setThemeMode(it) } },
+    WidgetsSettingsScreen(
         widgetBackground = widgetBackground,
         onPickWidgetBackground = { value ->
             scope.launch {
@@ -569,7 +623,18 @@ internal fun AppearanceRoute(
                 world.taqwa.app.widget.refreshWidgets()
             }
         },
+        widgetPinRequester = container.widgetPinRequester,
+        widgetPlacementSource = container.widgetPlacementSource,
         onBack = { navigator.pop() },
+    )
+}
+
+/** Settings › About Taqwa, the app's profile page; Attribution & licences opens from its Open source card. */
+@Composable
+internal fun AboutRoute(navigator: Navigator) {
+    AboutScreen(
+        onBack = { navigator.pop() },
+        onOpenAttribution = { navigator.push(Screen.Attribution) },
     )
 }
 

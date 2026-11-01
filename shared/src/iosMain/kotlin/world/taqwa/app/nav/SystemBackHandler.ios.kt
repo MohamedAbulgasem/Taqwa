@@ -1,18 +1,10 @@
 package world.taqwa.app.nav
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.backhandler.BackHandler
-import platform.Foundation.NSNotification
-import platform.Foundation.NSNotificationCenter
-import platform.Foundation.NSOperationQueue
-import platform.UIKit.UIAccessibilityIsVoiceOverRunning
-import platform.UIKit.UIAccessibilityVoiceOverStatusDidChangeNotification
+import world.taqwa.app.design.rememberVoiceOverRunning
 
 /**
  * iOS has no back button, but it has a back *gesture* for VoiceOver users: the two-finger scrub,
@@ -41,23 +33,4 @@ import platform.UIKit.UIAccessibilityVoiceOverStatusDidChangeNotification
 actual fun SystemBackHandler(enabled: Boolean, onBack: () -> Unit) {
     val voiceOver by rememberVoiceOverRunning()
     BackHandler(enabled = enabled && voiceOver, onBack = onBack)
-}
-
-/** True while VoiceOver is on, kept current by the system's own status notification. */
-@Composable
-private fun rememberVoiceOverRunning(): State<Boolean> {
-    val running = remember { mutableStateOf(UIAccessibilityIsVoiceOverRunning()) }
-    DisposableEffect(Unit) {
-        val centre = NSNotificationCenter.defaultCenter
-        val observer = centre.addObserverForName(
-            name = UIAccessibilityVoiceOverStatusDidChangeNotification,
-            `object` = null,
-            queue = NSOperationQueue.mainQueue,
-        ) { _: NSNotification? -> running.value = UIAccessibilityIsVoiceOverRunning() }
-        // Read again once the observer is in place: a toggle between the first read and this
-        // effect would otherwise go unseen until the next one.
-        running.value = UIAccessibilityIsVoiceOverRunning()
-        onDispose { centre.removeObserver(observer) }
-    }
-    return running
 }

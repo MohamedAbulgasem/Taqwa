@@ -1,45 +1,48 @@
 package world.taqwa.app.widget
 
-import org.jetbrains.compose.resources.StringResource
-import world.taqwa.app.resources.Res
-import world.taqwa.app.resources.appearance_widget_add_android
-import world.taqwa.app.resources.appearance_widget_add_ios_hold
-import world.taqwa.app.resources.appearance_widget_add_ios_plus
-
 /**
- * Which Taqwa widgets are on a home screen right now.
+ * Which Taqwa widgets are placed right now: [prayer] and [ayah] on a home screen, and on iPhone
+ * [lockScreen], the Lock Screen widget, which is a widget of its own and never counts as the prayer
+ * widget on the Home Screen. Android has no Lock Screen widget, so it never reports one.
  *
  * Read on demand and never cached across a resume: widgets are added and removed *outside* the
  * app, so a cached answer is wrong precisely when it matters.
  */
-data class WidgetPlacement(val prayer: Boolean, val ayah: Boolean) {
-    companion object {
-        /**
-         * What every platform reports when it cannot answer — no hook installed, a failure, or a
-         * timeout. Both widgets read as placed, so nothing is offered while the answer is unknown:
-         * offering to add a widget somebody already has is worse than staying quiet, because it
-         * makes the screen look wrong to the one person able to notice.
-         */
-        val Unknown = WidgetPlacement(prayer = true, ayah = true)
-    }
-}
+data class WidgetPlacement(val prayer: Boolean, val ayah: Boolean, val lockScreen: Boolean = false)
 
 interface WidgetPlacementSource {
-    /** Suspend because iOS answers asynchronously; Android answers immediately. */
-    suspend fun current(): WidgetPlacement
+    /**
+     * The widgets placed now, or null when this platform cannot tell: no hook installed, no
+     * AppWidgetManager, a WidgetKit failure, or no answer within its wait. Cannot tell is not an
+     * answer, so it never puts a check on a card or counts a widget as added, and it never offers
+     * a widget either: offering one somebody already has is as wrong as claiming one they do not.
+     *
+     * Suspend because iOS answers asynchronously; Android answers immediately.
+     */
+    suspend fun current(): WidgetPlacement?
 }
 
 expect fun createWidgetPlacementSource(): WidgetPlacementSource
 
-/** What the Appearance screen offers under one widget's preview. */
+/**
+ * Placement read again for a screen that shows [shown] (null before any answer): the new answer
+ * when the platform gives one, and otherwise what was shown already. A read that cannot tell is no
+ * news. On iPhone a pull of Control Center or Notification Center resumes the app, and the read
+ * that follows can time out; it must not take away a true check, or a count, that the last answer
+ * gave. Before any answer the screens show no status at all, which is also what a first read that
+ * cannot tell leaves.
+ */
+suspend fun WidgetPlacementSource.reread(shown: WidgetPlacement?): WidgetPlacement? = current() ?: shown
+
+/** What the Widgets screen offers at the foot of one widget's card. */
 sealed interface WidgetOffer {
-    /** Already on a home screen — no row, no note; the preview is only a preview. */
+    /** Already on a home screen — nothing to add, so the card says so instead of offering. */
     data object None : WidgetOffer
 
-    /** A tappable row that asks the launcher to place [widget]. */
+    /** A button that asks the launcher to place [widget]. */
     data class Pin(val widget: PinnableWidget) : WidgetOffer
 
-    /** A caption giving the platform's own steps; nothing tappable. */
+    /** The platform's own steps for adding the widget by hand; nothing asks the launcher. */
     data class Instructions(val path: WidgetAddPath) : WidgetOffer
 }
 
@@ -47,11 +50,12 @@ sealed interface WidgetOffer {
  * The three-way choice beneath a preview, as a pure function so the branching is testable without
  * a composable.
  *
- * [placed] wins over everything: while placement is [WidgetPlacement.Unknown] both widgets read as
- * placed and the screen shows nothing at all, which is what makes the row fade in when the answer
- * arrives rather than flash away when it turns out to be unnecessary.
+ * [placed] wins over everything: a widget already placed is offered nothing. This is only ever
+ * asked with a real answer. While placement is unread, or the platform cannot tell, the screen has
+ * no offer to decide and shows nothing, which is what makes the foot of each card fade in when the
+ * answer arrives rather than flash away.
  *
- * [refused] is true once the launcher has turned down a request for this widget: the row did
+ * [refused] is true once the launcher has turned down a request for this widget: the button did
  * nothing, so the steps by hand take its place. It is never set by a request the launcher took.
  */
 fun widgetOffer(
@@ -64,18 +68,4 @@ fun widgetOffer(
     placed -> WidgetOffer.None
     pinnable && !refused -> WidgetOffer.Pin(widget)
     else -> WidgetOffer.Instructions(addPath)
-}
-
-/**
- * The caption shown for [WidgetOffer.Instructions] — this platform's own steps for adding a
- * widget by hand, in the shorter wording the Appearance screen wants: the preview directly above
- * already says what the widget is, which is what onboarding's longer copy opens by explaining.
- *
- * A pure mapping rather than a `when` inside the composable, so both the branching and the copy
- * it picks are testable without a UI test, exactly as [translucentOrFrostedTitleKey] is.
- */
-fun widgetAddInstructionsKey(path: WidgetAddPath): StringResource = when (path) {
-    WidgetAddPath.ANDROID_PIN -> Res.string.appearance_widget_add_android
-    WidgetAddPath.IOS_HOLD_ICON -> Res.string.appearance_widget_add_ios_hold
-    WidgetAddPath.IOS_PLUS_BUTTON -> Res.string.appearance_widget_add_ios_plus
 }

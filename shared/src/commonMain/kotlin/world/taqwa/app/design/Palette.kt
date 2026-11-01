@@ -38,7 +38,7 @@ val DarkColors = TaqwaColors(
 )
 
 /**
- * The stand-in wallpaper the widget preview in Appearance sits on — a flat, deliberately
+ * The stand-in wallpaper the widget previews in Settings › Widgets sit on — a flat, deliberately
  * uninteresting neutral, not a photo, so the eye reads the widget card rather than the backdrop.
  *
  * It lives here rather than inline at the one call site for a greppable reason: `Palette.kt` and
@@ -49,3 +49,11 @@ val DarkColors = TaqwaColors(
  * dark.
  */
 val PreviewWallpaper = Color(0xFF9C8F73)
+
+/**
+ * The stand-in Lock Screen behind the iPhone lock-screen widget's preview in Settings › Widgets: a
+ * dark, neutral slate, because the widget sits under the clock in white on a Lock Screen whichever
+ * theme the phone is in. Not a theme role for the same reason [PreviewWallpaper] is not; the type
+ * drawn on it is [DarkColors]' own, so it matches the dark theme's ink.
+ */
+val PreviewLockScreen = Color(0xFF22262A)

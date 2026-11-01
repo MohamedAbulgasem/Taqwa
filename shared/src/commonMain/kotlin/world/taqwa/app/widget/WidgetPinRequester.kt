@@ -25,7 +25,7 @@ interface WidgetPinRequester {
 /**
  * Asks the launcher for [widget]. [onTaken] runs when it took the request and shows its own sheet;
  * [onRefused] runs only when it is known the request did not work, the one case a caller puts the
- * steps by hand where its button was. Onboarding and Appearance both ask through here, so a
+ * steps by hand where its button was. Onboarding and Settings › Widgets both ask through here, so a
  * request that went through can never turn a screen into the steps.
  */
 fun WidgetPinRequester.askToPin(widget: PinnableWidget, onTaken: () -> Unit, onRefused: () -> Unit) {
