@@ -53,12 +53,13 @@ Situs web: https://taqwa.world/id/
 Dukungan: support@taqwa.world
 
 ### Release notes (500)
-Selamat datang di Taqwa, pendamping yang tenang untuk setiap hari:
-• Waktu salat dari jadwal setempat jika Taqwa memilikinya, dengan takbir atau awal azan pada setiap salat
-• Al-Qur’an lengkap yang tersedia offline, dengan terjemahan, serta tilawah sepuluh qari yang bisa diunduh
-• Kiblat, penghitung tasbih, tanggal Hijriah, dan widget
-• Tujuh bahasa: Indonesia, Inggris, Arab, Prancis, Turki, Urdu, dan Bengali
-Gratis, tanpa iklan, tanpa akun, tanpa pelacakan.
+Yang baru di versi 1.4.0:
+• Notifikasi lebih jelas: lima salat dulu, lalu pengingat ibadah sunah bersama
+• Layar Widget baru: pilih latar, lihat setiap widget, tambahkan dengan sekali ketuk bila bisa
+• Halaman Tentang Taqwa baru, dengan Beri nilai dan Bagikan
+• Bahasa kini di Tampilan, dan “Tentang waktu ini” di atas Waktu salat
+• Unduhan lebih aman, dan permintaan yang lebih sedikit mengungkap ponsel Anda
+• Waktu salat: perbaikan untuk Rafah, Sidi Barrani, dan Asar MJC di Cape Town
 
 ## App Store
 
@@ -88,12 +89,13 @@ sholat,shalat,jadwal,waktu,adzan,alquran,murottal,tilawah,zikir,masjid,arah,isla
 (Teks yang sama dengan deskripsi lengkap Play di atas.)
 
 ### What's new (4000)
-Yang baru di versi 1.1.0:
-• Zikir pagi dan petang: hitung di layar, dengarkan ayat Al-Qur’an di dalamnya dengan suara qari pilihan Anda, dan pasang pengingat bila Anda mau
-• Format waktu 12 jam, di Pengaturan
-• Waktu salat kini lebih sesuai dengan jadwal kota Anda sendiri di Arab Saudi, Kazakhstan, Palestina, Suriah, Amerika Utara, dan lainnya
-• Beri nilai dan bagikan Taqwa dari Pengaturan
-• Kata-kata yang lebih jelas, dan angka jarak ditulis sesuai bahasa Anda
+Yang baru di versi 1.4.0:
+• Notifikasi lebih jelas: lima salat dulu, lalu pengingat ibadah sunah bersama
+• Layar Widget baru: pilih latar, lihat setiap widget dan cara menambahkannya
+• Halaman Tentang Taqwa baru, dengan Beri nilai dan Bagikan
+• Bahasa kini di Tampilan, dan “Tentang waktu ini” di atas Waktu salat
+• Unduhan lebih aman, dan permintaan yang lebih sedikit mengungkap ponsel Anda
+• Waktu salat: perbaikan untuk Rafah, Sidi Barrani, dan Asar MJC di Cape Town
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Waktu salat di tempat Anda

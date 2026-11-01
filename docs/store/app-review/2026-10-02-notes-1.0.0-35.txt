@@ -20,7 +20,7 @@ Taqwa has no server of its own and no analytics, advertising, crash-reporting, a
 Only the default prayer times differ by place. Where an authority publishes the timetable, or most local mosques follow one, Taqwa reproduces it on the device and names it under the (i) (About these times says Taqwa is not affiliated with the authority); where mosques differ, each prayer shows once all have begun it; elsewhere Taqwa calculates on the safe side. Users can choose another in Settings.
 
 6. Third-party material
-Taqwa is not in a regulated industry. Its content is used under each provider's published terms and credited in the app under Settings › Attribution & licences:
+Taqwa is not in a regulated industry. Its content is used under each provider's published terms and credited in the app under Settings › About Taqwa › Attribution & licences:
 - Quran text: Tanzil Project, reproduced verbatim as its licence requires (tanzil.net/docs/text_license)
 - Translations: Tanzil Project, for non-commercial use (tanzil.net/trans)
 - Recitations: Islamic Network, licensed by the reciters for free, non-commercial redistribution at the published bitrates (alquran.cloud/terms-and-conditions, section IV)

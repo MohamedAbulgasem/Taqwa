@@ -58,12 +58,13 @@ Website: https://taqwa.world
 Support: support@taqwa.world
 
 ### Release notes (500)
-Welcome to Taqwa, a quiet companion for every day:
-• Prayer times from the local timetable where Taqwa knows one, with a takbir or the opening of the adhan at each prayer
-• The whole Quran offline, with translations, and ten reciters to download
-• Qibla, tasbeeh counter, Hijri date and widgets
-• Seven languages: English, Arabic, French, Turkish, Indonesian, Urdu and Bengali
-Free, with no adverts, account or tracking.
+What's new in 1.4.0:
+• Notifications, clearer: your five prayers first, then the voluntary reminders together
+• A new Widgets screen: pick the background, see each widget, and add it in one tap where your phone allows
+• A new About Taqwa page, with Rate and Share
+• Language is now in Appearance, and "About these times" near the top of Prayer times
+• Safer downloads, and requests that say less about your phone
+• Prayer times: fixes for Rafah and Sidi Barrani, and the MJC's Asr in Cape Town
 
 ## App Store
 
@@ -93,12 +94,13 @@ times,salah,salat,azan,athan,koran,islam,recitation,tasbih,mosque,dhikr,ramadan,
 (The same text as the Play full description above.)
 
 ### What's new (4000)
-What's new in 1.1.0:
-• Morning and evening adhkar: count them on screen, hear the Quranic ones from your reciter, and set a reminder if you like
-• A 12-hour clock, in Settings
-• Prayer times follow your own city's timetable more closely in Saudi Arabia, Kazakhstan, Palestine, Syria, North America and more
-• Rate and share Taqwa from Settings
-• Clearer wording, and distances written the way your language writes numbers
+What's new in 1.4.0:
+• Notifications, clearer: your five prayers first, then the voluntary reminders together
+• A new Widgets screen: pick the background, see each widget and how to add it
+• A new About Taqwa page, with Rate and Share
+• Language is now in Appearance, and "About these times" near the top of Prayer times
+• Safer downloads, and requests that say less about your phone
+• Prayer times: fixes for Rafah and Sidi Barrani, and the MJC's Asr in Cape Town
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Prayer times where you are
@@ -114,4 +116,4 @@ What's new in 1.1.0:
 ## Review notes (App Store and Play, English only)
 No account or sign-in. Location is optional: Settings › Location lets a reviewer choose any city instead. Everything works offline except recitation downloads, which fetch audio from a public GitHub release on request. To see the lock-screen player, play a surah and lock the phone. Widgets are added from the home screen's widget gallery. Nothing is collected or sent anywhere; the privacy policy is at https://taqwa.world/privacy/.
 
-App Store Connect's Notes field carries the longer answers to App Review's information request of 23 September 2026 instead, brought up to date for the engine build on 29 September: `docs/store/app-review/2026-09-29-notes-1.0.0.txt` (the 23 September reply stays as the record of what was sent then). Apple asked for them to stay there for future submissions, so update the newest file and the field together when a feature, a network use or a licence changes. The field holds 4,000 bytes.
+App Store Connect's Notes field carries the longer answers to App Review's information request of 23 September 2026 instead, brought up to date for the engine build on 29 September and for build 35 on 2 October: `docs/store/app-review/2026-10-02-notes-1.0.0-35.txt` (the 23 September reply and the 29 September notes stay as the record of what was sent then). Apple asked for them to stay there for future submissions, so update the newest file and the field together when a feature, a network use or a licence changes. The field holds 4,000 bytes.

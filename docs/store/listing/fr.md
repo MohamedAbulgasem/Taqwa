@@ -56,12 +56,13 @@ Site web : https://taqwa.world/fr/
 Assistance : support@taqwa.world
 
 ### Release notes (500)
-Bienvenue dans Taqwa, un compagnon discret au quotidien :
-• Les horaires de prière du calendrier local, là où Taqwa en connaît un, avec un takbir ou le début de l’adhan à chaque prière
-• Le Coran entier hors ligne, avec des traductions, et dix récitateurs à télécharger
-• Qibla, compteur de tasbih, date hégirienne et widgets
-• Sept langues : français, anglais, arabe, turc, indonésien, ourdou et bengali
-Gratuit, sans publicité, sans compte ni suivi.
+Nouveautés de la 1.4.0 :
+• Notifications plus claires : vos cinq prières d’abord, puis les actes surérogatoires
+• Nouvel écran Widgets : choisissez le fond, voyez chaque widget, ajoutez-le d’un geste si possible
+• Nouvelle page À propos de Taqwa, avec Noter et Partager
+• La langue passe dans Apparence, « À propos de ces horaires » en haut des Horaires de prière
+• Téléchargements plus sûrs, requêtes plus discrètes
+• Horaires : corrections pour Rafah, Sidi Barrani et l’Asr du MJC au Cap
 
 ## App Store
 
@@ -91,12 +92,13 @@ horaires,salat,azan,quran,mushaf,mosquée,islam,musulman,récitation,chapelet,dh
 (Le même texte que la description complète Play ci-dessus.)
 
 ### What's new (4000)
-Nouveautés de la 1.1.0 :
-• Adhkar du matin et du soir : comptez-les à l’écran, écoutez ceux du Coran par votre récitateur et activez un rappel si vous voulez
-• Le format 12 heures, dans les Paramètres
-• Des horaires plus proches du calendrier de votre ville en Arabie saoudite, au Kazakhstan, en Palestine, en Syrie, en Amérique du Nord et ailleurs
-• Notez et partagez Taqwa dans les Paramètres
-• Des textes plus clairs et des distances écrites comme dans votre langue
+Nouveautés de la 1.4.0 :
+• Notifications plus claires : vos cinq prières d’abord, puis les actes surérogatoires
+• Nouvel écran Widgets : choisissez le fond, voyez chaque widget et comment l’ajouter
+• Nouvelle page À propos de Taqwa, avec Noter et Partager
+• La langue passe dans Apparence, « À propos de ces horaires » en haut des Horaires de prière
+• Téléchargements plus sûrs, requêtes plus discrètes
+• Horaires : corrections pour Rafah, Sidi Barrani et l’Asr du MJC au Cap
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Les horaires là où vous êtes

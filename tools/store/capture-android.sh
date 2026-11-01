@@ -24,7 +24,7 @@ for L in "$@"; do
   adb -s $D shell am force-stop $PKG; sleep 1; adb -s $D shell am start -n $PKG/.MainActivity >/dev/null; sleep 6
   h --es cmd theme --es name light; h --es cmd mode --es name translation; h --es cmd translation --es id "$(tr_for $L)"
   want 1-prayer && { h --es cmd screen --es name prayer; shot 1-prayer; }
-  # Tahajjud on for the shot, so the listing shows what the toggle opens; off again after.
+  # Tahajjud on for the shot, so VOLUNTARY shows what its toggle opens at the foot of the screen; off again after.
   want 2-notifications && { h --es cmd tahajjud --es name on; h --es cmd screen --es name notifications; shot 2-notifications; h --es cmd tahajjud --es name off; }
   want 3-reader && { ayah 2 255; shot 3-reader; }
   want 4-mushaf && { h --es cmd mode --es name mushaf; ayah 2 255; shot 4-mushaf; }

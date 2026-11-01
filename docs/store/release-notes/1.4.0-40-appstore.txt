@@ -23,8 +23,8 @@ Nouveautés de la 1.4.0 :
 • Notifications plus claires : vos cinq prières d’abord, puis les actes surérogatoires
 • Nouvel écran Widgets : choisissez le fond, voyez chaque widget et comment l’ajouter
 • Nouvelle page À propos de Taqwa, avec Noter et Partager
-• La langue passe dans Apparence, « À propos de ces horaires » en haut des Horaires
-• Téléchargements plus sûrs, requêtes plus discrètes sur votre téléphone
+• La langue passe dans Apparence, « À propos de ces horaires » en haut des Horaires de prière
+• Téléchargements plus sûrs, requêtes plus discrètes
 • Horaires : corrections pour Rafah, Sidi Barrani et l’Asr du MJC au Cap
 
 === Turkish ===

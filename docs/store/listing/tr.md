@@ -56,12 +56,13 @@ Web sitesi: https://taqwa.world/tr/
 Destek: support@taqwa.world
 
 ### Release notes (500)
-Taqwa’ya hoş geldiniz; her gün yanınızda sakin bir yol arkadaşı:
-• Taqwa’nın yerel takvimini bildiği yerlerde o takvime göre namaz vakitleri; her vakitte bir tekbir ya da ezanın ilk saniyeleri
-• Kur’an’ın tamamı çevrimdışı, mealleriyle; on karinin tilaveti indirilebilir
-• Kıble, tesbih sayacı, hicri tarih ve widget’lar
-• Yedi dil: Türkçe, İngilizce, Arapça, Fransızca, Endonezce, Urduca ve Bengalce
-Ücretsiz; reklam yok, hesap yok, takip yok.
+1.4.0 sürümündeki yenilikler:
+• Daha anlaşılır bildirimler: önce beş vakit, sonra nafile ibadetler bir arada
+• Yeni Widget’lar ekranı: arka planı seçin, widget’ları görün, mümkünse tek dokunuşla ekleyin
+• Değerlendir ve Paylaş ile yeni Taqwa hakkında sayfası
+• Dil artık Görünüm’de, “Bu vakitler hakkında” Namaz vakitleri’nin en üstünde
+• Daha güvenli indirmeler, telefonunuz hakkında daha az şey anlatan istekler
+• Vakitler: Refah, Sidi Barrani ve Cape Town’da MJC’nin ikindisi için düzeltmeler
 
 ## App Store
 
@@ -91,12 +92,13 @@ kuran,vakitleri,vakti,tilavet,meal,mushaf,tesbih,zikir,ramazan,imsakiye,islam,m�
 (Yukarıdaki Play tam açıklamasıyla aynı metin.)
 
 ### What's new (4000)
-1.1.0 sürümündeki yenilikler:
-• Sabah ve akşam zikirleri: ekranda sayın, Kur’an’dan olanları seçtiğiniz karinin sesinden dinleyin, dilerseniz hatırlatma kurun
-• Ayarlar’da 12 saat biçimi
-• Namaz vakitleri Suudi Arabistan, Kazakistan, Filistin, Suriye, Kuzey Amerika ve daha birçok yerde şehrinizin kendi takvimini daha yakından izliyor
-• Taqwa’yı Ayarlar’dan değerlendirin ve paylaşın
-• Daha anlaşılır ifadeler; mesafeler de dilinizdeki sayı yazımıyla gösteriliyor
+1.4.0 sürümündeki yenilikler:
+• Daha anlaşılır bildirimler: önce beş vakit, sonra nafile ibadetler bir arada
+• Yeni Widget’lar ekranı: arka planı seçin, her widget’ı ve nasıl ekleneceğini görün
+• Değerlendir ve Paylaş ile yeni Taqwa hakkında sayfası
+• Dil artık Görünüm’de, “Bu vakitler hakkında” Namaz vakitleri’nin en üstünde
+• Daha güvenli indirmeler, telefonunuz hakkında daha az şey anlatan istekler
+• Vakitler: Refah, Sidi Barrani ve Cape Town’da MJC’nin ikindisi için düzeltmeler
 
 ## Screenshot captions (her biri tek kısa satır, çerçeveli ekran görüntüsünün üstünde)
 1. Bulunduğunuz yerin namaz vakti

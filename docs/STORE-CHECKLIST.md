@@ -60,8 +60,8 @@ accounts on day one: the App Store can be live within about a week, Google Play 
   flags a raw 1080 × 2340 capture as too tall); the App Store gets framed 1320 × 2868 images made
   from simulator captures (the 6.9-inch slot, which Apple scales down for smaller phones). Seven
   languages each. Play has eight screens: 1 Prayer, 2 Notifications, 3 Reader, 4 Mushaf,
-  5 Recitation, 6 Qibla, 7 Tasbeeh, 8 Prayer in Dark; the App Store has the same seven without
-  Qibla, because the simulator has no compass. 1 and 8 show the Prayer screen, so a change to its
+  5 Recitation, 6 Qibla, 8 Prayer in Dark, 9 Morning and evening adhkar (the adhkar took Tasbeeh's place in
+  1.1.0); the App Store has eight too, with 7 Tasbeeh and without Qibla, because the simulator has no compass. 1 and 8 show the Prayer screen, so a change to its
   times or its ⓘ means re-shooting both, as the engine did (launch audit A8).
 - **The framed sets are checked in** at `docs/store/screenshots/{play,appstore}/<lang>/` (since
   18 September). A feature that changes a screen re-shoots that screen in the same piece of work
@@ -333,7 +333,7 @@ costs days.
    own falls back to English), promotional text, description, keywords, support URL
    https://taqwa.world/support/, marketing URL https://taqwa.world, copyright
    "2026 Mohamed Abulgasem", App Review contact (name, phone, email), sign-in required: No,
-   **App Review Information › Notes** from `docs/store/app-review/2026-09-29-notes-1.0.0.txt` (the
+   **App Review Information › Notes** from `docs/store/app-review/2026-10-02-notes-1.0.0-35.txt` (the
    Guideline 2.1 answers, which Apple asked to find there on every submission), select the
    processed build, and under Version Release choose **Manually release this version**. A first
    version has no "What's New" field, so Play's release notes have no App Store twin until the
@@ -358,8 +358,8 @@ costs days.
    to App Review → Attach File) and pasted into App Review Information → Notes, then Edit → Add for
    Review → Resubmit to App Review with the same build. The answers are in
    `docs/store/app-review/2026-09-23-guideline-2.1-reply.txt` (3,814 of the 4,000 characters both
-   fields allow), kept as the record of that reply; the Notes for the engine build are
-   `docs/store/app-review/2026-09-29-notes-1.0.0.txt` (3,958 bytes; App Store Connect Help gives
+   fields allow), kept as the record of that reply; the Notes, last brought up to date for build 35, are
+   `docs/store/app-review/2026-10-02-notes-1.0.0-35.txt` (3,969 bytes; App Store Connect Help gives
    the Notes field 4,000 bytes). Keep Notes in step with the app on every later submission.
    "Metadata Rejected" or "Information Needed" is answered in App Store Connect's
    App Review messages without a new build; a binary rejection needs a fix, the next build number
