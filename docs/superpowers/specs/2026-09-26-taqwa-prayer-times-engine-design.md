@@ -780,3 +780,15 @@ R155–R157 R130–R132.)
   Conventions' 5 s. Nothing else moves. `GulfEgyptProofTest` holds every day of 2026–2028 at or after the town's
   noon plus 74 s to the nearest minute, with no printed time (R69). The follow-ups ESA's 2026 page leaves (Rafah's
   Fajr, Sidi Barrani's Isha and end of eating, Kharga's other starts, Taba) and their deadlines are in the build log.
+- **R160** (not the owner's; the gate, as R159; the owner said yes to ESA's tables for the two towns on 25 Oct 2026):
+  Rafah's Fajr margin is +11 s (the national +2), Sidi Barrani's Isha +15 s (the national −4) and its end of eating
+  −20 s (the national +5). ESA's own daily page, read by hand for every day of 2026 on 26 Oct 2026 (2027 is not
+  served), prints the same minutes as Dar al-Ifta's pinned September and October at all 29 towns, and shows these two
+  towns' tables computed off the town: Rafah's from about 0.06° south and west, Sidi Barrani's from about 0.16°
+  north. With the national margins Rafah's Fajr was a minute early on 2 days in June and Sidi Barrani's Isha on 14
+  days and its end of eating a minute late on 20, from 28 April to early August 2026; their rows had held 52 Wayback
+  days and September to November. Fitted on each town's whole year with the Conventions' 5 s (needs 6, 10 and −15);
+  nothing else moves. ESA's rule at the fitted points, with its own almanac sun, asks no more in 2027 and 2028 than
+  in 2026. `GulfEgyptProofTest` holds every day of 2026–2028 against the sun at ESA's point with its allowance (5 s
+  after at Rafah's dawn, 3 s after at Sidi Barrani's dusk, 4 s before at its dawn), to the nearest minute, with no
+  printed time (R69): red at the national margins, green from +8, from +14 and at −20.

@@ -52,6 +52,13 @@ import world.taqwa.app.prayer.engine.registry.widened
  * +40 and a minute before ESA's printed one on 2–4 November 2026. ESA's rule asks up to 43 s over
  * 2026–2028, on 2–4 November each year: +48 with the Conventions' 5 s.
  *
+ * Rafah and Sidi Barrani (ruling R160): ESA's own page for every day of 2026 shows their tables printed off the
+ * town too, nearer: Rafah's from about 0.06° south and west, Sidi Barrani's from about 0.16° north, so their errors
+ * follow the season. With the national margins Rafah's Fajr was a minute early on 2 days in June and Sidi Barrani's
+ * Isha on 14 and its end of eating a minute late on 20, from late April to early August. Fitted on their whole year
+ * with the Conventions' 5 s, only those are their own: Rafah's Fajr +11, Sidi Barrani's Isha +15 and end of eating
+ * −20. Projected at their ESA points with ESA's own sun, 2027 and 2028 ask no more than 2026.
+ *
  * Beyond every unit ESA's own point is not known and may be that far off: starts
  * [EDGE_START_SECONDS] s later (Taba's own margins exceed the national ones by up to 103 s, their
  * 5 s included), sunrise and the end of eating 60 s earlier (Ras Gharib's need 42 and 54). Checked by
@@ -89,10 +96,10 @@ object Egypt {
             town("Marsa Matruh", 31.3529, 27.23725),
             town("El Arish", 31.13159, 33.79844),
             town("Sallum", 31.55371, 25.15793),
-            town("Sidi Barrani", 31.61166, 25.92539),
+            offPoint("Sidi Barrani", 31.61166, 25.92539, national.copy(isha = 15), endOfEating = -20),
             town("Siwa", 29.2032, 25.51965),
             town("Halaib", 22.22273, 36.64679),
-            town("Rafah", 31.28204, 34.23869),
+            offPoint("Rafah", 31.28204, 34.23869, national.copy(fajr = 11), endOfEating = 5),
             town("Sharm El Sheikh", 27.91582, 34.32995),
             town("Hurghada", 27.25738, 33.81291),
             offPoint("Kharga", 25.45101, 30.54653, margins(start = 0, sunrise = 0, fajr = 45, dhuhr = 48, asr = 42, maghrib = 46, isha = 44), endOfEating = 5),

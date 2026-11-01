@@ -5746,3 +5746,53 @@ still to be seen. For the minors (27 October), `scripts/test.sh` (4,468 tests, n
 `scripts/ios-build.sh` green again; the new `HttpTest` case fails after 20 s, the read timeout, with the
 Content-Length pre-check taken out, and `publish.py`'s refusal was run against fake work dirs with `gh`
 stubbed, so nothing reached GitHub.
+
+## Rafah and Sidi Barrani (26 October) — ruling R160
+
+Branch `fix/esa-rafah-sidi-barrani`, off main 125c70a5. Not pushed; for the release after 1.3.0. The owner said yes
+to ESA's tables for the two towns on 25 October.
+
+**The tables.** ESA's own daily page, read by hand through its calendar for every day of 2026 on 26 October (the
+November round's script, one postback a day, the raw pages kept; 2027 is not served). It prints the pinned Dar
+al-Ifta minutes on every day of September and October at all 29 towns (1,769 town-days), the same minutes as the
+scratch read of 25 October on all 10,585 town-days, and each town's Wayback captures on the 33 days of 2026 they
+hold. Archived for all 29 towns (Taqwa-official, `manual/eg-esa/2026-10-26/`, a month table each); gate rows for
+Rafah and Sidi Barrani only, January to August and December (September to November are rows already), 18, held out.
+
+**What the whole year shows.** With the national margins, three cells are red, as on 25 October:
+- Rafah's Fajr: 2 days in June, 1 min early.
+- Sidi Barrani's Isha: 14 days from mid-May to early August, 1 min early.
+- Sidi Barrani's end of eating: 20 days from 28 April to late July, 1 min late.
+
+**Why.** ESA prints both tables from points off the town, as at Kharga, Taba and Ras Gharib but nearer. Fitted
+on each town's held days with ESA's almanac sun (the one that gives Kharga's noon): Rafah's at about 31.22 N
+34.18 E, 0.06° south and west of the town; Sidi Barrani's at about 31.77 N 25.93 E, 0.16° north. A point off in
+latitude moves the dawn and dusk with the season, so the national margins, fitted and held out on days that
+missed the summer (Rafah's 52 Wayback days and September to November), sat a few seconds short there.
+
+**R160** (not the owner's; the gate, as R159): Rafah's Fajr +11 s (national +2), Sidi Barrani's Isha +15 s
+(national −4) and end of eating −20 s (national +5), each the need on the town's whole held year (6, 10, −15) with
+the Conventions' 5 s. Nothing else moves: their other times keep the national margins, and the two towns become
+off-point units like Ras Gharib. ESA's rule at the fitted points, with a constant offset per event fitted on the
+held days, projects no larger need for 2027 and 2028 (Rafah's Fajr 5 and 5, Sidi Barrani's Isha 9 and 10, its end
+of eating −12 and −14).
+
+The tests (`GulfEgyptProofTest`) hold every day of 2026–2028 at each town against the sun at ESA's fitted point
+(this core's exact sun) plus an allowance, to the nearest minute, with no printed time (R69). The allowance is
+ESA's almanac sun against this core's at that point over the three years (−2.5 to +2.3 s at 19.5° dawn, −1.7 to
++3.1 s at 17.5° dusk) plus the fitted offset: 5 s after at Rafah's dawn, 3 s after at Sidi Barrani's dusk, 4 s
+before at its dawn. Red at the national margins (first on 26 May, 14 May and 28 April 2026), green from +8, from
++14 and at −20. The off-point test now also pins that only those three times are the towns' own, and the
+§3.5 principle test covers both towns.
+
+**Gate.** eg.esa: 108 rows, 4,049 place-days through 31 December 2026; 0 early, 0 late ends, none over its limit,
+none broken.
+
+**Left, without anything early or late.** Where the Conventions' 5 s runs thin at the two towns: Rafah's Asr
+(4 s spare on the 2026 page, 5 projected) and Maghrib (5, and 4 projected for 2027); Sidi Barrani's sunrise (3,
+and 2 projected for 2027). None is a minute out on any day of 2026 or in the projection to 2028; a refit of those
+three would move them by 1 to 3 s.
+
+**Next on ESA's page.** The other 27 towns' months of 2026 are in the archive with no rows. Kharga's other starts
+(0 to 3 s spare in November, before November 2027) and Taba (thin days through the year) can take their rows and
+refits from them, as R159's entry above lists.

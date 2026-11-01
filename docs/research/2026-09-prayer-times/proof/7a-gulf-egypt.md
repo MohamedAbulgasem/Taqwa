@@ -462,6 +462,14 @@ minute before ESA's own printed Dhuhr on 2–4 November 2026. ESA's noon at its 
 s after the town's every day and its almanac sun up to 4 s after this core's in early November, so its
 rule asks up to 43 s over 2026–2028, on 2–4 November each year: +48.
 
+Rafah and Sidi Barrani (ruling R160, 26 October 2026). ESA's own daily page for every day of 2026 shows
+their tables printed off the town too, nearer: Rafah's from about 0.06° south and west, Sidi Barrani's from
+about 0.16° north, so their errors follow the season. On their 52 Wayback days and September to November
+the national margins held; on the whole year Rafah's Fajr was a minute early on 2 days in June and
+Sidi Barrani's Isha on 14 and its end of eating a minute late on 20, from 28 April to early August. Fitted on
+their whole year with the Conventions' 5 s, only those are their own: Rafah's Fajr +11, Sidi Barrani's Isha
++15 and end of eating −20. ESA's rule at the fitted points asks no more in 2027 and 2028.
+
 **Exception (unit Taba, 3 min, sunrise and end of eating).** ESA computes Taba's table about half a
 degree west of Taba, and Taqwa keeps Taba's own earlier sunrise and dawn (the §3.5 floor): 3 min
 before the table on 23 of 45 days at sunrise and 22 at the end of eating.

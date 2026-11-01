@@ -187,6 +187,16 @@ class GulfEgyptProofTest {
         assertEquals(starts(national), starts(rasGharib))
         assertTrue(rasGharib.margins.sunrise < national.margins.sunrise)
         assertTrue(rasGharib.endOfEatingMarginSeconds < national.endOfEatingMarginSeconds)
+        // Rafah's point is south-west of the town and Sidi Barrani's north of it (ruling R160): only the times their
+        // whole year asks for are their own.
+        val rafah = assertNotNull(units.unit("rafah").method)
+        assertEquals(national.margins.copy(fajr = rafah.margins.fajr), rafah.margins)
+        assertTrue(rafah.margins.fajr > national.margins.fajr)
+        assertEquals(national.endOfEatingMarginSeconds, rafah.endOfEatingMarginSeconds)
+        val sidiBarrani = assertNotNull(units.unit("sidi-barrani").method)
+        assertEquals(national.margins.copy(isha = sidiBarrani.margins.isha), sidiBarrani.margins)
+        assertTrue(sidiBarrani.margins.isha > national.margins.isha)
+        assertTrue(sidiBarrani.endOfEatingMarginSeconds < national.endOfEatingMarginSeconds)
         val taba = units.unit("taba")
         assertEquals(3, lateLimitFor(TimedEvent.SUNRISE, taba, Registry.byId("eg.esa")!!)?.minutes)
         assertNull(lateLimitFor(TimedEvent.MAGHRIB, taba, Registry.byId("eg.esa")!!))
@@ -215,6 +225,59 @@ class GulfEgyptProofTest {
         }
     }
 
+    @Test
+    fun `rafah's fajr is never before esa's dawn south-west of the town at its latest rounding`() {
+        // ESA prints Rafah's table from a point about 0.06° south and west of the town (ruling R160): its printed Fajr
+        // is at most that point's 19.5° dawn plus 5 s (its own sun and the fit), to the nearest minute.
+        val rafah = place(31.28204, 34.23869, "Africa/Cairo", "EG")
+        everyDayAgainstEsa(rafah, ESA_RAFAH, -19.5, morning = true, ESA_RAFAH_DAWN_AFTER, start = true) { it.fajr.epochSeconds }
+    }
+
+    @Test
+    fun `sidi barrani's isha is never before esa's dusk north of the town at its latest rounding`() {
+        // ESA prints Sidi Barrani's table from a point about 0.16° north of the town (ruling R160): its printed Isha is
+        // at most that point's 17.5° dusk plus 3 s (its own sun and the fit), to the nearest minute.
+        val sidiBarrani = place(31.61166, 25.92539, "Africa/Cairo", "EG")
+        everyDayAgainstEsa(sidiBarrani, ESA_SIDI_BARRANI, -17.5, morning = false, ESA_SIDI_BARRANI_DUSK_AFTER, start = true) {
+            it.isha.epochSeconds
+        }
+    }
+
+    @Test
+    fun `sidi barrani's end of eating is never after esa's dawn north of the town at its earliest rounding`() {
+        // The fast begins at ESA's printed Fajr, at least that point's 19.5° dawn less 4 s (its own sun and the fit), to
+        // the nearest minute (ruling R160).
+        val sidiBarrani = place(31.61166, 25.92539, "Africa/Cairo", "EG")
+        everyDayAgainstEsa(sidiBarrani, ESA_SIDI_BARRANI, -19.5, morning = true, -ESA_SIDI_BARRANI_DAWN_BEFORE, start = false) {
+            it.endOfEating.epochSeconds
+        }
+    }
+
+    /**
+     * Every day of 2026–2028 at [town], the engine's time (rounded as shown) against ESA's printed minute at its own
+     * [esa] point: the sun at [altitude] there plus [allowance] s, to the nearest minute. A start is never before it,
+     * an end never after it. No printed time is here (R69).
+     */
+    private fun everyDayAgainstEsa(
+        town: Place, esa: GeoPoint, altitude: Double, morning: Boolean, allowance: Double, start: Boolean,
+        shown: (PrayerDay) -> Long,
+    ) {
+        val zone = TimeZone.of(town.zoneId)
+        var date = LocalDate(2026, 1, 1)
+        while (date.year <= 2028) {
+            val offset = zone.offsetAt(date.atTime(12, 0).toInstant(zone)).totalSeconds
+            val sun = assertNotNull(SunClock(esa.lat, esa.lon, date, offset, SunModel.EXACT).altitudeTime(altitude, morning))
+            val printed = floor((sun + allowance + 30) / 60).toLong() * 60
+            val time = shown(day("eg.esa", town, date))
+            if (start) {
+                assertTrue(time >= printed, "on $date ${(printed - time) / 60} min before ESA's latest")
+            } else {
+                assertTrue(time <= printed, "on $date ${(time - printed) / 60} min after ESA's earliest")
+            }
+            date = date.plus(1, DateTimeUnit.DAY)
+        }
+    }
+
     // The principle every fitted margin keeps (spec §3.5).
 
     @Test
@@ -229,6 +292,8 @@ class GulfEgyptProofTest {
             Triple("eg.esa", place(25.45101, 30.54653, "Africa/Cairo", "EG"), "eg.esa"),
             Triple("eg.esa", place(29.4925, 34.8969, "Africa/Cairo", "EG"), "eg.esa"),
             Triple("eg.esa", place(28.35831, 33.07829, "Africa/Cairo", "EG"), "eg.esa"),
+            Triple("eg.esa", place(31.28204, 34.23869, "Africa/Cairo", "EG"), "eg.esa"),
+            Triple("eg.esa", place(31.61166, 25.92539, "Africa/Cairo", "EG"), "eg.esa"),
         )
         for ((id, at, national) in cases) {
             val entry = assertNotNull(Registry.byId(id))
@@ -264,5 +329,18 @@ class GulfEgyptProofTest {
     private companion object {
         /** ESA's Kharga noon after the town's, at most: its point's 70 s and its sun's 4 s (ruling R159). */
         const val ESA_KHARGA_NOON_LAG = 74.0
+
+        /** ESA's Rafah and Sidi Barrani points, fitted on their held days (ruling R160). */
+        val ESA_RAFAH = GeoPoint(31.22204, 34.17869)
+        val ESA_SIDI_BARRANI = GeoPoint(31.76666, 25.92539)
+
+        /**
+         * ESA's printed minute against this engine's sun at ESA's point, 2026–2028 (ruling R160): its almanac sun runs
+         * −2.5 to +2.3 s from this core's at 19.5° dawn and −1.7 to +3.1 s at 17.5° dusk; the fitted offsets on the held
+         * days add +2.3 s at Rafah's dawn, −0.4 s at Sidi Barrani's dusk and −0.9 s at its dawn.
+         */
+        const val ESA_RAFAH_DAWN_AFTER = 5.0
+        const val ESA_SIDI_BARRANI_DUSK_AFTER = 3.0
+        const val ESA_SIDI_BARRANI_DAWN_BEFORE = 4.0
     }
 }
