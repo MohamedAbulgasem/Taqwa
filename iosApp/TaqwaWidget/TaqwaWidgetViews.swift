@@ -433,6 +433,11 @@ struct TaqwaLockScreenWidgetView: View {
     }
 
     var body: some View {
+        face.lockScreenContainer()
+    }
+
+    @ViewBuilder
+    private var face: some View {
         if let content = entry.content {
             switch family {
             case .accessoryCircular:
@@ -496,6 +501,22 @@ struct TaqwaLockScreenWidgetView: View {
 
 private extension Double {
     func clamped01() -> Double { Swift.min(1, Swift.max(0, self)) }
+}
+
+private extension View {
+    /// iOS 17 and later draw "Please adopt containerBackground API" over a widget whose view never
+    /// calls `containerBackground(for: .widget)`, the Lock Screen's included. The 1.4.0 build (Xcode
+    /// 27.2) showed it on the iPhone 12 (iOS 27.0) where 1.3.0's had drawn. The Lock Screen draws its
+    /// own backdrop, so the container's is clear; the round widget keeps its AccessoryWidgetBackground
+    /// in the view, where the in-app preview route, which has no container, sees it too.
+    @ViewBuilder
+    func lockScreenContainer() -> some View {
+        if #available(iOS 17.0, *) {
+            containerBackground(for: .widget) { Color.clear }
+        } else {
+            self
+        }
+    }
 }
 
 // MARK: - Widget declarations
