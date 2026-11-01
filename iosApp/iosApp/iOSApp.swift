@@ -105,6 +105,9 @@ struct iOSApp: App {
 			.onAppear {
 				Self.scheduleNextRefresh()
 				Self.reloadWidgets()
+				#if DEBUG
+				RecitationHarness.runLaunchURLs { Self.openAyah(from: $0) }
+				#endif
 			}
 			.onOpenURL { url in
 				#if DEBUG
@@ -289,6 +292,23 @@ enum RecitationHarness {
 
 	private static var watcher: Timer?
 	private static var last: String = ""
+	private static var launchURLsRun = false
+
+	/// The URLs in `TAQWA_HARNESS_URLS` (`SIMCTL_CHILD_TAQWA_HARNESS_URLS="url url …" xcrun simctl launch …`),
+	/// each handled as `onOpenURL` would, two seconds after launch and a second and a half apart. iOS 27 asks
+	/// "Open in Taqwa?" before `simctl openurl` reaches the app, which no script can answer, so the store and
+	/// README captures relaunch with their URLs instead. Once per process: `onAppear` can run again.
+	static func runLaunchURLs(openAyah: @escaping (URL) -> Void) {
+		guard !launchURLsRun, let list = ProcessInfo.processInfo.environment["TAQWA_HARNESS_URLS"] else { return }
+		launchURLsRun = true
+		let urls = list.split(separator: " ").compactMap { URL(string: String($0)) }
+		for (i, url) in urls.enumerated() {
+			DispatchQueue.main.asyncAfter(deadline: .now() + 2 + 1.5 * Double(i)) {
+				NSLog("TaqwaHarness launch url %@", url.absoluteString)
+				if !handle(url) { openAyah(url) }
+			}
+		}
+	}
 
 	/// True if this URL was a harness command, so the real `taqwa://ayah/...` route never sees it.
 	static func handle(_ url: URL) -> Bool {
