@@ -1,0 +1,64 @@
+App Store "What's New" for 1.4.0 (40): one block per localization, iPhone items only, no other platform named.
+
+=== English (UK) ===
+What's new in 1.4.0:
+• Notifications, clearer: your five prayers first, then the voluntary reminders together
+• A new Widgets screen: pick the background, see each widget and how to add it
+• A new About Taqwa page, with Rate and Share
+• Language is now in Appearance, and "About these times" near the top of Prayer times
+• Safer downloads, and requests that say less about your phone
+• Prayer times: fixes for Rafah and Sidi Barrani, and the MJC's Asr in Cape Town
+
+=== Arabic ===
+الجديد في الإصدار 1.4.0:
+• إعدادات الإشعارات أوضح: الصلوات الخمس أولًا، ثم النوافل والأذكار معًا
+• شاشة جديدة للأدوات: اختر الخلفية، وشاهد كل أداة وطريقة إضافتها
+• صفحة جديدة «عن تقوى»، فيها التقييم والمشاركة
+• اللغة الآن في «المظهر»، و«عن هذه المواقيت» في أعلى «مواقيت الصلاة»
+• تنزيلات أكثر أمانًا، وطلبات تكشف أقل عن هاتفك
+• مواقيت الصلاة: تصحيحات لرفح وسيدي براني، ولعصر المجلس القضائي الإسلامي في كيب تاون
+
+=== French ===
+Nouveautés de la 1.4.0 :
+• Notifications plus claires : vos cinq prières d’abord, puis les actes surérogatoires
+• Nouvel écran Widgets : choisissez le fond, voyez chaque widget et comment l’ajouter
+• Nouvelle page À propos de Taqwa, avec Noter et Partager
+• La langue passe dans Apparence, « À propos de ces horaires » en haut des Horaires
+• Téléchargements plus sûrs, requêtes plus discrètes sur votre téléphone
+• Horaires : corrections pour Rafah, Sidi Barrani et l’Asr du MJC au Cap
+
+=== Turkish ===
+1.4.0 sürümündeki yenilikler:
+• Daha anlaşılır bildirimler: önce beş vakit, sonra nafile ibadetler bir arada
+• Yeni Widget’lar ekranı: arka planı seçin, her widget’ı ve nasıl ekleneceğini görün
+• Değerlendir ve Paylaş ile yeni Taqwa hakkında sayfası
+• Dil artık Görünüm’de, “Bu vakitler hakkında” Namaz vakitleri’nin en üstünde
+• Daha güvenli indirmeler, telefonunuz hakkında daha az şey anlatan istekler
+• Vakitler: Refah, Sidi Barrani ve Cape Town’da MJC’nin ikindisi için düzeltmeler
+
+=== Indonesian ===
+Yang baru di versi 1.4.0:
+• Notifikasi lebih jelas: lima salat dulu, lalu pengingat ibadah sunah bersama
+• Layar Widget baru: pilih latar, lihat setiap widget dan cara menambahkannya
+• Halaman Tentang Taqwa baru, dengan Beri nilai dan Bagikan
+• Bahasa kini di Tampilan, dan “Tentang waktu ini” di atas Waktu salat
+• Unduhan lebih aman, dan permintaan yang lebih sedikit mengungkap ponsel Anda
+• Waktu salat: perbaikan untuk Rafah, Sidi Barrani, dan Asar MJC di Cape Town
+
+=== Urdu ===
+1.4.0 میں نیا کیا ہے:
+• زیادہ واضح اطلاعات: پہلے پانچوں نمازیں، پھر نوافل اور اذکار کی یاد دہانیاں ایک ساتھ
+• ویجٹس کی نئی اسکرین: پس منظر چنیں، ہر ویجٹ اور اسے لگانے کا طریقہ دیکھیں
+• ریٹ اور شیئر کے ساتھ "تقویٰ کے بارے میں" کا نیا صفحہ
+• زبان اب "ظاہری شکل" میں ہے، اور "ان اوقات کے بارے میں" "نماز کے اوقات" میں سب سے اوپر
+• زیادہ محفوظ ڈاؤن لوڈ، اور ایسی درخواستیں جو آپ کے فون کے بارے میں کم بتاتی ہیں
+• نماز کے اوقات: رفح اور سیدی برانی، اور کیپ ٹاؤن میں MJC کی عصر کی درستی
+
+=== Bengali ===
+1.4.0 সংস্করণে যা নতুন:
+• আরও পরিষ্কার নোটিফিকেশন: আগে পাঁচ ওয়াক্ত নামাজ, তারপর নফল ইবাদতের রিমাইন্ডার একসাথে
+• নতুন উইজেট স্ক্রিন: ব্যাকগ্রাউন্ড বেছে নিন, প্রতিটি উইজেট আর তা যোগ করার উপায় দেখুন
+• রেটিং ও শেয়ারসহ নতুন "তাকওয়া সম্পর্কে" পাতা
+• ভাষা এখন "চেহারা"-য়, আর "এই সময়গুলো সম্পর্কে" "নামাজের সময়"-এর একেবারে ওপরে
+• আরও নিরাপদ ডাউনলোড, আর এমন অনুরোধ যা আপনার ফোন সম্পর্কে কম জানায়
+• নামাজের সময়: রাফাহ ও সিদি বাররানি, আর কেপটাউনে এমজেসির আসরের সংশোধন
