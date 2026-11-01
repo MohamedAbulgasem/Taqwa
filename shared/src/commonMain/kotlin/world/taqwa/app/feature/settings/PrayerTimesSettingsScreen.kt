@@ -108,12 +108,12 @@ private val SCHOOLS = listOf("automatic", "standard", "hanafi")
  *
  * - The Timetable card: the timetable ("Automatic · London Unified"), Saudi Arabia's "Pray Fajr 5
  *   minutes later" while Umm al-Qura applies there, the high-latitude rule for an Other method
- *   only, and Manual adjustments. Under it, one line when the stored timetable does not apply here
- *   (ruling R50) or waits to be confirmed (ruling R52).
+ *   only, Manual adjustments, and About these times. Under it, one line when the stored timetable
+ *   does not apply here (ruling R50) or waits to be confirmed (ruling R52).
  * - Asr: Automatic, Standard, Hanafi, with a note naming the school by its shadow; the switches
  *   for both Asr times and, where mosques differ, where their timetables differ.
  * - Hijri date, then Show sunrise and Time format (24-hour or 12-hour, chosen in a sheet): both
- *   say how the list is shown, neither changes a time. About these times at the foot.
+ *   say how the list is shown, neither changes a time.
  *
  * [status] is null without a location: the rows then name the stored choice alone.
  */
@@ -168,6 +168,10 @@ fun PrayerTimesSettingsScreen(
                 value = adjustmentsSummary(settings.minuteAdjustments, adjustmentsPaused),
                 onClick = onOpenManualAdjustments,
             )
+            // Where the times come from sits with the timetable that gives them, seen on arrival
+            // rather than at the foot of the screen.
+            CardDivider()
+            ChevronRow(stringResource(Res.string.prayer_times_about_row), onClick = onOpenAboutTimes)
         }
         if (status != null && (status.outOfScope || status.paused)) {
             Spacer(Modifier.height(10.dp))
@@ -252,8 +256,6 @@ fun PrayerTimesSettingsScreen(
                 value = clockFormatName(clockFormat),
                 onClick = { timeFormatOpen = true },
             )
-            CardDivider()
-            ChevronRow(stringResource(Res.string.prayer_times_about_row), onClick = onOpenAboutTimes)
         }
     }
     if (timeFormatOpen) {
