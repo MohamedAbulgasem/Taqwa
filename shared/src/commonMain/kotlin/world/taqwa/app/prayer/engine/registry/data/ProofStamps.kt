@@ -1294,8 +1294,8 @@ object ProofStamps {
     private fun myJakim() = ProofStamp(
         entryId = "my.jakim",
         places = 13,
-        placeDays = 11648,
-        ramadanDays = 932,
+        placeDays = 11679,
+        ramadanDays = 940,
         lastChecked = "2027-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 3),
         worstLateByUnit = myJakimUnits(),
@@ -1309,7 +1309,6 @@ object ProofStamps {
     )
 
     private fun myJakimChecked(): Map<String, List<String>> = mapOf(
-        "KTN01" to listOf("2025-01-01..2027-02-28", "2027-04-01..2027-12-31"),
         "PLS01" to listOf("2025-01-01..2025-02-28", "2025-03-02..2026-12-31"),
         "PNG01" to listOf("2025-01-01..2026-12-31"),
         "SBH01" to listOf("2025-01-01..2026-12-31"),
