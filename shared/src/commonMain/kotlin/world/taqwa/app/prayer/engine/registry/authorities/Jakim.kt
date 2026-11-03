@@ -58,9 +58,10 @@ object Jakim {
                 startPoints = z.startPoints,
                 imsakMinutesBeforeFajr = if (z.imsak) 10 else null,
             ),
-            lateLimits = z.sunriseLateLimitMinutes?.let {
-                listOf(LateLimit(it, PLS01_SUNRISE_REASON, setOf(TimedEvent.SUNRISE)))
-            } ?: emptyList(),
+            lateLimits = listOfNotNull(
+                z.sunriseLateLimitMinutes?.let { LateLimit(it, PLS01_SUNRISE_REASON, setOf(TimedEvent.SUNRISE)) },
+                z.fajrLateLimitMinutes?.let { LateLimit(it, WLY01_FAJR_REASON, setOf(TimedEvent.FAJR)) },
+            ),
         )
     }
 
@@ -106,6 +107,9 @@ object Jakim {
 
     private const val BORNEO_WEST_LON = 109.5
     private const val BORNEO_EXTRA_SECONDS = 300
+
+    private const val WLY01_FAJR_REASON =
+        "Kuala Lumpur's 2027 Subuh prints up to 3 min before its 2025 and 2026 Subuh at the same point; an earlier Fajr would be early in those years"
 
     private const val PLS01_SUNRISE_REASON =
         "Kangar's printed sunrise spreads a further minute beyond a plain classic-noon model across the seasons"

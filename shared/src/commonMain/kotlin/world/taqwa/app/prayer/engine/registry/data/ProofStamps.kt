@@ -1301,6 +1301,7 @@ object ProofStamps {
         worstLateByUnit = myJakimUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrStandard", "dhuhr", "fajr", "isha", "maghrib", "sunrise")),
+            ProofLateLimit(minutes = 3, reason = "Kuala Lumpur's 2027 Subuh prints up to 3 min before its 2025 and 2026 Subuh at the same point; an earlier Fajr would be early in those years", events = listOf("fajr")),
             ProofLateLimit(minutes = 3, reason = "Kangar's printed sunrise spreads a further minute beyond a plain classic-noon model across the seasons", events = listOf("sunrise")),
             ProofLateLimit(minutes = 4, reason = "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)", events = listOf("endOfEating")),
         ),

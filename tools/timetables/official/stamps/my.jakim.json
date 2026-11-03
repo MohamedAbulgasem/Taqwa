@@ -1,7 +1,7 @@
 {
   "entry": "my.jakim",
   "class": "B",
-  "engineHash": "cf06342f7d46a8dd",
+  "engineHash": "a7888874216134dc",
   "broken": 0,
   "places": 13,
   "first": "2025-01-01",
@@ -18,27 +18,27 @@
       "checked": 12013,
       "early": 0,
       "late": {
-        "0": 7886,
-        "1": 4048,
-        "2": 79,
+        "0": 7562,
+        "1": 4370,
+        "2": 81,
         "3+": 0
       },
-      "exactShare": 0.6565,
+      "exactShare": 0.6295,
       "worstLate": 2,
-      "lateLimit": 2,
-      "lateLimitFrom": "class B",
+      "lateLimit": 3,
+      "lateLimitFrom": "class B, unit WLY01",
       "overLimit": 0
     },
     "sunrise": {
       "checked": 12013,
       "lateEnd": 0,
       "late": {
-        "0": 7114,
-        "1": 4142,
+        "0": 6907,
+        "1": 4349,
         "2": 545,
         "3+": 212
       },
-      "exactShare": 0.5922,
+      "exactShare": 0.575,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class B, unit PLS01",
@@ -48,12 +48,12 @@
       "checked": 12013,
       "early": 0,
       "late": {
-        "0": 9095,
-        "1": 2918,
+        "0": 8752,
+        "1": 3261,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7571,
+      "exactShare": 0.7285,
       "worstLate": 1,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
@@ -63,12 +63,12 @@
       "checked": 12013,
       "early": 0,
       "late": {
-        "0": 6878,
-        "1": 5051,
-        "2": 84,
+        "0": 6530,
+        "1": 5394,
+        "2": 89,
         "3+": 0
       },
-      "exactShare": 0.5725,
+      "exactShare": 0.5436,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
@@ -78,12 +78,12 @@
       "checked": 12013,
       "early": 0,
       "late": {
-        "0": 7187,
-        "1": 3950,
+        "0": 7031,
+        "1": 4106,
         "2": 876,
         "3+": 0
       },
-      "exactShare": 0.5983,
+      "exactShare": 0.5853,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
@@ -93,12 +93,12 @@
       "checked": 12013,
       "early": 0,
       "late": {
-        "0": 7842,
-        "1": 4102,
+        "0": 7636,
+        "1": 4308,
         "2": 69,
         "3+": 0
       },
-      "exactShare": 0.6528,
+      "exactShare": 0.6356,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
@@ -128,27 +128,27 @@
         "checked": 7269,
         "early": 0,
         "late": {
-          "0": 4737,
-          "1": 2493,
-          "2": 39,
+          "0": 4573,
+          "1": 2656,
+          "2": 40,
           "3+": 0
         },
-        "exactShare": 0.6517,
+        "exactShare": 0.6291,
         "worstLate": 2,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
+        "lateLimit": 3,
+        "lateLimitFrom": "class B, unit WLY01",
         "overLimit": 0
       },
       "sunrise": {
         "checked": 7269,
         "lateEnd": 0,
         "late": {
-          "0": 4376,
-          "1": 2512,
+          "0": 4276,
+          "1": 2612,
           "2": 276,
           "3+": 105
         },
-        "exactShare": 0.602,
+        "exactShare": 0.5883,
         "worstLate": 3,
         "lateLimit": 3,
         "lateLimitFrom": "class B, unit PLS01",
@@ -158,12 +158,12 @@
         "checked": 7269,
         "early": 0,
         "late": {
-          "0": 5417,
-          "1": 1852,
+          "0": 5243,
+          "1": 2026,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.7452,
+        "exactShare": 0.7213,
         "worstLate": 1,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
@@ -173,12 +173,12 @@
         "checked": 7269,
         "early": 0,
         "late": {
-          "0": 4096,
-          "1": 3121,
-          "2": 52,
+          "0": 3916,
+          "1": 3296,
+          "2": 57,
           "3+": 0
         },
-        "exactShare": 0.5635,
+        "exactShare": 0.5387,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
@@ -188,12 +188,12 @@
         "checked": 7269,
         "early": 0,
         "late": {
-          "0": 4298,
-          "1": 2390,
+          "0": 4223,
+          "1": 2465,
           "2": 581,
           "3+": 0
         },
-        "exactShare": 0.5913,
+        "exactShare": 0.581,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
@@ -203,12 +203,12 @@
         "checked": 7269,
         "early": 0,
         "late": {
-          "0": 4739,
-          "1": 2499,
+          "0": 4640,
+          "1": 2598,
           "2": 31,
           "3+": 0
         },
-        "exactShare": 0.6519,
+        "exactShare": 0.6383,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "class B",
@@ -242,6 +242,10 @@
     "unit PLS01: 3 min": {
       "reason": "Kangar's printed sunrise spreads a further minute beyond a plain classic-noon model across the seasons",
       "events": ["sunrise"]
+    },
+    "unit WLY01: 3 min": {
+      "reason": "Kuala Lumpur's 2027 Subuh prints up to 3 min before its 2025 and 2026 Subuh at the same point; an earlier Fajr would be early in those years",
+      "events": ["fajr"]
     }
   },
   "units": {
@@ -878,12 +882,12 @@
           "checked": 729,
           "early": 0,
           "late": {
-            "0": 413,
-            "1": 303,
-            "2": 13,
+            "0": 396,
+            "1": 318,
+            "2": 15,
             "3+": 0
           },
-          "exactShare": 0.5665,
+          "exactShare": 0.5432,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -908,12 +912,12 @@
           "checked": 729,
           "early": 0,
           "late": {
-            "0": 617,
-            "1": 112,
+            "0": 436,
+            "1": 293,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8464,
+          "exactShare": 0.5981,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -923,12 +927,12 @@
           "checked": 729,
           "early": 0,
           "late": {
-            "0": 592,
-            "1": 137,
+            "0": 479,
+            "1": 250,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8121,
+          "exactShare": 0.6571,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -938,12 +942,12 @@
           "checked": 729,
           "early": 0,
           "late": {
-            "0": 613,
-            "1": 116,
+            "0": 590,
+            "1": 139,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8409,
+          "exactShare": 0.8093,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -953,12 +957,12 @@
           "checked": 729,
           "early": 0,
           "late": {
-            "0": 582,
-            "1": 147,
+            "0": 525,
+            "1": 204,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7984,
+          "exactShare": 0.7202,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -1000,12 +1004,12 @@
           "checked": 730,
           "early": 0,
           "late": {
-            "0": 577,
-            "1": 153,
+            "0": 270,
+            "1": 460,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7904,
+          "exactShare": 0.3699,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -1030,12 +1034,12 @@
           "checked": 730,
           "early": 0,
           "late": {
-            "0": 602,
-            "1": 128,
+            "0": 440,
+            "1": 290,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8247,
+          "exactShare": 0.6027,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -1045,12 +1049,12 @@
           "checked": 730,
           "early": 0,
           "late": {
-            "0": 333,
-            "1": 394,
-            "2": 3,
+            "0": 263,
+            "1": 459,
+            "2": 8,
             "3+": 0
           },
-          "exactShare": 0.4562,
+          "exactShare": 0.3603,
           "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -1075,12 +1079,12 @@
           "checked": 730,
           "early": 0,
           "late": {
-            "0": 489,
-            "1": 241,
+            "0": 468,
+            "1": 262,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6699,
+          "exactShare": 0.6411,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -1598,11 +1602,15 @@
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
         },
         "entry my.jakim: 4 min": {
           "reason": "e-solat prints each zone's Subuh for its latest point, rounded up, and the fast here begins at the dawn of the place itself: up to 4 min before the printed Subuh (end-of-eating audit, 3 Oct 2026)",
           "events": ["endOfEating"]
+        },
+        "unit WLY01: 3 min": {
+          "reason": "Kuala Lumpur's 2027 Subuh prints up to 3 min before its 2025 and 2026 Subuh at the same point; an earlier Fajr would be early in those years",
+          "events": ["fajr"]
         }
       },
       "events": {
@@ -1617,20 +1625,20 @@
           },
           "exactShare": 0.8219,
           "worstLate": 1,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "lateLimit": 3,
+          "lateLimitFrom": "unit WLY01",
           "overLimit": 0
         },
         "sunrise": {
           "checked": 730,
           "lateEnd": 0,
           "late": {
-            "0": 605,
-            "1": 125,
+            "0": 398,
+            "1": 332,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8288,
+          "exactShare": 0.5452,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -1655,12 +1663,12 @@
           "checked": 730,
           "early": 0,
           "late": {
-            "0": 611,
-            "1": 119,
+            "0": 446,
+            "1": 284,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.837,
+          "exactShare": 0.611,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -1670,12 +1678,12 @@
           "checked": 730,
           "early": 0,
           "late": {
-            "0": 642,
-            "1": 88,
+            "0": 509,
+            "1": 221,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8795,
+          "exactShare": 0.6973,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
@@ -1685,12 +1693,12 @@
           "checked": 730,
           "early": 0,
           "late": {
-            "0": 603,
-            "1": 127,
+            "0": 475,
+            "1": 255,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.826,
+          "exactShare": 0.6507,
           "worstLate": 1,
           "lateLimit": 2,
           "lateLimitFrom": "class B",

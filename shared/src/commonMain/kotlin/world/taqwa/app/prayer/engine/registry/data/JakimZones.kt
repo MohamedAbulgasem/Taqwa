@@ -24,6 +24,10 @@ import world.taqwa.app.prayer.engine.method.GeoPoint
  *   unmargined, floor-rounded sunset at the same horizon, and a margin that negative ceils below it
  *   on some days (out of order, repaired later at runtime). A positive margin stays on the safe,
  *   never-early side (only later, which class B allows) without ever repairing.
+ * - 2027 refit (4 Nov 2026, the monitor's first 2027 tables): WLY01, PLS01 and PNG01 refitted on
+ *   2025–2027 together, each margin only ever later for a start and earlier for an end. WLY01's 2027
+ *   Subuh prints up to 3 min before 2025–2026's at the same point, so its Fajr carries a 3-min late
+ *   exception ([fajrLateLimitMinutes]) rather than an earlier margin, which would be early in 2025–26.
  * - PLS01's sunrise carries its own exception ([sunriseLateLimitMinutes]): Perlis's printed sunrise
  *   spreads about 3 min from a plain classic-noon sunrise across the seasons, a minute past class B,
  *   on close to 30 % of the days checked (2025–2026); every other zone's spread stays inside 2 min.
@@ -40,6 +44,8 @@ object JakimZones {
         val imsak: Boolean = true,
         val ishaAngleDeg: Double = 18.0,
         val sunriseLateLimitMinutes: Int? = null,
+        /** Minutes Subuh may be late here, where one year's table prints it earlier than the others. */
+        val fajrLateLimitMinutes: Int? = null,
     )
 
     private val selangor = listOf(GeoPoint(2.62, 101.69), GeoPoint(3.73, 101.45))
@@ -48,7 +54,8 @@ object JakimZones {
         EventOffsets(fajr = fajr, sunrise = sunrise, dhuhr = dhuhr, asr = asr, maghrib = maghrib, isha = isha)
 
     val zones: List<Zone> = listOf(
-        Zone("WLY01", "Kuala Lumpur", GeoPoint(3.1412, 101.68653), 12.0, m(25, -28, 88, 26, 24, 27), startPoints = selangor),
+        Zone("WLY01", "Kuala Lumpur", GeoPoint(3.1412, 101.68653), 12.0, m(25, -44, 88, 39, 35, 38), startPoints = selangor,
+            fajrLateLimitMinutes = 3),
         Zone("SGR01", "Shah Alam", GeoPoint(3.08507, 101.53281), 50.0, m(24, -111, 88, 26, 23, 26), startPoints = selangor),
         Zone("JHR02", "Johor Bahru", GeoPoint(1.4655, 103.7578), 40.0, m(81, 19, 143, 105, 86, 91)),
         Zone("KTN01", "Kota Bharu", GeoPoint(6.12361, 102.24333), 45.0, m(82, 46, 135, 81, 79, 77), ishaAngleDeg = 17.0),
@@ -56,10 +63,10 @@ object JakimZones {
         Zone("SWK08", "Kuching", GeoPoint(1.55, 110.33333), 45.0, m(169, 104, 208, 175, 168, 172)),
         Zone("SBH01", "Sandakan", GeoPoint(5.8402, 118.1179), 50.0, m(123, 38, 148, 116, 118, 114)),
         Zone(
-            "PLS01", "Kangar", GeoPoint(6.4414, 100.1986), 30.0, m(29, -117, 91, 28, 28, 28), imsak = false,
+            "PLS01", "Kangar", GeoPoint(6.4414, 100.1986), 30.0, m(30, -117, 106, 38, 30, 32), imsak = false,
             sunriseLateLimitMinutes = 3,
         ),
-        Zone("PNG01", "George Town", GeoPoint(5.4141, 100.3288), 25.0, m(58, -93, 109, 72, 64, 61)),
+        Zone("PNG01", "George Town", GeoPoint(5.4141, 100.3288), 25.0, m(81, -93, 122, 78, 64, 63)),
         Zone("WLY02", "Labuan", GeoPoint(5.2831, 115.2308), 20.0, m(33, -35, 93, 32, 32, 33)),
         Zone("PHG06", "Tanah Rata", GeoPoint(4.4721, 101.3801), 20.0, m(9, 57, 86, 15, 30, 7), horizonDeg = -2.5),
         Zone("JHR01", "Pulau Aur", GeoPoint(2.45, 104.52), 10.0, m(67, 27, 138, 81, 69, 72)),
