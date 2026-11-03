@@ -56,13 +56,12 @@ Web sitesi: https://taqwa.world/tr/
 Destek: support@taqwa.world
 
 ### Release notes (500)
-1.4.0 sürümündeki yenilikler:
-• Daha anlaşılır bildirimler: önce beş vakit, sonra nafile ibadetler bir arada
-• Yeni Widget’lar ekranı: arka planı seçin, widget’ları görün, mümkünse tek dokunuşla ekleyin
-• Değerlendir ve Paylaş ile yeni Taqwa hakkında sayfası
-• Dil artık Görünüm’de, “Bu vakitler hakkında” Namaz vakitleri’nin en üstünde
-• Daha güvenli indirmeler, telefonunuz hakkında daha az şey anlatan istekler
-• Vakitler: Refah, Sidi Barrani ve Cape Town’da MJC’nin ikindisi için düzeltmeler
+1.5.0 sürümündeki yenilikler:
+• İki yeni ezan sesi: Mekke ve Medine
+• Bildirimler artık ezanın tamamını çalar; durdurmak için bildirimi kaydırın
+• Kendi ezanınız: telefonunuzdan bir kayıt seçin
+• “Güneşi göster” ve “Saat biçimi” artık Namaz vakitleri’nin üst kısmında
+• Vakitler: Kuala Lumpur, George Town ve Kangar 2027 için güncellendi
 
 ## App Store
 
@@ -92,13 +91,12 @@ kuran,vakitleri,vakti,tilavet,meal,mushaf,tesbih,zikir,ramazan,imsakiye,islam,m�
 (Yukarıdaki Play tam açıklamasıyla aynı metin.)
 
 ### What's new (4000)
-1.4.0 sürümündeki yenilikler:
-• Daha anlaşılır bildirimler: önce beş vakit, sonra nafile ibadetler bir arada
-• Yeni Widget’lar ekranı: arka planı seçin, her widget’ı ve nasıl ekleneceğini görün
-• Değerlendir ve Paylaş ile yeni Taqwa hakkında sayfası
-• Dil artık Görünüm’de, “Bu vakitler hakkında” Namaz vakitleri’nin en üstünde
-• Daha güvenli indirmeler, telefonunuz hakkında daha az şey anlatan istekler
-• Vakitler: Refah, Sidi Barrani ve Cape Town’da MJC’nin ikindisi için düzeltmeler
+1.5.0 sürümündeki yenilikler:
+• İki yeni ezan sesi: Mekke ve Medine
+• Kendi ezanınız: telefonunuzdan bir kayıt seçin; bildirim ilk 30 saniyesini çalar
+• Kilit Ekranı widget’ı artık sıradaki namazın adını vaktinin yanında gösterir
+• “Güneşi göster” ve “Saat biçimi” artık Namaz vakitleri’nin üst kısmında
+• Vakitler: Kuala Lumpur, George Town ve Kangar 2027 için güncellendi
 
 ## Screenshot captions (her biri tek kısa satır, çerçeveli ekran görüntüsünün üstünde)
 1. Bulunduğunuz yerin namaz vakti

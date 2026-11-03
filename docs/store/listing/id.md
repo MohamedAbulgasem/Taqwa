@@ -53,13 +53,12 @@ Situs web: https://taqwa.world/id/
 Dukungan: support@taqwa.world
 
 ### Release notes (500)
-Yang baru di versi 1.4.0:
-• Notifikasi lebih jelas: lima salat dulu, lalu pengingat ibadah sunah bersama
-• Layar Widget baru: pilih latar, lihat setiap widget, tambahkan dengan sekali ketuk bila bisa
-• Halaman Tentang Taqwa baru, dengan Beri nilai dan Bagikan
-• Bahasa kini di Tampilan, dan “Tentang waktu ini” di atas Waktu salat
-• Unduhan lebih aman, dan permintaan yang lebih sedikit mengungkap ponsel Anda
-• Waktu salat: perbaikan untuk Rafah, Sidi Barrani, dan Asar MJC di Cape Town
+Yang baru di versi 1.5.0:
+• Dua suara azan baru: Makkah dan Madinah
+• Notifikasi kini memutar azan lengkap; geser notifikasi untuk menghentikannya
+• Azan Anda sendiri: pilih rekaman dari ponsel Anda
+• “Tampilkan waktu terbit” dan “Format waktu” kini di atas Waktu salat
+• Waktu salat: Kuala Lumpur, George Town, dan Kangar diperbarui untuk 2027
 
 ## App Store
 
@@ -89,13 +88,12 @@ sholat,shalat,jadwal,waktu,adzan,alquran,murottal,tilawah,zikir,masjid,arah,isla
 (Teks yang sama dengan deskripsi lengkap Play di atas.)
 
 ### What's new (4000)
-Yang baru di versi 1.4.0:
-• Notifikasi lebih jelas: lima salat dulu, lalu pengingat ibadah sunah bersama
-• Layar Widget baru: pilih latar, lihat setiap widget dan cara menambahkannya
-• Halaman Tentang Taqwa baru, dengan Beri nilai dan Bagikan
-• Bahasa kini di Tampilan, dan “Tentang waktu ini” di atas Waktu salat
-• Unduhan lebih aman, dan permintaan yang lebih sedikit mengungkap ponsel Anda
-• Waktu salat: perbaikan untuk Rafah, Sidi Barrani, dan Asar MJC di Cape Town
+Yang baru di versi 1.5.0:
+• Dua suara azan baru: Makkah dan Madinah
+• Azan Anda sendiri: pilih rekaman dari ponsel Anda; notifikasi memutar 30 detik pertamanya
+• Widget Layar Terkunci kini menampilkan nama salat berikutnya di samping waktunya
+• “Tampilkan waktu terbit” dan “Format waktu” kini di atas Waktu salat
+• Waktu salat: Kuala Lumpur, George Town, dan Kangar diperbarui untuk 2027
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Waktu salat di tempat Anda

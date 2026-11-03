@@ -1,0 +1,57 @@
+App Store "What's New" for 1.5.0 (41): one block per localization, iPhone items only, no other platform named.
+
+=== English (UK) ===
+What's new in 1.5.0:
+• Two new adhan voices: Makkah and Madinah
+• Your own adhan: choose a recording from your phone; the notification plays its first 30 seconds
+• The Lock Screen widget now names the next prayer beside its time
+• Show sunrise and Time format now sit near the top of Prayer times
+• Prayer times: Kuala Lumpur, George Town and Kangar updated for 2027
+
+=== Arabic ===
+الجديد في الإصدار 1.5.0:
+• صوتان جديدان للأذان: مكة والمدينة
+• أذانك الخاص: اختر تسجيلًا من هاتفك، ويُشغّل الإشعار أول 30 ثانية منه
+• أداة شاشة القفل تذكر الآن اسم الصلاة القادمة بجانب وقتها
+• «إظهار الشروق» و«تنسيق الوقت» الآن في أعلى «مواقيت الصلاة»
+• مواقيت الصلاة: تحديث كوالالمبور وجورج تاون وكانغار لعام 2027
+
+=== French ===
+Nouveautés de la 1.5.0 :
+• Deux nouvelles voix d’adhan : La Mecque et Médine
+• Votre propre adhan : choisissez un enregistrement sur votre téléphone ; la notification en joue les 30 premières secondes
+• Le widget de l’écran verrouillé nomme la prochaine prière à côté de son heure
+• « Afficher le lever du soleil » et « Format de l’heure » en haut des Horaires de prière
+• Horaires : Kuala Lumpur, George Town et Kangar mis à jour pour 2027
+
+=== Turkish ===
+1.5.0 sürümündeki yenilikler:
+• İki yeni ezan sesi: Mekke ve Medine
+• Kendi ezanınız: telefonunuzdan bir kayıt seçin; bildirim ilk 30 saniyesini çalar
+• Kilit Ekranı widget’ı artık sıradaki namazın adını vaktinin yanında gösterir
+• “Güneşi göster” ve “Saat biçimi” artık Namaz vakitleri’nin üst kısmında
+• Vakitler: Kuala Lumpur, George Town ve Kangar 2027 için güncellendi
+
+=== Indonesian ===
+Yang baru di versi 1.5.0:
+• Dua suara azan baru: Makkah dan Madinah
+• Azan Anda sendiri: pilih rekaman dari ponsel Anda; notifikasi memutar 30 detik pertamanya
+• Widget Layar Terkunci kini menampilkan nama salat berikutnya di samping waktunya
+• “Tampilkan waktu terbit” dan “Format waktu” kini di atas Waktu salat
+• Waktu salat: Kuala Lumpur, George Town, dan Kangar diperbarui untuk 2027
+
+=== Urdu ===
+1.5.0 میں نیا کیا ہے:
+• اذان کی دو نئی آوازیں: مکہ اور مدینہ
+• اپنی اذان: اپنے فون سے کوئی ریکارڈنگ چنیں؛ اطلاع اس کے پہلے 30 سیکنڈ سناتی ہے
+• لاک اسکرین ویجٹ اب اگلی نماز کا نام اس کے وقت کے ساتھ دکھاتا ہے
+• "طلوعِ آفتاب دکھائیں" اور "وقت کا فارمیٹ" اب "نماز کے اوقات" میں سب سے اوپر
+• نماز کے اوقات: کوالالمپور، جارج ٹاؤن اور کنگار 2027 کے لیے اپ ڈیٹ
+
+=== Bengali ===
+1.5.0 সংস্করণে যা নতুন:
+• আযানের দুটি নতুন কণ্ঠ: মক্কা ও মদিনা
+• নিজের আযান: আপনার ফোন থেকে একটি রেকর্ডিং বেছে নিন; নোটিফিকেশনে এর প্রথম 30 সেকেন্ড বাজে
+• লক স্ক্রিন উইজেট এখন পরের নামাজের নাম তার সময়ের পাশে দেখায়
+• "সূর্যোদয় দেখান" আর "সময়ের ফরম্যাট" এখন "নামাজের সময়"-এর একেবারে ওপরে
+• নামাজের সময়: 2027-এর জন্য কুয়ালালামপুর, জর্জ টাউন ও কাঙ্গারের হালনাগাদ

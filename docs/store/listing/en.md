@@ -58,13 +58,12 @@ Website: https://taqwa.world
 Support: support@taqwa.world
 
 ### Release notes (500)
-What's new in 1.4.0:
-• Notifications, clearer: your five prayers first, then the voluntary reminders together
-• A new Widgets screen: pick the background, see each widget, and add it in one tap where your phone allows
-• A new About Taqwa page, with Rate and Share
-• Language is now in Appearance, and "About these times" near the top of Prayer times
-• Safer downloads, and requests that say less about your phone
-• Prayer times: fixes for Rafah and Sidi Barrani, and the MJC's Asr in Cape Town
+What's new in 1.5.0:
+• Two new adhan voices: Makkah and Madinah
+• Notifications now play the complete adhan; swipe the notification away to stop it
+• Your own adhan: choose a recording from your phone
+• Show sunrise and Time format now sit near the top of Prayer times
+• Prayer times: Kuala Lumpur, George Town and Kangar updated for 2027
 
 ## App Store
 
@@ -94,13 +93,12 @@ times,salah,salat,azan,athan,koran,islam,recitation,tasbih,mosque,dhikr,ramadan,
 (The same text as the Play full description above.)
 
 ### What's new (4000)
-What's new in 1.4.0:
-• Notifications, clearer: your five prayers first, then the voluntary reminders together
-• A new Widgets screen: pick the background, see each widget and how to add it
-• A new About Taqwa page, with Rate and Share
-• Language is now in Appearance, and "About these times" near the top of Prayer times
-• Safer downloads, and requests that say less about your phone
-• Prayer times: fixes for Rafah and Sidi Barrani, and the MJC's Asr in Cape Town
+What's new in 1.5.0:
+• Two new adhan voices: Makkah and Madinah
+• Your own adhan: choose a recording from your phone; the notification plays its first 30 seconds
+• The Lock Screen widget now names the next prayer beside its time
+• Show sunrise and Time format now sit near the top of Prayer times
+• Prayer times: Kuala Lumpur, George Town and Kangar updated for 2027
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Prayer times where you are
