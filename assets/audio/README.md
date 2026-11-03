@@ -79,6 +79,25 @@ transcripts are in the research report.
 - **Transcript check:** complete 15-phrase Sunni adhan; first "Allahu akbar, Allahu akbar" pair
   0.61–5.43 s; four takbirs end 11.11 s; both shahadas end 26.66 s.
 
+### Makkah, Masjid al-Haram (`*_makkah.*`) — CC BY 3.0
+
+- **Source:** "Adhan, Great Mosque of Mecca - Jan 21, 2013" by Seyfula Islam, Wikimedia Commons.
+- **Page:** https://commons.wikimedia.org/wiki/File:Adhan,_Great_Mosque_of_Mecca_-_Jan_21,_2013.webm
+- **Licence:** Creative Commons Attribution 3.0 Unported. Attribution required, no share-alike.
+- **Processing (3 Nov 2026):** audio from the WebM, mono 44.1 kHz, loudnorm I=-16 TP=-2, then the
+  first 8.0 s cut (crowd and a click before the muezzin begins, the owner's call), 50 ms fade-in.
+  Full 189.09 s. Takbir: the first pair, cut at 7.30 s. iOS 30 s clip: the first two pairs, cut at
+  24.15 s. 0.4 s fade-out on each cut.
+
+### Madinah, Masjid an-Nabawi (`*_madinah.*`) — CC BY 3.0
+
+- **Source:** "33937 ejaz215 call-to-prayer-from-the-prophet-s-mo.ogg" by ejaz215, Wikimedia Commons.
+- **Page:** https://commons.wikimedia.org/wiki/File:33937_ejaz215_call-to-prayer-from-the-prophet-s-mo.ogg
+- **Licence:** Creative Commons Attribution 3.0 Unported. Attribution required, no share-alike.
+- **Processing (3 Nov 2026):** mono 44.1 kHz, loudnorm I=-16 TP=-2. Full 185.57 s. Takbir and the iOS
+  30 s clip are the same cut, the first pair to 16.40 s (the pause 15.9–19.4 s; the owner chose it
+  over a mid-phrase fade at 29.5 s). 0.4 s fade-out.
+
 ### Besim Azemi, Malmö Mosque (`*_azemi.*`) — CC BY 3.0
 
 - **Source:** "Eid al-Fitr Fajr azan at Malmö Mosque – 19 August 2012", published by Islamic Center
@@ -97,6 +116,8 @@ transcripts are in the research report.
   209.4 s of the edited timeline). What remains is the standard 15-phrase adhan.
 - **Transcript check:** first takbir pair 0–3.67 s; four takbirs end 23.29 s; la ilaha illallah ends
   ~231 s of the source.
+
+- **Trimmed again (3 Nov 2026):** every shipped Azemi file starts 0.4 s later, past most of a cough before the first "Allah" (the owner's ear; 1.2 s clipped the word), with a 40 ms fade-in: full 211.00 s, takbir 4.80 s, iOS clip 24.30 s.
 
 ### Pipeline for both
 

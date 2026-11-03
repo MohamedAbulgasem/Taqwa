@@ -48,9 +48,26 @@ object NotificationChannels {
     ): String = base(prayer, sound, kind) +
         when {
             sound == PrayerSound.NOTIFICATION -> CHIME_SUFFIX
-            sound in VOICED_SOUNDS && voice != AdhanVoice.ORIGINAL -> "_${voice.name.lowercase()}"
-            else -> ""
+            else -> voiceSuffix(sound, voice) + if (sound == PrayerSound.ADHAN) ADHAN_SUFFIX else ""
         }
+
+    /**
+     * Android plays the whole adhan from 1.5.0, where it played the 30-second clip before. The
+     * sound is part of a channel that cannot change, so the Adhan level moves to ids Android has
+     * never seen; the clip-era ids, the same ids without this suffix, are swept by [legacyAdhanIds].
+     */
+    private const val ADHAN_SUFFIX = "_full"
+
+    private fun voiceSuffix(sound: PrayerSound, voice: AdhanVoice): String =
+        if (sound in VOICED_SOUNDS && voice != AdhanVoice.ORIGINAL) "_${voice.name.lowercase()}" else ""
+
+    /** The Adhan level's clip-era ids, before [ADHAN_SUFFIX], so an upgrade deletes them. */
+    private fun legacyAdhanIds(prayer: Prayer, kind: NotificationKind): List<String> =
+        AdhanVoice.entries.map { voice -> base(prayer, PrayerSound.ADHAN, kind) + voiceSuffix(PrayerSound.ADHAN, voice) }
+
+    private fun everyId(prayer: Prayer, kind: NotificationKind): List<String> =
+        (PrayerSound.entries.flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(prayer, sound, voice, kind) } } +
+            legacyAdhanIds(prayer, kind)).distinct()
 
     /** Every channel id the Notification level has ever used and no longer does. */
     fun staleNotificationIds(prayer: Prayer): List<String> =
@@ -61,9 +78,7 @@ object NotificationChannels {
      * scheduler checks when deciding which stale channels it may delete, so it has to enumerate
      * every id [channelId] can return or a channel becomes undeletable. */
     fun allChannelIdsFor(prayer: Prayer): List<String> =
-        PrayerSound.entries
-            .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(prayer, sound, voice) } }
-            .distinct() + staleNotificationIds(prayer)
+        everyId(prayer, NotificationKind.PRAYER) + staleNotificationIds(prayer)
 
     /**
      * Every channel Tahajjud could ever have had. It has channels of its own rather than Fajr's
@@ -72,9 +87,7 @@ object NotificationChannels {
      * could not be told from the reminder that shares that channel.
      */
     fun allTahajjudChannelIds(): List<String> =
-        PrayerSound.entries
-            .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.FAJR, sound, voice, NotificationKind.TAHAJJUD) } }
-            .distinct()
+        everyId(Prayer.FAJR, NotificationKind.TAHAJJUD)
 
     /**
      * Every channel the adhkar reminder could ever have had, for the reason Tahajjud has its own
@@ -83,9 +96,7 @@ object NotificationChannels {
      * setting, so whichever [NotificationKind] asks, the ids are the same.
      */
     fun allAdhkarChannelIds(): List<String> =
-        PrayerSound.entries
-            .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.FAJR, sound, voice, NotificationKind.ADHKAR_MORNING) } }
-            .distinct()
+        everyId(Prayer.FAJR, NotificationKind.ADHKAR_MORNING)
 
     /**
      * Every channel the Duha reminder could ever have had (Duha and Iqama spec §3.4). Both timings
@@ -93,18 +104,14 @@ object NotificationChannels {
      * are the same.
      */
     fun allDuhaChannelIds(): List<String> =
-        PrayerSound.entries
-            .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.SUNRISE, sound, voice, NotificationKind.DUHA_BEST) } }
-            .distinct()
+        everyId(Prayer.SUNRISE, NotificationKind.DUHA_BEST)
 
     /**
      * Every channel the iqama reminder could ever have had. All five prayers' iqamas share one,
      * so it can be silenced in the system's list without silencing any adhan.
      */
     fun allIqamaChannelIds(): List<String> =
-        PrayerSound.entries
-            .flatMap { sound -> AdhanVoice.entries.map { voice -> channelId(Prayer.FAJR, sound, voice, NotificationKind.IQAMA) } }
-            .distinct()
+        everyId(Prayer.FAJR, NotificationKind.IQAMA)
 
     // A reminder rides its prayer's own Notification channel, as it always has; Tahajjud, the
     // adhkar reminder, Duha and the iqama leave the prayer's namespace.

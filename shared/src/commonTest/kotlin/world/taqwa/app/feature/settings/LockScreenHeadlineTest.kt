@@ -2,6 +2,7 @@ package world.taqwa.app.feature.settings
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.i18n.UiLanguage
 import world.taqwa.app.widget.ScheduledPrayer
@@ -11,11 +12,10 @@ import world.taqwa.app.widget.WidgetMirrorWriter
 import world.taqwa.app.widget.WidgetSnapshot
 
 /**
- * The Lock Screen picture's first line says what the real rectangular accessory's says (the
- * owner's decision, 31 October): the "Maghrib in" phrase beside the time, in the reader's language,
- * not the prayer's name alone. The accessory's line is `entry.headline` in TaqwaWidgetViews.swift,
- * which `TaqwaTimelineProvider.entries` takes from [WidgetCountdown.headline] of the content it
- * builds for the minute; the picture reads the same mirror as the Widgets screen reads it.
+ * The Lock Screen picture's first line, like the real rectangular accessory's, names the next
+ * prayer as the prayer list does ("Maghrib · المغرب"), beside its start time, the same way the
+ * "then" line under it names the prayer after (the owner's decision, 3 Nov 2026). It once read
+ * "Maghrib in" beside the start time, which read as a countdown it was not.
  */
 class LockScreenHeadlineTest {
 
@@ -52,31 +52,22 @@ class LockScreenHeadlineTest {
     private fun pictureFirstLine(snapshot: WidgetSnapshot): String =
         lockScreenHeadline(WidgetContentBuilder.build(snapshot))
 
-    /** The real accessory's first line from the same mirror at the same minute, as the Swift entry builds it. */
-    private fun accessoryFirstLine(snapshot: WidgetSnapshot): String = WidgetCountdown.headline(
-        WidgetContentBuilder.build(snapshot, writtenAt),
-        WidgetCountdown.remainingMinutesAt(snapshot, writtenAt),
-    )
+    /** How the prayer list names the next prayer in the same mirror. */
+    private fun listName(snapshot: WidgetSnapshot): String =
+        WidgetContentBuilder.build(snapshot).rows.first { it.prayer == Prayer.MAGHRIB }.displayName
 
     @Test
-    fun `in English the first line is the Maghrib in phrase the accessory shows`() {
+    fun `in English the first line names the prayer as the list does and has no countdown phrase`() {
         val snapshot = mirror("en-GB")
-        assertEquals("Maghrib in", pictureFirstLine(snapshot))
-        assertEquals(accessoryFirstLine(snapshot), pictureFirstLine(snapshot))
+        assertEquals(listName(snapshot), pictureFirstLine(snapshot))
+        assertFalse(" in" in pictureFirstLine(snapshot), pictureFirstLine(snapshot))
     }
 
     @Test
-    fun `in Arabic it is the Arabic phrase the accessory shows`() {
-        val snapshot = mirror("ar-LY")
-        assertEquals("متبقٍّ على المغرب", pictureFirstLine(snapshot))
-        assertEquals(accessoryFirstLine(snapshot), pictureFirstLine(snapshot))
-    }
-
-    @Test
-    fun `in every language the app speaks the picture and the accessory say the same words`() {
+    fun `in every language the first line is the prayer's name as the list writes it`() {
         for (language in UiLanguage.entries) {
             val snapshot = mirror(language.code)
-            assertEquals(accessoryFirstLine(snapshot), pictureFirstLine(snapshot), language.name)
+            assertEquals(listName(snapshot), pictureFirstLine(snapshot), language.name)
         }
     }
 }

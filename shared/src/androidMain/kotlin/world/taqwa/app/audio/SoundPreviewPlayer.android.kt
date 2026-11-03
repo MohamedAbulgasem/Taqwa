@@ -6,6 +6,7 @@ import android.net.Uri
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.notifications.SoundAssets
+import world.taqwa.app.notifications.CustomAdhanFiles
 import world.taqwa.app.settings.appContext
 
 private class AndroidSoundPreviewPlayer : SoundPreviewPlayer {
@@ -18,8 +19,11 @@ private class AndroidSoundPreviewPlayer : SoundPreviewPlayer {
         // nothing plays.
         if (sound == PrayerSound.SILENT) return
 
-        val name = SoundAssets.androidPreviewRawResourceName(sound, voice)!!
-        val uri = Uri.parse("android.resource://${appContext.packageName}/raw/$name")
+        val uri = if (sound == PrayerSound.ADHAN && voice == AdhanVoice.CUSTOM && CustomAdhanFiles.present(appContext)) {
+            Uri.fromFile(CustomAdhanFiles.file(appContext))
+        } else {
+            Uri.parse("android.resource://${appContext.packageName}/raw/${SoundAssets.androidPreviewRawResourceName(sound, voice)!!}")
+        }
 
         // Wrapped exactly as ClipPlayer is: setDataSource throws IOException on a raw resource
         // that resource shrinking removed, and this is called straight from a tap in the sound

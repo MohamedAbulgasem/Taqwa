@@ -86,7 +86,12 @@ class IosNotificationScheduler : NotificationScheduler {
     /** Silent means no sound at all; every other level either uses the bundled `.caf` or, for
      * "Notification", the system default — mirroring the Android channel setup in Task 17. */
     private fun soundFor(sound: PrayerSound, voice: AdhanVoice): UNNotificationSound? {
-        val fileName = SoundAssets.iosResourceFileName(sound, voice)
+        // A recording from the phone plays as its 29.5-second cut in Library/Sounds.
+        val fileName = if (sound == PrayerSound.ADHAN && voice == AdhanVoice.CUSTOM && IosCustomAdhanFiles.soundPresent()) {
+            IosCustomAdhanFiles.SOUND_NAME
+        } else {
+            SoundAssets.iosResourceFileName(sound, voice)
+        }
         return when {
             sound == PrayerSound.SILENT -> null
             fileName != null -> UNNotificationSound.soundNamed(fileName)

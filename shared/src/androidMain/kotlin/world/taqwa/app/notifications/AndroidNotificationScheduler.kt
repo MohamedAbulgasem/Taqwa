@@ -286,8 +286,14 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
         when (sound) {
             PrayerSound.SILENT -> channel.setSound(null, null)
             PrayerSound.NOTIFICATION, PrayerSound.TAKBIR, PrayerSound.ADHAN -> {
-                val name = SoundAssets.androidRawResourceName(sound, voice)!!
-                channel.setSound(Uri.parse("android.resource://${context.packageName}/raw/$name"), attrs)
+                // A recording from the phone plays from its one fixed content URI, so choosing
+                // another replaces what this channel plays without a new channel.
+                val uri = if (sound == PrayerSound.ADHAN && voice == AdhanVoice.CUSTOM && CustomAdhanFiles.present(context)) {
+                    CustomAdhanFiles.uri(context)
+                } else {
+                    Uri.parse("android.resource://${context.packageName}/raw/${SoundAssets.androidRawResourceName(sound, voice)!!}")
+                }
+                channel.setSound(uri, attrs)
             }
         }
         // Notification is the level people pick for the prayers they keep during a working day —

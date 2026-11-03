@@ -1,5 +1,6 @@
 package world.taqwa.app.audio
 
+import world.taqwa.app.notifications.IosCustomAdhanFiles
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFAudio.AVAudioPlayer
 import platform.AVFAudio.AVAudioPlayerDelegateProtocol
@@ -37,8 +38,9 @@ private class IosSoundPreviewPlayer : SoundPreviewPlayer {
             // Nothing to audition; the button press itself is the reassurance.
             PrayerSound.SILENT -> return
             PrayerSound.NOTIFICATION, PrayerSound.TAKBIR, PrayerSound.ADHAN -> {
+                val custom = if (sound == PrayerSound.ADHAN && voice == AdhanVoice.CUSTOM) IosCustomAdhanFiles.fullPath() else null
                 val fileName = SoundAssets.iosPreviewResourceFileName(sound, voice)!!
-                val path = NSBundle.mainBundle.pathForResource(
+                val path = custom ?: NSBundle.mainBundle.pathForResource(
                     fileName.substringBeforeLast('.'), fileName.substringAfterLast('.'),
                 ) ?: return
                 claimSession()

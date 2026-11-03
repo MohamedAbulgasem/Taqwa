@@ -473,8 +473,10 @@ struct TaqwaLockScreenWidgetView: View {
             default:
                 VStack(alignment: .leading, spacing: 1) {
                     HStack {
-                        // See `TaqwaHomeWidgetView.small(_:)` — same already-localised phrase.
-                        Text(entry.headline)
+                        // The next prayer's name as the list writes it, beside its start time, as
+                        // the "then" line names the one after: "Maghrib in" beside a start time read
+                        // as a countdown (the owner's decision, 3 Nov 2026).
+                        Text(content.nextPrayerDisplayName)
                             .font(.headline)
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)

@@ -1027,7 +1027,9 @@ private data class ShrinkThenWrap(val size: TextUnit) : TextAutoSize {
  * widget so. It once named the prayer alone there; the owner chose the accessory's words (31 October).
  */
 internal fun lockScreenHeadline(content: WidgetContent): String =
-    WidgetCountdown.headline(content, remainingMinutes = content.countdownMinutes)
+    // The next prayer's name as the list writes it, as the "then" line names the one after: the
+    // time beside it is when the prayer starts, so "Maghrib in" read as a countdown (3 Nov 2026).
+    content.rows.firstOrNull { it.displayName == content.nextPrayerDisplayName }?.displayName ?: content.nextPrayerDisplayName
 
 /**
  * The prayer the accessory's second line names, chosen as `prayerAfterNext` in

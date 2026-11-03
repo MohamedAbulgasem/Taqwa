@@ -8,7 +8,12 @@ enum class PrayerSound { SILENT, NOTIFICATION, TAKBIR, ADHAN }
  * per prayer. [ORIGINAL] is the recording shipped since 0.1.0 and stays the default, so a user
  * who never opens the setting hears exactly what they heard before.
  */
-enum class AdhanVoice { ORIGINAL, AZEEZ, AZEMI }
+enum class AdhanVoice {
+    ORIGINAL, MAKKAH, MADINAH, AZEMI, AZEEZ,
+
+    /** A recording chosen from the phone ([world.taqwa.app.notifications.CustomAdhanInfo]); Android only for now. */
+    CUSTOM,
+}
 
 /**
  * When the Duha reminder rings (Duha and Iqama spec §2): at its best time, midway between sunrise

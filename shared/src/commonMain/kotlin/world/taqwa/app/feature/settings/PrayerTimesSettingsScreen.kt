@@ -112,8 +112,8 @@ private val SCHOOLS = listOf("automatic", "standard", "hanafi")
  *   does not apply here (ruling R50) or waits to be confirmed (ruling R52).
  * - Asr: Automatic, Standard, Hanafi, with a note naming the school by its shadow; the switches
  *   for both Asr times and, where mosques differ, where their timetables differ.
- * - Hijri date, then Show sunrise and Time format (24-hour or 12-hour, chosen in a sheet): both
- *   say how the list is shown, neither changes a time.
+ * - Under it, Show sunrise and Time format (24-hour or 12-hour, chosen in a sheet): both say how
+ *   the list is shown, neither changes a time. Then Asr, then the Hijri date.
  *
  * [status] is null without a location: the rows then name the stored choice alone.
  */
@@ -183,6 +183,23 @@ fun PrayerTimesSettingsScreen(
             )
         }
 
+        // How the list is shown, right under the timetable that gives the times (the owner's call,
+        // 4 Nov 2026): neither changes a time.
+        Spacer(Modifier.height(14.dp))
+        SettingsCard {
+            TaqwaRow(
+                stringResource(Res.string.prayer_times_show_sunrise),
+                toggle = RowToggle(settings.showSunrise, onShowSunrise),
+            )
+            CardDivider()
+            // The screen's other display preference sits with "Show sunrise": both say how the
+            // list is shown, neither changes a time.
+            TaqwaRow(
+                stringResource(Res.string.prayer_times_time_format),
+                value = clockFormatName(clockFormat),
+                onClick = { timeFormatOpen = true },
+            )
+        }
         Spacer(Modifier.height(28.dp))
         SectionLabel(stringResource(Res.string.prayer_times_asr_label))
         SegmentedControl(
@@ -242,21 +259,6 @@ fun PrayerTimesSettingsScreen(
         // explanation concludes the app is wrong, not that it uses a different convention.
         SettingsNote(stringResource(Res.string.hijri_method_note))
 
-        Spacer(Modifier.height(28.dp))
-        SettingsCard {
-            TaqwaRow(
-                stringResource(Res.string.prayer_times_show_sunrise),
-                toggle = RowToggle(settings.showSunrise, onShowSunrise),
-            )
-            CardDivider()
-            // The screen's other display preference sits with "Show sunrise": both say how the
-            // list is shown, neither changes a time.
-            TaqwaRow(
-                stringResource(Res.string.prayer_times_time_format),
-                value = clockFormatName(clockFormat),
-                onClick = { timeFormatOpen = true },
-            )
-        }
     }
     if (timeFormatOpen) {
         TaqwaBottomSheet(onDismissRequest = { timeFormatOpen = false }) {

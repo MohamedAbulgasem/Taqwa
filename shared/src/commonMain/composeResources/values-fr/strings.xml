@@ -270,6 +270,7 @@
     <string name="sound_takbir_detail">Allahou akbar, Allahou akbar, environ %1$ss</string>
     <string name="sound_adhan_detail">L’adhan, les %1$s premières secondes</string>
     <string name="sound_sheet_footnote">Une notification de prière joue les %1$s premières secondes du son choisi. L’adhan complet peut être écouté dans l’application.</string>
+    <string name="sound_adhan_detail_full">L’adhan en entier</string>
     <string name="sound_sheet_muted_hint">Votre téléphone est en mode silencieux ou « Ne pas déranger » : les aperçus et les notifications de prière ne produisent aucun son.</string>
 
     <!-- Adhan voice -->
@@ -281,6 +282,19 @@
     <string name="adhan_voice_original_detail">Mélismatique, %1$s</string>
     <string name="adhan_voice_azeez_detail">Simple et rapide, %1$s</string>
     <string name="adhan_voice_azemi_detail">En direct de la mosquée de Malmö, %1$s</string>
+    <string name="adhan_voice_makkah">La Mecque</string>
+    <string name="adhan_voice_madinah">Médine</string>
+    <string name="adhan_voice_makkah_detail">Masjid al-Haram, %1$s</string>
+    <string name="adhan_voice_madinah_detail">Masjid an-Nabawi, %1$s</string>
+    <string name="adhan_voice_taqwa_label">ADHANS DE TAQWA</string>
+    <string name="adhan_voice_phone_label">DEPUIS VOTRE TÉLÉPHONE</string>
+    <string name="adhan_voice_choose">Choisir un enregistrement</string>
+    <string name="adhan_voice_choose_detail">Un adhan enregistré sur ce téléphone. Il y reste.</string>
+    <string name="adhan_voice_custom">Votre enregistrement</string>
+    <string name="adhan_voice_choose_another">En choisir un autre</string>
+    <string name="adhan_voice_remove">Retirer</string>
+    <string name="adhan_voice_pick_failed">Ce fichier n’a pas pu être lu comme un son.</string>
+    <string name="adhan_voice_custom_detail">%1$s · %2$s</string>
 
     <!-- Prayer time settings -->
     <!-- Prayer engine: Settings (Task 12) -->
@@ -449,7 +463,7 @@
     <string name="credit_typeface">Police Manrope</string>
     <string name="credit_typeface_detail">Licence SIL Open Font 1.1.</string>
     <string name="credit_audio">Enregistrements de l’adhan et du takbir</string>
-    <string name="credit_audio_detail">« Beautiful adhan » d’Adam-synagda, CC0 1.0, via Wikimedia Commons. « The Adhan – Muslim Call to Prayer – Aaqib Azeez », CC BY-SA 4.0, via Wikimedia Commons. « Eid al-Fitr Fajr azan at Malmö Mosque » d’Islamic Center Malmö, CC BY 3.0, via Wikimedia Commons.</string>
+    <string name="credit_audio_detail">« Beautiful adhan » d’Adam-synagda, CC0 1.0, via Wikimedia Commons. « The Adhan – Muslim Call to Prayer – Aaqib Azeez », CC BY-SA 4.0, via Wikimedia Commons. « Eid al-Fitr Fajr azan at Malmö Mosque » d’Islamic Center Malmö, CC BY 3.0, via Wikimedia Commons. « Adhan, Great Mosque of Mecca » de Seyfula Islam, CC BY 3.0, via Wikimedia Commons. « Call to prayer from the Prophet’s Mosque » d’ejaz215, CC BY 3.0, via Wikimedia Commons.</string>
     <string name="credit_chime">Tonalité de notification</string>
     <string name="credit_chime_detail">« Clear announce tones », de Mixkit, licence gratuite Mixkit pour les effets sonores.</string>
     <string name="credit_quran_text">Texte du Coran</string>

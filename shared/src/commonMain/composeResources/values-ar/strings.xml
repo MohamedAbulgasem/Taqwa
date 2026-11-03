@@ -265,6 +265,7 @@
     <string name="sound_takbir_detail">الله أكبر، الله أكبر، نحو %1$s ثانية</string>
     <string name="sound_adhan_detail">الأذان، أول %1$s ثانية</string>
     <string name="sound_sheet_footnote">يُشغِّل إشعار الصلاة أول %1$s ثانية من الصوت. ويمكن تشغيل الأذان كاملًا داخل التطبيق.</string>
+    <string name="sound_adhan_detail_full">الأذان كاملًا</string>
     <string name="sound_sheet_muted_hint">هاتفك على الوضع الصامت أو «عدم الإزعاج»، لذا لن يصدر صوت للمعاينة ولا لإشعارات الصلاة.</string>
 
     <!-- Adhan voice -->
@@ -276,6 +277,19 @@
     <string name="adhan_voice_original_detail">مُرتَّل، %1$s</string>
     <string name="adhan_voice_azeez_detail">بسيط وسريع، %1$s</string>
     <string name="adhan_voice_azemi_detail">مباشر من مسجد مالمو، %1$s</string>
+    <string name="adhan_voice_makkah">مكة</string>
+    <string name="adhan_voice_madinah">المدينة</string>
+    <string name="adhan_voice_makkah_detail">المسجد الحرام، %1$s</string>
+    <string name="adhan_voice_madinah_detail">المسجد النبوي، %1$s</string>
+    <string name="adhan_voice_taqwa_label">أذانات تقوى</string>
+    <string name="adhan_voice_phone_label">من هاتفك</string>
+    <string name="adhan_voice_choose">اختر تسجيلًا</string>
+    <string name="adhan_voice_choose_detail">أذان محفوظ على هذا الهاتف، ويبقى عليه.</string>
+    <string name="adhan_voice_custom">تسجيلك</string>
+    <string name="adhan_voice_choose_another">اختر غيره</string>
+    <string name="adhan_voice_remove">إزالة</string>
+    <string name="adhan_voice_pick_failed">تعذّرت قراءة هذا الملف كصوت.</string>
+    <string name="adhan_voice_custom_detail">%1$s · %2$s</string>
 
     <!-- Prayer time settings -->
     <!-- Prayer engine: Settings (Task 12) -->
@@ -448,7 +462,7 @@
     <string name="credit_typeface">خط Manrope</string>
     <string name="credit_typeface_detail">رخصة SIL Open Font 1.1.</string>
     <string name="credit_audio">تسجيل الأذان والتكبير</string>
-    <string name="credit_audio_detail">«Beautiful adhan» لـ Adam-synagda، رخصة CC0 1.0، عبر ويكيميديا كومنز. «The Adhan – Muslim Call to Prayer – Aaqib Azeez»، رخصة CC BY-SA 4.0، عبر ويكيميديا كومنز. «Eid al-Fitr Fajr azan at Malmö Mosque» لمركز مالمو الإسلامي، رخصة CC BY 3.0، عبر ويكيميديا كومنز.</string>
+    <string name="credit_audio_detail">«Beautiful adhan» لـ Adam-synagda، رخصة CC0 1.0، عبر ويكيميديا كومنز. «The Adhan – Muslim Call to Prayer – Aaqib Azeez»، رخصة CC BY-SA 4.0، عبر ويكيميديا كومنز. «Eid al-Fitr Fajr azan at Malmö Mosque» لمركز مالمو الإسلامي، رخصة CC BY 3.0، عبر ويكيميديا كومنز. «Adhan, Great Mosque of Mecca» لـ Seyfula Islam، رخصة CC BY 3.0، عبر ويكيميديا كومنز. «Call to prayer from the Prophet’s Mosque» لـ ejaz215، رخصة CC BY 3.0، عبر ويكيميديا كومنز.</string>
     <string name="credit_chime">نغمة التنبيه</string>
     <string name="credit_chime_detail">«Clear announce tones» من Mixkit، رخصة Mixkit المجانية للمؤثرات الصوتية.</string>
     <string name="credit_quran_text">نص القرآن</string>

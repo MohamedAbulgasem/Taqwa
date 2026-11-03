@@ -154,6 +154,9 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                         "off" -> appContainer.setTahajjud(false)
                         else -> fireTahajjud()
                     }
+                    // `--es name <VOICE>` (ORIGINAL, MAKKAH, MADINAH, AZEMI, AZEEZ, CUSTOM): that voice, all
+                    // five prayers on Adhan, and one prayer notification through the real scheduler in 8 s.
+                    "adhan" -> fireAdhan(intent.getStringExtra("name") ?: "ORIGINAL")
                     // `--es name on|off` switches Duha or the iqama (Duha and Iqama spec §3), as
                     // their Settings cards do, and logs what the new plan arms for it.
                     "duha", "iqama" -> {
@@ -194,6 +197,25 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
         val soon = entry.copy(id = "TAHAJJUD-debug", instant = Clock.System.now() + 8.seconds)
         createNotificationScheduler().scheduleAll(plan + soon)
         Log.i(TAG, "tahajjud: real one at ${entry.instant}, test one in 8 s: ${soon.title} | ${soon.body} | ${soon.sound}")
+    }
+
+    /** The adhan test: [voiceName], every prayer on Adhan, and the plan's next prayer moved to 8 s from now. */
+    private suspend fun fireAdhan(voiceName: String) {
+        val repository = appContainer.settingsRepository
+        val current = repository.notificationSettings.first()
+        val voice = world.taqwa.app.domain.AdhanVoice.valueOf(voiceName)
+        repository.setNotificationSettings(
+            current.copy(voice = voice, sounds = current.sounds.mapValues { world.taqwa.app.domain.PrayerSound.ADHAN }),
+        )
+        val plan = appContainer.notificationCoordinator.reschedule(RescheduleTrigger.SETTINGS_CHANGED)
+        val entry = plan.firstOrNull { it.kind == NotificationKind.PRAYER && it.sound == world.taqwa.app.domain.PrayerSound.ADHAN }
+        if (entry == null) {
+            Log.w(TAG, "adhan: nothing planned — are notifications on, with a location set?")
+            return
+        }
+        val soon = entry.copy(id = "PRAYER-debug", instant = Clock.System.now() + 8.seconds)
+        createNotificationScheduler().scheduleAll(plan + soon)
+        Log.i(TAG, "adhan: $voice, test one in 8 s: ${soon.title} | ${soon.sound} ${soon.voice}")
     }
 
     /** One collector for the life of the process, logging every state the player publishes. */

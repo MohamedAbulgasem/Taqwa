@@ -14,14 +14,14 @@ Prayer times, adhan, Quran with recitation, adhkar and Qibla. Works offline.
 (No price or promotion words here: Play flags them in the short description and may not promote the app.)
 
 ### Full description (4000)
-Taqwa gives you the essentials of the day in one quiet place: prayer times where you are, a takbir or the opening of the adhan at each prayer, the whole Quran to read and listen to, the morning and evening adhkar, and the Qibla. It works offline, costs nothing, shows no adverts and asks for no account.
+Taqwa gives you the essentials of the day in one quiet place: prayer times where you are, a takbir or the adhan at each prayer, the whole Quran to read and listen to, the morning and evening adhkar, and the Qibla. It works offline, costs nothing, shows no adverts and asks for no account.
 
 PRAYER TIMES
 • Times for where you are, from your phone's location or a city you choose from more than 34,000.
 • Times from the timetable the mosques near you follow. Where Taqwa holds it, it reproduces it and checks it day by day against the published tables: on every day checked, no prayer starts before the published time. Where a timetable is not yet fully checked, Taqwa adds a safety margin; where mosques follow different timetables, it shows cautious times, each prayer once all have begun it; and where no timetable is known, it calculates on the safe side.
 • Tap the (i) on the Prayer screen to see whose times these are, and About these times for how they are made and checked. Match my mosque looks for your mosque's timetable from two times on its board, and the usual calculation methods (Muslim World League, Egyptian, Karachi, ISNA and more) and a per-prayer adjustment are there too.
 • Rules for high latitudes, where the night is too short for the usual angles.
-• A notification for each prayer: a clear tone, a takbir, or the opening of the adhan in a choice of voices, with an optional reminder before it, an Iqama reminder a chosen number of minutes after the adhan, and a Duha reminder at its best time.
+• A notification for each prayer: a clear tone, a takbir, or the adhan in a choice of voices, among them Makkah and Madinah, or a recording from your phone, with an optional reminder before it, an Iqama reminder a chosen number of minutes after the adhan, and a Duha reminder at its best time.
 • A Jumu'ah pill on Friday's Dhuhr, home-screen widgets with today's times and the countdown to the next prayer, and the Hijri date alongside the Gregorian one.
 • A 24-hour or 12-hour clock, as you prefer.
 

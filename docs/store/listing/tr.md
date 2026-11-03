@@ -12,14 +12,14 @@ Taqwa: Namaz, Kur’an ve Kıble
 Namaz vakitleri, ezan, tilavetli Kur’an, zikirler, Kıble. Çevrimdışı çalışır.
 
 ### Full description (4000)
-Taqwa, günün temel ihtiyaçlarını tek bir sakin yerde toplar: bulunduğunuz yerin namaz vakitleri, her vakitte bir tekbir ya da ezanın ilk saniyeleri, okumak ve dinlemek için Kur’an’ın tamamı, sabah ve akşam zikirleri ve Kıble. Çevrimdışı çalışır, hiçbir ücret istemez, reklam göstermez ve hesap açtırmaz.
+Taqwa, günün temel ihtiyaçlarını tek bir sakin yerde toplar: bulunduğunuz yerin namaz vakitleri, her vakitte bir tekbir ya da ezan, okumak ve dinlemek için Kur’an’ın tamamı, sabah ve akşam zikirleri ve Kıble. Çevrimdışı çalışır, hiçbir ücret istemez, reklam göstermez ve hesap açtırmaz.
 
 NAMAZ VAKİTLERİ
 • Telefonunuzun konumundan ya da 34.000’den fazla şehir arasından seçeceğiniz bir şehirden, bulunduğunuz yere göre vakitler.
 • Yakınınızdaki camilerin uyduğu takvime göre vakitler. Taqwa bu takvime sahipse onu yeniden hesaplar ve yayımlanan tablolarla gün gün karşılaştırır: karşılaştırılan her günde hiçbir namaz yayımlanan vakitten önce başlamaz. Takvim henüz tam doğrulanmadıysa Taqwa bir güvenlik payı ekler; camiler farklı takvimlere uyuyorsa ihtiyatlı vakitler gösterir, yani her namaz hepsinde vakit girdikten sonra görünür; hiçbir takvim bilinmiyorsa vakitleri ihtiyatlı biçimde hesaplar.
 • Vakitlerin kime ait olduğunu görmek için Namaz ekranındaki (i) simgesine dokunun; nasıl hesaplanıp doğrulandıkları “Bu vakitler hakkında” ekranında anlatılır. “Camimle eşleştir”, caminizin panosundaki iki vakitten takvimini bulmaya çalışır; alışılmış hesaplama yöntemleri (Dünya İslam Birliği, Mısır, Karaçi, ISNA ve daha fazlası) ve her namaz için ayrı düzeltme de mevcuttur.
 • Gecenin alışılmış açılar için fazla kısa kaldığı yüksek enlemler için kurallar.
-• Her namaz için bir bildirim: net bir uyarı tonu, bir tekbir ya da farklı seslerden birinin okuduğu ezanın ilk saniyeleri; dilerseniz öncesinde bir hatırlatma, ezandan belirlediğiniz dakika sonra bir kamet hatırlatması ve en faziletli vaktinde bir kuşluk namazı hatırlatmasıyla.
+• Her namaz için bir bildirim: net bir uyarı tonu, bir tekbir ya da aralarında Mekke ve Medine’nin de bulunduğu seslerden birinin okuduğu ezan veya telefonunuzdaki bir kayıt; dilerseniz öncesinde bir hatırlatma, ezandan belirlediğiniz dakika sonra bir kamet hatırlatması ve en faziletli vaktinde bir kuşluk namazı hatırlatmasıyla.
 • Cuma günleri öğle vaktinde Cuma etiketi, günün vakitlerini ve sonraki vakte geri sayımı gösteren ana ekran widget’ları, miladi tarihin yanında hicri tarih.
 • Tercihinize göre 24 saat ya da 12 saat biçimi.
 

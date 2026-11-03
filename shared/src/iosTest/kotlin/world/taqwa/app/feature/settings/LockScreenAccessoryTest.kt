@@ -40,7 +40,7 @@ import kotlin.test.assertTrue
  * as two lines: the next prayer with its time at the end, then "then" and the prayer after it, in
  * a smaller, fainter line. It shows no countdown. The picture once read "Maghrib in 0:21 · 18:32",
  * and then "in 0:21" under the first line, neither of which the real accessory ever shows. Its
- * first line is the accessory's own "Maghrib in" phrase (the owner's decision, 31 October), where
+ * first line names the prayer as the list does, "Maghrib · المغرب" (the owner's decision, 3 Nov 2026), where
  * it once named the prayer alone.
  */
 @OptIn(ExperimentalTestApi::class)
@@ -63,7 +63,7 @@ class LockScreenAccessoryTest {
     @Test
     fun thePrayerAndItsTimeShareTheFirstLineAndThePrayerAfterItComesUnderThem() = runComposeUiTest {
         setContent { CompositionLocalProvider(LocalTaqwaColors provides LightColors) { LockScreenAccessory(maghrib) } }
-        val prayer = onNodeWithText("Maghrib in").getUnclippedBoundsInRoot()
+        val prayer = onNodeWithText("Maghrib · المغرب").getUnclippedBoundsInRoot()
         val time = onNodeWithText("18:32").getUnclippedBoundsInRoot()
         val then = onNodeWithText(getString(Res.string.widgets_lock_then, "Isha · العشاء")).getUnclippedBoundsInRoot()
         assertTrue(prayer.right <= time.left, "the time is not after the prayer on its line")
@@ -137,7 +137,7 @@ class LockScreenAccessoryTest {
     fun atLargeTextSizesEveryLineIsWhole() = runComposeUiTest {
         // The largest text an iPhone offers, in an accessory narrower than the iPhone SE's.
         setContent { Accessory(fontScale = 3.2f, width = 200.dp) }
-        for (text in listOf("Maghrib in", "18:32", getString(Res.string.widgets_lock_then, "Isha · العشاء"))) {
+        for (text in listOf("Maghrib · المغرب", "18:32", getString(Res.string.widgets_lock_then, "Isha · العشاء"))) {
             assertFalse(layoutOf(text).hasVisualOverflow, "\"$text\" is cut")
         }
     }
@@ -146,7 +146,7 @@ class LockScreenAccessoryTest {
     @Test
     fun atLargeTextSizesTheArabicFirstLineIsWhole() = runComposeUiTest {
         setContent { Accessory(fontScale = 3.2f, width = 200.dp, maghribArabic, LayoutDirection.Rtl) }
-        for (text in listOf("متبقٍّ على المغرب", "18:32")) {
+        for (text in listOf("المغرب", "18:32")) {
             assertFalse(layoutOf(text).hasVisualOverflow, "\"$text\" is cut")
         }
     }
@@ -155,7 +155,7 @@ class LockScreenAccessoryTest {
     @Test
     fun atTheDefaultTextSizeEachLineIsOneWholeLine() = runComposeUiTest {
         setContent { Accessory(fontScale = 1f, width = 300.dp) }
-        for (text in listOf("Maghrib in", "18:32", getString(Res.string.widgets_lock_then, "Isha · العشاء"))) {
+        for (text in listOf("Maghrib · المغرب", "18:32", getString(Res.string.widgets_lock_then, "Isha · العشاء"))) {
             val line = layoutOf(text)
             assertEquals(1, line.lineCount, "\"$text\" is not on one line")
             assertFalse(line.hasVisualOverflow, "\"$text\" is cut")
@@ -168,13 +168,12 @@ class LockScreenAccessoryTest {
         return layouts.single()
     }
 
-    /** The first line is the accessory's own: the "Maghrib in" phrase, as `entry.headline` reads, never the
-     * name alone nor the pair with the Arabic. */
+    /** The first line names the next prayer as the list does, never the "Maghrib in" countdown phrase:
+     * the time beside it is when the prayer starts (the owner's decision, 3 Nov 2026). */
     @Test
-    fun theFirstLineIsTheCountdownPhraseAsTheRealAccessorysIs() = runComposeUiTest {
+    fun theFirstLineNamesThePrayerAsTheListDoes() = runComposeUiTest {
         setContent { CompositionLocalProvider(LocalTaqwaColors provides LightColors) { LockScreenAccessory(maghrib) } }
-        onAllNodesWithText("Maghrib in").assertCountEquals(1)
-        onAllNodesWithText("Maghrib").assertCountEquals(0)
-        onAllNodesWithText("Maghrib · المغرب").assertCountEquals(0)
+        onAllNodesWithText("Maghrib · المغرب").assertCountEquals(1)
+        onAllNodesWithText("Maghrib in").assertCountEquals(0)
     }
 }

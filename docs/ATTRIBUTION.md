@@ -14,8 +14,10 @@ only on its own terms, or must be replaced. Licence texts that must travel with 
 - **City database**: [GeoNames](https://www.geonames.org/) `cities15000`, CC BY 4.0.
 - **Magnetic declination (iOS compass)**: the [World Magnetic Model 2025](https://www.ncei.noaa.gov/products/world-magnetic-model) by NOAA's National Centers for Environmental Information and the British Geological Survey, for the US National Geospatial-Intelligence Agency and the UK Defence Geographic Centre. Public domain, not subject to copyright; its coefficient file is embedded in `WorldMagneticModel.kt`.
 - **Manrope** typeface: SIL Open Font Licence 1.1; the licence text is in `docs/licences/OFL-1.1-Manrope.txt`, as the OFL requires of every copy. The website serves Manrope from taqwa.world: the app's own Regular, SemiBold and ExtraBold files plus a Bold from the same Google Fonts release (`site/assets/fonts/`), and `site/build.py` puts the same licence text beside them (`taqwa.world/assets/fonts/OFL-1.1-Manrope.txt`).
-- **Adhan and takbir audio**, three recordings, one chosen in Settings under Notifications, Adhan:
+- **Adhan and takbir audio**, five recordings, one chosen in Settings under Notifications, Adhan:
   - *Original*: "Beautiful adhan" by Adam-synagda, CC0 1.0, via Wikimedia Commons.
+  - *Makkah*: "Adhan, Great Mosque of Mecca - Jan 21, 2013" by Seyfula Islam, CC BY 3.0, via Wikimedia Commons. Taqwa's files start 8 s in, where the adhan begins, and are loudness-matched.
+  - *Madinah*: "Call to prayer from the Prophet's Mosque" by ejaz215, CC BY 3.0, via Wikimedia Commons; loudness-matched.
   - *Aaqib Azeez*: "The Adhan – Muslim Call to Prayer – Aaqib Azeez", CC BY-SA 4.0, via Wikimedia Commons. The clips Taqwa bundles are trimmed and loudness-matched excerpts, and are themselves released under CC BY-SA 4.0 as that licence requires.
   - *Besim Azemi*: "Eid al-Fitr Fajr azan at Malmö Mosque" by Islamic Center Malmö, CC BY 3.0, via Wikimedia Commons.
 - **Notification tone**: "Clear announce tones" from [Mixkit](https://mixkit.co/free-sound-effects/tones/), Mixkit Sound Effects Free Licence (use in apps permitted, not redistributable on its own, which is why the source WAV is not in this repository; `assets/audio/source/README.md` says how to regenerate the chime).

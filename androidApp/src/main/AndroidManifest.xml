@@ -103,6 +103,13 @@
             android:authorities="${applicationId}.artwork"
             android:exported="true"
             tools:ignore="ExportedContentProvider" />
+        <!-- The adhan recording chosen from the phone, for the Adhan channel's sound: the system
+             plays it from another process. Read-only, one fixed file, nothing else. -->
+        <provider
+            android:name="world.taqwa.app.notifications.CustomAdhanProvider"
+            android:authorities="${applicationId}.adhan"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
         <receiver android:name="world.taqwa.app.notifications.PrayerAlarmReceiver" android:exported="false" />
         <receiver android:name="world.taqwa.app.notifications.SystemEventReceiver" android:exported="true">
             <intent-filter>

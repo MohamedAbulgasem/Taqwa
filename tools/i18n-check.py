@@ -43,7 +43,7 @@ PLURAL_CATEGORIES = {
 SAME_OK = {
     "about_licence_value", "about_source_value", "qibla_bearing", "recitation_arriving_voice",
     "recitation_percent", "settings_version_value", "ui_language", "app_name",
-    "adhan_voice_azeez", "adhan_voice_azemi", "about_website_value",
+    "adhan_voice_azeez", "adhan_voice_azemi", "adhan_voice_makkah", "adhan_voice_madinah", "adhan_voice_makkah_detail", "adhan_voice_madinah_detail", "adhan_voice_custom_detail", "about_website_value",
 }
 PLACEHOLDER = re.compile(r"%(\d+)\$[sd]")
 BOLD_MARK = "**"

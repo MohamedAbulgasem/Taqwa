@@ -1,5 +1,6 @@
 package world.taqwa.app.notifications
 
+import world.taqwa.app.widget.isIosPlatform
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.PrayerSound
 import kotlin.test.Test
@@ -36,8 +37,9 @@ class SoundAssetsTest {
 
     @Test
     fun adhanResolvesToTheMeasuredTwentyNinePointNineFiveSeconds() {
-        assertEquals(29.95.seconds, SoundAssets.duration(PrayerSound.ADHAN))
-        assertEquals("adhan_30s", SoundAssets.androidRawResourceName(PrayerSound.ADHAN))
+        // Only iOS stops a notification sound at 30 s; Android plays the whole recording.
+        assertEquals(if (isIosPlatform) 29.95.seconds else 154.10.seconds, SoundAssets.duration(PrayerSound.ADHAN))
+        assertEquals("adhan_full", SoundAssets.androidRawResourceName(PrayerSound.ADHAN))
         assertEquals("adhan-30s.caf", SoundAssets.iosResourceFileName(PrayerSound.ADHAN))
     }
 
@@ -78,10 +80,13 @@ class SoundAssetsTest {
     @Test
     fun theVoicedLevelsResolveToADifferentFilePerVoice() {
         listOf(PrayerSound.TAKBIR, PrayerSound.ADHAN).forEach { sound ->
-            val android = AdhanVoice.entries.map { SoundAssets.androidRawResourceName(sound, it) }
-            val ios = AdhanVoice.entries.map { SoundAssets.iosResourceFileName(sound, it) }
-            assertEquals(AdhanVoice.entries.size, android.toSet().size, "$sound android")
-            assertEquals(AdhanVoice.entries.size, ios.toSet().size, "$sound ios")
+            // A recording from the phone has no bundled files of its own: it borrows the original's.
+            val bundled = AdhanVoice.entries.filter { it != AdhanVoice.CUSTOM }
+            val android = bundled.map { SoundAssets.androidRawResourceName(sound, it) }
+            val ios = bundled.map { SoundAssets.iosResourceFileName(sound, it) }
+            assertEquals(bundled.size, android.toSet().size, "$sound android")
+            assertEquals(bundled.size, ios.toSet().size, "$sound ios")
+            assertEquals(SoundAssets.androidRawResourceName(sound), SoundAssets.androidRawResourceName(sound, AdhanVoice.CUSTOM))
         }
     }
 
@@ -98,7 +103,7 @@ class SoundAssetsTest {
     @Test
     fun everyBundledDurationIsUnderThePlatformThirtySecondCap() {
         AdhanVoice.entries.forEach { voice ->
-            PrayerSound.entries.mapNotNull { SoundAssets.duration(it, voice) }.forEach {
+            PrayerSound.entries.filter { isIosPlatform || it != PrayerSound.ADHAN }.mapNotNull { SoundAssets.duration(it, voice) }.forEach {
                 assertTrue(it.inWholeMilliseconds <= 30_000, "$voice: $it exceeds the 30s cap")
             }
         }
@@ -135,7 +140,8 @@ class SoundAssetsTest {
     fun everyVoiceHasAFullLengthLongerThanItsNotificationClip() {
         AdhanVoice.entries.forEach { voice ->
             val full = SoundAssets.fullAdhanDuration(voice)
-            assertTrue(full > SoundAssets.duration(PrayerSound.ADHAN, voice)!!, "$voice: $full")
+            val notification = SoundAssets.duration(PrayerSound.ADHAN, voice)!!
+            if (isIosPlatform) assertTrue(full > notification, "$voice: $full") else assertEquals(full, notification, "$voice")
         }
     }
 
@@ -143,7 +149,7 @@ class SoundAssetsTest {
     fun everyVoiceCarriesItsMeasuredFullLength() {
         // ffprobe on the shipped files, assets/audio/README.md.
         assertEquals(86.15.seconds, SoundAssets.fullAdhanDuration(AdhanVoice.AZEEZ))
-        assertEquals(211.40.seconds, SoundAssets.fullAdhanDuration(AdhanVoice.AZEMI))
+        assertEquals(211.00.seconds, SoundAssets.fullAdhanDuration(AdhanVoice.AZEMI))
         assertEquals(154.10.seconds, SoundAssets.fullAdhanDuration(AdhanVoice.ORIGINAL))
     }
 }

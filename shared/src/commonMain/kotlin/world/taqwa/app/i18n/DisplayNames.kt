@@ -13,6 +13,9 @@ import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.adhan_voice_azeez
 import world.taqwa.app.resources.adhan_voice_azemi
+import world.taqwa.app.resources.adhan_voice_custom
+import world.taqwa.app.resources.adhan_voice_madinah
+import world.taqwa.app.resources.adhan_voice_makkah
 import world.taqwa.app.resources.adhan_voice_original
 import world.taqwa.app.resources.asr_automatic
 import world.taqwa.app.resources.high_lat_automatic
@@ -127,5 +130,8 @@ fun adhanVoiceDisplayName(voice: AdhanVoice): String = stringResource(
         AdhanVoice.ORIGINAL -> Res.string.adhan_voice_original
         AdhanVoice.AZEEZ -> Res.string.adhan_voice_azeez
         AdhanVoice.AZEMI -> Res.string.adhan_voice_azemi
+        AdhanVoice.MAKKAH -> Res.string.adhan_voice_makkah
+        AdhanVoice.MADINAH -> Res.string.adhan_voice_madinah
+        AdhanVoice.CUSTOM -> Res.string.adhan_voice_custom
     },
 )

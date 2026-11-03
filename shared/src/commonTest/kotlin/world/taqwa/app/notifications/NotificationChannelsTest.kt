@@ -51,7 +51,8 @@ class NotificationChannelsTest {
         assertEquals("prayer_fajr_silent", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.SILENT))
         assertEquals("prayer_fajr_notification_chime3", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.NOTIFICATION))
         assertEquals("prayer_fajr_takbir", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.TAKBIR))
-        assertEquals("prayer_fajr_adhan", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.ADHAN))
+        // 1.5.0: Android plays the whole adhan, a new sound, so the Adhan level has new ids.
+        assertEquals("prayer_fajr_adhan_full", NotificationChannels.channelId(Prayer.FAJR, PrayerSound.ADHAN))
         PrayerSound.entries.forEach { sound ->
             assertEquals(
                 NotificationChannels.channelId(Prayer.ISHA, sound),
@@ -64,7 +65,7 @@ class NotificationChannelsTest {
     @Test
     fun anotherVoiceSuffixesTheIdOfTheTwoLevelsThatAreARecording() {
         assertEquals("prayer_asr_takbir_azeez", NotificationChannels.channelId(Prayer.ASR, PrayerSound.TAKBIR, AdhanVoice.AZEEZ))
-        assertEquals("prayer_asr_adhan_azemi", NotificationChannels.channelId(Prayer.ASR, PrayerSound.ADHAN, AdhanVoice.AZEMI))
+        assertEquals("prayer_asr_adhan_azemi_full", NotificationChannels.channelId(Prayer.ASR, PrayerSound.ADHAN, AdhanVoice.AZEMI))
     }
 
     // Silent has no sound and the chime is the same clip whichever adhan was picked, so neither
@@ -114,9 +115,14 @@ class NotificationChannelsTest {
             assertNotEquals(stale, live)
             assertEquals(1, ids.count { it == stale }, stale)
         }
-        // Four sounds, of which two fork per voice, plus the three retired chime ids.
+        // Four sounds, of which two fork per voice, plus the three retired chime ids and every
+        // voice's clip-era Adhan id.
         val voicedExtras = 2 * (AdhanVoice.entries.size - 1)
-        assertEquals(PrayerSound.entries.size + voicedExtras + 3, ids.toSet().size)
+        assertEquals(PrayerSound.entries.size + voicedExtras + 3 + AdhanVoice.entries.size, ids.toSet().size)
+        AdhanVoice.entries.forEach { voice ->
+            val clipEra = NotificationChannels.channelId(Prayer.MAGHRIB, PrayerSound.ADHAN, voice).removeSuffix("_full")
+            assertTrue(clipEra in ids, clipEra)
+        }
     }
 
     @Test

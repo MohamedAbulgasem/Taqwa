@@ -33,6 +33,8 @@ import world.taqwa.app.notifications.SoundAssets
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.sound_a11y_preview
 import world.taqwa.app.resources.sound_adhan_detail
+import world.taqwa.app.widget.isIosPlatform
+import world.taqwa.app.resources.sound_adhan_detail_full
 import world.taqwa.app.resources.sound_notification_detail
 import world.taqwa.app.resources.sound_sheet_footnote
 import world.taqwa.app.resources.sound_sheet_title
@@ -61,7 +63,8 @@ private fun subtitle(sound: PrayerSound, voice: AdhanVoice): String {
         PrayerSound.SILENT -> stringResource(Res.string.sound_silent_detail)
         PrayerSound.NOTIFICATION -> stringResource(Res.string.sound_notification_detail, seconds!!)
         PrayerSound.TAKBIR -> stringResource(Res.string.sound_takbir_detail, seconds!!)
-        PrayerSound.ADHAN -> stringResource(Res.string.sound_adhan_detail, seconds!!)
+        // Android plays the whole adhan; only iOS stops a notification sound at 30 seconds.
+        PrayerSound.ADHAN -> if (isIosPlatform) stringResource(Res.string.sound_adhan_detail, seconds!!) else stringResource(Res.string.sound_adhan_detail_full)
     }
 }
 
@@ -130,15 +133,21 @@ fun SoundSheet(
                 modifier = Modifier.padding(top = 16.dp),
             )
         }
-        Text(
-            stringResource(
-                Res.string.sound_sheet_footnote,
-                LocalPlatformFormat.current.localizedDigits(SOUND_CAP_SECONDS),
-            ),
-            style = TaqwaText.caption,
-            color = colors.textSecondary,
-            modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),
-        )
+        // Only iOS stops a notification sound at 30 seconds, so only iOS says so; Android plays the
+        // whole adhan and needs no note (the owner's call, 4 Nov 2026).
+        if (isIosPlatform) {
+            Text(
+                stringResource(
+                    Res.string.sound_sheet_footnote,
+                    LocalPlatformFormat.current.localizedDigits(SOUND_CAP_SECONDS),
+                ),
+                style = TaqwaText.caption,
+                color = colors.textSecondary,
+                modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),
+            )
+        } else {
+            Spacer(Modifier.height(24.dp))
+        }
         extra?.invoke(this)
     }
 }

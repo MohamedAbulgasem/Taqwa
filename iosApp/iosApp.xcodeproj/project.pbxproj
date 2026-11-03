@@ -27,8 +27,14 @@
 		A1B2C3D4E5F6A1B2C3D4E534 /* adhan-azeez-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E533 /* adhan-azeez-30s.caf */; };
 		A1B2C3D4E5F6A1B2C3D4E536 /* adhan-azeez-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E535 /* adhan-azeez-full.m4a */; };
 		A1B2C3D4E5F6A1B2C3D4E542 /* takbir-azemi.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E541 /* takbir-azemi.caf */; };
+		F1A46C4378A6D740000844F4 /* takbir-madinah.caf in Resources */ = {isa = PBXBuildFile; fileRef = 3798D69A01A7ACA5DBA0AB14 /* takbir-madinah.caf */; };
+		9557C6E20195A83B0FBFB322 /* takbir-makkah.caf in Resources */ = {isa = PBXBuildFile; fileRef = 853956501464B7B96F26CDBE /* takbir-makkah.caf */; };
 		A1B2C3D4E5F6A1B2C3D4E544 /* adhan-azemi-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E543 /* adhan-azemi-30s.caf */; };
+		B2EA1FFCABD4B208A9DDA38C /* adhan-madinah-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = 4B03D1B752E5670B396B2952 /* adhan-madinah-30s.caf */; };
+		3A9641FF5646837AC4D460A6 /* adhan-makkah-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = CE0B81E97BCECD62D79F98B0 /* adhan-makkah-30s.caf */; };
 		A1B2C3D4E5F6A1B2C3D4E546 /* adhan-azemi-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E545 /* adhan-azemi-full.m4a */; };
+		C3A2E19E4876F858066328FD /* adhan-madinah-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2E5658243E7990AC55B7FF42 /* adhan-madinah-full.m4a */; };
+		9A772063459754A9B5AD7F41 /* adhan-makkah-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 3A3F703EC55A287946AA36F0 /* adhan-makkah-full.m4a */; };
 		A1B2C3D4E5F6A1B2C3D4E552 /* recitation-artwork.png in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E551 /* recitation-artwork.png */; };
 		A7CF8ECCACEB4FAB893423B5 /* TaqwaWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B05AA9035AF4D3C9731B3E6 /* TaqwaWidgetBundle.swift */; };
 		C7983528BFE48BBADC014C36 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D563877F07E6BEE4908C30A /* Foundation.framework */; };
@@ -99,8 +105,14 @@
 		A1B2C3D4E5F6A1B2C3D4E533 /* adhan-azeez-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azeez-30s.caf"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E535 /* adhan-azeez-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azeez-full.m4a"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E541 /* takbir-azemi.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-azemi.caf"; sourceTree = "<group>"; };
+		3798D69A01A7ACA5DBA0AB14 /* takbir-madinah.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-madinah.caf"; sourceTree = "<group>"; };
+		853956501464B7B96F26CDBE /* takbir-makkah.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-makkah.caf"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E543 /* adhan-azemi-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azemi-30s.caf"; sourceTree = "<group>"; };
+		4B03D1B752E5670B396B2952 /* adhan-madinah-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-madinah-30s.caf"; sourceTree = "<group>"; };
+		CE0B81E97BCECD62D79F98B0 /* adhan-makkah-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-makkah-30s.caf"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E545 /* adhan-azemi-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azemi-full.m4a"; sourceTree = "<group>"; };
+		2E5658243E7990AC55B7FF42 /* adhan-madinah-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-madinah-full.m4a"; sourceTree = "<group>"; };
+		3A3F703EC55A287946AA36F0 /* adhan-makkah-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-makkah-full.m4a"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E551 /* recitation-artwork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "recitation-artwork.png"; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		B6765399CE6FAD9760BEA061 /* bn */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = bn; path = bn.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -225,8 +237,14 @@
 				A1B2C3D4E5F6A1B2C3D4E533 /* adhan-azeez-30s.caf */,
 				A1B2C3D4E5F6A1B2C3D4E535 /* adhan-azeez-full.m4a */,
 				A1B2C3D4E5F6A1B2C3D4E541 /* takbir-azemi.caf */,
+				3798D69A01A7ACA5DBA0AB14 /* takbir-madinah.caf */,
+				853956501464B7B96F26CDBE /* takbir-makkah.caf */,
 				A1B2C3D4E5F6A1B2C3D4E543 /* adhan-azemi-30s.caf */,
+				4B03D1B752E5670B396B2952 /* adhan-madinah-30s.caf */,
+				CE0B81E97BCECD62D79F98B0 /* adhan-makkah-30s.caf */,
 				A1B2C3D4E5F6A1B2C3D4E545 /* adhan-azemi-full.m4a */,
+				2E5658243E7990AC55B7FF42 /* adhan-madinah-full.m4a */,
+				3A3F703EC55A287946AA36F0 /* adhan-makkah-full.m4a */,
 				A1B2C3D4E5F6A1B2C3D4E551 /* recitation-artwork.png */,
 			);
 			path = Resources;
@@ -336,8 +354,14 @@
 				A1B2C3D4E5F6A1B2C3D4E534 /* adhan-azeez-30s.caf in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E536 /* adhan-azeez-full.m4a in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E542 /* takbir-azemi.caf in Resources */,
+				F1A46C4378A6D740000844F4 /* takbir-madinah.caf in Resources */,
+				9557C6E20195A83B0FBFB322 /* takbir-makkah.caf in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E544 /* adhan-azemi-30s.caf in Resources */,
+				B2EA1FFCABD4B208A9DDA38C /* adhan-madinah-30s.caf in Resources */,
+				3A9641FF5646837AC4D460A6 /* adhan-makkah-30s.caf in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E546 /* adhan-azemi-full.m4a in Resources */,
+				C3A2E19E4876F858066328FD /* adhan-madinah-full.m4a in Resources */,
+				9A772063459754A9B5AD7F41 /* adhan-makkah-full.m4a in Resources */,
 				A1B2C3D4E5F6A1B2C3D4E552 /* recitation-artwork.png in Resources */,
 				EA16D17443377A5A4AC28816 /* PrivacyInfo.xcprivacy in Resources */,
 				427E434635D5050BBA21CB6E /* InfoPlist.strings in Resources */,
