@@ -53,12 +53,8 @@ Situs web: https://taqwa.world/id/
 Dukungan: support@taqwa.world
 
 ### Release notes (500)
-Yang baru di versi 1.5.0:
-• Dua suara azan baru: Makkah dan Madinah
-• Notifikasi kini memutar azan lengkap; geser notifikasi untuk menghentikannya
-• Azan Anda sendiri: pilih rekaman dari ponsel Anda
-• “Tampilkan waktu terbit” dan “Format waktu” kini di atas Waktu salat
-• Waktu salat: Kuala Lumpur, George Town, dan Kangar diperbarui untuk 2027
+Yang baru di versi 1.5.1:
+• Al-Qur’an: di banyak kata, termasuk pada basmalah, fathah berdiri (alif kecil) tampil di samping kata, bukan di atasnya. Kini tampil di tempatnya. Terima kasih kepada pembaca yang telah menulis kepada kami.
 
 ## App Store
 
@@ -88,12 +84,8 @@ sholat,shalat,jadwal,waktu,adzan,alquran,murottal,tilawah,zikir,masjid,arah,isla
 (Teks yang sama dengan deskripsi lengkap Play di atas.)
 
 ### What's new (4000)
-Yang baru di versi 1.5.0:
-• Dua suara azan baru: Makkah dan Madinah
-• Azan Anda sendiri: pilih rekaman dari ponsel Anda; notifikasi memutar 30 detik pertamanya
-• Widget Layar Terkunci kini menampilkan nama salat berikutnya di samping waktunya
-• “Tampilkan waktu terbit” dan “Format waktu” kini di atas Waktu salat
-• Waktu salat: Kuala Lumpur, George Town, dan Kangar diperbarui untuk 2027
+Yang baru di versi 1.5.1:
+• Al-Qur’an: di banyak kata, termasuk pada basmalah, fathah berdiri (alif kecil) tampil di samping kata, bukan di atasnya. Kini tampil di tempatnya. Terima kasih kepada pembaca yang telah menulis kepada kami.
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Waktu salat di tempat Anda

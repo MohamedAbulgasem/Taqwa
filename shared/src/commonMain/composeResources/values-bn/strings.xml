@@ -125,7 +125,7 @@
     <string name="settings_not_set">নির্ধারিত নয়</string>
     <string name="settings_notifications_off">বন্ধ</string>
     <string name="settings_notifications_on_count">%1$sটি চালু</string>
-    <string name="settings_version_value">1.5.0</string>
+    <string name="settings_version_value">1.5.1</string>
 
     <!-- About screen. The product name is written তাকওয়া here, as on the icon. -->
     <string name="about_tagline">বিনামূল্যে, সবার জন্য, চিরকালের জন্য।</string>
@@ -451,7 +451,7 @@
     <string name="credit_chime">নোটিফিকেশনের সুর</string>
     <string name="credit_chime_detail">“Clear announce tones”, Mixkit থেকে, Mixkit Sound Effects Free Licence।</string>
     <string name="credit_quran_text">কুরআনের পাঠ</string>
-    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons Attribution 3.0। হুবহু অপরিবর্তিতভাবে দেওয়া।</string>
+    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons Attribution 3.0। তিনটি বিষয়ে বদলানো হয়েছে: উচ্চারিত না হওয়া হরফের চিহ্ন হাফস টাইপফেসের রূপে লেখা, বিসমিল্লাহ প্রথম আয়াতের ভেতরে নয়, সূরার ওপরে (সূরা ফাতিহায় তা এখনও প্রথম আয়াত), আর কিছু শব্দ খাড়া যবরের আগের সংযোগ-রেখা (তাতওয়িল) ছাড়া আঁকা হয়, যাতে টাইপফেস খাড়া যবরকে তার জায়গায় বসায়।</string>
     <string name="credit_quran_font">কুরআনের টাইপফেস</string>
     <string name="credit_quran_font_detail">বাদশাহ ফাহাদ কুরআন মুদ্রণ কমপ্লেক্সের KFGQPC Uthmanic Script Hafs। অপরিবর্তিত অবস্থায় ব্যবহার ও বিতরণ অবাধ।</string>
     <string name="credit_quran_layout">পৃষ্ঠাবিন্যাস</string>

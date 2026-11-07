@@ -147,7 +147,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">1.5.0</string>
+    <string name="settings_version_value">1.5.1</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          both locales, as on the icon. -->
@@ -499,7 +499,7 @@
     <string name="credit_chime">Notification tone</string>
     <string name="credit_chime_detail">“Clear announce tones” from Mixkit, Mixkit Sound Effects Free Licence.</string>
     <string name="credit_quran_text">Quran text</string>
-    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons Attribution 3.0. Reproduced verbatim.</string>
+    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons Attribution 3.0. Changed in three ways: the silent-letter sign takes the Hafs typeface’s form, the basmala stands above its surah instead of in the first ayah (in Al-Fatihah it is still the first ayah), and some words are drawn without the connecting stroke (tatweel) before a small alef so the typeface puts the alef in its place.</string>
     <string name="credit_quran_font">Quran typeface</string>
     <string name="credit_quran_font_detail">KFGQPC Uthmanic Script Hafs by the King Fahd Glorious Quran Printing Complex. Free to use and distribute unmodified.</string>
     <string name="credit_quran_layout">Page layout</string>

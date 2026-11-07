@@ -329,7 +329,8 @@ def fuse_sign_tokens(tokens: list[str]) -> list[str]:
     its own, space-separated. The Mushaf layout counts them as part of a neighbouring word:
     a pause mark or sajdah sign belongs to the word before it, the rub-el-hizb star to the
     word after it. This re-groups Tanzil's tokens the same way -- the space is kept inside the
-    fused word, so the stored text is still character-for-character Tanzil's."""
+    fused word, so the stored text keeps Tanzil's characters apart from clean()'s U+06DF
+    mapping and the basmala taken off each surah's first ayah."""
     fused: list[str] = []
     carry = ""
     for t in tokens:

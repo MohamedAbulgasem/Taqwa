@@ -58,12 +58,8 @@ Website: https://taqwa.world
 Support: support@taqwa.world
 
 ### Release notes (500)
-What's new in 1.5.0:
-• Two new adhan voices: Makkah and Madinah
-• Notifications now play the complete adhan; swipe the notification away to stop it
-• Your own adhan: choose a recording from your phone
-• Show sunrise and Time format now sit near the top of Prayer times
-• Prayer times: Kuala Lumpur, George Town and Kangar updated for 2027
+What's new in 1.5.1:
+• Quran: in many words, the basmala included, the small superscript alef was drawn beside the word instead of above it. It is now drawn in its place. Thank you to the reader who wrote in.
 
 ## App Store
 
@@ -93,12 +89,8 @@ times,salah,salat,azan,athan,koran,islam,recitation,tasbih,mosque,dhikr,ramadan,
 (The same text as the Play full description above.)
 
 ### What's new (4000)
-What's new in 1.5.0:
-• Two new adhan voices: Makkah and Madinah
-• Your own adhan: choose a recording from your phone; the notification plays its first 30 seconds
-• The Lock Screen widget now names the next prayer beside its time
-• Show sunrise and Time format now sit near the top of Prayer times
-• Prayer times: Kuala Lumpur, George Town and Kangar updated for 2027
+What's new in 1.5.1:
+• Quran: in many words, the basmala included, the small superscript alef was drawn beside the word instead of above it. It is now drawn in its place. Thank you to the reader who wrote in.
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Prayer times where you are
@@ -114,4 +106,4 @@ What's new in 1.5.0:
 ## Review notes (App Store and Play, English only)
 No account or sign-in. Location is optional: Settings › Location lets a reviewer choose any city instead. Everything works offline except recitation downloads, which fetch audio from a public GitHub release on request. To see the lock-screen player, play a surah and lock the phone. Widgets are added from the home screen's widget gallery. Nothing is collected or sent anywhere; the privacy policy is at https://taqwa.world/privacy/.
 
-App Store Connect's Notes field carries the longer answers to App Review's information request of 23 September 2026 instead, brought up to date for the engine build on 29 September and for build 35 on 2 October: `docs/store/app-review/2026-10-02-notes-1.0.0-35.txt` (the 23 September reply and the 29 September notes stay as the record of what was sent then). Apple asked for them to stay there for future submissions, so update the newest file and the field together when a feature, a network use or a licence changes. The field holds 4,000 bytes.
+App Store Connect's Notes field carries the longer answers to App Review's information request of 23 September 2026 instead, brought up to date for the engine build on 29 September, for build 35 on 2 October and for build 42 on 7 November: `docs/store/app-review/2026-11-07-notes-1.5.1-42.txt` (the 23 September reply and the earlier notes stay as the record of what was sent then). Apple asked for them to stay there for future submissions, so update the newest file and the field together when a feature, a network use or a licence changes. The field holds 4,000 bytes.

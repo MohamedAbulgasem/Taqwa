@@ -128,7 +128,7 @@
     <string name="settings_not_set">Non définie</string>
     <string name="settings_notifications_off">Désactivées</string>
     <string name="settings_notifications_on_count">%1$s activées</string>
-    <string name="settings_version_value">1.5.0</string>
+    <string name="settings_version_value">1.5.1</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          every locale, as on the icon. -->
@@ -467,7 +467,7 @@
     <string name="credit_chime">Tonalité de notification</string>
     <string name="credit_chime_detail">« Clear announce tones », de Mixkit, licence gratuite Mixkit pour les effets sonores.</string>
     <string name="credit_quran_text">Texte du Coran</string>
-    <string name="credit_quran_text_detail">Texte coranique Tanzil v1.1, Creative Commons Attribution 3.0. Reproduit sans modification.</string>
+    <string name="credit_quran_text_detail">Texte coranique Tanzil v1.1, Creative Commons Attribution 3.0. Modifié sur trois points : le signe des lettres muettes prend la forme de la police Hafs, la basmala se trouve au-dessus de sa sourate et non dans le premier verset (dans Al-Fatiha, elle reste le premier verset), et certains mots sont dessinés sans le trait de liaison (tatwil) qui précède un petit alif, pour que la police pose l’alif à sa place.</string>
     <string name="credit_quran_font">Police du Coran</string>
     <string name="credit_quran_font_detail">KFGQPC Uthmanic Script Hafs, du Complexe du Roi Fahd pour l’impression du noble Coran. Libre d’utilisation et de diffusion sans modification.</string>
     <string name="credit_quran_layout">Mise en page</string>

@@ -133,7 +133,7 @@
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
-    <string name="settings_version_value">1.5.0</string>
+    <string name="settings_version_value">1.5.1</string>
 
     <!-- شاشة «عن تقوى». الاسم «Taqwa» يبقى بالحروف اللاتينية كما على الأيقونة. -->
     <string name="about_tagline">مجاني، للجميع، دائمًا.</string>
@@ -466,7 +466,7 @@
     <string name="credit_chime">نغمة التنبيه</string>
     <string name="credit_chime_detail">«Clear announce tones» من Mixkit، رخصة Mixkit المجانية للمؤثرات الصوتية.</string>
     <string name="credit_quran_text">نص القرآن</string>
-    <string name="credit_quran_text_detail">نص مصحف تنزيل، الإصدار 1.1، رخصة Creative Commons Attribution 3.0. منقول دون تغيير.</string>
+    <string name="credit_quran_text_detail">نص مصحف تنزيل، الإصدار 1.1، رخصة Creative Commons Attribution 3.0. غُيِّر في ثلاثة أمور: تُكتب علامة الحرف الزائد بالشكل الذي يرسمه خط حفص، وتأتي البسملة فوق سورتها لا في أول آية منها (وتبقى في الفاتحة آيتها الأولى)، وتُرسم بعض الكلمات بلا تطويل قبل الألف الصغيرة ليضع الخط الألف في موضعها.</string>
     <string name="credit_quran_font">خط المصحف</string>
     <string name="credit_quran_font_detail">خط مجمع الملك فهد لطباعة المصحف الشريف، حفص. حر الاستخدام والتوزيع دون تعديل.</string>
     <string name="credit_quran_layout">تخطيط الصفحات</string>

@@ -96,6 +96,7 @@ import world.taqwa.app.resources.quran_madani
 import world.taqwa.app.resources.quran_makki
 import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_play
+import world.taqwa.app.widget.HafsSpelling
 import kotlin.math.roundToInt
 
 /** The frame's own width at the reference 375 dp screen, from which the base size scales (spec §5.1). */
@@ -254,7 +255,7 @@ fun MushafPageView(
                                 when (line.type) {
                                     LineType.SURAH -> line.surah?.let(surahOf)?.let { SurahBand(it, layout.sizeSp, family) }
                                     LineType.BASMALA -> BasicText(
-                                        basmala,
+                                        HafsSpelling.forDrawing(basmala),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .height(lineHeight)
@@ -364,6 +365,9 @@ private fun layoutPage(
         measurer.measure(text, style(sizeSp), softWrap = false, maxLines = 1, layoutDirection = LayoutDirection.Rtl, density = density)
 
     val textLines = page.lines.withIndex().filter { it.value.type == LineType.TEXT }
+    // The stored spelling, not the drawn one: it is what sets the page's size, so that restoring a
+    // superscript alef (HafsSpelling) moves no page to another size or row height. A line it widens
+    // is about 1 % over at most, and placeWords closes that line's gaps by as much.
     val widestAtBase = textLines.maxOfOrNull { (_, line) ->
         measure(AnnotatedString(line.text.orEmpty()), base).size.width.toFloat()
     } ?: 0f
@@ -380,9 +384,9 @@ private fun layoutPage(
     val size = fit.sizeSp
 
     val lines = textLines.associate { (index, line) ->
-        val words = line.words.map { measure(annotateWord(it.text, accent), size) }
+        val words = line.words.map { measure(annotateWord(HafsSpelling.forDrawing(it.text), accent), size) }
         val widths = words.map { it.size.width.toFloat() }
-        val whole = measure(AnnotatedString(line.text.orEmpty()), size).size.width.toFloat()
+        val whole = measure(AnnotatedString(HafsSpelling.forDrawing(line.text.orEmpty())), size).size.width.toFloat()
         val gaps = (words.size - 1).coerceAtLeast(1)
         val naturalGap = ((whole - widths.sum()) / gaps).coerceAtLeast(0f)
         index to PlacedLine(words, placeWords(widths, frameWidthPx, naturalGap, isJustified(page, line)))

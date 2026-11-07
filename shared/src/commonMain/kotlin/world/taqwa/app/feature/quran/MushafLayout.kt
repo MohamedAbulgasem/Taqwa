@@ -111,17 +111,19 @@ internal data class PlacedWord(val left: Float, val right: Float)
  * line's right edge; each following word is placed to the left of the previous one, separated by
  * a gap. A justified line divides its slack evenly between the gaps so the last word ends on the
  * left edge, the way a printed line is filled; an unjustified line keeps [naturalGap], the width
- * of one space in the same font and size. A justified line whose words already exceed the width —
- * which the page size makes impossible bar sub-pixel rounding — falls back to touching words rather
- * than negative gaps, so nothing is ever drawn over its neighbour.
+ * of one space in the same font and size, unless that would run it out of the frame, when it takes
+ * the gap that just fits. A line whose words already exceed the width — which the page size makes
+ * impossible bar sub-pixel rounding — falls back to touching words rather than negative gaps, so
+ * nothing is ever drawn over its neighbour.
  */
 internal fun placeWords(widths: List<Float>, lineWidth: Float, naturalGap: Float, justify: Boolean): List<PlacedWord> {
     if (widths.isEmpty()) return emptyList()
     val gaps = widths.size - 1
+    val fills = if (gaps == 0) 0f else ((lineWidth - widths.sum()) / gaps).coerceAtLeast(0f)
     val gap = when {
         gaps == 0 -> 0f
-        justify -> ((lineWidth - widths.sum()) / gaps).coerceAtLeast(0f)
-        else -> naturalGap
+        justify -> fills
+        else -> minOf(naturalGap, fills)
     }
     var right = lineWidth
     return widths.map { width ->

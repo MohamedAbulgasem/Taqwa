@@ -81,7 +81,8 @@ class QuranRepository(
     // a few milliseconds, the same shape as searchTranslation. Matching is plain `contains`,
     // which is deliberately broader than FTS prefix terms: «رحمن» also finds «الرحمن».
     //
-    // The column is Tanzil's plain text as published — «إياك», «موسى», «أنزل» keep their hamza and
+    // The column is Tanzil's Simple Clean text, the basmala taken off each surah's first ayah as in
+    // text_uthmani; otherwise as published — «إياك», «موسى», «أنزل» keep their hamza and
     // their alef maksura — while the query arrives folded («اياك», «موسي»). Until 1.1.0 the row
     // was matched unfolded, so any query with one of those letters in it found nothing at all
     // (spec §17.4). The row is folded by the same rule as the query, once per process: the fold

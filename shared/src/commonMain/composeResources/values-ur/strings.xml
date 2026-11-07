@@ -125,7 +125,7 @@
     <string name="settings_not_set">مقرر نہیں</string>
     <string name="settings_notifications_off">بند</string>
     <string name="settings_notifications_on_count">%1$s فعال</string>
-    <string name="settings_version_value">1.5.0</string>
+    <string name="settings_version_value">1.5.1</string>
 
     <!-- «تقویٰ کے بارے میں» کی اسکرین۔ -->
     <string name="about_tagline">مفت، سب کے لیے، ہمیشہ کے لیے۔</string>
@@ -450,7 +450,7 @@
     <string name="credit_chime">اطلاع کی ٹون</string>
     <string name="credit_chime_detail">Mixkit سے ”Clear announce tones“، Mixkit Sound Effects Free Licence۔</string>
     <string name="credit_quran_text">قرآن کا متن</string>
-    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1، Creative Commons Attribution 3.0۔ حرف بہ حرف نقل کیا گیا۔</string>
+    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1، Creative Commons Attribution 3.0۔ تین باتوں میں تبدیلی کی گئی ہے: زائد حرف کی علامت حفص خط کی شکل میں لکھی گئی ہے، بسم اللہ پہلی آیت میں نہیں بلکہ سورت کے اوپر ہے (سورۂ فاتحہ میں وہ اب بھی پہلی آیت ہے)، اور کچھ الفاظ کھڑے زبر سے پہلے کی کشش کے بغیر دکھائے جاتے ہیں تاکہ خط کھڑا زبر اس کی جگہ پر رکھے۔</string>
     <string name="credit_quran_font">مصحف کا خط</string>
     <string name="credit_quran_font_detail">مجمع الملک فہد لطباعۃ المصحف الشریف کا KFGQPC عثمانی خط، حفص۔ بغیر ترمیم کے استعمال اور تقسیم کی آزادی ہے۔</string>
     <string name="credit_quran_layout">صفحات کی ترتیب</string>

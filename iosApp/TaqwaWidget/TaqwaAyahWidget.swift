@@ -334,7 +334,7 @@ struct TaqwaAyahWidgetView: View {
     /// reader's own `AyahCard` styles it — built by concatenating two runs rather than searching
     /// for a range, because the same digits can occur inside the ayah text.
     private func arabicText(_ ayah: AyahPoolEntry) -> some View {
-        var text = AttributedString(ayah.arabic + markerSeparator)
+        var text = AttributedString(HafsSpelling.shared.forDrawing(text: ayah.arabic) + markerSeparator)
         var marker = AttributedString(arabicIndicDigits(ayah.ayah))
         marker.foregroundColor = accentColor
         text.append(marker)

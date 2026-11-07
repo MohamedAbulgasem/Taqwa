@@ -66,6 +66,7 @@ import world.taqwa.app.resources.source_nasai_amal
 import world.taqwa.app.resources.source_nasai_kubra
 import world.taqwa.app.resources.source_quran
 import world.taqwa.app.resources.source_tirmidhi
+import world.taqwa.app.widget.HafsSpelling
 
 /**
  * One page of the session (spec §3.2): the label, the Arabic, the transliteration and translation
@@ -217,7 +218,7 @@ private fun QuranBlock(text: QuranPageText, prefixKind: QuranPrefix?, sizeSp: In
             if (prefix != null) {
                 when (prefixKind) {
                     QuranPrefix.BASMALA -> Text(
-                        prefix,
+                        HafsSpelling.forDrawing(prefix),
                         fontFamily = hafs,
                         fontSize = BASMALA_SIZE,
                         textAlign = TextAlign.Center,
@@ -258,7 +259,7 @@ private fun passage(lines: List<Pair<String, Int?>>, accent: Color): AnnotatedSt
     buildAnnotatedString {
         lines.forEachIndexed { index, (ayah, number) ->
             if (index > 0) append(' ')
-            append(ayah)
+            append(HafsSpelling.forDrawing(ayah))
             if (number != null) {
                 append(QuranText.MARKER_SEPARATOR)
                 withStyle(SpanStyle(color = accent)) { append(QuranText.arabicIndic(number)) }

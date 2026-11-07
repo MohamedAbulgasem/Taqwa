@@ -333,7 +333,7 @@ costs days.
    own falls back to English), promotional text, description, keywords, support URL
    https://taqwa.world/support/, marketing URL https://taqwa.world, copyright
    "2026 Mohamed Abulgasem", App Review contact (name, phone, email), sign-in required: No,
-   **App Review Information › Notes** from `docs/store/app-review/2026-10-02-notes-1.0.0-35.txt` (the
+   **App Review Information › Notes** from `docs/store/app-review/2026-11-07-notes-1.5.1-42.txt` (the
    Guideline 2.1 answers, which Apple asked to find there on every submission), select the
    processed build, and under Version Release choose **Manually release this version**. A first
    version has no "What's New" field, so Play's release notes have no App Store twin until the
@@ -358,8 +358,8 @@ costs days.
    to App Review → Attach File) and pasted into App Review Information → Notes, then Edit → Add for
    Review → Resubmit to App Review with the same build. The answers are in
    `docs/store/app-review/2026-09-23-guideline-2.1-reply.txt` (3,814 of the 4,000 characters both
-   fields allow), kept as the record of that reply; the Notes, last brought up to date for build 35, are
-   `docs/store/app-review/2026-10-02-notes-1.0.0-35.txt` (3,969 bytes; App Store Connect Help gives
+   fields allow), kept as the record of that reply; the Notes, last brought up to date for build 42, are
+   `docs/store/app-review/2026-11-07-notes-1.5.1-42.txt` (3,957 bytes; App Store Connect Help gives
    the Notes field 4,000 bytes). Keep Notes in step with the app on every later submission.
    "Metadata Rejected" or "Information Needed" is answered in App Store Connect's
    App Review messages without a new build; a binary rejection needs a fix, the next build number

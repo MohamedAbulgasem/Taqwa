@@ -56,12 +56,8 @@ Web sitesi: https://taqwa.world/tr/
 Destek: support@taqwa.world
 
 ### Release notes (500)
-1.5.0 sürümündeki yenilikler:
-• İki yeni ezan sesi: Mekke ve Medine
-• Bildirimler artık ezanın tamamını çalar; durdurmak için bildirimi kaydırın
-• Kendi ezanınız: telefonunuzdan bir kayıt seçin
-• “Güneşi göster” ve “Saat biçimi” artık Namaz vakitleri’nin üst kısmında
-• Vakitler: Kuala Lumpur, George Town ve Kangar 2027 için güncellendi
+1.5.1 sürümündeki yenilikler:
+• Kur’an: Besmele dahil birçok kelimede küçük elif, kelimenin üstünde değil yanında çiziliyordu. Artık yerinde çiziliyor. Bize yazan okuyucumuza teşekkür ederiz.
 
 ## App Store
 
@@ -91,12 +87,8 @@ kuran,vakitleri,vakti,tilavet,meal,mushaf,tesbih,zikir,ramazan,imsakiye,islam,m�
 (Yukarıdaki Play tam açıklamasıyla aynı metin.)
 
 ### What's new (4000)
-1.5.0 sürümündeki yenilikler:
-• İki yeni ezan sesi: Mekke ve Medine
-• Kendi ezanınız: telefonunuzdan bir kayıt seçin; bildirim ilk 30 saniyesini çalar
-• Kilit Ekranı widget’ı artık sıradaki namazın adını vaktinin yanında gösterir
-• “Güneşi göster” ve “Saat biçimi” artık Namaz vakitleri’nin üst kısmında
-• Vakitler: Kuala Lumpur, George Town ve Kangar 2027 için güncellendi
+1.5.1 sürümündeki yenilikler:
+• Kur’an: Besmele dahil birçok kelimede küçük elif, kelimenin üstünde değil yanında çiziliyordu. Artık yerinde çiziliyor. Bize yazan okuyucumuza teşekkür ederiz.
 
 ## Screenshot captions (her biri tek kısa satır, çerçeveli ekran görüntüsünün üstünde)
 1. Bulunduğunuz yerin namaz vakti

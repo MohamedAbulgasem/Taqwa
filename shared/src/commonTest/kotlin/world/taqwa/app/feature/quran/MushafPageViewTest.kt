@@ -117,6 +117,15 @@ class MushafPageViewTest {
         assertEquals(PlacedWord(250f, 330f), placed[2])
     }
 
+    // Restoring a superscript alef (HafsSpelling) widens a few surah-ending lines a little past the
+    // width that set the page's size: the line closes its gaps rather than leave the frame.
+    @Test
+    fun anUnjustifiedLineClosesItsGapsRatherThanLeaveTheFrame() {
+        val placed = placeWords(widths = listOf(240f, 250f), lineWidth = 500f, naturalGap = 20f, justify = false)
+        assertEquals(PlacedWord(260f, 500f), placed[0])
+        assertEquals(PlacedWord(0f, 250f), placed[1])
+    }
+
     @Test
     fun aJustifiedLineSpreadsItsSlackEvenlyAndEndsOnTheLeftEdge() {
         val placed = placeWords(widths = listOf(100f, 50f, 80f), lineWidth = 500f, naturalGap = 10f, justify = true)

@@ -47,6 +47,7 @@ import world.taqwa.app.quran.QuranText
 import world.taqwa.app.widget.AyahPoolEntry
 import world.taqwa.app.widget.AyahPoolMirror
 import world.taqwa.app.widget.AyahRotation
+import world.taqwa.app.widget.HafsSpelling
 import world.taqwa.app.widget.WidgetDigits
 import world.taqwa.app.widget.WidgetPalette
 import world.taqwa.app.widget.WidgetPaletteColors
@@ -142,7 +143,7 @@ private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColo
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Text(
                     buildAnnotatedString {
-                        append(entry.arabic)
+                        append(HafsSpelling.forDrawing(entry.arabic))
                         append(QuranText.MARKER_SEPARATOR)
                         withStyle(SpanStyle(color = Color(colors.accentArgb))) {
                             append(QuranText.arabicIndic(entry.ayah))

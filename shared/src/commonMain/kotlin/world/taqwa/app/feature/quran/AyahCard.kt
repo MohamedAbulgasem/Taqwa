@@ -67,6 +67,7 @@ import world.taqwa.app.resources.quran_ayah_n
 import world.taqwa.app.resources.quran_remove_bookmark
 import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_play
+import world.taqwa.app.widget.HafsSpelling
 
 /**
  * One ayah's card (spec §2.3): the Uthmani Arabic with the ayah roundel inline, an optional
@@ -201,7 +202,7 @@ fun AyahCard(
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Text(
                         buildAnnotatedString {
-                            append(text)
+                            append(HafsSpelling.forDrawing(text))
                             // QuranText.MARKER_SEPARATOR, not a plain space: keeps the ayah number
                             // glued to its text when wrapping, matching QuranText.withMarker's own
                             // separator (spec §5.2) from the one shared definition.

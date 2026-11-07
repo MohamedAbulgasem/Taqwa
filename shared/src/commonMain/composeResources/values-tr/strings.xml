@@ -130,7 +130,7 @@
     <string name="settings_not_set">Belirlenmedi</string>
     <string name="settings_notifications_off">Kapalı</string>
     <string name="settings_notifications_on_count">%1$s açık</string>
-    <string name="settings_version_value">1.5.0</string>
+    <string name="settings_version_value">1.5.1</string>
 
     <!-- “Taqwa hakkında” ekranı. Ürün adı, simgede olduğu gibi Latin harfleriyle kalır. -->
     <string name="about_tagline">Ücretsiz, herkes için, kalıcı olarak.</string>
@@ -468,7 +468,7 @@
     <string name="credit_chime">Bildirim tonu</string>
     <string name="credit_chime_detail">Mixkit’ten “Clear announce tones”, Mixkit Ses Efektleri Ücretsiz Lisansı.</string>
     <string name="credit_quran_text">Kur’an metni</string>
-    <string name="credit_quran_text_detail">Tanzil Kur’an Metni v1.1, Creative Commons Attribution 3.0. Birebir aktarıldı.</string>
+    <string name="credit_quran_text_detail">Tanzil Kur’an Metni v1.1, Creative Commons Attribution 3.0. Üç noktada değiştirildi: okunmayan harf işareti Hafs yazı tipinin biçimini alır, besmele ilk ayetin içinde değil suresinin üstünde durur (Fâtiha’da hâlâ ilk ayettir) ve bazı kelimeler küçük eliften önceki bağlantı çizgisi (tatvil) olmadan çizilir, böylece yazı tipi elifi yerine koyar.</string>
     <string name="credit_quran_font">Mushaf yazı tipi</string>
     <string name="credit_quran_font_detail">Kral Fahd Kur’an-ı Kerim Basım Kompleksi’nin KFGQPC Uthmanic Script Hafs yazı tipi. Değiştirilmeden kullanılabilir ve dağıtılabilir.</string>
     <string name="credit_quran_layout">Sayfa düzeni</string>

@@ -56,12 +56,8 @@ Site web : https://taqwa.world/fr/
 Assistance : support@taqwa.world
 
 ### Release notes (500)
-Nouveautés de la 1.5.0 :
-• Deux nouvelles voix d’adhan : La Mecque et Médine
-• Les notifications jouent désormais l’adhan en entier ; balayez la notification pour l’arrêter
-• Votre propre adhan : choisissez un enregistrement sur votre téléphone
-• « Afficher le lever du soleil » et « Format de l’heure » en haut des Horaires de prière
-• Horaires : Kuala Lumpur, George Town et Kangar mis à jour pour 2027
+Nouveautés de la 1.5.1 :
+• Coran : dans de nombreux mots, y compris dans la basmala, le petit alif suscrit était dessiné à côté du mot au lieu d’être au-dessus. Il est désormais à sa place. Merci au lecteur qui nous a écrit.
 
 ## App Store
 
@@ -91,12 +87,8 @@ horaires,salat,azan,quran,mushaf,mosquée,islam,musulman,récitation,chapelet,dh
 (Le même texte que la description complète Play ci-dessus.)
 
 ### What's new (4000)
-Nouveautés de la 1.5.0 :
-• Deux nouvelles voix d’adhan : La Mecque et Médine
-• Votre propre adhan : choisissez un enregistrement sur votre téléphone ; la notification en joue les 30 premières secondes
-• Le widget de l’écran verrouillé nomme la prochaine prière à côté de son heure
-• « Afficher le lever du soleil » et « Format de l’heure » en haut des Horaires de prière
-• Horaires : Kuala Lumpur, George Town et Kangar mis à jour pour 2027
+Nouveautés de la 1.5.1 :
+• Coran : dans de nombreux mots, y compris dans la basmala, le petit alif suscrit était dessiné à côté du mot au lieu d’être au-dessus. Il est désormais à sa place. Merci au lecteur qui nous a écrit.
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Les horaires là où vous êtes

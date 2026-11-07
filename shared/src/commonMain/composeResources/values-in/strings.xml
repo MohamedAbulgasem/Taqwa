@@ -123,7 +123,7 @@
     <string name="settings_not_set">Belum diatur</string>
     <string name="settings_notifications_off">Nonaktif</string>
     <string name="settings_notifications_on_count">%1$s aktif</string>
-    <string name="settings_version_value">1.5.0</string>
+    <string name="settings_version_value">1.5.1</string>
 
     <!-- Layar «Tentang Taqwa». Nama «Taqwa» tetap dalam huruf Latin, seperti pada ikonnya. -->
     <string name="about_tagline">Gratis, untuk semua, selamanya.</string>
@@ -448,7 +448,7 @@
     <string name="credit_chime">Nada notifikasi</string>
     <string name="credit_chime_detail">“Clear announce tones” dari Mixkit, Lisensi Gratis Efek Suara Mixkit.</string>
     <string name="credit_quran_text">Teks Al-Qur’an</string>
-    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons Attribution 3.0. Disalin apa adanya.</string>
+    <string name="credit_quran_text_detail">Tanzil Quran Text v1.1, Creative Commons Attribution 3.0. Diubah dalam tiga hal: tanda huruf yang tidak dibaca memakai bentuk dari jenis huruf Hafs, basmalah berada di atas surahnya, bukan di awal ayat pertama (di Al-Fatihah tetap ayat pertama), dan sebagian kata digambar tanpa garis sambung (tatwil) sebelum fathah berdiri agar jenis huruf itu meletakkannya di tempatnya.</string>
     <string name="credit_quran_font">Huruf mushaf</string>
     <string name="credit_quran_font_detail">KFGQPC Uthmanic Script Hafs dari Kompleks Percetakan Al-Qur’an Raja Fahd. Bebas dipakai dan disebarkan tanpa perubahan.</string>
     <string name="credit_quran_layout">Tata letak halaman</string>

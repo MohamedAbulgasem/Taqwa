@@ -100,6 +100,7 @@ import world.taqwa.app.resources.quran_tab_bookmarks
 import world.taqwa.app.resources.quran_tab_juz
 import world.taqwa.app.resources.quran_tab_surah
 import world.taqwa.app.resources.quran_title
+import world.taqwa.app.widget.HafsSpelling
 
 /** The card frame's own corner radius (spec §2.1) — [TaqwaCard]'s, kept in one place here since
  * the list section below rebuilds that frame by hand out of two cap items rather than a single
@@ -800,7 +801,8 @@ private fun SearchHitRow(
         // The words an Arabic query found, in the accent and nothing else: colour alone, on
         // whole words, so the Mushaf face shapes the line exactly as it would unlit (spec §17.4).
         val arabicLine = remember(hit.arabic, hit.matchedWords, colors.accent) {
-            highlightArabicWords(hit.arabic, hit.matchedWords, SpanStyle(color = colors.accent))
+            // The drawn spelling keeps every word and every space, so matchedWords still counts true.
+            highlightArabicWords(HafsSpelling.forDrawing(hit.arabic), hit.matchedWords, SpanStyle(color = colors.accent))
         }
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             Text(
@@ -903,7 +905,7 @@ private fun BookmarkRowView(row: BookmarkRow, onClick: () -> Unit, onRemove: () 
                     // only survived on the shortest ayahs — and the search hits above show none —
                     // which made the roundel read as a property of the ayah rather than of the row.
                     // The reference above the line already says which ayah this is.
-                    row.arabic,
+                    HafsSpelling.forDrawing(row.arabic),
                     fontFamily = mushafFamily(),
                     fontSize = 18.sp,
                     color = colors.textPrimary,

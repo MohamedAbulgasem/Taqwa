@@ -75,6 +75,7 @@ import world.taqwa.app.quran.displayName
 import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_juz_page
 import world.taqwa.app.resources.quran_next_surah
+import world.taqwa.app.widget.HafsSpelling
 import world.taqwa.app.share.shareText
 import world.taqwa.app.design.components.TaqwaBottomSheet
 
@@ -339,7 +340,7 @@ fun ReaderScreen(
                     item(key = "basmala") {
                         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                             Text(
-                                ready.basmala.orEmpty(),
+                                HafsSpelling.forDrawing(ready.basmala.orEmpty()),
                                 fontFamily = mushafFamily(),
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,

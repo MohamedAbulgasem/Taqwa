@@ -70,6 +70,7 @@ import world.taqwa.app.resources.quran_translation_off
 import world.taqwa.app.resources.quran_sheet_transliteration
 import world.taqwa.app.resources.quran_size_mushaf_note
 import world.taqwa.app.resources.recitation_read_aloud_get_voice
+import world.taqwa.app.widget.HafsSpelling
 import kotlin.math.roundToInt
 
 /** Falls back to the bundled default's own name (spec §2.5) — matches [ReadingSettings]'s own
@@ -255,7 +256,7 @@ fun ReadingSheet(
                 val (base, marker) = QuranText.splitMarker(previewAyah)
                 Text(
                     buildAnnotatedString {
-                        append(base)
+                        append(HafsSpelling.forDrawing(base))
                         withStyle(SpanStyle(color = colors.accent)) { append(marker) }
                     },
                     fontFamily = mushafFamily(),

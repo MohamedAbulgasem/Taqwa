@@ -42,9 +42,12 @@ otherwise. In more detail:
   [How to contribute](#how-to-contribute).
 - **The Quran is recited, never synthesised.** The Quran is only ever heard in a reciter's voice.
   The phone's text-to-speech reads translations and tafsir, never the Quran itself.
-- **Religious text is as published.** The Quran's Arabic is the [Tanzil](https://tanzil.net) text,
-  verbatim, and is never edited here. Translations, tafsir and adhkar come from the sources
-  credited in [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md), and a correction needs a source (the
+- **Religious text comes from its sources, and every change is stated.** The Quran's Arabic is the
+  [Tanzil](https://tanzil.net) text, and no one edits it by hand here. The build changes it in two
+  ways and the app's drawing in a third, all stated in [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md): the
+  silent-letter sign takes the Hafs typeface's form, the basmala stands above its surah, and some words
+  are drawn without the connecting stroke (tatweel) before a small alef. Translations, tafsir and
+  adhkar come from the sources credited there, and a correction needs a source (the
   [wording form](https://github.com/MohamedAbulgasem/Taqwa/issues/new?template=wording.yml) says which).
 - **Nothing interrupts.** The app never asks for a review and never nags.
 
