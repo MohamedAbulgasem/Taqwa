@@ -8,7 +8,8 @@ import androidx.compose.ui.text.withStyle
 /**
  * The Arabic line of a search hit with the words the query found wearing [style], opened near
  * the first of them (spec §17.4). [matchedWords] are positions among the whitespace-separated
- * words of [text], as [world.taqwa.app.quran.ArabicWordAlignment] reports them.
+ * words of [text]: [world.taqwa.app.quran.ArabicWordAlignment] reports them in the stored ayah,
+ * and [world.taqwa.app.widget.HafsSpelling.drawnWordPositions] moves them to the drawn one.
  *
  * **Whole words, never part of one.** The search matches a token as a substring, so «رحمن»
  * finds «ٱلرَّحْمَـٰنِ» — but the span goes round the whole written word, harakat and all. A style

@@ -152,7 +152,7 @@ class AdhkarScreenTest {
         arabic = null,
         transliteration = null,
         translation = null,
-        quran = QuranPageText(ISTIADHAH, listOf(KURSI to 255), "Allah - there is no deity except Him", "en"),
+        quran = QuranPageText(ISTIADHAH, listOf(KURSI to 255), "Allah - there is no deity except Him", "en", surah = 2),
         count = 0,
         target = 1,
         done = false,

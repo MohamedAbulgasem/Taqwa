@@ -71,6 +71,7 @@ import world.taqwa.app.resources.quran_sheet_transliteration
 import world.taqwa.app.resources.quran_size_mushaf_note
 import world.taqwa.app.resources.recitation_read_aloud_get_voice
 import world.taqwa.app.widget.HafsSpelling
+import world.taqwa.app.widget.QuranPlace
 import kotlin.math.roundToInt
 
 /** Falls back to the bundled default's own name (spec §2.5) — matches [ReadingSettings]'s own
@@ -204,6 +205,8 @@ fun ReadingSheet(
     settings: ReadingSettings,
     translations: List<TranslationInfo>,
     previewAyah: String,
+    /** What is read after the preview ayah, for its drawing (HafsSpelling R4). */
+    previewFollowedBy: String?,
     mushafMode: Boolean,
     onChange: (ReadingSettings) -> Unit,
     onDismiss: () -> Unit,
@@ -256,7 +259,8 @@ fun ReadingSheet(
                 val (base, marker) = QuranText.splitMarker(previewAyah)
                 Text(
                     buildAnnotatedString {
-                        append(HafsSpelling.forDrawing(base))
+                        // The preview is always Al-Fatihah's second ayah.
+                        append(HafsSpelling.forDrawing(base, previewFollowedBy, QuranPlace(1, 2)))
                         withStyle(SpanStyle(color = colors.accent)) { append(marker) }
                     },
                     fontFamily = mushafFamily(),

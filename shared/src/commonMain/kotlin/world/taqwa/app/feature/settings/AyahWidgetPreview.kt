@@ -48,6 +48,7 @@ import world.taqwa.app.widget.AyahPoolEntry
 import world.taqwa.app.widget.AyahPoolMirror
 import world.taqwa.app.widget.AyahRotation
 import world.taqwa.app.widget.HafsSpelling
+import world.taqwa.app.widget.QuranPlace
 import world.taqwa.app.widget.WidgetDigits
 import world.taqwa.app.widget.WidgetPalette
 import world.taqwa.app.widget.WidgetPaletteColors
@@ -143,7 +144,7 @@ private fun AyahCardSurface(shown: AyahPreviewContent, colors: WidgetPaletteColo
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 Text(
                     buildAnnotatedString {
-                        append(HafsSpelling.forDrawing(entry.arabic))
+                        append(HafsSpelling.forDrawing(entry.arabic, entry.followedBy, QuranPlace(entry.surah, entry.ayah)))
                         append(QuranText.MARKER_SEPARATOR)
                         withStyle(SpanStyle(color = Color(colors.accentArgb))) {
                             append(QuranText.arabicIndic(entry.ayah))
@@ -301,13 +302,15 @@ private fun translationSizeFor(translation: String) =
 /**
  * Ar-Ra'd 13:28, its Saheeh International translation, for when the mirror has not been written
  * yet: onboarding runs before the Prayer screen has ever shown, and Settings › Widgets can be opened
- * on a fresh install before the pool exists.
+ * on a fresh install before the pool exists. The Arabic, and 13:29 after it, are the bundled
+ * `quran.db`'s bytes, which `AyahPoolDbTest` holds them to.
  */
 private val SampleEntry = AyahPoolEntry(
     surah = 13,
     ayah = 28,
     surahLatin = "Ar-Ra'd",
     surahArabic = "الرعد",
-    arabic = "ٱلَّذِينَ ءَامَنُواْ وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ ٱللَّهِ ۗ أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ",
+    arabic = "ٱلَّذِينَ ءَامَنُوا۟ وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ ٱللَّهِ ۗ أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ",
     translation = "Those who have believed and whose hearts are assured by the remembrance of Allah. Unquestionably, by the remembrance of Allah hearts are assured.\"",
+    followedBy = "ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ طُوبَىٰ لَهُمْ وَحُسْنُ مَـَٔابٍ",
 )

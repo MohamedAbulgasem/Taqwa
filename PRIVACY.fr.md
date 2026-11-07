@@ -1,6 +1,6 @@
 # Politique de confidentialité de Taqwa
 
-_Dernière mise à jour le 29 septembre 2026. S’applique à Taqwa 1.0.0 et aux versions ultérieures sur Android et iOS._
+_Dernière mise à jour le 7 novembre 2026. S’applique à Taqwa 1.0.0 et aux versions ultérieures sur Android et iOS._
 
 Taqwa est une application islamique gratuite, sans compte, sans publicité et sans outil d’analyse. Elle
 fonctionne hors ligne. La seule chose pour laquelle elle utilise Internet est le téléchargement
@@ -22,6 +22,12 @@ et aucun compte à créer. Supprimer l’application supprime tout cela.
 Si Taqwa plante, elle enregistre un rapport technique sur votre téléphone (la version de
 l’application, le modèle de votre téléphone et l’erreur, rien d’autre). Il ne quitte jamais le
 téléphone, sauf si vous choisissez de nous l’envoyer par e-mail.
+Sur Android, l’e-mail que prépare « Signaler un problème » (Paramètres › À propos de Taqwa)
+indique aussi si les notifications et les alarmes exactes sont autorisées pour Taqwa, dans quelle
+mesure le téléphone limite sa consommation de batterie, si le téléphone est en mode silencieux, en
+vibreur ou en mode « Ne pas déranger », à peu près à quel moment la dernière notification de
+prière est arrivée, et quand l’application a été installée ou mise à jour pour la dernière fois ;
+vous le voyez avant de l’envoyer.
 
 ## Position
 

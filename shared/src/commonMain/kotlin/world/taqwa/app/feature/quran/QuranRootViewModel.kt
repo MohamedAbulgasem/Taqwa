@@ -56,7 +56,8 @@ sealed interface SearchState {
  * database, so the row can name its surah and show the ayah's own text without the screen having
  * to query anything itself.
  */
-data class BookmarkRow(val bookmark: Bookmark, val surah: Surah, val arabic: String, val juz: Int, val page: Int)
+/** One saved ayah's row. [followedBy] is what is read after the ayah, for its drawing ([world.taqwa.app.quran.Ayah.followedBy]). */
+data class BookmarkRow(val bookmark: Bookmark, val surah: Surah, val arabic: String, val juz: Int, val page: Int, val followedBy: String? = null)
 
 /**
  * One row of the Juz list (spec §2.1 point 5): a juz's start and end expressed as surah/ayah
@@ -353,7 +354,7 @@ class QuranRootViewModel(
             val surah = byNumber[bookmark.surah] ?: return@mapNotNull null
             val ayahs = ayahsBySurah.getOrPut(bookmark.surah) { source.ayahs(bookmark.surah) }
             val ayah = ayahs.firstOrNull { it.number == bookmark.ayah } ?: return@mapNotNull null
-            BookmarkRow(bookmark, surah, ayah.text, ayah.juz, ayah.page)
+            BookmarkRow(bookmark, surah, ayah.text, ayah.juz, ayah.page, ayah.followedBy)
         }
         _state.update { (it as? QuranRootUiState.Ready)?.copy(bookmarks = rows) ?: it }
     }

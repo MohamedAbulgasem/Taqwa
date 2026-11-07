@@ -73,6 +73,23 @@ class AyahPoolDbTest {
     @Test fun thePoolHasNoDuplicateReferences() {
         assertEquals(AyahPool.REFS.size, AyahPool.REFS.distinct().size)
     }
+
+    // The sample card the Widgets screen and the iOS widget gallery show before a mirror exists is
+    // typed into the source, so it is held to the database: 13:28 and, after it, 13:29, byte for
+    // byte, the silent-letter sign included.
+    @Test fun theSampleCardsCarryTheDatabasesOwnText() = runTest {
+        val ayah = repo.ayahText(13, 28)!!
+        val next = repo.ayahText(13, 29)!!
+        val kotlin = source("src/commonMain/kotlin/world/taqwa/app/feature/settings/AyahWidgetPreview.kt")
+        assertTrue("arabic = \"$ayah\"," in kotlin, "AyahWidgetPreview's sample is not 13:28 as stored")
+        assertTrue("followedBy = \"$next\"," in kotlin, "AyahWidgetPreview's sample is not followed by 13:29")
+        val swift = source("../iosApp/TaqwaWidget/TaqwaAyahWidget.swift")
+        assertTrue("arabic: \"$ayah\"," in swift, "the iOS widget's sample is not 13:28 as stored")
+        assertTrue("followedBy: \"$next\"" in swift, "the iOS widget's sample is not followed by 13:29")
+    }
+
+    private fun source(path: String): String =
+        (java.io.File(path).takeIf { it.exists() } ?: java.io.File("shared/$path")).readText()
 }
 
 /**
@@ -98,6 +115,18 @@ class AyahPoolMirrorWriterTest {
             assertTrue(entry.translation.isNotEmpty())
         }
         assertEquals(mirror, AyahPoolMirror.read(store))
+    }
+
+    // What is read after each pool ayah, which the widgets need to draw its last tanwin as the
+    // Reader does (HafsSpelling R4): the next ayah, or the next basmala's ب at a surah's end.
+    @Test fun everyEntryCarriesWhatIsReadAfterItsAyah() = runTest {
+        val mirror = AyahPoolMirrorWriter.write(FakePoolKeyValueStore(), repo, ReadingSettings(translationId = "en.sahih"), "en-US", EnglishPlatformFormat)
+        mirror.entries.forEach { entry ->
+            val expected = repo.ayahs(entry.surah).single { it.number == entry.ayah }.followedBy.orEmpty()
+            assertEquals(expected, entry.followedBy, "${entry.surah}:${entry.ayah}")
+            assertTrue(entry.followedBy.isNotEmpty())
+        }
+        assertEquals("\u0628", mirror.entries.single { it.surah == 9 && it.ayah == 129 }.followedBy, "9:129 ends At-Tawbah")
     }
 
     @Test fun translationIsEmptyWhenTranslationsAreOff() = runTest {

@@ -97,6 +97,7 @@ import world.taqwa.app.resources.quran_makki
 import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_play
 import world.taqwa.app.widget.HafsSpelling
+import world.taqwa.app.widget.QuranPlace
 import kotlin.math.roundToInt
 
 /** The frame's own width at the reference 375 dp screen, from which the base size scales (spec §5.1). */
@@ -179,6 +180,8 @@ fun MushafPageView(
     // One invisible stop per ayah, over its first run of words (design §5): the page's own rule,
     // computed once per page, then handed to each line for the runs that fall on it.
     val stopsByLine = remember(page) { ayahStops(page).groupBy { it.lineIndex } }
+    // What is read after each line, so every word draws as it does in its own ayah (HafsSpelling R4).
+    val following = remember(page, basmala) { followingLines(page, basmala) }
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         BoxWithConstraints(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
             // Held sideways there is far more width than a page of fifteen lines can use, and the
@@ -216,8 +219,8 @@ fun MushafPageView(
                     // Keyed on everything the measurements depend on; the highlight is
                     // deliberately not among them, since it only changes what is drawn behind
                     // words already placed.
-                    val layout = remember(page, scaledBase, frameWidthPx, innerHeightPx, family, colors.accent, density) {
-                        layoutPage(page, scaledBase, frameWidthPx, innerHeightPx, family, colors.accent, measurer, density)
+                    val layout = remember(page, following, scaledBase, frameWidthPx, innerHeightPx, family, colors.accent, density) {
+                        layoutPage(page, following, scaledBase, frameWidthPx, innerHeightPx, family, colors.accent, measurer, density)
                     }
                     val lineHeight: Dp = with(density) { (layout.sizeSp * layout.lineMultiple).sp.toDp() }
                     val scrolls = landscape || layout.scrolls
@@ -255,7 +258,7 @@ fun MushafPageView(
                                 when (line.type) {
                                     LineType.SURAH -> line.surah?.let(surahOf)?.let { SurahBand(it, layout.sizeSp, family) }
                                     LineType.BASMALA -> BasicText(
-                                        HafsSpelling.forDrawing(basmala),
+                                        HafsSpelling.forDrawing(basmala, following[index], QuranPlace(1, 1)),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .height(lineHeight)
@@ -352,6 +355,7 @@ internal class PageLayout(
  */
 private fun layoutPage(
     page: MushafPage,
+    following: List<String?>,
     base: Float,
     frameWidthPx: Float,
     availableHeightPx: Float?,
@@ -365,9 +369,12 @@ private fun layoutPage(
         measurer.measure(text, style(sizeSp), softWrap = false, maxLines = 1, layoutDirection = LayoutDirection.Rtl, density = density)
 
     val textLines = page.lines.withIndex().filter { it.value.type == LineType.TEXT }
-    // The stored spelling, not the drawn one: it is what sets the page's size, so that restoring a
-    // superscript alef (HafsSpelling) moves no page to another size or row height. A line it widens
-    // is about 1 % over at most, and placeWords closes that line's gaps by as much.
+    // The stored spelling, not the drawn one: it is what sets the page's size, so that drawing the
+    // print's own signs (HafsSpelling) moves no page to another size or row height. The drawn words
+    // take a little more or less room; MushafFitDbTest measures every line of every page on the
+    // short phone and at the largest text size, and none runs past the frame: the tightest gap
+    // between two words is 0.19 em, against 0.20 em stored, and placeWords closes a line's gaps
+    // rather than leave the frame.
     val widestAtBase = textLines.maxOfOrNull { (_, line) ->
         measure(AnnotatedString(line.text.orEmpty()), base).size.width.toFloat()
     } ?: 0f
@@ -384,9 +391,11 @@ private fun layoutPage(
     val size = fit.sizeSp
 
     val lines = textLines.associate { (index, line) ->
-        val words = line.words.map { measure(annotateWord(HafsSpelling.forDrawing(it.text), accent), size) }
+        val words = line.words.mapIndexed { i, word ->
+            measure(annotateWord(HafsSpelling.forDrawing(word.text, followingWord(line, i, following[index]), placeOf(word)), accent), size)
+        }
         val widths = words.map { it.size.width.toFloat() }
-        val whole = measure(AnnotatedString(HafsSpelling.forDrawing(line.text.orEmpty())), size).size.width.toFloat()
+        val whole = measure(AnnotatedString(HafsSpelling.forDrawing(line.text.orEmpty(), following[index], line.words.firstOrNull()?.let(::placeOf))), size).size.width.toFloat()
         val gaps = (words.size - 1).coerceAtLeast(1)
         val naturalGap = ((whole - widths.sum()) / gaps).coerceAtLeast(0f)
         index to PlacedLine(words, placeWords(widths, frameWidthPx, naturalGap, isJustified(page, line)))

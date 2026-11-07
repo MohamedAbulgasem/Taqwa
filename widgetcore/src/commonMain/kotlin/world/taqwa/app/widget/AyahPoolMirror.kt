@@ -2,7 +2,10 @@ package world.taqwa.app.widget
 
 /**
  * One pool ayah as mirrored for the widgets: the reference, the surah name in both scripts, the
- * Uthmani Arabic text, and the active translation's text (empty when translations are off).
+ * Uthmani Arabic text, the active translation's text (empty when translations are off), and
+ * [followedBy], what is read straight after the ayah in the Quran — the next ayah's text, or at a
+ * surah's end [HafsSpelling.afterLastAyahOf] — which the drawing of its last tanwin needs
+ * (HafsSpelling R4). Empty only where nothing is read after it, after 114:6.
  */
 data class AyahPoolEntry(
     val surah: Int,
@@ -11,6 +14,7 @@ data class AyahPoolEntry(
     val surahArabic: String,
     val arabic: String,
     val translation: String,
+    val followedBy: String,
 )
 
 /**
@@ -62,8 +66,13 @@ data class AyahPoolMirror(
          * would keep contradicting itself until the next write. Both platforms already handle
          * "no mirror" (the Android widget writes one itself; iOS shows the placeholder until the
          * app next runs), which is exactly the state a rejected mirror leaves behind.
+         *
+         * 3 since 1.5.1's marks hotfix: each entry gained [AyahPoolEntry.followedBy], and the
+         * stored Arabic keeps Tanzil's silent-letter sign (U+06DF), which a version-2 mirror had
+         * as U+0652. Drawn through HafsSpelling's R1, a version-2 mirror's silent letters would
+         * carry the head of kha, so it is rejected like a version-1 one.
          */
-        const val VERSION = 2
+        const val VERSION = 3
 
         /** Separates entry blocks. Never appears in any field: build it from the escape, not by
          * pasting the raw control character into source. */
@@ -73,14 +82,15 @@ data class AyahPoolMirror(
         const val FIELD_SEP = '\u001F'
 
         private const val HEADER_FIELD_COUNT = 5
-        private const val ENTRY_FIELD_COUNT = 6
+        private const val ENTRY_FIELD_COUNT = 7
 
         /**
          * Wire form: a header block (`version`, `languageTag`, `translationId`, `0`/`1` for
          * [AyahPoolMirror.translationRtl], `0`/`1` for [AyahPoolMirror.arabicIndicDigits])
          * followed by one block per entry (`surah`, `ayah`,
-         * `surahLatin`, `surahArabic`, `arabic`, `translation`), joined with [ENTRY_SEP]; fields
-         * within a block are joined with [FIELD_SEP]. About 60 KB for the full hundred-ayah pool.
+         * `surahLatin`, `surahArabic`, `arabic`, `translation`, `followedBy`), joined with [ENTRY_SEP]; fields
+         * within a block are joined with [FIELD_SEP]. About 60 KB for the full hundred-ayah pool, of which
+         * `followedBy` is about 22 KB.
          */
         fun serialize(m: AyahPoolMirror): String {
             val header = listOf(
@@ -98,6 +108,7 @@ data class AyahPoolMirror(
                     e.surahArabic,
                     e.arabic,
                     e.translation,
+                    e.followedBy,
                 ).joinToString(FIELD_SEP.toString())
             }
             return (listOf(header) + entryBlocks).joinToString(ENTRY_SEP.toString())
@@ -142,6 +153,7 @@ data class AyahPoolMirror(
                     surahArabic = fields[3],
                     arabic = fields[4],
                     translation = fields[5],
+                    followedBy = fields[6],
                 )
             }
             return AyahPoolMirror(

@@ -19,7 +19,15 @@ data class Surah(
  */
 fun Surah.displayName(rtl: Boolean): String = if (rtl) nameArabic else nameLatin
 
-data class Ayah(val surah: Int, val number: Int, val text: String, val page: Int, val juz: Int, val hizbQuarter: Int, val sajdah: Int)
+/**
+ * One ayah. [followedBy] is what is read straight after it, which the Hafs face's drawing needs for
+ * the ayah's last tanwin (HafsSpelling R4): the next ayah's text, or at a surah's end
+ * [world.taqwa.app.widget.HafsSpelling.afterLastAyahOf]. [QuranRepository] fills it; null after 114:6.
+ */
+data class Ayah(
+    val surah: Int, val number: Int, val text: String, val page: Int, val juz: Int, val hizbQuarter: Int, val sajdah: Int,
+    val followedBy: String? = null,
+)
 
 /** One search result (spec 2b §2.1): the ayah's own Arabic and, for a translation hit, the
  * translation text the match was found in. */
@@ -30,6 +38,8 @@ data class SearchHit(
     val translation: String?,
     /** The words of [arabic], by position, that an Arabic query found; empty for a translation hit. */
     val matchedWords: Set<Int> = emptySet(),
+    /** What is read straight after the ayah, for its drawing ([Ayah.followedBy]). */
+    val followedBy: String? = null,
 )
 
 data class Juz(val number: Int, val startSurah: Int, val startAyah: Int)
@@ -48,4 +58,12 @@ data class MushafLine(
     val endsSurah: Boolean, val words: List<LineWord>,
 )
 
-data class MushafPage(val number: Int, val firstSurah: Int, val firstAyah: Int, val juz: Int, val lines: List<MushafLine>)
+/**
+ * One printed page. [followedBy] is what is read straight after its last line — the next page's
+ * first basmala or text line, null after page 604 — so the page's last word draws as it does in its
+ * ayah ([Ayah.followedBy]).
+ */
+data class MushafPage(
+    val number: Int, val firstSurah: Int, val firstAyah: Int, val juz: Int, val lines: List<MushafLine>,
+    val followedBy: String? = null,
+)

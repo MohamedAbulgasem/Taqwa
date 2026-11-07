@@ -1,8 +1,10 @@
 package world.taqwa.app.feature.quran
 
 import world.taqwa.app.quran.LineType
+import world.taqwa.app.quran.LineWord
 import world.taqwa.app.quran.MushafLine
 import world.taqwa.app.quran.MushafPage
+import world.taqwa.app.widget.QuranPlace
 import kotlin.math.floor
 
 /**
@@ -101,6 +103,37 @@ internal fun fitToHeight(
  */
 internal fun isJustified(page: MushafPage, line: MushafLine): Boolean =
     line.type == LineType.TEXT && !line.endsSurah && page.number > 2
+
+/**
+ * What is read straight after each line of [page], by its index in [MushafPage.lines], for the Hafs
+ * face's drawing (HafsSpelling R4, which reads the next letter): the next basmala or text line on
+ * the page, passing over a surah band, which is not read; after the page's last such line, what is
+ * read after the page ([MushafPage.followedBy]). A basmala line has no text of its own, so
+ * [basmala] stands in for it.
+ */
+internal fun followingLines(page: MushafPage, basmala: String): List<String?> {
+    val following = arrayOfNulls<String>(page.lines.size)
+    var after = page.followedBy
+    for (index in page.lines.indices.reversed()) {
+        following[index] = after
+        val line = page.lines[index]
+        when (line.type) {
+            LineType.TEXT -> after = line.text
+            LineType.BASMALA -> after = basmala
+            LineType.SURAH -> Unit
+        }
+    }
+    return following.toList()
+}
+
+/** What is read straight after word [index] of [line]: the next word, or after the last one what
+ * is read after the line ([lineFollowedBy], from [followingLines]). */
+internal fun followingWord(line: MushafLine, index: Int, lineFollowedBy: String?): String? =
+    line.words.getOrNull(index + 1)?.text ?: lineFollowedBy
+
+/** Where [word] stands in the Quran, which the Hafs face's drawing needs for the few words it takes
+ * in the King Fahd Complex's spelling (HafsSpelling's table). */
+internal fun placeOf(word: LineWord): QuranPlace = QuranPlace(word.surah, word.ayah, word.word)
 
 /** One word's horizontal span on its line, in pixels from the line's left edge. [right] is
  * exclusive: `right - left` is exactly the word's measured width. */

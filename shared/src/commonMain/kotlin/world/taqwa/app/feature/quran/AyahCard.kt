@@ -68,6 +68,7 @@ import world.taqwa.app.resources.quran_remove_bookmark
 import world.taqwa.app.resources.recitation_a11y_pause
 import world.taqwa.app.resources.recitation_play
 import world.taqwa.app.widget.HafsSpelling
+import world.taqwa.app.widget.QuranPlace
 
 /**
  * One ayah's card (spec §2.3): the Uthmani Arabic with the ayah roundel inline, an optional
@@ -93,6 +94,11 @@ import world.taqwa.app.widget.HafsSpelling
 @Composable
 fun AyahCard(
     text: String,
+    /** What is read straight after the ayah ([world.taqwa.app.quran.Ayah.followedBy]), which its
+     * last tanwin's drawing depends on (HafsSpelling R4). */
+    followedBy: String?,
+    /** The ayah's surah, which with [ayahNumber] is its place for the drawing (HafsSpelling's table). */
+    surah: Int,
     ayahNumber: Int,
     transliteration: String?,
     translation: String?,
@@ -202,7 +208,7 @@ fun AyahCard(
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Text(
                         buildAnnotatedString {
-                            append(HafsSpelling.forDrawing(text))
+                            append(HafsSpelling.forDrawing(text, followedBy, QuranPlace(surah, ayahNumber)))
                             // QuranText.MARKER_SEPARATOR, not a plain space: keeps the ayah number
                             // glued to its text when wrapping, matching QuranText.withMarker's own
                             // separator (spec §5.2) from the one shared definition.

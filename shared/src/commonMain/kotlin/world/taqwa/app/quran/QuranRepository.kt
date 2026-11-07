@@ -6,6 +6,7 @@ import app.cash.sqldelight.db.SqlDriver
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import world.taqwa.app.quran.db.QuranDatabase
+import world.taqwa.app.widget.HafsSpelling
 
 /** Read-only access to the bundled Quran database. Introduced so later tasks can fake it in
  * tests without touching a real SQLite file. */
@@ -43,7 +44,13 @@ class QuranRepository(
     override suspend fun surah(number: Int): Surah = withContext(io) { q.surahByNumber(number.toLong()).executeAsOne().toSurah() }
     override suspend fun juzs(): List<Juz> = withContext(io) { q.juzs().executeAsList().map { Juz(it.number.toInt(), it.start_surah.toInt(), it.start_ayah.toInt()) } }
     override suspend fun ayahs(surah: Int): List<Ayah> = withContext(io) {
-        q.ayahsOfSurah(surah.toLong()).executeAsList().map { Ayah(it.surah.toInt(), it.number.toInt(), it.text_uthmani, it.page.toInt(), it.juz.toInt(), it.hizb_quarter.toInt(), it.sajdah.toInt()) }
+        val rows = q.ayahsOfSurah(surah.toLong()).executeAsList()
+        rows.mapIndexed { i, it ->
+            Ayah(
+                it.surah.toInt(), it.number.toInt(), it.text_uthmani, it.page.toInt(), it.juz.toInt(), it.hizb_quarter.toInt(), it.sajdah.toInt(),
+                followedBy = rows.getOrNull(i + 1)?.text_uthmani ?: HafsSpelling.afterLastAyahOf(surah),
+            )
+        }
     }
     override suspend fun translations(): List<TranslationInfo> = withContext(io) { q.translations().executeAsList().map { it.toInfo() } }
     override suspend fun translationTexts(translationId: String, surah: Int): Map<Int, String> = withContext(io) {
@@ -58,6 +65,13 @@ class QuranRepository(
     override suspend fun pageOf(surah: Int, ayah: Int): Int = withContext(io) { q.pageOfAyah(surah.toLong(), ayah.toLong()).executeAsOne().toInt() }
     override suspend fun page(number: Int): MushafPage = withContext(io) {
         val header = q.pageHeader(number.toLong()).executeAsOne()
+        // What is read after the page's last line: the next page's first basmala or text line.
+        val next = q.pageLines(number.toLong() + 1).executeAsList().firstOrNull { it.type != "surah" }
+        val followedBy = when (next?.type) {
+            null -> null
+            "basmala" -> q.ayahByRef(1, 1).executeAsOne().text_uthmani
+            else -> next.text
+        }
         val words = q.pageWords(number.toLong()).executeAsList().groupBy { it.line.toInt() }
         val lines = q.pageLines(number.toLong()).executeAsList().map { l ->
             MushafLine(
@@ -71,7 +85,7 @@ class QuranRepository(
             )
         }
         val juz = q.juzOfAyah(header.first_surah, header.first_ayah).executeAsOne().toInt()
-        MushafPage(number, header.first_surah.toInt(), header.first_ayah.toInt(), juz, lines)
+        MushafPage(number, header.first_surah.toInt(), header.first_ayah.toInt(), juz, lines, followedBy)
     }
 
     // Not FTS5: Android's framework SQLite is built without that module, so `ayah_fts MATCH`
@@ -91,14 +105,20 @@ class QuranRepository(
         val tokens = SearchQuery.arabicTokens(query)
         if (tokens.isEmpty()) return@withContext emptyList()
         val folded = foldedSearchText()
-        q.ayahSearchRows().executeAsList()
+        val rows = q.ayahSearchRows().executeAsList()
+        rows.indices
             .asSequence()
-            .filterIndexed { index, _ -> tokens.all { folded[index].contains(it) } }
+            .filter { index -> tokens.all { folded[index].contains(it) } }
             .take(limit)
-            .map {
+            .map { index ->
+                val it = rows[index]
+                // The rows run in reading order, so the next one is what is read after this ayah
+                // unless it opens another surah.
+                val next = rows.getOrNull(index + 1)?.takeIf { n -> n.surah == it.surah }
                 SearchHit(
                     it.surah.toInt(), it.number.toInt(), it.text_uthmani, translation = null,
                     matchedWords = ArabicWordAlignment.matchedWords(it.text_uthmani, it.text_search, tokens),
+                    followedBy = next?.text_uthmani ?: HafsSpelling.afterLastAyahOf(it.surah.toInt()),
                 )
             }
             .toList()
@@ -129,9 +149,23 @@ class QuranRepository(
         val arabicBySurah = hits.map { it.surah.toInt() }.distinct().associateWith { surah ->
             q.ayahsOfSurah(surah.toLong()).executeAsList().associate { it.number.toInt() to it.text_uthmani }
         }
-        hits.map { SearchHit(it.surah.toInt(), it.number.toInt(), arabicBySurah.getValue(it.surah.toInt()).getValue(it.number.toInt()), it.text) }
+        hits.map {
+            val arabic = arabicBySurah.getValue(it.surah.toInt())
+            SearchHit(
+                it.surah.toInt(), it.number.toInt(), arabic.getValue(it.number.toInt()), it.text,
+                followedBy = arabic[it.number.toInt() + 1] ?: HafsSpelling.afterLastAyahOf(it.surah.toInt()),
+            )
+        }
     }
 }
+
+/**
+ * What is read straight after ayah [surah]:[ayah] ([Ayah.followedBy]), for a caller that holds the
+ * one ayah rather than its surah: the next ayah's text, or at the surah's end what
+ * [HafsSpelling.afterLastAyahOf] gives.
+ */
+suspend fun QuranSource.textAfter(surah: Int, ayah: Int): String? =
+    ayahText(surah, ayah + 1) ?: HafsSpelling.afterLastAyahOf(surah)
 
 private fun world.taqwa.app.quran.db.Surah.toSurah() = Surah(
     number = number.toInt(),

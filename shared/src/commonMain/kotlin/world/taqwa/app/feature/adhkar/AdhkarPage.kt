@@ -67,6 +67,7 @@ import world.taqwa.app.resources.source_nasai_kubra
 import world.taqwa.app.resources.source_quran
 import world.taqwa.app.resources.source_tirmidhi
 import world.taqwa.app.widget.HafsSpelling
+import world.taqwa.app.widget.QuranPlace
 
 /**
  * One page of the session (spec §3.2): the label, the Arabic, the transliteration and translation
@@ -218,7 +219,8 @@ private fun QuranBlock(text: QuranPageText, prefixKind: QuranPrefix?, sizeSp: In
             if (prefix != null) {
                 when (prefixKind) {
                     QuranPrefix.BASMALA -> Text(
-                        HafsSpelling.forDrawing(prefix),
+                        // Followed by the surah's first ayah.
+                        HafsSpelling.forDrawing(prefix, text.lines.firstOrNull()?.first, QuranPlace(1, 1)),
                         fontFamily = hafs,
                         fontSize = BASMALA_SIZE,
                         textAlign = TextAlign.Center,
@@ -244,7 +246,7 @@ private fun QuranBlock(text: QuranPageText, prefixKind: QuranPrefix?, sizeSp: In
                 Spacer(Modifier.height(8.dp))
             }
             Text(
-                passage(text.lines, colors.accent),
+                passage(text.surah, text.lines, text.followedBy, colors.accent),
                 style = TaqwaText.quran(sizeSp),
                 fontFamily = hafs,
                 color = colors.textPrimary,
@@ -254,12 +256,13 @@ private fun QuranBlock(text: QuranPageText, prefixKind: QuranPrefix?, sizeSp: In
     }
 }
 
-/** The ayahs run on as one paragraph, each closed by its roundel in the accent. */
-private fun passage(lines: List<Pair<String, Int?>>, accent: Color): AnnotatedString =
+/** The ayahs of [surah] run on as one paragraph, each closed by its roundel in the accent. Each is
+ * drawn with what is read after it: the next ayah of the passage, then [followedBy]. */
+private fun passage(surah: Int, lines: List<Pair<String, Int?>>, followedBy: String?, accent: Color): AnnotatedString =
     buildAnnotatedString {
         lines.forEachIndexed { index, (ayah, number) ->
             if (index > 0) append(' ')
-            append(HafsSpelling.forDrawing(ayah))
+            append(HafsSpelling.forDrawing(ayah, lines.getOrNull(index + 1)?.first ?: followedBy, number?.let { QuranPlace(surah, it) }))
             if (number != null) {
                 append(QuranText.MARKER_SEPARATOR)
                 withStyle(SpanStyle(color = accent)) { append(QuranText.arabicIndic(number)) }

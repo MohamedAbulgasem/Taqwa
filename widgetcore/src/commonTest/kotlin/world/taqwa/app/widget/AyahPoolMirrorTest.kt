@@ -29,6 +29,7 @@ class AyahPoolMirrorTest {
         surahArabic = "التوبة",
         arabic = "قُلْ لَنْ يُصِيبَنَا إِلَّا مَا كَتَبَ اللَّهُ لَنَا",
         translation = "Say, \"Never will we be struck except by what Allah has decreed for us\"",
+        followedBy = "قُلْ هَلْ تَرَبَّصُونَ بِنَا",
     )
     private val entryTwo = AyahPoolEntry(
         surah = 65,
@@ -39,6 +40,8 @@ class AyahPoolMirrorTest {
         // formats (| ; =) and an embedded newline, to prove only U+001E/U+001F matter here.
         arabic = "وَمَنْ يَتَّقِ اللَّهَ | يَجْعَلْ لَهُ ; مَخْرَجًا = مِنْ\nحَيْثُ",
         translation = "And whoever fears Allah = He will make; for him | a way\nout",
+        // Empty only after 114:6; any string round-trips.
+        followedBy = "",
     )
     private val mirror = AyahPoolMirror(
         languageTag = "en-US",
@@ -93,8 +96,24 @@ class AyahPoolMirrorTest {
     }
 
     @Test
-    fun theSerialisedHeaderCarriesVersionTwo() {
-        assertEquals("2", AyahPoolMirror.serialize(mirror).substringBefore(fs))
+    fun theSerialisedHeaderCarriesVersionThree() {
+        assertEquals("3", AyahPoolMirror.serialize(mirror).substringBefore(fs))
+    }
+
+    @Test
+    fun roundTripsWhatIsReadAfterEachAyah() {
+        val restored = AyahPoolMirror.deserialize(AyahPoolMirror.serialize(mirror))!!
+        assertEquals(listOf("قُلْ هَلْ تَرَبَّصُونَ بِنَا", ""), restored.entries.map { it.followedBy })
+    }
+
+    @Test
+    fun aVersionTwoMirrorDeserializesToNull() {
+        // A version-2 mirror's Arabic carries the silent-letter sign as U+0652, which HafsSpelling's
+        // R1 would draw as the head of kha, and has no followedBy: the widgets treat it as "no
+        // mirror", which is right for a mirror left by the previous build.
+        val versionTwo = listOf("2", "en-US", "en.sahih", "0", "0").joinToString(fs)
+        val entry = listOf("9", "51", "At-Tawbah", "التوبة", "text", "trans").joinToString(fs)
+        assertNull(AyahPoolMirror.deserialize(versionTwo + rs + entry))
     }
 
     @Test
@@ -125,7 +144,7 @@ class AyahPoolMirrorTest {
 
     @Test
     fun aFutureVersionDeserializesToNull() {
-        val futureVersion = listOf("3", "en-US", "en.sahih", "0", "0").joinToString(fs)
+        val futureVersion = listOf("4", "en-US", "en.sahih", "0", "0").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(futureVersion))
     }
 
@@ -141,28 +160,28 @@ class AyahPoolMirrorTest {
 
     @Test
     fun aHeaderMissingTheDigitFieldDeserializesToNull() {
-        val fourFieldHeader = listOf("2", "en-US", "en.sahih", "0").joinToString(fs)
+        val fourFieldHeader = listOf("3", "en-US", "en.sahih", "0").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(fourFieldHeader))
     }
 
     @Test
     fun aDigitFieldThatIsNotZeroOrOneDeserializesToNull() {
-        val header = listOf("2", "en-US", "en.sahih", "0", "yes").joinToString(fs)
+        val header = listOf("3", "en-US", "en.sahih", "0", "yes").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(header))
     }
 
     @Test
-    fun anEntryWithFiveFieldsDeserializesToNull() {
-        val header = listOf("2", "en-US", "en.sahih", "0", "0").joinToString(fs)
-        // Five fields: missing the trailing translation field.
-        val shortEntry = listOf("9", "51", "At-Tawbah", "التوبة", "text").joinToString(fs)
+    fun anEntryWithSixFieldsDeserializesToNull() {
+        val header = listOf("3", "en-US", "en.sahih", "0", "0").joinToString(fs)
+        // Six fields: missing the trailing followedBy field.
+        val shortEntry = listOf("9", "51", "At-Tawbah", "التوبة", "text", "trans").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(header + rs + shortEntry))
     }
 
     @Test
     fun anEntryWithNonIntegerSurahDeserializesToNull() {
-        val header = listOf("2", "en-US", "en.sahih", "0", "0").joinToString(fs)
-        val badEntry = listOf("nine", "51", "At-Tawbah", "التوبة", "text", "trans").joinToString(fs)
+        val header = listOf("3", "en-US", "en.sahih", "0", "0").joinToString(fs)
+        val badEntry = listOf("nine", "51", "At-Tawbah", "التوبة", "text", "trans", "next").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(header + rs + badEntry))
     }
 
@@ -189,7 +208,7 @@ class AyahPoolMirrorTest {
 
     @Test
     fun aHeaderWithTheWrongFieldCountDeserializesToNull() {
-        val tooFewFields = listOf("2", "en-US", "en.sahih").joinToString(fs)
+        val tooFewFields = listOf("3", "en-US", "en.sahih").joinToString(fs)
         assertNull(AyahPoolMirror.deserialize(tooFewFields))
     }
 

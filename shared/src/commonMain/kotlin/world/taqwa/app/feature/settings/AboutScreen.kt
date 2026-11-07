@@ -52,6 +52,7 @@ import world.taqwa.app.about.AboutLinks
 import world.taqwa.app.crash.ReportMail
 import world.taqwa.app.crash.crashLogStore
 import world.taqwa.app.crash.deviceInfoOrUnknown
+import world.taqwa.app.crash.notificationDiagnosticsOrNone
 import world.taqwa.app.design.LocalTaqwaColors
 import world.taqwa.app.design.LocalTaqwaDark
 import world.taqwa.app.design.TaqwaText
@@ -175,10 +176,11 @@ fun AboutScreen(onBack: () -> Unit, onOpenAttribution: () -> Unit) {
                                 Canvas(Modifier.size(16.dp)) { drawChevron(colors.textTertiary, pointsForward = forward) }
                             },
                         )
-                        // The support email (crash spec §3.2), carrying the last crash report if there is one.
+                        // The support email (crash spec §3.2), carrying the last crash report if there is one,
+                        // and what the phone says about Taqwa's notifications (NotificationDiagnostics).
                         AboutRow.REPORT -> LinkRow(stringResource(Res.string.about_report_problem), null, forward) {
                             val info = deviceInfoOrUnknown()
-                            val body = ReportMail.body(info, crashLogStore.read(), noReportLine)
+                            val body = ReportMail.body(info, crashLogStore.read(), noReportLine, notificationDiagnosticsOrNone())
                             open(ReportMail.mailto(AboutLinks.SUPPORT_EMAIL, ReportMail.subject(info), body))
                         }
                         AboutRow.WEBSITE ->

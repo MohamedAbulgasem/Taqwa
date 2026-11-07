@@ -201,7 +201,8 @@ struct AyahTimelineProvider: TimelineProvider {
         )
     }
 
-    /// Ar-Ra'd 13:28 — for the widget gallery alone, in the gallery's own language.
+    /// Ar-Ra'd 13:28 — for the widget gallery alone, in the gallery's own language. The Arabic, and
+    /// 13:29 after it, are the bundled `quran.db`'s bytes (`AyahPoolDbTest` holds them to it).
     static func sampleEntry(background: WidgetBackground) -> AyahEntry {
         let tag = Locale.current.language.languageCode?.identifier ?? "en"
         // The sample translation is the Arabic tafsir only for Arabic itself; the footer's
@@ -213,12 +214,14 @@ struct AyahTimelineProvider: TimelineProvider {
             ayah: 28,
             surahLatin: "Ar-Ra'd",
             surahArabic: "الرعد",
-            arabic: "ٱلَّذِينَ ءَامَنُواْ وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ ٱللَّهِ ۗ أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ",
+            arabic: "ٱلَّذِينَ ءَامَنُوا۟ وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ ٱللَّهِ ۗ أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ",
             // The bundled default for each UI language (`ReadingSettings.defaultsFor`): Saheeh
             // International in English, al-Muyassar in Arabic.
             translation: arabic
                 ? "ويهدي الذين تسكن قلوبهم بتوحيد الله وذكره فتطمئن، ألا بطاعة الله وذكره وثوابه تسكن القلوب وتستأنس."
-                : "Those who have believed and whose hearts are assured by the remembrance of Allah. Unquestionably, by the remembrance of Allah hearts are assured."
+                : "Those who have believed and whose hearts are assured by the remembrance of Allah. Unquestionably, by the remembrance of Allah hearts are assured.",
+            // 13:29, what is read after it, which its drawing needs (HafsSpelling R4).
+            followedBy: "ٱلَّذِينَ ءَامَنُوا۟ وَعَمِلُوا۟ ٱلصَّـٰلِحَـٰتِ طُوبَىٰ لَهُمْ وَحُسْنُ مَـَٔابٍ"
         )
         return AyahEntry(
             date: Date(), entry: entry, showTranslation: true, translationRtl: arabic,
@@ -334,7 +337,7 @@ struct TaqwaAyahWidgetView: View {
     /// reader's own `AyahCard` styles it — built by concatenating two runs rather than searching
     /// for a range, because the same digits can occur inside the ayah text.
     private func arabicText(_ ayah: AyahPoolEntry) -> some View {
-        var text = AttributedString(HafsSpelling.shared.forDrawing(text: ayah.arabic) + markerSeparator)
+        var text = AttributedString(HafsSpelling.shared.forDrawing(text: ayah.arabic, followedBy: ayah.followedBy, startsAt: QuranPlace(surah: ayah.surah, ayah: ayah.ayah, word: 1)) + markerSeparator)
         var marker = AttributedString(arabicIndicDigits(ayah.ayah))
         marker.foregroundColor = accentColor
         text.append(marker)

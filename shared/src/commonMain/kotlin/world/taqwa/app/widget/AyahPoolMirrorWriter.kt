@@ -4,6 +4,7 @@ import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.quran.QuranSource
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.RTL_TRANSLATION_LANGUAGES
+import world.taqwa.app.quran.textAfter
 import kotlin.random.Random
 
 /**
@@ -44,6 +45,7 @@ object AyahPoolMirrorWriter {
                 surahArabic = surahInfo.nameArabic,
                 arabic = quran.ayahText(surah, ayah).orEmpty(),
                 translation = if (translationOff) "" else quran.translationText(settings.translationId, surah, ayah).orEmpty(),
+                followedBy = quran.textAfter(surah, ayah).orEmpty(),
             )
         }
         val mirror = AyahPoolMirror(

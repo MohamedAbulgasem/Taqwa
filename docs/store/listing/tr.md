@@ -57,7 +57,9 @@ Destek: support@taqwa.world
 
 ### Release notes (500)
 1.5.1 sürümündeki yenilikler:
-• Kur’an: Besmele dahil birçok kelimede küçük elif, kelimenin üstünde değil yanında çiziliyordu. Artık yerinde çiziliyor. Bize yazan okuyucumuza teşekkür ederiz.
+• Kur’an: ekrandaki hareke ve işaretler artık basılı Medine Mushafı’ndakilere daha yakın
+• “Sorun bildir” artık telefonunuzun bildirimleri nasıl yönettiğine dair iki kısa satır ekliyor
+• Bildirimler: bazı telefonlarda uygulama güncellendikten sonra daha güvenilir
 
 ## App Store
 
@@ -88,7 +90,7 @@ kuran,vakitleri,vakti,tilavet,meal,mushaf,tesbih,zikir,ramazan,imsakiye,islam,m�
 
 ### What's new (4000)
 1.5.1 sürümündeki yenilikler:
-• Kur’an: Besmele dahil birçok kelimede küçük elif, kelimenin üstünde değil yanında çiziliyordu. Artık yerinde çiziliyor. Bize yazan okuyucumuza teşekkür ederiz.
+• Kur’an: ekrandaki hareke ve işaretler artık basılı Medine Mushafı’ndakilere daha yakın
 
 ## Screenshot captions (her biri tek kısa satır, çerçeveli ekran görüntüsünün üstünde)
 1. Bulunduğunuz yerin namaz vakti

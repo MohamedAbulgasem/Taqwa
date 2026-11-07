@@ -90,6 +90,7 @@ Three tabs: Prayer (mihrab), Quran (open book), Settings (sliders; the gear neve
 
 1. Strip the UTF-8 BOM and trailing whitespace from every source line.
 2. Map **U+06DF → U+0652** in the Uthmani text and in every layout word (the Hafs font draws U+06DF as an inline ring that splits the word; spike §12).
+   *Superseded in 1.5.1 (42), quran.db user_version 6: the pipeline no longer maps U+06DF, so the stored text is Tanzil's own bytes; the face is handed U+0652 for it at draw time instead (`HafsSpelling` R1 in `widgetcore`, which also turns the sounded U+0652 into U+06E1). Do not bring the mapping back.*
 3. Verify per ayah that the layout's words, joined with spaces and with the trailing ayah digits removed from the last word, equal the Tanzil Uthmani text with the standalone sign tokens (rub-el-hizb ۞ U+06DE and sajdah ۩ U+06E9, and pause marks U+06D6–U+06DC when they are separate tokens) accounted for. Any mismatch fails the build and prints the ayah.
 4. Transliteration: remove `<u>`, `</u>`, `<b>`, `</b>` (case-insensitive) and collapse double spaces.
 5. Tanzil prefixes the basmala to ayah 1 of every surah except Al-Fatiha and At-Tawbah; the pipeline strips that leading basmala (matched on bare letters, since surahs 95 and 97 spell it with a different shadda placement) from `text_uthmani` and `text_search`, because the app renders the basmala as its own line. 27:30, where the basmala sits mid-ayah, is untouched.
@@ -185,7 +186,7 @@ The Attribution screen gains: Tanzil Project (text and translations, with the re
 
 ## 7. Testing
 
-- Pipeline: `tools/build-quran-db.py --verify` checks counts (114 / 6,236 / 30 / 604 / 15 lines on pages 3–604), the word-equality rule per ayah, U+06DF absence, and that every ayah maps to exactly one page and every page's first line to an ayah.
+- Pipeline: `tools/build-quran-db.py --verify` checks counts (114 / 6,236 / 30 / 604 / 15 lines on pages 3–604), the word-equality rule per ayah, U+06DF absence (since 1.5.1: Tanzil's own bytes, U+06DF kept, `verify_tanzil_bytes`), and that every ayah maps to exactly one page and every page's first line to an ayah.
 - JVM (`androidUnitTest`, JDBC driver over the built file): repository queries return the right shapes for known references (1:1, 2:255, 114:6, page 1, page 604, juz 30).
 - commonTest: roundel rule, digit conversion, locale defaults for translation and mode, position mapping ayah ↔ page from a small in-memory fake.
 - Device round on S23, LoopPhone, iPhone 12 and the emulator in English and Arabic, light and dark, with screenshots in `docs/BUILD-LOG.md`.

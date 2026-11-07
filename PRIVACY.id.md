@@ -1,6 +1,6 @@
 # Kebijakan privasi Taqwa
 
-_Terakhir diperbarui 29 September 2026. Berlaku untuk Taqwa 1.0.0 dan versi setelahnya di Android dan iOS._
+_Terakhir diperbarui 7 November 2026. Berlaku untuk Taqwa 1.0.0 dan versi setelahnya di Android dan iOS._
 
 Taqwa adalah aplikasi Islami gratis tanpa akun, tanpa iklan, dan tanpa analitik. Aplikasi ini
 berfungsi offline. Satu-satunya hal yang membuatnya memakai internet adalah mengunduh tilawah
@@ -22,6 +22,11 @@ Taqwa dan tidak ada akun yang perlu dibuat. Menghapus aplikasinya menghapus semu
 Jika Taqwa mengalami kerusakan, aplikasi menyimpan laporan teknis di ponsel Anda (versi aplikasi,
 model ponsel Anda, dan kesalahannya, tidak lebih). Laporan itu tidak pernah keluar dari ponsel
 kecuali Anda memilih mengirimkannya kepada kami lewat email.
+Di Android, email dari Pengaturan › Tentang Taqwa › “Laporkan masalah” juga menyebutkan apakah
+notifikasi dan alarm tepat waktu Taqwa diizinkan, sejauh mana ponsel membatasi penggunaan
+baterainya, apakah ponsel dalam mode senyap, getar, atau “Jangan Ganggu”, serta kira-kira kapan
+notifikasi salat terakhir masuk dan kapan aplikasi dipasang atau terakhir diperbarui; Anda
+melihatnya sebelum mengirimnya.
 
 ## Lokasi
 

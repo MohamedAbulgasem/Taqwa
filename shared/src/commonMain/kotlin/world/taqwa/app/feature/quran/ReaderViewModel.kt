@@ -55,6 +55,8 @@ sealed interface ReaderUiState {
         /** The name of the translation actually being shown, null with translation off — the
          * share text names its translation (spec 2b §2.3) and must never invent that name. */
         val translationName: String?,
+        /** What is read after [previewAyah] (1:3), for its drawing. */
+        val previewFollowedBy: String? = null,
     ) : ReaderUiState
 }
 
@@ -100,6 +102,7 @@ class ReaderViewModel(
     private var basmalaText: String? = null
     private var nextSurahInfo: Surah? = null
     private var previewAyahText: String? = null
+    private var previewFollowedBy: String? = null
 
     /** The last set the bookmark collection saw, so [applySettings]'s own re-emission (a slider
      * tweak, say) carries the bookmarks forward instead of dropping them until the store's flow
@@ -142,6 +145,7 @@ class ReaderViewModel(
             val alFatiha = source.ayahs(1)
             basmalaText = if (surah in SURAHS_WITHOUT_A_LEADING_BASMALA) null else alFatiha.first().text
             previewAyahText = QuranText.withMarker(alFatiha[1].text, 2)
+            previewFollowedBy = alFatiha[1].followedBy
         }
 
         // A translation id the sheet stored that this build no longer bundles (e.g. dropped
@@ -188,6 +192,7 @@ class ReaderViewModel(
             // translation to lay out) or an id this same catalogue was just checked to contain.
             translationLanguage = translations.firstOrNull { it.id == translationId }?.language ?: "en",
             previewAyah = previewAyahText!!,
+            previewFollowedBy = previewFollowedBy,
             translations = sheetTranslations,
             bookmarked = bookmarkedAyahs,
             // Null exactly when translation is off. Beyond that the lookup cannot miss, for

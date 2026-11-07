@@ -1,6 +1,6 @@
 # Taqwa privacy policy
 
-_Last updated 29 September 2026. Applies to Taqwa 1.0.0 and later on Android and iOS._
+_Last updated 7 November 2026. Applies to Taqwa 1.0.0 and later on Android and iOS._
 
 Taqwa is a free Islamic app with no account, no ads and no analytics. It works offline.
 The one thing it uses the internet for is downloading Quran recitations, and only when you
@@ -21,6 +21,10 @@ create. Deleting the app deletes all of it.
 
 If Taqwa crashes, it saves a technical report on your phone (the app version, your phone model
 and the error, nothing else). It never leaves the phone unless you choose to email it to us.
+On Android, the email from Settings › About Taqwa › Report a problem also says whether Taqwa's
+notifications and exact alarms are allowed, how far the phone limits its battery use, whether the
+phone is on silent, vibrate or Do Not Disturb, and roughly when the last prayer alert came and when
+the app was installed or last updated; you see it before you send it.
 
 ## Location
 

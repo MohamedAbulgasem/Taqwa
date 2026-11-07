@@ -18,8 +18,9 @@ import world.taqwa.app.widget.androidWidgetUpdateHook
 
 /**
  * `BOOT_COMPLETED`, `MY_PACKAGE_REPLACED`, `TIME_SET` and `TIMEZONE_CHANGED` all invalidate
- * whatever is currently scheduled: a reboot or an app update clears every `AlarmManager` entry
- * outright, and a clock or timezone change can silently leave the existing plan pointing at the
+ * whatever is currently scheduled: a reboot clears every `AlarmManager` entry outright, an app
+ * update keeps the old build's alarms with that build's extras and channel ids (verified on an
+ * Android 15 emulator, 7 Nov 2026), and a clock or timezone change can silently leave the existing plan pointing at the
  * wrong wall-clock moments. A change to the "Alarms & reminders" grant does too, in its own way:
  * an alarm keeps the exactness it was armed with, so the plan has to be re-armed to gain (or
  * lose) the minute.
@@ -83,7 +84,7 @@ class SystemEventReceiver : BroadcastReceiver() {
  * `MY_PACKAGE_REPLACED` reuses [RescheduleTrigger.BOOT_COMPLETED] rather than earning a value of
  * its own: nothing branches on the trigger except [world.taqwa.app.location.LocationRefresher],
  * which asks only whether the position may have moved, and an update is a reboot's twin on both
- * counts — every alarm gone, the device still exactly where it was. A new enum value would read
+ * counts — every alarm gone or due to be replaced, the device still exactly where it was. A new enum value would read
  * better and mean the same thing everywhere it was matched.
  *
  * `Intent.ACTION_TIME_CHANGED` really is `"android.intent.action.TIME_SET"`; the manifest's

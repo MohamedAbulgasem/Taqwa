@@ -29,8 +29,8 @@ class SystemEventReceiverTest {
 
     @Test
     fun `an app update is a reboot for scheduling purposes`() {
-        // Replacing the package drops every AlarmManager entry the app owns, exactly as a reboot
-        // does, so a Play auto-update has to rebuild the plan the same way (audit B1).
+        // Replacing the package keeps the old build's alarms, with its extras and channel ids, so a
+        // Play auto-update has to rebuild the plan as a reboot does (audit B1; the adhan report).
         assertEquals(
             RescheduleTrigger.BOOT_COMPLETED,
             rescheduleTriggerFor("android.intent.action.MY_PACKAGE_REPLACED"),

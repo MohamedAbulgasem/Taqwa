@@ -157,6 +157,8 @@ class RecitationHarnessReceiver : BroadcastReceiver() {
                     // `--es name <VOICE>` (ORIGINAL, MAKKAH, MADINAH, AZEMI, AZEEZ, CUSTOM): that voice, all
                     // five prayers on Adhan, and one prayer notification through the real scheduler in 8 s.
                     "adhan" -> fireAdhan(intent.getStringExtra("name") ?: "ORIGINAL")
+                    // The notification lines the support email carries, one log line each.
+                    "diagnostics" -> world.taqwa.app.crash.notificationDiagnosticsOrNone().forEach { Log.i(TAG, "diagnostics: $it") }
                     // `--es name on|off` switches Duha or the iqama (Duha and Iqama spec §3), as
                     // their Settings cards do, and logs what the new plan arms for it.
                     "duha", "iqama" -> {

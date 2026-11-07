@@ -1,5 +1,6 @@
 package world.taqwa.app.notifications
 
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -83,6 +84,15 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             return
         }
 
+        // The channel is made by the plan that armed this alarm, so it is almost always there.
+        // When it is not, the alarm was armed by an older build whose channel ids differ, and
+        // Android would drop the post without a word; so it is made here, and the plan is rebuilt
+        // after the post so the next alarms are this build's own. A channel that exists is never
+        // touched. Guarded like everything else on this path: it must never cost the post.
+        val madeChannel = runCatching {
+            AndroidNotificationScheduler(context).ensureChannel(prayer, sound, voice, kind)
+        }.getOrDefault(false)
+
         val builder = NotificationCompat.Builder(context, NotificationChannels.channelId(prayer, sound, voice, kind))
             .setSmallIcon(notificationSmallIconResId)
             .setContentTitle(title)
@@ -97,8 +107,18 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         // Tagged with its id for the adhkar reminder, so a finished set can withdraw it from the
         // shade by id alone (AndroidNotificationScheduler.cancel). Null, as always, for the rest.
         NotificationManagerCompat.from(context).notify(AdhkarReminderDelivery.tagFor(kind, id), notificationId, builder.build())
+        // A prayer's own alarm is noted for the support email only once the notification is
+        // posted, so the note can never stand between the alarm and the adhan; and marked when its
+        // channel was still missing, so a post Android dropped is not read as one delivered.
+        runCatching {
+            if (kind == NotificationKind.PRAYER) {
+                val channelId = NotificationChannels.channelId(prayer, sound, voice, kind)
+                val missing = context.getSystemService(NotificationManager::class.java).getNotificationChannel(channelId) == null
+                AlarmLog.alarmPosted(context, missing)
+            }
+        }
 
-        afterAlarm(context)
+        afterAlarm(context, rebuildPlan = madeChannel)
     }
 
     /**
@@ -136,14 +156,17 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
      *
      * Nothing here may throw: this is the notification path, and neither a widget that failed to
      * redraw nor a top-up that failed must ever cost the user their adhan.
+     *
+     * [rebuildPlan] is set when this alarm's channel had to be made, the mark of a plan armed by
+     * an older build: that plan is replaced whatever its horizon.
      */
-    private fun afterAlarm(context: Context) {
+    private fun afterAlarm(context: Context, rebuildPlan: Boolean = false) {
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 withTimeout(WORK_BUDGET_MILLIS) {
                     refreshWidgets()
-                    topUpPlan(context)
+                    topUpPlan(context, rebuildPlan)
                 }
             } catch (_: TimeoutCancellationException) {
                 // The half-hourly update and the next window alarm will both catch up.
@@ -183,12 +206,12 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
      * window that still has days left in it is waste. The horizon comes from the scheduler's own
      * preference file because this process has no plan in memory (see [scheduledPlanHorizon]).
      */
-    private suspend fun topUpPlan(context: Context) {
+    private suspend fun topUpPlan(context: Context, rebuild: Boolean) {
         runCatching {
             val coordinator = appContainer.notificationCoordinator
             // Or the phone has moved (spec §16.5): the plan was built for somewhere else, and
             // this alarm is the one moment a closed app gets to notice before the next prayer.
-            if (coordinator.needsTopUp(scheduledPlanHorizon(context)) || appContainer.locationRefresher.hasMoved()) {
+            if (rebuild || coordinator.needsTopUp(scheduledPlanHorizon(context)) || appContainer.locationRefresher.hasMoved()) {
                 coordinator.reschedule(RescheduleTrigger.ALARM_FIRED)
             }
         }

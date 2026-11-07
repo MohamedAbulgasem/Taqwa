@@ -54,6 +54,7 @@ class ReadingSheetTest {
                 settings = settings,
                 translations = emptyList(),
                 previewAyah = "بِسْمِ ٱللَّهِ",
+                previewFollowedBy = null,
                 mushafMode = mushafMode,
                 onChange = { changes += it },
                 onDismiss = {},

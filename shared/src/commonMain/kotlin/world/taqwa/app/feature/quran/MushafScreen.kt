@@ -342,6 +342,7 @@ fun MushafScreen(
                     settings = ready.settings,
                     translations = ready.translations,
                     previewAyah = ready.previewAyah,
+                    previewFollowedBy = ready.previewFollowedBy,
                     // The size slider does not apply to a printed page (spec §2.4): the sheet
                     // shows it disabled with its own note.
                     mushafMode = true,

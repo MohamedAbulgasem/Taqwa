@@ -1,6 +1,6 @@
 # Taqwa gizlilik politikası
 
-_Son güncelleme 29 Eylül 2026. Android ve iOS'ta Taqwa 1.0.0 ve sonrası için geçerlidir._
+_Son güncelleme 7 Kasım 2026. Android ve iOS'ta Taqwa 1.0.0 ve sonrası için geçerlidir._
 
 Taqwa; hesabı, reklamı ve analizi olmayan ücretsiz bir İslami uygulamadır. Çevrimdışı çalışır.
 İnterneti tek bir şey için kullanır: Kur'an tilavetlerini indirmek, o da yalnızca siz
@@ -21,6 +21,11 @@ açılacak bir hesap da yok. Uygulamayı silmek bunların hepsini siler.
 
 Taqwa çökerse telefonunuza teknik bir rapor kaydeder (uygulama sürümü, telefonunuzun modeli ve hata;
 başka bir şey yok). Siz bize e-postayla göndermeyi seçmedikçe bu rapor telefondan asla çıkmaz.
+Android'de Ayarlar › Taqwa hakkında › "Sorun bildir" ile hazırlanan e-posta ayrıca Taqwa'nın
+bildirimlerine ve tam alarmlarına izin verilip verilmediğini, pil kullanımının ne ölçüde
+kısıtlandığını, telefonun sessizde, titreşimde ya da "Rahatsız etmeyin" modunda olup olmadığını, son
+namaz bildiriminin yaklaşık ne zaman geldiğini, uygulamanın da ne zaman yüklendiğini ya da en son
+güncellendiğini söyler; e-postayı göndermeden önce siz de görürsünüz.
 
 ## Konum
 

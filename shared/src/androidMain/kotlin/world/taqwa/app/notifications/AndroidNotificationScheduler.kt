@@ -253,29 +253,30 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
             .forEach { runCatching { notificationManager.deleteNotificationChannel(it) } }
     }
 
-    /** A channel's identity: one [ChannelKey] per channel id, so each is created once a plan. */
-    private data class ChannelKey(
-        val prayer: Prayer,
-        val sound: PrayerSound,
-        val voice: AdhanVoice,
-        val kind: NotificationKind,
-    )
+    private fun channelKeyOf(entry: ScheduledNotification): ChannelKey =
+        channelKeyOf(entry.prayer, entry.sound, entry.voice, entry.kind)
 
     /**
-     * A reminder shares its prayer's channels, so it folds into PRAYER. Both adhkar kinds share
-     * one channel whatever prayer they follow, so they fold into one key too — two keys for one
-     * id would create the channel twice a plan. Both Duha timings fold into one key, and all five
-     * prayers' iqamas into one, for the same reason.
+     * The channel an alarm for (prayer, sound, voice, kind) posts into, created if it is missing,
+     * as [ensureChannels] would have made it. Returns whether it had to be made.
+     *
+     * For [PrayerAlarmReceiver], at the moment an alarm fires. A plan makes the channels its
+     * alarms need, so normally the channel is there and nothing happens. But an update keeps the
+     * alarms the old build armed, and a build whose channel ids differ then posts them into a
+     * channel no plan has made yet, which Android drops without a word: 1.4.0's Adhan alarms
+     * fired into 1.5.0's "_full" channels that way whenever the update's own reschedule did not
+     * run (the adhan report, 7 Nov 2026). A channel that exists is left exactly as it is, the
+     * person's own changes to it — blocked or silenced included — with it.
      */
-    private fun channelKeyOf(entry: ScheduledNotification): ChannelKey = when (entry.kind) {
-        NotificationKind.TAHAJJUD -> ChannelKey(entry.prayer, entry.sound, entry.voice, NotificationKind.TAHAJJUD)
-        NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING ->
-            ChannelKey(Prayer.FAJR, entry.sound, entry.voice, NotificationKind.ADHKAR_MORNING)
-        NotificationKind.DUHA_BEST, NotificationKind.DUHA_START ->
-            ChannelKey(Prayer.SUNRISE, entry.sound, entry.voice, NotificationKind.DUHA_BEST)
-        NotificationKind.IQAMA -> ChannelKey(Prayer.FAJR, entry.sound, entry.voice, NotificationKind.IQAMA)
-        NotificationKind.PRAYER, NotificationKind.REMINDER ->
-            ChannelKey(entry.prayer, entry.sound, entry.voice, NotificationKind.PRAYER)
+    internal fun ensureChannel(prayer: Prayer, sound: PrayerSound, voice: AdhanVoice, kind: NotificationKind): Boolean {
+        val key = channelKeyOf(prayer, sound, voice, kind)
+        val id = NotificationChannels.channelId(key.prayer, key.sound, key.voice, key.kind)
+        if (notificationManager.getNotificationChannel(id) != null) return false
+        val copy = LocalizedNotificationCopy(createPlatformFormat())
+        val channel = NotificationChannel(id, copy.channelName(key.prayer, key.sound, key.kind), NotificationManager.IMPORTANCE_HIGH)
+        configureSound(channel, key.sound, key.voice)
+        notificationManager.createNotificationChannel(channel)
+        return true
     }
 
     private fun configureSound(channel: NotificationChannel, sound: PrayerSound, voice: AdhanVoice) {
@@ -306,6 +307,31 @@ class AndroidNotificationScheduler(private val context: Context) : NotificationS
             channel.vibrationPattern = NOTIFICATION_VIBRATION
         }
     }
+}
+
+/** A channel's identity: one [ChannelKey] per channel id, so each is created once a plan. */
+internal data class ChannelKey(
+    val prayer: Prayer,
+    val sound: PrayerSound,
+    val voice: AdhanVoice,
+    val kind: NotificationKind,
+)
+
+/**
+ * A reminder shares its prayer's channels, so it folds into PRAYER. Both adhkar kinds share
+ * one channel whatever prayer they follow, so they fold into one key too — two keys for one
+ * id would create the channel twice a plan. Both Duha timings fold into one key, and all five
+ * prayers' iqamas into one, for the same reason.
+ */
+internal fun channelKeyOf(prayer: Prayer, sound: PrayerSound, voice: AdhanVoice, kind: NotificationKind): ChannelKey = when (kind) {
+    NotificationKind.TAHAJJUD -> ChannelKey(prayer, sound, voice, NotificationKind.TAHAJJUD)
+    NotificationKind.ADHKAR_MORNING, NotificationKind.ADHKAR_EVENING ->
+        ChannelKey(Prayer.FAJR, sound, voice, NotificationKind.ADHKAR_MORNING)
+    NotificationKind.DUHA_BEST, NotificationKind.DUHA_START ->
+        ChannelKey(Prayer.SUNRISE, sound, voice, NotificationKind.DUHA_BEST)
+    NotificationKind.IQAMA -> ChannelKey(Prayer.FAJR, sound, voice, NotificationKind.IQAMA)
+    NotificationKind.PRAYER, NotificationKind.REMINDER ->
+        ChannelKey(prayer, sound, voice, NotificationKind.PRAYER)
 }
 
 /**

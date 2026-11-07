@@ -116,11 +116,12 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
-                <!-- Replacing the package stops the app and drops every AlarmManager entry it
-                     owns, exactly as a reboot does, so every Play auto-update would otherwise
-                     leave the reader with no adhan until they next opened the app by hand.
-                     MY_PACKAGE_REPLACED is the self-targeted one: no data element, no
-                     permission, and never delivered for another app's update. -->
+                <!-- Replacing the package keeps the AlarmManager entries the old build armed
+                     (verified on an Android 15 emulator, 7 Nov 2026), and they carry that build's
+                     extras and channel ids, so every Play auto-update re-arms the plan here; the
+                     alarm receiver also makes any channel an old alarm needs that this build has
+                     not (PrayerAlarmReceiver). MY_PACKAGE_REPLACED is the self-targeted one: no
+                     data element, no permission, and never delivered for another app's update. -->
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <!-- Android 12+ tells the app when "Alarms & reminders" is granted or revoked.
                      Every alarm already armed keeps the exactness it was armed with, so the plan

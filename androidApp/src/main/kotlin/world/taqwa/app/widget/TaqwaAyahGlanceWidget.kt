@@ -127,15 +127,16 @@ private const val EXTRA_OPEN_AYAH = "open_ayah"
  * rather than the placeholder iOS has to show. Best-effort — a database that fails to open leaves
  * [AyahWidgetRender.entry] null and the card empty until the app runs.
  *
- * A mirror from an older wire version deserialises to null (spec §4, `AyahPoolMirror.VERSION` 2),
- * so this is also what rewrites it after an upgrade rather than leaving the card blank.
+ * A mirror from an older wire version deserialises to null (spec §4, `AyahPoolMirror.VERSION`, 3
+ * since 1.5.1's marks hotfix), so this is also what rewrites it after an upgrade rather than leaving
+ * the card blank, and from the database the upgrade just copied in.
  */
 private suspend fun ensureMirror(context: Context) {
     val store = createWidgetKeyValueStore()
     if (AyahPoolMirror.read(store) != null) return
     val deviceTag = Locale.getDefault().toLanguageTag()
     // The user's own reading settings, not a hardcoded default: a missing mirror here is not
-    // necessarily a fresh install — it is just as likely a version-2 rejection of an old-format
+    // necessarily a fresh install — it is just as likely the rejection of an older-format
     // mirror (spec §4) or a prefs file the system cleared, and either one must not silently hand
     // someone who chose another translation the default one. Only a settings read that actually
     // throws falls back to the language's own defaults, so the widget still draws something.

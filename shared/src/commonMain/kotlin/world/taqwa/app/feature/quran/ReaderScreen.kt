@@ -76,6 +76,7 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.quran_juz_page
 import world.taqwa.app.resources.quran_next_surah
 import world.taqwa.app.widget.HafsSpelling
+import world.taqwa.app.widget.QuranPlace
 import world.taqwa.app.share.shareText
 import world.taqwa.app.design.components.TaqwaBottomSheet
 
@@ -340,7 +341,8 @@ fun ReaderScreen(
                     item(key = "basmala") {
                         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                             Text(
-                                HafsSpelling.forDrawing(ready.basmala.orEmpty()),
+                                // Followed by the surah's first ayah.
+                                HafsSpelling.forDrawing(ready.basmala.orEmpty(), ready.ayahs.firstOrNull()?.text, QuranPlace(1, 1)),
                                 fontFamily = mushafFamily(),
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,
@@ -355,6 +357,8 @@ fun ReaderScreen(
                     Box(Modifier.contentWidth().padding(horizontal = ReaderGutter)) {
                         AyahCard(
                             text = ayah.text,
+                            followedBy = ayah.followedBy,
+                            surah = ayah.surah,
                             ayahNumber = ayah.number,
                             transliteration = ready.transliteration?.get(ayah.number),
                             translation = ready.translation[ayah.number],
@@ -443,6 +447,7 @@ fun ReaderScreen(
                     settings = ready.settings,
                     translations = ready.translations,
                     previewAyah = ready.previewAyah,
+                    previewFollowedBy = ready.previewFollowedBy,
                     mushafMode = false,
                     onChange = { newSettings ->
                         if (newSettings.mode == ReadingMode.MUSHAF) {

@@ -40,6 +40,8 @@ sealed interface MushafUiState {
         val translations: List<TranslationInfo>,
         /** Al-Faatiha 1:2 with its marker — the sheet's live size preview, read from the database. */
         val previewAyah: String,
+        /** What is read after [previewAyah] (1:3), for its drawing. */
+        val previewFollowedBy: String? = null,
         /** Al-Faatiha 1:1, the text every `BASMALA` line draws — read from the database, never typed. */
         val basmala: String,
         /** Every surah by number, for the surah bands and the header; loaded once. */
@@ -98,6 +100,7 @@ class MushafViewModel(
     private var surahsByNumber: Map<Int, Surah>? = null
     private var basmalaText: String? = null
     private var previewAyahText: String? = null
+    private var previewFollowedBy: String? = null
 
     /** One surah's ayahs per entry, filled on demand: the pages themselves carry the words, so
      * this is only what the share text needs (spec 2b §2.5) — the tapped ayah's whole text in one
@@ -136,6 +139,7 @@ class MushafViewModel(
             val alFatiha = ayahsOf(1)
             basmalaText = alFatiha.first().text
             previewAyahText = QuranText.withMarker(alFatiha[1].text, 2)
+            previewFollowedBy = alFatiha[1].followedBy
         }
         val translations = orderForSheet(source.translations().filter { it.kind != TextKind.TRANSLITERATION })
         val page = page(currentPage)
@@ -146,6 +150,7 @@ class MushafViewModel(
             settings = newSettings,
             translations = translations,
             previewAyah = previewAyahText!!,
+            previewFollowedBy = previewFollowedBy,
             basmala = basmalaText!!,
             surahsByNumber = surahsByNumber!!,
             bookmarked = bookmarkedAyahs,

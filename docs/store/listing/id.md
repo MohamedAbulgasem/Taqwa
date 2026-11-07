@@ -54,7 +54,9 @@ Dukungan: support@taqwa.world
 
 ### Release notes (500)
 Yang baru di versi 1.5.1:
-• Al-Qur’an: di banyak kata, termasuk pada basmalah, fathah berdiri (alif kecil) tampil di samping kata, bukan di atasnya. Kini tampil di tempatnya. Terima kasih kepada pembaca yang telah menulis kepada kami.
+• Al-Qur’an: di layar, harakat dan tanda-tandanya kini lebih sesuai dengan Mushaf Madinah versi cetak
+• “Laporkan masalah” kini menambahkan dua baris singkat tentang cara ponsel Anda menangani notifikasi
+• Notifikasi: lebih andal setelah aplikasi diperbarui di beberapa ponsel
 
 ## App Store
 
@@ -85,7 +87,7 @@ sholat,shalat,jadwal,waktu,adzan,alquran,murottal,tilawah,zikir,masjid,arah,isla
 
 ### What's new (4000)
 Yang baru di versi 1.5.1:
-• Al-Qur’an: di banyak kata, termasuk pada basmalah, fathah berdiri (alif kecil) tampil di samping kata, bukan di atasnya. Kini tampil di tempatnya. Terima kasih kepada pembaca yang telah menulis kepada kami.
+• Al-Qur’an: di layar, harakat dan tanda-tandanya kini lebih sesuai dengan Mushaf Madinah versi cetak
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Waktu salat di tempat Anda

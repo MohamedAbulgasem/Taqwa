@@ -2,28 +2,28 @@ App Store "What's New" for 1.5.1 (42): one block per localization, iPhone items 
 
 === English (UK) ===
 What's new in 1.5.1:
-• Quran: in many words, the basmala included, the small superscript alef was drawn beside the word instead of above it. It is now drawn in its place. Thank you to the reader who wrote in.
+• Quran: the vowel and reading marks on screen now follow the printed Madinah Mushaf more closely
 
 === Arabic ===
 الجديد في الإصدار 1.5.1:
-• القرآن: كانت الألف الصغيرة (الألف الخنجرية) تظهر بجانب الكلمة لا فوق حروفها في كلمات كثيرة، منها كلمة «الرحمن» في البسملة، وصارت الآن في موضعها. شكرًا للقارئ الذي نبّهنا إلى ذلك.
+• القرآن: صارت علامات الضبط على الشاشة أقرب إلى ما في مصحف المدينة المطبوع
 
 === French ===
 Nouveautés de la 1.5.1 :
-• Coran : dans de nombreux mots, y compris dans la basmala, le petit alif suscrit était dessiné à côté du mot au lieu d’être au-dessus. Il est désormais à sa place. Merci au lecteur qui nous a écrit.
+• Coran : à l’écran, les voyelles et les signes de lecture suivent désormais de plus près le Mushaf de Médine imprimé
 
 === Turkish ===
 1.5.1 sürümündeki yenilikler:
-• Kur’an: Besmele dahil birçok kelimede küçük elif, kelimenin üstünde değil yanında çiziliyordu. Artık yerinde çiziliyor. Bize yazan okuyucumuza teşekkür ederiz.
+• Kur’an: ekrandaki hareke ve işaretler artık basılı Medine Mushafı’ndakilere daha yakın
 
 === Indonesian ===
 Yang baru di versi 1.5.1:
-• Al-Qur’an: di banyak kata, termasuk pada basmalah, fathah berdiri (alif kecil) tampil di samping kata, bukan di atasnya. Kini tampil di tempatnya. Terima kasih kepada pembaca yang telah menulis kepada kami.
+• Al-Qur’an: di layar, harakat dan tanda-tandanya kini lebih sesuai dengan Mushaf Madinah versi cetak
 
 === Urdu ===
 1.5.1 میں نیا کیا ہے:
-• قرآن: بسم اللہ سمیت بہت سے الفاظ میں کھڑا زبر لفظ کے اوپر کے بجائے اس کے ساتھ دکھائی دیتا تھا۔ اب وہ اپنی جگہ پر ہے۔ ہمیں لکھنے والے قاری کا شکریہ۔
+• قرآن: اسکرین پر اعراب اور علامات اب مطبوعہ مصحف مدینہ کے زیادہ مطابق ہیں
 
 === Bengali ===
 1.5.1 সংস্করণে যা নতুন:
-• কুরআন: বিসমিল্লাহসহ অনেক শব্দে খাড়া যবর (ছোট আলিফ) শব্দের ওপরে না হয়ে পাশে আঁকা হচ্ছিল। এখন তা নিজের জায়গায় আঁকা হয়। যে পাঠক আমাদের লিখেছেন, তাঁকে ধন্যবাদ।
+• কুরআন: পর্দায় হরকত ও চিহ্নগুলো এখন ছাপা মদিনা মুসহাফের আরও কাছাকাছি

@@ -42,6 +42,7 @@ import world.taqwa.app.qibla.Haptics
 import world.taqwa.app.quran.QuranSource
 import world.taqwa.app.quran.ReadingSettings
 import world.taqwa.app.quran.TranslationInfo
+import world.taqwa.app.quran.textAfter
 import world.taqwa.app.settings.AdhkarStore
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.tasbeeh.Dhikr
@@ -64,12 +65,19 @@ import kotlin.time.Instant
  * space; null when the reader reads without one.
  * @property translationLanguage [translation]'s own language, which decides its direction — not the
  * interface's: an English interface may read the Urdu translation.
+ * @property followedBy what is read straight after the passage's last ayah in the Quran — the next
+ * ayah, or at a surah's end the next basmala — which that ayah's drawing needs (HafsSpelling R4), so
+ * it draws here exactly as in the reader.
+ * @property surah the passage's surah, which with each line's number is that ayah's place in the
+ * Quran, for its drawing (HafsSpelling's table).
  */
 data class QuranPageText(
     val prefix: String?,
     val lines: List<Pair<String, Int?>>,
     val translation: String?,
     val translationLanguage: String = "en",
+    val followedBy: String? = null,
+    val surah: Int,
 )
 
 /**
@@ -473,11 +481,13 @@ class AdhkarViewModel(
     private suspend fun quranText(item: AdhkarItem, set: AdhkarSet, translation: TranslationInfo?): QuranPageText? {
         val ref = item.quran ?: return null
         val ayah = ref.ayah
+        val surahAyahs = if (ayah == null) quran.ayahs(ref.surah) else emptyList()
         val lines: List<Pair<String, Int?>> = if (ayah != null) {
             listOfNotNull(quran.ayahText(ref.surah, ayah)?.let { it to ayah })
         } else {
-            quran.ayahs(ref.surah).map { it.text to it.number }
+            surahAyahs.map { it.text to it.number }
         }
+        val followedBy = if (ayah != null) quran.textAfter(ref.surah, ayah) else surahAyahs.lastOrNull()?.followedBy
         val prefix = when (ref.prefix) {
             QuranPrefix.ISTIADHAH -> item.arabicFor(set)
             QuranPrefix.BASMALA -> basmala ?: quran.ayahText(1, 1).also { basmala = it }
@@ -491,7 +501,7 @@ class AdhkarViewModel(
                     .joinToString(" ") { it.value }.ifEmpty { null }
             }
         }
-        return QuranPageText(prefix, lines, translated, translation?.language ?: "en")
+        return QuranPageText(prefix, lines, translated, translation?.language ?: "en", followedBy, ref.surah)
     }
 
     /**

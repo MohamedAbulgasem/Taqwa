@@ -57,7 +57,9 @@ Assistance : support@taqwa.world
 
 ### Release notes (500)
 Nouveautés de la 1.5.1 :
-• Coran : dans de nombreux mots, y compris dans la basmala, le petit alif suscrit était dessiné à côté du mot au lieu d’être au-dessus. Il est désormais à sa place. Merci au lecteur qui nous a écrit.
+• Coran : à l’écran, les voyelles et les signes de lecture suivent désormais de plus près le Mushaf de Médine imprimé
+• « Signaler un problème » ajoute maintenant deux courtes lignes sur la façon dont votre téléphone gère les notifications
+• Notifications : plus fiables après une mise à jour de l’application sur certains téléphones
 
 ## App Store
 
@@ -88,7 +90,7 @@ horaires,salat,azan,quran,mushaf,mosquée,islam,musulman,récitation,chapelet,dh
 
 ### What's new (4000)
 Nouveautés de la 1.5.1 :
-• Coran : dans de nombreux mots, y compris dans la basmala, le petit alif suscrit était dessiné à côté du mot au lieu d’être au-dessus. Il est désormais à sa place. Merci au lecteur qui nous a écrit.
+• Coran : à l’écran, les voyelles et les signes de lecture suivent désormais de plus près le Mushaf de Médine imprimé
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Les horaires là où vous êtes

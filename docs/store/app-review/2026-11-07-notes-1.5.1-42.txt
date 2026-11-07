@@ -21,7 +21,7 @@ Only the default prayer times differ by place. Where an authority publishes the 
 
 6. Third-party material
 Taqwa is not in a regulated industry. Its content is credited in the app under Settings › About Taqwa › Attribution & licences, with each provider's licence:
-- Quran text: Tanzil Project, CC BY 3.0 (tanzil.net/docs/text_license); the credit states the three changes made for the Mushaf typeface and layout
+- Quran text: Tanzil Project, CC BY 3.0 (tanzil.net/docs/text_license); stored as published save the basmala's place; drawn with the Mushaf's marks
 - Translations: Tanzil Project, for non-commercial use (tanzil.net/trans)
 - Recitations: Islamic Network, licensed by the reciters for free, non-commercial redistribution at the published bitrates (alquran.cloud/terms-and-conditions, section IV)
 - Quran font: KFGQPC Uthmanic Script Hafs (King Fahd Complex), free to use unmodified

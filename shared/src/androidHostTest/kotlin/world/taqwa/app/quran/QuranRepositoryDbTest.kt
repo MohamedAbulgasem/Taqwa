@@ -7,7 +7,6 @@ import kotlinx.coroutines.test.runTest
 import world.taqwa.app.feature.quran.computeJuzRows
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
@@ -81,8 +80,52 @@ class QuranRepositoryDbTest {
         assertEquals(42, a.first { it.number == 255 }.page)
     }
 
-    @Test fun noSilentAlefSignSurvivesInText() = runTest {
-        assertFalse(repo.ayahs(2).any { '۟' in it.text })
+    // Tanzil's own bytes since 1.5.1's marks hotfix: the silent-letter sign stays U+06DF, so the
+    // drawing can tell it from a sounded sukun (HafsSpelling R1). 2:16's ٱشْتَرَوُا۟ carries one.
+    @Test fun theSilentLetterSignIsKeptAsTanzilWritesIt() = runTest {
+        val ayahs = repo.ayahs(2)
+        assertTrue(ayahs.single { it.number == 16 }.text.split(' ')[2].endsWith("\u06DF"))
+        assertEquals(396, ayahs.sumOf { a -> a.text.count { it == '\u06DF' } })
+    }
+
+    // What is read after each ayah, which the drawing of its last tanwin needs (HafsSpelling R4):
+    // the next ayah within a surah, the next basmala's ب at a surah's end and before At-Tawbah,
+    // nothing after An-Nas.
+    @Test fun everyAyahKnowsWhatIsReadAfterIt() = runTest {
+        for (surah in 1..114) {
+            val ayahs = repo.ayahs(surah)
+            ayahs.zipWithNext().forEach { (a, b) -> assertEquals(b.text, a.followedBy, "${a.surah}:${a.number}") }
+            assertEquals(if (surah == 114) null else "\u0628", ayahs.last().followedBy, "end of surah $surah")
+        }
+        assertTrue(repo.ayahs(9).first().text.startsWith("\u0628"), "9:1 begins with the ب that stands in for it")
+    }
+
+    @Test fun searchHitsKnowWhatIsReadAfterThem() = runTest {
+        val arabic = repo.searchArabic("الله", limit = 400)
+        assertTrue(arabic.size > 100)
+        for (hit in arabic) {
+            val ayahs = repo.ayahs(hit.surah)
+            assertEquals(ayahs.single { it.number == hit.ayah }.followedBy, hit.followedBy, "${hit.surah}:${hit.ayah}")
+        }
+        val translated = repo.searchTranslation("en.sahih", "Allah", limit = 400)
+        assertTrue(translated.size > 100)
+        for (hit in translated) {
+            assertEquals(repo.ayahs(hit.surah).single { it.number == hit.ayah }.followedBy, hit.followedBy, "${hit.surah}:${hit.ayah}")
+        }
+        assertEquals("\u0628", repo.textAfter(1, 7))
+        assertEquals(repo.ayahText(2, 256), repo.textAfter(2, 255))
+        assertEquals(null, repo.textAfter(114, 6))
+    }
+
+    // What is read after a page: the next page's first basmala or text line, nothing after 604.
+    @Test fun everyPageKnowsWhatIsReadAfterIt() = runTest {
+        val basmala = repo.ayahText(1, 1)
+        for (number in 1..603) {
+            val next = repo.page(number + 1).lines.first { it.type != LineType.SURAH }
+            val expected = if (next.type == LineType.BASMALA) basmala else next.text
+            assertEquals(expected, repo.page(number).followedBy, "page $number")
+        }
+        assertEquals(null, repo.page(604).followedBy)
     }
 
     @Test fun eightBundledTextsWithLicences() = runTest {

@@ -76,6 +76,8 @@ class AyahCardSemanticsTest {
         ) {
             AyahCard(
                 text = arabic,
+                followedBy = null,
+                surah = 2,
                 ayahNumber = 255,
                 transliteration = transliteration,
                 translation = translation,

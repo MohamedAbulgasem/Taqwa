@@ -368,7 +368,7 @@ object AyahCardRenderer {
         sp: Float,
     ): StaticLayout {
         val digits = QuranText.arabicIndic(input.entry.ayah)
-        val text = HafsSpelling.forDrawing(input.entry.arabic) + QuranText.MARKER_SEPARATOR + digits
+        val text = HafsSpelling.forDrawing(input.entry.arabic, input.entry.followedBy, QuranPlace(input.entry.surah, input.entry.ayah)) + QuranText.MARKER_SEPARATOR + digits
         val spanned = SpannableString(text)
         spanned.setSpan(
             ForegroundColorSpan(input.accentArgb),

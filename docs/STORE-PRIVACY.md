@@ -74,6 +74,14 @@ store-readiness sweep (targetSdk 36, 0.16.0).
   launch offers, once, to email it to support@taqwa.world through the user's own mail app. Nothing
   is collected or sent automatically, so the data-safety and App Privacy answers are unchanged
   ("Data Not Collected"); the policy's paragraph on it exists in all seven languages.
+- **Report a problem (1.5.1 (42)):** on Android the About screen's support email also carries two
+  short lines: whether notifications and exact alarms are allowed, the battery setting (optimised,
+  not optimised or restricted) and the ringer; then roughly when the last prayer alert came (marked
+  when Android had no channel for it) and when the app was installed or last updated. Not the
+  alert's sound level: that is the person's own Taqwa setting, and About, the site and the policy
+  say settings never leave the phone. The person sends it from their own mail app, so the answers
+  stay "Data Not Collected"; the policy's crash paragraph says so in all seven languages, dated
+  7 November 2026.
 - **Read-aloud (1.0.0 (33)):** during recitation, the phone's own text-to-speech voice can read
   the translation or tafsir after each ayah. Taqwa uses only voices that make their speech on the
   phone (on Android a voice its engine marks as needing no connection and not network synthesis,

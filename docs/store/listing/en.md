@@ -59,7 +59,9 @@ Support: support@taqwa.world
 
 ### Release notes (500)
 What's new in 1.5.1:
-• Quran: in many words, the basmala included, the small superscript alef was drawn beside the word instead of above it. It is now drawn in its place. Thank you to the reader who wrote in.
+• Quran: the vowel and reading marks on screen now follow the printed Madinah Mushaf more closely
+• "Report a problem" now adds two short lines about how your phone handles notifications
+• Notifications: more reliable after an app update on some phones
 
 ## App Store
 
@@ -90,7 +92,7 @@ times,salah,salat,azan,athan,koran,islam,recitation,tasbih,mosque,dhikr,ramadan,
 
 ### What's new (4000)
 What's new in 1.5.1:
-• Quran: in many words, the basmala included, the small superscript alef was drawn beside the word instead of above it. It is now drawn in its place. Thank you to the reader who wrote in.
+• Quran: the vowel and reading marks on screen now follow the printed Madinah Mushaf more closely
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Prayer times where you are

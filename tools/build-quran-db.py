@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / "cache"
 OUT = ROOT / "shared" / "src" / "commonMain" / "composeResources" / "files" / "quran.db"
-USER_VERSION = 5
+USER_VERSION = 6
 
 TANZIL_TEXT = "https://tanzil.net/pub/download/index.php?quranType={kind}&marks=true&sajdah=true&rub=true&tatweel=false&outType=txt-2&agree=true"
 TANZIL_TRANS = "https://tanzil.net/trans/?transID={id}&type=txt"
@@ -167,7 +167,12 @@ EXTRA_ALIASES = {
     111: "Al-Lahab", 112: "Ikhlaas|Ikhlas",
 }
 
-SILENT_ALEF_SIGN = "۟"   # the Hafs font draws this as an inline ring; see spike §12
+# Tanzil writes a silent letter's sign as U+06DF and a sounded sukun as U+0652. Until 1.5.1 clean() mapped
+# U+06DF to U+0652, because the Hafs font draws U+06DF as an inline ring (spike §12), which threw away
+# the difference the print shows. Since 1.5.1 (42)'s marks hotfix (user_version 6) the stored text keeps
+# Tanzil's own bytes and HafsSpelling makes the swap on the way to the screen (R1): U+0652 draws as the
+# head of kha (U+06E1), U+06DF as the ring (U+0652).
+SILENT_LETTER_SIGN = "۟"
 SUKUN = "ْ"
 SIGN_TOKENS = {"۞", "۩"}          # ۞ rub el hizb, ۩ sajdah, standalone tokens in Tanzil
 RUB_EL_HIZB = "۞"
@@ -203,7 +208,8 @@ def fetch(url: str, name: str) -> bytes:
 
 
 def clean(s: str) -> str:
-    return s.replace("﻿", "").strip().replace(SILENT_ALEF_SIGN, SUKUN)
+    """Tanzil's text as published: only the byte-order mark and the surrounding whitespace go."""
+    return s.replace("﻿", "").strip()
 
 
 def parse_tanzil_text(raw: bytes) -> dict[tuple[int, int], str]:
@@ -329,8 +335,8 @@ def fuse_sign_tokens(tokens: list[str]) -> list[str]:
     its own, space-separated. The Mushaf layout counts them as part of a neighbouring word:
     a pause mark or sajdah sign belongs to the word before it, the rub-el-hizb star to the
     word after it. This re-groups Tanzil's tokens the same way -- the space is kept inside the
-    fused word, so the stored text keeps Tanzil's characters apart from clean()'s U+06DF
-    mapping and the basmala taken off each surah's first ayah."""
+    fused word, so the stored text keeps Tanzil's characters apart from the basmala taken off
+    each surah's first ayah."""
     fused: list[str] = []
     carry = ""
     for t in tokens:
@@ -729,8 +735,7 @@ def verify(conn: sqlite3.Connection):
         ).fetchone()
         assert w == (s, 1, 1), f"surah {s}: first word after header/basmala is {w}, expected ({s}, 1, 1)"
 
-    assert one("SELECT count(*) FROM ayah WHERE instr(text_uthmani, char(1759)) > 0") == 0, "U+06DF survived"
-    assert one("SELECT count(*) FROM line_word WHERE instr(text, char(1759)) > 0") == 0
+    verify_tanzil_bytes(conn)
     assert one("SELECT text_uthmani FROM ayah WHERE surah=1 AND number=1").startswith("بِسْمِ")
     # The basmala is a line of its own in the app; no stored ayah 1 may still start with it.
     for s_, t_ in conn.execute("SELECT surah, text_uthmani FROM ayah WHERE number = 1 AND surah NOT IN (1, 9)"):
@@ -758,6 +763,32 @@ def verify(conn: sqlite3.Connection):
     verify_translation_repairs(conn)
     assert one("PRAGMA user_version") == USER_VERSION
     print("verify: ok")
+
+
+def verify_tanzil_bytes(conn: sqlite3.Connection):
+    """`ayah.text_uthmani` is Tanzil's Uthmani file byte for byte, apart from the basmala taken off
+    the first ayah of each surah that carries it: the silent-letter sign stays U+06DF (R1 in
+    HafsSpelling draws it as the ring), and the Mushaf's words copy the same bytes (verify_mushaf_text).
+    Checked against the cached download itself, not against clean()'s output."""
+    def one(sql, *args):
+        return conn.execute(sql, args).fetchone()[0]
+    cached = CACHE / "uthmani.txt"
+    if cached.exists():
+        raw = {}
+        for line in cached.read_bytes().decode("utf-8").splitlines():
+            line = line.replace("\ufeff", "")
+            if line and line[0].isdigit():
+                s, a, text = line.split("|", 2)
+                raw[(int(s), int(a))] = text.strip()
+        stored = {(s, a): t for s, a, t in conn.execute("SELECT surah, number, text_uthmani FROM ayah")}
+        assert sorted(stored) == sorted(raw), "ayah references differ from Tanzil's file"
+        differ = [k for k in sorted(raw) if stored[k] != strip_leading_basmala(raw[k], *k)]
+        assert not differ, f"{len(differ)} ayah(s) differ from Tanzil's bytes, first: {differ[:5]}"
+    marks = one("SELECT sum(length(text_uthmani) - length(replace(text_uthmani, char(1759), ''))) FROM ayah")
+    ayahs = one("SELECT count(*) FROM ayah WHERE instr(text_uthmani, char(1759)) > 0")
+    words = one("SELECT sum(length(text) - length(replace(text, char(1759), ''))) FROM line_word")
+    assert (marks, ayahs, words) == (3988, 2240, 3988), f"silent-letter signs: {marks} in {ayahs} ayahs, {words} in the Mushaf"
+    print(f"  tanzil bytes: all 6236 ayahs are Tanzil's own, {marks} silent-letter signs (U+06DF) kept in {ayahs} ayahs")
 
 
 def verify_translation_repairs(conn: sqlite3.Connection):
