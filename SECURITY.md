@@ -1,9 +1,10 @@
 # Security policy
 
-Taqwa's promise is that nothing about you leaves your phone. There is no account, no analytics
-and no tracking, and there is no server behind the app at all. The one network use is
-downloading the Quran recitations you ask for. A security problem is anything that could break
-that promise or harm the people who use the app, and reports are very welcome.
+Taqwa's promise is that only your own devices can see anything about you. There is no account, no
+analytics and no tracking, and there is no server behind the app at all. The one network use is
+downloading the Quran recitations you ask for; the link to your own watch is Google's or Apple's,
+end-to-end encrypted. A security problem is anything that could break that promise or harm the people
+who use the app, and reports are very welcome.
 
 ## Reporting a vulnerability
 
@@ -55,9 +56,9 @@ In scope:
 
 Of most interest:
 
-- **Data leaving the phone:** anything that sends off the phone what the
-  [privacy policy](PRIVACY.md) says stays on it, such as your location, settings, bookmarks,
-  counts or the crash report.
+- **Data leaving your own devices:** anything that sends what the [privacy policy](PRIVACY.md) says
+  stays on them, such as your location, settings, bookmarks, counts or the crash report, to anyone or
+  anywhere else.
 - **Tampered downloads:** any way to make the app download, keep or play something other than
   the published recitation.
 - **Other apps reading Taqwa's data:** any way another app on the same phone could read it, for
@@ -67,9 +68,9 @@ Of most interest:
 
 Out of scope:
 
-- **Third-party services:** GitHub, Google Play, the App Store, Cloudflare and the phone's own
-  text-to-speech engine have their own security programmes. Report to them; if it affects Taqwa,
-  tell us as well.
+- **Third-party services:** GitHub, Google Play, the App Store, Google's and Apple's watch links,
+  Cloudflare and the phone's own text-to-speech engine have their own security programmes. Report to
+  them; if it affects Taqwa, tell us as well.
 - **Physical or root access:** problems that need a rooted or jailbroken phone, or access to an
   unlocked phone.
 - **Automated scans:** findings with no demonstrated impact.

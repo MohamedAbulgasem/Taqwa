@@ -1,14 +1,14 @@
 # Taqwa gizlilik politikası
 
-_Son güncelleme 7 Kasım 2026. Android ve iOS'ta Taqwa 1.0.0 ve sonrası için geçerlidir._
+_Son güncelleme 9 Kasım 2026. Android ve iOS'ta Taqwa 1.0.0 ve sonrası için geçerlidir._
 
-Taqwa; hesabı, reklamı ve analizi olmayan ücretsiz bir İslami uygulamadır. Çevrimdışı çalışır.
-İnterneti tek bir şey için kullanır: Kur'an tilavetlerini indirmek, o da yalnızca siz
-istediğinizde.
+Taqwa; hesabı, reklamı ve analizi olmayan ücretsiz bir İslami uygulamadır. Çevrimdışı çalışır. İnterneti Kur'an
+tilavetlerini indirmek için kullanır, o da yalnızca siz istediğinizde. Taqwa'yı saatinize eklerseniz, verileri de
+aşağıda anlatıldığı gibi şifreli olarak internet üzerinden iletilebilir.
 
-## Telefonunuzda kalanlar
+## Cihazlarınızda kalanlar
 
-Uygulamanın bildiği her şey cihazınızda saklanır, başka hiçbir yerde değil:
+Uygulamanın bildiği her şey kendi cihazlarınızda saklanır:
 
 - namaz vakitlerini ve kıbleyi hesaplamak için kullanılan konumunuz ya da seçtiğiniz şehir;
 - ayarlarınız: vakit takvimi, bildirim tercihleri, ezan sesi, tema, kari;
@@ -16,8 +16,8 @@ Uygulamanın bildiği her şey cihazınızda saklanır, başka hiçbir yerde de�
 - tesbih sayaçlarınız;
 - indirdiğiniz tilavetler.
 
-Bunların hiçbiri bize ya da bir başkasına gönderilmez. Taqwa'nın arkasında bir sunucu yok,
-açılacak bir hesap da yok. Uygulamayı silmek bunların hepsini siler.
+Bunların hiçbiri bize ya da bir başkasına gönderilmez. Taqwa'nın arkasında bir sunucu yok, açılacak bir hesap da yok.
+Taqwa'yı telefonunuzdan ve saatinizden silmek bunların hepsini siler.
 
 Taqwa çökerse telefonunuza teknik bir rapor kaydeder (uygulama sürümü, telefonunuzun modeli ve hata;
 başka bir şey yok). Siz bize e-postayla göndermeyi seçmedikçe bu rapor telefondan asla çıkmaz.
@@ -27,11 +27,19 @@ kısıtlandığını, telefonun sessizde, titreşimde ya da "Rahatsız etmeyin" 
 namaz bildiriminin yaklaşık ne zaman geldiğini, uygulamanın da ne zaman yüklendiğini ya da en son
 güncellendiğini söyler; e-postayı göndermeden önce siz de görürsünüz.
 
+## Saatiniz
+
+Taqwa'yı saatinize eklerseniz telefonunuz ona şehrinizi, kıblenin yönünü ve uzaklığını, bölgenizin pusula düzeltmesini,
+önümüzdeki ayın namaz vakitlerini uygulamanın yazdığı biçimde ve kendi tesbih ifadelerinizi, bunları hangi telefonun
+gönderdiğini saatinize bildiren ve telefonunuzda bir kez oluşturulan rastgele bir sayıyla birlikte verir. Telefonunuz
+ve saatiniz doğrudan bağlı olmadığında Google (Android) ya da Apple (iPhone) bu verileri internet üzerinden
+taşıyabilir; veriler uçtan uca şifrelidir, böylece yalnızca telefonunuz ve saatiniz okuyabilir.
+
 ## Konum
 
-Uygulama konumunuzu yalnızca namaz vakitlerini ve kıble yönünü hesaplamak için, yalnızca siz
-izin verirseniz ister. Uygulamayla gelen listeden bir şehir seçmek de aynı işi görür ve hiçbir
-izin gerektirmez. Konumunuz cihaz üzerinde kullanılır ve hiçbir zaman aktarılmaz.
+Uygulama konumunuzu yalnızca namaz vakitlerini ve kıble yönünü hesaplamak için, yalnızca siz izin verirseniz ister.
+Uygulamayla gelen listeden bir şehir seçmek de aynı işi görür ve hiçbir izin gerektirmez. Konumunuz cihaz üzerinde
+kullanılır. Konumunuzu yalnızca kendi cihazlarınız görebilir.
 
 ## Tilavet indirmeleri
 
@@ -46,10 +54,10 @@ da kariyi ve sureyi ele verir. İstek sizi tanımlayan hiçbir şey taşımaz: n
 tanımlayıcısı, ne de çerez. GitHub'ın bu tür istekler hakkında ne sakladığını kendi gizlilik
 bildirimi anlatır: docs.github.com/site-policy/privacy-policies/github-general-privacy-statement.
 
-Tilavetle ilgili herhangi bir şeyi bir kez açtıktan sonra — kari listesi, Tilavet ayarları ya da
-bir indirme — uygulama ayrıca günde bir kez, aynı depodan güncellenmiş bir kari listesi olup olmadığını kontrol eder. Bu
-istek herkes için aynıdır ve IP adresinizden başka hiçbir şeyi ele vermez. Tilaveti ilk kez
-kullanana kadar uygulama hiçbir ağ isteği yapmaz.
+Tilavetle ilgili herhangi bir şeyi bir kez açtıktan sonra — kari listesi, Tilavet ayarları ya da bir indirme — uygulama
+ayrıca günde bir kez, aynı depodan güncellenmiş bir kari listesi olup olmadığını kontrol eder. Bu istek herkes için
+aynıdır ve IP adresinizden başka hiçbir şeyi ele vermez. Tilaveti ilk kez kullanana kadar uygulamanın kendisi hiçbir ağ
+isteği yapmaz.
 
 İndirilen tilavetler, Ayarlar › Kur'an › Tilavet › İndirilenler altından her kari için ayrı
 ayrı silinebilir.
@@ -65,19 +73,21 @@ kendi indirme ekranını açar; iPhone'da sesler Ayarlar uygulamasından eklenir
 
 ## Yedeklemeler
 
-Taqwa, Android'in uygulama yedeklemesinin dışında kalır; böylece konumunuz ve ayarlarınız
-Google'a kopyalanmaz. iOS'ta ayarlarınız, yer imleriniz, sayaçlarınız ve indirdiğiniz tilavetler
-iCloud yedeklemesinin dışında tutulur; Taqwa'ya ait olup yedeklenen tek şey widget'ların küçük
-önbellekleri, yani yaklaşan namaz vakitleri ile günün ayeti widget'ının sırayla gösterdiği yüz ayettir.
-Bunların hiçbiri konumunuzu içermez; o yedekleme de Apple tarafından şifrelenir ve bize hiçbir
-zaman görünmez.
+Taqwa, Android'in uygulama yedeklemesinin dışında kalır; böylece konumunuz ve ayarlarınız Google'a kopyalanmaz. iOS'ta
+ayarlarınız, yer imleriniz, sayaçlarınız ve indirdiğiniz tilavetler iCloud yedeklemesinin dışında tutulur; Taqwa'nın
+kendi dosyalarından yedeklenen tek şey widget'ların küçük önbellekleri, yani yaklaşan namaz vakitleri ile günün ayeti
+widget'ının sırayla gösterdiği yüz ayettir. Bunların hiçbiri konumunuzu içermez. Taqwa'yı bir Apple Watch'a eklerseniz
+iOS, iPhone'unuzun ona gönderdiği ve şehrinizin adını taşıyan son kopyayı saklar; bu kopya iPhone'unuzun yedeğinde
+bulunabilir. iCloud yedeği, anahtarlarını Apple'ın sakladığı bir şifrelemeyle korunur; İleri Düzey Veri Koruma'yı
+açarsanız uçtan uca şifrelenir. Bilgisayardaki bir yedek ise yalnızca siz seçerseniz şifrelenir.
 
 ## Taqwa'nın asla yapmadıkları
 
 - Hesap, oturum açma ya da profil yok.
 - Reklam ve reklam tanımlayıcısı yok.
 - Analiz, çökme raporlaması ya da kullanım istatistiği yok.
-- İnternete bağlanan üçüncü taraf SDK yok.
+- İnternete bağlanan üçüncü taraf SDK yok. Android uygulamasındaki tek Google Play hizmetleri kütüphanesi telefonunuzu
+  kendi saatinize bağlar; Google bu bağlantıyı, yukarıda anlatıldığı gibi şifreli olarak aktarabilir.
 - Veri satışı ya da paylaşımı yok, çünkü satılacak veya paylaşılacak veri yok.
 
 Telefonunuz kendi ayarları uyarınca Google'a ya da Apple'a çökme raporu gönderebilir; bunlar

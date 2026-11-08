@@ -26,16 +26,17 @@ deliberately out of scope.
 
 ## The constraints
 
-No network calls beyond the recitation downloads the person asked for, no third-party SDKs that
-phone home, no new colour outside the palette in `Palette.kt`, and every language must be checked
-as carefully as English, the right-to-left ones (Arabic, Urdu) especially. If a change touches the
-UI, include screenshots of English and Arabic in both themes.
+No network calls beyond the recitation downloads the person asked for and the link to the person's own
+watch, no third-party SDKs that phone home (Google's Wear OS library, for the person's own watch, is the
+one exception), no new colour outside the palette in `Palette.kt`, and every language must be checked as
+carefully as English, the right-to-left ones (Arabic, Urdu) especially. If a change touches the UI,
+include screenshots of English and Arabic in both themes.
 
 These are what Taqwa is, so a change that breaks one is not merged, however good it is
 otherwise. In more detail:
 
-- **Nothing leaves the phone.** No analytics, no crash-reporting SDKs, no account. There is no
-  server behind Taqwa and there will not be one. Exodus Privacy's report finds no trackers in the
+- **Nothing leaves the person's own devices.** No analytics, no crash-reporting SDKs, no account. There
+  is no server behind Taqwa and there will not be one. Exodus Privacy's report finds no trackers in the
   app, and it has to stay that way.
 - **Never early.** Where Taqwa holds the timetable a place follows, no prayer may start before
   the published time on any day checked. Engine changes are held to the gate, under

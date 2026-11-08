@@ -1,14 +1,14 @@
 # Taqwa privacy policy
 
-_Last updated 7 November 2026. Applies to Taqwa 1.0.0 and later on Android and iOS._
+_Last updated 9 November 2026. Applies to Taqwa 1.0.0 and later on Android and iOS._
 
-Taqwa is a free Islamic app with no account, no ads and no analytics. It works offline.
-The one thing it uses the internet for is downloading Quran recitations, and only when you
-ask it to.
+Taqwa is a free Islamic app with no account, no ads and no analytics. It works offline. It uses
+the internet to download Quran recitations, and only when you ask it to. If you add Taqwa to your
+watch, its data may travel over the internet too, encrypted, as below.
 
-## What stays on your phone
+## What stays on your devices
 
-Everything the app knows is stored on your device and nowhere else:
+Everything the app knows is stored on your own devices:
 
 - your location, or the city you chose, used to compute prayer times and the Qibla;
 - your settings: prayer timetable, notification choices, adhan voice, theme, reciter;
@@ -16,8 +16,8 @@ Everything the app knows is stored on your device and nowhere else:
 - your Tasbeeh counts;
 - any recitations you have downloaded.
 
-None of this is sent to us or to anyone. There is no server behind Taqwa and no account to
-create. Deleting the app deletes all of it.
+None of this is sent to us or to anyone else. There is no server behind Taqwa and no account to
+create. Deleting Taqwa from your phone and your watch deletes all of it.
 
 If Taqwa crashes, it saves a technical report on your phone (the app version, your phone model
 and the error, nothing else). It never leaves the phone unless you choose to email it to us.
@@ -26,11 +26,20 @@ notifications and exact alarms are allowed, how far the phone limits its battery
 phone is on silent, vibrate or Do Not Disturb, and roughly when the last prayer alert came and when
 the app was installed or last updated; you see it before you send it.
 
+## Your watch
+
+If you add Taqwa to your watch, your phone gives it your city, the Qibla's direction and
+distance, your area's compass correction, the coming month's prayer times as the app writes them,
+and your own tasbeeh phrases, with a random number made once on your phone that tells your watch
+which phone sent them. When your phone and watch are not directly connected, Google (Android) or
+Apple (iPhone) may carry this data over the internet, end-to-end encrypted so only your phone and
+watch can read it.
+
 ## Location
 
-The app asks for your location only to compute prayer times and the Qibla direction, and
-only if you allow it. Picking a city from the built-in list works just as well and needs no
-permission. Your location is used on the device and never transmitted.
+The app asks for your location only to compute prayer times and the Qibla direction, and only if
+you allow it. Picking a city from the built-in list works just as well and needs no permission.
+Your location is used on the device. Only your own devices can see your location.
 
 ## Recitation downloads
 
@@ -46,9 +55,8 @@ such requests: docs.github.com/site-policy/privacy-policies/github-general-priva
 
 Once you have opened anything to do with recitation, whether the reciter list, the Recitation
 settings or a download, the app also checks once a day for an updated list of reciters, from the
-same repository. That request is the same for everyone and reveals
-nothing but your IP address. Until you first use recitation, the app makes no network
-request at all.
+same repository. That request is the same for everyone and reveals nothing but your IP address.
+Until you first use recitation, the app itself makes no network request at all.
 
 Downloaded recitations can be deleted per reciter in Settings › Quran › Recitation ›
 Downloads.
@@ -64,18 +72,23 @@ on iPhone, voices are added in the Settings app.
 
 ## Backups
 
-Taqwa opts out of Android's app backup, so your location and settings are not copied to
-Google. On iOS, your settings, bookmarks, counts and downloaded recitations are excluded
-from iCloud backup; the only things of Taqwa's that are backed up are the widgets' small caches,
-the upcoming prayer times and the hundred ayahs the daily-ayah widget rotates through, neither of
-which contains your location, and that backup is encrypted by Apple and never visible to us.
+Taqwa opts out of Android's app backup, so your location and settings are not copied to Google.
+On iOS, your settings, bookmarks, counts and downloaded recitations are excluded from iCloud
+backup; the only files of Taqwa's own that are backed up are the widgets' small caches, the
+upcoming prayer times and the hundred ayahs the daily-ayah widget rotates through, neither of
+which contains your location. If you add Taqwa to an Apple Watch, iOS keeps the last copy your
+iPhone sent it, which names your city, and that copy may be in your iPhone's backup. An iCloud
+backup is encrypted with keys Apple keeps, unless you turn on Advanced Data Protection, which
+encrypts it end to end; a backup to a computer is encrypted only if you choose to encrypt it.
 
 ## What Taqwa never does
 
 - No account, sign-in or profile.
 - No ads and no advertising identifier.
 - No analytics, crash reporting or usage statistics.
-- No third-party SDK that talks to the internet.
+- No third-party SDK that talks to the internet. The Android app's one Google Play services
+  library links your phone to your own watch, and Google may relay that link, encrypted, as
+  above.
 - No sale or sharing of data, because there is none to sell or share.
 
 Your phone may send crash reports to Google or Apple under its own settings; those come from
