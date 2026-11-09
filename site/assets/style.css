@@ -332,7 +332,10 @@ html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt 
 .cities-strip { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; align-items: center; }
 .cities-strip .lede { font-size: 17px; max-width: 36ch; }
 
-@media (max-width: 720px) {
+/* The phone rules here and below are for screens: a printed sheet narrower than 720 px (A4 with
+   any margin; every iPhone print, whose media queries follow the phone's screen) keeps the
+   sheet's own table, not the phone's two-line rows. */
+@media screen and (max-width: 720px) {
   /* The footer carries Privacy and GitHub; the header keeps the two a phone needs. */
   .nav a.wide, html[dir="rtl"] .nav a.wide { display: none; }
   .city-hero { grid-template-columns: 1fr; gap: 28px; padding-block: 18px 32px; }
@@ -497,7 +500,7 @@ main[data-digits="bengali"] .steps > li::before { content: counter(step, bengali
 .city .chips a { position: relative; display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; }
 .city .chips a::before { content: ""; position: absolute; inset: -2px 0; }
 
-@media (max-width: 720px) {
+@media screen and (max-width: 720px) {
   .city-copy h1 { font-size: 36px; }
   .city-hero { grid-template-areas: "copy" "today" "qibla"; }
   .city-hero .today { margin-top: 22px; }
@@ -582,7 +585,7 @@ main.dv .note.dv { display: block; }
 /* After the fold opens, focus moves to the first day it revealed (its row head), not to the page. */
 .tt tbody th.d:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
 
-@media (max-width: 720px) {
+@media screen and (max-width: 720px) {
   .tt thead th { font-size: 10px; letter-spacing: 0.04em; color: var(--t2); padding-inline: 3px; }
   .tt td { padding-inline: 3px; }
   .tt td.t small.dv { font-size: 10px; }
@@ -681,10 +684,11 @@ html[dir="rtl"] .index-checks a { direction: rtl; }
   .tt tr.past > *, .tt tr.past th.d b { color: var(--t1); }
   .tt tr.past td.h, .tt tr.past th.d span { color: var(--t2); }
   .tt tr.fri.past th.d span, .tt tr.fri.past td.jm { color: var(--accent-text); }
-  /* The foot of every sheet (fixed, so each printed page repeats it): the Taqwa mark and name,
-     the page's address, and whose times these are. Borders and text print without the dialog's
-     "Background graphics"; fills would not. */
-  .print-foot { display: block; position: fixed; left: 14mm; right: 14mm; bottom: 8mm; border-top: 1px solid #E3A21C; padding-top: 2.5mm; }
+  /* The foot: the Taqwa mark and name, the page's address, and whose times these are. In the flow
+     after the months, whole, unless the sheet can repeat it (below): WebKit (Safari, every iPhone
+     browser) prints a fixed box once, where the window would put it, over the rows. Borders and
+     text print without the dialog's "Background graphics"; fills would not. */
+  .print-foot { display: block; break-inside: avoid; margin-top: 3mm; border-top: 1px solid #E3A21C; padding-top: 2.5mm; }
   .pf-brand { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--t1); }
   .pf-brand b { font-weight: 800; }
   .pf-mark { width: 13px; height: 13px; flex: none; color: var(--t1); }
@@ -721,4 +725,59 @@ html[dir="rtl"] .index-checks a { direction: rtl; }
   .note { font-size: 12px; margin-top: 8px; }
   html[data-print] .month { display: none; break-before: auto; padding-top: 12px; }
   html[data-print] .month[data-print-target] { display: block; }
+  /* A month that runs onto a second sheet (a dialog's margins or scale) breaks between days, under
+     its heading row again, never inside a day, and never right after its heading. */
+  .tt tr { break-inside: avoid; }
+  .month-head { break-after: avoid; }
+  /* Where every sheet keeps its own copy of the page's padding (Chrome 130 and later, Firefox), the
+     foot is fixed, so each sheet repeats it at its bottom, and the cloned bottom padding is its
+     room: no day can run under it. The cloned top padding is then each sheet's top margin. Never
+     in WebKit (it alone knows the font -apple-system-body), even once it knows the property: it
+     prints a fixed box once, over the rows, and clones no padding across sheets. */
+  @supports (box-decoration-break: clone) and (not (font: -apple-system-body)) {
+    /* 26 mm: the tallest foot (two lines of whose times these are) is 16 mm, set 8 mm up. */
+    main.city { padding-bottom: 26mm; box-decoration-break: clone; }
+    .month ~ .month { padding-top: 0; }
+    .print-foot { position: fixed; left: 14mm; right: 14mm; bottom: 8mm; margin: 0; }
+    /* Chrome prints a right-to-left page shifted sideways at any Scale but 100 %, its first or
+       last columns off the paper; a left-to-right root around a right-to-left body prints it in
+       place (and at 100 % as before, to a quarter of a point). */
+    html[dir="rtl"] { direction: ltr; }
+    html[dir="rtl"] body { direction: rtl; }
+    /* A sheet narrower than the table (the dialog's Scale above about 110 %, or wide Custom
+       margins): cells wrap and the detailed view's lines go under their times, so every column
+       stays on the paper; narrower still (Scale about 150 % and up), the Hijri column and the
+       Jumuʿah pill give way, as on a phone, and the side margins narrow. Here only: an iPhone's
+       print media queries follow its screen, not the paper. */
+    @media (max-width: 734px) {
+      .tt th, .tt td { white-space: normal; }
+      .tt td, .tt tbody th, .tt thead th { padding-inline: 3px; }
+      .tt thead th:first-child, .tt tbody th.d { padding-inline-start: 6px; }
+      main.dv .tt td.t small.dv { display: block; margin-inline-start: 0; white-space: normal; }
+    }
+    @media (max-width: 540px) {
+      .tt .h, .tt td.jm .tag { display: none; }
+      main.wrap { padding-inline: 8mm; }
+      main.city { padding-bottom: 32mm; }
+      .print-foot { left: 8mm; right: 8mm; }
+    }
+  }
+  /* Elsewhere (WebKit: Safari and every iPhone browser) a month and the foot must share one sheet:
+     WebKit splits a day across sheets and repeats no heading row. Its shortest sheet is an iPhone's
+     on US Letter, about 660 × 800 px (on A4 about 640 × 860), so the month is set tighter there: a
+     31-day month with its note, in Urdu, fits with room to spare, and the heading row may wrap so
+     the table keeps to the text column. The sheet keeps its 12 mm top: with the print dialog's
+     margins WebKit draws the sheet higher, and less would cut the title. */
+  @supports not ((box-decoration-break: clone) and (not (font: -apple-system-body))) {
+    .city-copy h1 { font-size: 22px; }
+    .month { padding-top: 6px; }
+    .month h2 { font-size: 18px; }
+    .month-head { margin-bottom: 6px; }
+    .tt, .tt td.h, .tt tbody th.d span { font-size: 11px; }
+    html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt thead th { font-size: 11px; }
+    .tt thead th { padding: 4px 5px; white-space: normal; }
+    .tt td, .tt tbody th { padding: 1px 5px; }
+    .tt td.t, .tt td.h, .tt tbody th.d { line-height: 1.15; }
+    .tt .tag, .tt td.jm .tag { line-height: 12px; }
+  }
 }
