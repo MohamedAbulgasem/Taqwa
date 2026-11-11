@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- What the watch system shows of the face, in the watch's own language and before any feed
+         (spec 1.3), so none of it can come from the feed: it ships in the phone's seven languages,
+         in the folders the phone's own resources use (values-ar, -fr, -tr, -in, -ur, -bn). The
+         face's name and "Next prayer" are the phone's own words, the fixed slots the pickers also
+         list are named as the watch app names their sources there, and every other phrase had its
+         native review (plan 5 Task 11), spec 1.3's Arabic style and colour names read and approved
+         by Mohamed at M8. FaceStringsTest (wearApp) holds all seven to this file. -->
+
+    <!-- The face's name in the watch's face picker. -->
+    <string name="watch_face_name">Taqwa</string>
+
+    <!-- The face editor (Customise): the style, the colour and the wearer's own slots. The names
+         are used by watchface.xml as resource names, without the @string/ prefix. -->
+    <string name="style">Style</string>
+    <string name="style_arch">Arch</string>
+    <string name="style_ring">Ring</string>
+    <string name="style_sun">Sun</string>
+    <string name="style_moon">Moon</string>
+    <string name="accent">Colour</string>
+    <string name="accent_amber">Amber</string>
+    <string name="accent_pearl">Pearl</string>
+    <string name="accent_sage">Sage</string>
+    <string name="accent_night">Night</string>
+
+    <!-- The fixed slots, which the editor does not show, and the two that are the wearer's. -->
+    <string name="slot_next_prayer">Next prayer</string>
+    <string name="slot_day">Prayer day</string>
+    <string name="slot_dates">Dates</string>
+    <string name="slot_dates_short">Date and moon</string>
+    <string name="slot_countdown">Time to the next prayer</string>
+    <string name="slot_day_dial">Prayer day dial</string>
+    <string name="slot_left">Left complication</string>
+    <string name="slot_right">Right complication</string>
+</resources>

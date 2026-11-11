@@ -1,0 +1,24 @@
+== phone-capetown-ur24-qibla
+content-desc='تقریباً ۴۵ درجے دائیں مڑیں'
+text='۲۳°'
+text='مکہ مکرمہ · ۶٬۶۰۰ کلومیٹر دور'
+== phone-capetown-ur24-tasbeeh-list
+content-desc='تقریباً ۴۵ درجے دائیں مڑیں'
+text='۲۳°'
+text='مکہ مکرمہ · ۶٬۶۰۰ کلومیٹر دور'
+== phone-capetown-ur24-tasbeeh
+content-desc='سبحان اللہ، چکر ۲'
+== phone-capetown-ur24-today
+content-desc='۱ گھنٹہ ۱۱ منٹ بعد عصر، ۱۶:۱۰ بجے'
+== phone-tripoli-ar-ly12-qibla
+content-desc='استدر يمينًا حوالي 105 درجات'
+text='109°'
+text='مكة · على بُعد 2,900 كم'
+== phone-tripoli-ar-ly12-tasbeeh-list
+content-desc='استدر يمينًا حوالي 105 درجات'
+text='109°'
+text='مكة · على بُعد 2,900 كم'
+== phone-tripoli-ar-ly12-tasbeeh
+content-desc='سبحان الله، الجولة 2'
+== phone-tripoli-ar-ly12-today
+content-desc='العصر بعد 1 ساعة و6 دقائق، الساعة \u20684:05\xa0م\u2069'

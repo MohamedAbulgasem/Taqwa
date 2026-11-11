@@ -1,0 +1,30 @@
+App Store "What's New" for 1.6.0 (43): one block per localization, iPhone and Apple Watch items only, no other platform named.
+Every block but English has had its native review (plan 5 Task 11): Mohamed read the Arabic at M8 on 6 November 2026, and the other five were read the same day, and again by five independent native readers (Ruling 71).
+
+=== English (UK) ===
+What's new in 1.6.0:
+• Taqwa on your Apple Watch: the next prayer in your complications, tasbeeh with the Digital Crown, and Qibla
+
+=== Arabic ===
+الجديد في الإصدار 1.6.0:
+• تقوى على Apple Watch: الصلاة التالية في إضافات ساعتك، والتسبيح باستخدام Digital Crown، والقبلة
+
+=== French ===
+Nouveautés de la 1.6.0 :
+• Taqwa sur votre Apple Watch : la prochaine prière dans vos complications, le tasbih avec la Digital Crown, et la qibla
+
+=== Turkish ===
+1.6.0 sürümündeki yenilikler:
+• Taqwa Apple Watch’unuzda: komplikasyonlarınızda sonraki namaz, Digital Crown ile tesbih ve Kıble
+
+=== Indonesian ===
+Yang baru di versi 1.6.0:
+• Taqwa di Apple Watch Anda: salat berikutnya di komplikasi Anda, tasbih dengan Digital Crown, dan kiblat
+
+=== Urdu ===
+1.6.0 میں نیا کیا ہے:
+• آپ کی Apple Watch پر تقویٰ: کمپلیکیشنز میں اگلی نماز، Digital Crown سے تسبیح، اور قبلہ
+
+=== Bengali ===
+1.6.0 সংস্করণে যা নতুন:
+• আপনার Apple Watch-এ তাকওয়া: কমপ্লিকেশনে পরবর্তী নামাজ, Digital Crown দিয়ে তাসবিহ, আর কিবলা

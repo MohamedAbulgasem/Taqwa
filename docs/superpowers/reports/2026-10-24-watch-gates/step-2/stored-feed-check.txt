@@ -1,0 +1,13 @@
+# wearApp's StoredFeedCheck (StoredFeedCheck.kt.txt) over stored-feed.json, on the host: 1 test, 0 failed. Delivery 7, fingerprint 5cb4f7c2d90cbbe6.
+city London, days 31
+first day midnight 2026-11-05T00:00:00Z, last 2026-12-05T00:00:00Z
+face at 6 Nov 20:45:08 SAST: FAJR 5:23, in 10 h 37 min
+face at 7 Nov 08:53:55 SAST: DHUHR 11:49, in 4 h 55 min
+request 6 Nov 20:40:31 SAST: 13 steps, last until 2026-11-08T17:57:00Z
+request 7 Nov 02:41:49 SAST: 12 steps, last until 2026-11-08T17:57:00Z
+request 7 Nov 08:45:32 SAST: 13 steps, last until 2026-11-09T05:26:00Z
+tile request 7 Nov 09:00:20 SAST: 32 entries, 18 counting down, fresh for 2700 s
+tile request 5 Dec 19:00:00 SAST: 9 entries, 8 counting down, fresh for 1980 s
+tile request 5 Dec 19:21:00 SAST: 5 entries, 4 counting down, fresh for 720 s
+tile request 5 Dec 19:28:00 SAST: 4 entries, 3 counting down, fresh for 300 s
+tile request 5 Dec 19:33:00 SAST: 1 entries, 0 counting down, fresh for 0 s

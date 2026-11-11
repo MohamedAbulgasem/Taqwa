@@ -218,7 +218,7 @@ list, one tap on the opt-in link, the app installed from Play, and to keep it in
 weeks. Family and friends anywhere in the world count. Ask now; the list is needed the day the
 first bundle is uploaded.
 
-## 3. The upload key (Mohamed, two minutes)
+## 3. The upload key and the face key (Mohamed, two minutes each)
 
 ```bash
 scripts/make-upload-key.sh
@@ -230,6 +230,28 @@ Back up the `.jks` and the password in two places (password manager plus an offl
 Play App Signing, on by default for every new app, Google holds the key that signs what phones
 install and this one only signs uploads; a lost upload key is reset through Play support, which
 costs days.
+
+**The face key** (the watch release, two minutes, once): the Taqwa watch face is signed with a key
+of its own, never the app's, because Watch Face Push requires it (spec 3.1). Only you hold it.
+
+```bash
+scripts/make-face-key.sh
+```
+
+It asks for one password twice (12+ characters), never echoed, and writes it nowhere: unlike the
+upload key there is no properties file. It writes `~/keys/taqwa-face.jks` (alias `taqwa-face`) and
+prints the certificate's SHA-256. Paste that line into chat. It is public, not a secret: the Lead
+writes it into `watchface/face-release-cert.sha256` and commits it, and `scripts/release-face.sh`
+and `scripts/release.sh` hold every signed face to it. Back up the `.jks` and its password in two
+places, as for the upload key. **Unlike the upload key, nobody can reset a lost face key**, since
+Google does not hold it. A new key means every watch's Taqwa face is removed and added again, which
+loses its wearer's style, colour and slots.
+
+Each watch release, past the cut gate, you sign the face yourself, typing the face key's password
+(about a minute): `scripts/release-face.sh`, in a Terminal window, its output not piped or
+redirected. It builds the face, then apksigner asks for the password once, and what you type is
+not shown. It signs the face into `build/face-release/watchface-release-signed.apk`, and deletes
+it again unless its certificate is the pinned one. Then the Lead runs `scripts/release.sh`.
 
 ## 4. Built here before the uploads (nothing needs an account)
 
@@ -254,6 +276,162 @@ costs days.
   off by design).
 - Site: `site/pages/<lang>/home.html` store buttons get their real links as each store goes live,
   and the city pages' app sections with them (no edit there: `site/stores.json` drives both).
+
+### Each watch release
+
+From the watch release on, one release is four builds at one version: the phone, the Galaxy watch
+app with the Taqwa face inside it, and the iPhone app with the Apple Watch app inside it. A
+candidate is cut only past the cut gate (every privacy line applied, every new word reviewed), and
+each takes the next version code, never one used before. In order, from the release worktree's
+root:
+
+1. **The bump:** `scripts/bump-version.sh <V> <C>`. It writes the phone's C, the Galaxy watch
+   app's 100000 + C, the face's C and every iOS plist's C, all at V, and runs
+   `scripts/check-versions.sh`. Then `scripts/test.sh` and `scripts/ios-build.sh`, which also runs
+   `scripts/test-watch-bundle-signing.sh` on the build it made.
+2. **The face gate:** `scripts/face-gate.sh`. The face's generators, its fit tools on the watch's
+   own fonts, and Google's two validators.
+3. **Mohamed:** `scripts/release-face.sh`, in a Terminal window, its output not piped or
+   redirected (§3). He types the face key's password once. It writes
+   `build/face-release/watchface-release-signed.apk`, signed by the key
+   `watchface/face-release-cert.sha256` pins. Its face build passes `-Ptaqwa.unsignedRelease=true`,
+   which leaves the face as it is and keeps `keystore.properties` unread.
+4. **The Lead alone, the Android store build:**
+   ```bash
+   ln -s ~/Desktop/Workspace/apps/Taqwa/keystore.properties keystore.properties
+   scripts/release.sh
+   rm keystore.properties && ls keystore.properties   # "No such file or directory": the link is gone
+   ```
+   `scripts/release.sh` refuses without the link, without the face's pin (M1, §3), or with
+   `TAQWA_FACE_CERT_FILE` set. In order it runs the version and stamp checks, the face gate, the
+   signed face's checks (the pinned certificate, and the current face entry for entry: otherwise
+   "run scripts/release-face.sh again"), the four builds, then the checks of what was built, and it
+   prints the two AABs and two APKs with their sizes and certificate SHA-256s. It ends with
+   `release.sh: PASS` only when every check passed. A run that fails from the build on removes the
+   four outputs it built ("the outputs it built are removed"), so no bundle that failed a check is
+   left at the upload paths. Leave the worktree
+   alone while it runs: the face gate fails on any change to a tracked file during its run. Only
+   Gradle reads `keystore.properties`; no agent opens, prints or copies it. Before it, agents prove the same
+   path with `scripts/test-release.sh` and the dry run,
+   `TAQWA_RELEASE_DRY_RUN=1 TAQWA_FACE_CERT_FILE=<test pin> scripts/release.sh` after
+   `scripts/release-face.sh` with the throwaway test key (`TAQWA_FACE_KS` and the rest). The dry
+   run builds unsigned, signs with the debug key into `build/release-dry-run/*-DRY-RUN.{aab,apk}`
+   for the emulators, and Play refuses those. Every build of the root project it makes passes
+   `-Ptaqwa.unsignedRelease=true`, the face gate's included, so none reads a `keystore.properties`
+   even beside one. A dry run refused before its build (the versions, the face gate, the signed
+   face) leaves the last dry run's outputs where they were; one that fails from the build on
+   removes them.
+5. **With Mohamed's OK in chat, each time:** `scripts/ios-release.sh archive`, then
+   `scripts/ios-release.sh export-check`, then `scripts/ios-release.sh upload`. The archive's
+   report runs `scripts/ios-release.sh check` on it: the Apple Watch app is inside under `Watch/`
+   with its widgets, every app and extension is at V (C), and `scripts/check-watch-bundle.sh
+   --release` passes on its development signature. `export-check` exports it locally as an upload
+   would sign it, checks the IPA's distribution signature the same way, deletes the IPA and
+   uploads nothing. The Lead records the keys each signature carried, as the check prints them.
+   `scripts/ios-release.sh` with no argument runs the three in that order and stops at the first
+   that fails, so it never uploads an archive whose export check did not pass. If `export-check`
+   cannot sign on the Mac, §6 step 2's fallback applies.
+6. **The uploads:** both AABs to Play (the phone's and the watch's, on the one listing; the watch's
+   on the Wear OS track), and the iPhone build in App Store Connect (`upload`, step 5). Upload the
+   AABs only after `scripts/release.sh` printed `release.sh: PASS` in step 4. Play never takes a
+   code twice, so a bundle that failed a check would burn its candidate. Every Play Console action
+   is Mohamed's, in the order of the next section.
+
+### The watch release in the stores (1.6.0), in Mohamed's order
+
+Plan 5 Task 17's table, in console order: the cut gate, candidate C, M10a, then each later
+candidate up to production. What is done carries its date from the watch ledger
+(`.superpowers/sdd/2026-10-19-watch-companion-1-galaxy-face/progress.md`). Every Play Console and
+App Store Connect click is Mohamed's; an upload to App Store Connect needs his OK in chat, each
+time; the real `scripts/release.sh` is the Lead's alone.
+
+1. **The cut gate**, before any candidate is cut. Held for C on 8 November 2026:
+   - M1, the face key: made by Mohamed on 6 November. Its certificate's SHA-256 is
+     `watchface/face-release-cert.sha256`, and `release.sh` holds every signed face to it.
+   - M3, the privacy wording, and M9, both store forms ("No data collected" on Play, "Data Not
+     Collected" on the App Store, `docs/STORE-PRIVACY.md`): given on 31 October, with his two
+     tweaks.
+   - M8, his reading of the English and the Arabic: 6 November. The five native readers of
+     Task 11 read the other five languages the same day (Ruling 71), and
+     `git grep "draft, to native review" -- ':!docs'` prints nothing.
+   - `python3 tools/privacy-check.py`: every row approved, none awaiting.
+   - Task 12: the Lead's call 6 ruled (b) on 6 November (Ruling 72 item 1); the 12-hour
+     observation passed on 7 November (Ruling 78).
+2. **C = 1.6.0 (43)**, 8 November: the bump, M5 (Mohamed signs the face with
+   `scripts/release-face.sh`), then the Lead's `scripts/release.sh`, PASS. Both AABs on the
+   Desktop, and both notes files pasted in chat.
+3. **M10a, the public privacy pages**, 9 November, with his OK: `main` `dd3f8a30`, the seven
+   policies dated 9 November, live on taqwa.world before any track took C. He approved the Play
+   listing's two privacy lines the same day, for the live listing.
+4. **M10, its first half**, 9 November: Test and release › Advanced settings › Form factors ›
+   Add form factor › Wear OS. Its opt-in and Wear OS's terms stay locked until every listing has
+   Wear OS screenshots and a Wear OS testing release exists; they are step 12.
+5. **M11, C on Play's internal tracks**, 9 November: the phone AAB on the phone's internal
+   testing, the Wear AAB (100043) on Wear OS's (the Releases page's form-factor selector), each with
+   its notes file. His Galaxy Watch 8 Classic installed 100043 from Play the same night. No closed
+   track is recorded as taking a 1.6.0 candidate, so question 8's three-day closed test has not
+   run.
+6. **M6a, her devices**, 9 November: her iPhone and Apple Watch registered under team 3K93P4PA5H.
+   Her builds go on by cable (a Release build signed for development), as Mohamed chose on
+   7 November, so M6's TestFlight group is not used.
+7. **C+1 = 1.6.0 (44)**, 9 November: Sunrise on both watches follows the phone's Show sunrise, the
+   watch app refreshes less when it opens, and Settings › Watch's rows follow the watch while
+   Settings is open. Face signed, `release.sh` PASS, notes in 43's words. It reached his watch from
+   Play's internal track that day, and her pair by cable.
+8. **C+2 = 1.6.0 (45)**, 10 November: the Tile's countdown in short words where the full ones do
+   not fit ("in 6h 20m", and French, Turkish and Indonesian alike; Arabic, Urdu and Bengali keep
+   the full words), and Report a problem's layout. Bumped in `c9a08a97`, notes `46ec030d` (44's
+   words), the whole gate green on `46ec030d`. `2f0aae26` (Report a problem's typing place) came
+   after the gate, so the gate runs again on the commit that is cut, and the iPhone archive is made
+   from that same commit.
+9. **Each later candidate (M11a)**, in this order: M5, the Lead's `release.sh`, then the pair on
+   the internal tracks over the candidate before (his own account is an internal tester), with its
+   two notes files. Then Task 17 Step 3's update check on his watch: Play updates the watch app,
+   `dumpsys` shows the new face code, one `TaqwaFace update` line, the face still active and still
+   in his style, and `logcat -b crash` is empty. Then the checks Task 13 Step 6 asks for its
+   changes. Her pair takes it by cable for Task 15's checks 1 and 2. A failure is a finding, and
+   the next code is cut the same way.
+10. **The ship gate** (Task 17), every line before step 11. As of 10 November:
+    - done: the cut gate (step 1), both forms approved, the 12-hour observation, call 6 and its
+      follow-up; M10a live since before any track took a candidate; 1.5.1 (42) live on the App
+      Store and at 100 % on Play, so the 1.6.0 notes carry no Quran bullet;
+    - open: Task 10's cut, which each listing's note under its Play full description puts to him;
+    - open: his Galaxy on the production candidate, Task 13's checks with the screen readers, Ruling
+      42 holding (otherwise Task 14), and Step 3's update from Play over the candidate before;
+    - open: her Apple Watch, every gate of Task 15 (check 6, VoiceOver; check 10, the payload
+      thresholds; check 12, no location prompt; check 13, the needle within 5° with the crown on
+      each side), and check 11;
+    - open: the phones' smoke test on the S23 and the iPhone 12 (Task 13 Step 2);
+    - open: Task 16, the 35 Galaxy shots and the Apple Watch face shots (`<lang>-04.png`) shot again
+      in the afternoon;
+    - open: Exodus's local check of both release APKs, recorded in `docs/STORE-PRIVACY.md` (Task 17
+      Step 1).
+11. **M13, before either store's release button:** with his OK, the Lead squashes the release onto
+    `main` under his Taqwa identity, with the README's Roadmap slice 5 turned to Done, pushes it
+    (the site goes live with "On your wrist" and the support answer `#watch`), and does the
+    after-push cleanup.
+12. **Play, the production candidate (M10's second half, then M11a's end):** Main store listing, in
+    each of the seven languages: the full description with its wrist paragraph, and under Wear OS
+    the five screenshots in `docs/store/screenshots/play-wear/<lang>/`. Then Advanced settings ›
+    Form factors › Wear OS: opt in and accept Wear OS's terms. Then promote the candidate's two
+    internal releases to production, the phone's and Wear OS's, each with its notes file, and send
+    every change for review from Publishing overview. The plan names no staged rollout (§5 step 7:
+    staged or 100 %, both fine). Play reviews Wear OS on its own, and a first Wear review can take
+    days.
+13. **M12, the App Store:** with his OK, the Lead uploads the production candidate
+    (`scripts/ios-release.sh upload`). Then the version 1.6.0 with that build, and in each
+    localization the four Apple Watch screenshots (`docs/store/screenshots/appstore-watch/<lang>/`,
+    all 422 × 514), the Description and What's New from the App Store section of
+    `docs/store/listing/<lang>.md`. App Privacy stays "Data Not Collected". App Review Information ›
+    Notes from `docs/store/app-review/2026-10-30-notes-1.6.0-43.txt` (the 1.6.0 notes, 3,993 of
+    4,000 bytes). Version Release: Manually release this version. Then Add for Review and Submit.
+    The name, subtitle, keywords and promotional text are 1.5.1's, unchanged. Look again for Urdu
+    and Bengali localizations (§6 step 4).
+14. **M14, once Play serves the build:** a new Exodus analysis of 1.6.0 (45)
+    (reports.exodus-privacy.eu.org/en/analysis/submit/), by Mohamed, or by the Lead with his OK.
+    `CONTRIBUTING.md`'s and the site's "no trackers" stay only if it finds none.
+15. **After each store goes live:** a ledger line. `site/stores.json` needs no change. On the App
+    Store, Release This Version when Play's release is live too, or when he chooses.
 
 ## 5. Google Play, in console order
 
@@ -299,9 +477,16 @@ costs days.
 2. **Archive and upload**: `scripts/test.sh` and `scripts/ios-build.sh` green, then
    `scripts/ios-release.sh archive` (the archive lands in `build/ios-archive/`, and the script
    prints the built identifiers, team, app group and widget size back), the app record (step 3),
-   then `scripts/ios-release.sh upload`. The script signs automatically through the Apple account
-   signed into Xcode and refuses an empty or LOOPDL team. If the command-line upload is refused,
-   open the `.xcarchive` in Xcode (Window › Organizer) → Distribute App → App Store Connect →
+   then `scripts/ios-release.sh export-check` (a local export signed as the upload would be, its
+   bundles checked as a release, the IPA deleted, nothing uploaded), then
+   `scripts/ios-release.sh upload`, each with Mohamed's OK in chat (§4, "Each watch release",
+   step 5). The script signs automatically through the Apple account signed into Xcode and refuses
+   an empty or LOOPDL team. If `export-check` cannot sign on the Mac, upload alone,
+   `scripts/ios-release.sh upload` with Mohamed's OK, and read each bundle's entitlements in App
+   Store Connect › TestFlight › the build › Build Metadata instead; the Lead records them against
+   `scripts/check-watch-bundle.sh`'s distribution keys. If the command-line upload is refused, open
+   the `.xcarchive` in Xcode
+   (Window › Organizer) → Distribute App → App Store Connect →
    Upload, automatic signing, symbols included. The build appears under TestFlight after 10–30
    minutes of processing. Export compliance is answered by `ITSAppUsesNonExemptEncryption =
    false`, so no encryption question appears. Tag the archived commit `ios-build-<code>`.
@@ -333,7 +518,7 @@ costs days.
    own falls back to English), promotional text, description, keywords, support URL
    https://taqwa.world/support/, marketing URL https://taqwa.world, copyright
    "2026 Mohamed Abulgasem", App Review contact (name, phone, email), sign-in required: No,
-   **App Review Information › Notes** from `docs/store/app-review/2026-11-07-notes-1.5.1-42.txt` (the
+   **App Review Information › Notes** from `docs/store/app-review/2026-10-30-notes-1.6.0-43.txt` (the
    Guideline 2.1 answers, which Apple asked to find there on every submission), select the
    processed build, and under Version Release choose **Manually release this version**. A first
    version has no "What's New" field, so Play's release notes have no App Store twin until the
@@ -358,8 +543,8 @@ costs days.
    to App Review → Attach File) and pasted into App Review Information → Notes, then Edit → Add for
    Review → Resubmit to App Review with the same build. The answers are in
    `docs/store/app-review/2026-09-23-guideline-2.1-reply.txt` (3,814 of the 4,000 characters both
-   fields allow), kept as the record of that reply; the Notes, last brought up to date for build 42, are
-   `docs/store/app-review/2026-11-07-notes-1.5.1-42.txt` (3,957 bytes; App Store Connect Help gives
+   fields allow), kept as the record of that reply; the Notes, last brought up to date for 1.6.0 (43), are
+   `docs/store/app-review/2026-10-30-notes-1.6.0-43.txt` (3,993 bytes; App Store Connect Help gives
    the Notes field 4,000 bytes). Keep Notes in step with the app on every later submission.
    "Metadata Rejected" or "Information Needed" is answered in App Store Connect's
    App Review messages without a new build; a binary rejection needs a fix, the next build number
@@ -372,7 +557,8 @@ costs days.
    1. On the version page, **Cancel this release**. The version returns to Developer Rejected,
       and every field on it is editable again, as are the name and subtitle under App Information.
    2. Upload the replacement: `scripts/ios-release.sh archive`, then `scripts/ios-release.sh
-      upload`, and wait until TestFlight shows the build processed.
+      export-check`, then `scripts/ios-release.sh upload` (step 2, its fallback included), and
+      wait until TestFlight shows the build processed.
    3. Edit whatever metadata changed: App Information (name, subtitle), then per localisation the
       promotional text, description, keywords and screenshots, then App Review Information ›
       Notes. Every value is in `docs/store/listing/<lang>.md` and `docs/store/app-review/`, and
@@ -403,8 +589,41 @@ costs days.
 - **targetSdk 36** (`gradle/libs.versions.toml`), the level Play requires for new apps since
   31 August 2026; verified on an Android 16 emulator and on the S23.
 - **Release signing** reads `keystore.properties` (git-ignored; `scripts/make-upload-key.sh`
-  writes it); `scripts/release.sh` builds the signed App Bundle and APK with the R8 mapping
-  inside the bundle.
+  writes it); `scripts/release.sh` builds the phone's and the Galaxy watch app's signed App
+  Bundles and APKs together, with each R8 mapping inside its bundle. Both are signed with the one
+  upload key, which Play re-signs, and the Taqwa face inside the watch app with Mohamed's face key
+  alone. `-Ptaqwa.unsignedRelease=true` keeps every key out of a release-type build and leaves
+  `keystore.properties` unread. The dry run passes it to every build of the root project it makes,
+  `tools/watchface/validate.sh` (the face gate's) to its face builds, and `scripts/release-face.sh`
+  to the face it signs, which the flag leaves as it is, so none reads a `keystore.properties`
+  beside it (`scripts/test-release.sh`). `scripts/release.sh`'s own builds in the store run never
+  pass it, so the upload key signs the four store outputs.
+- **The watch builds' permissions**: the Galaxy watch app's merged release manifest asks for
+  exactly `wearApp/permissions.txt`: `VIBRATE`, androidx.core's
+  `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, `PUSH_WATCH_FACES` and
+  `SET_PUSHED_WATCH_FACE_AS_ACTIVE` (a runtime permission, asked on the wearer's tap). It has no
+  `INTERNET` and no location permission, and holds Watch Face Push's `wear-sdk` as not required,
+  so Wear OS 3 to 5 install it. The face has no code and asks for nothing. The phone's merged
+  release manifest asks for exactly `androidApp/permissions.txt`, today's 12, each with its reason:
+  the watch adds none. The Apple Watch app and its widgets ask for no location, no HealthKit and
+  no network, and are signed with the app group alone.
+- **Where each check lives**:
+
+  | What | Checked by | Run by |
+  |---|---|---|
+  | One version for the four builds | `scripts/check-versions.sh` | `release.sh` step 1, `scripts/test.sh`, CI |
+  | The face's generators, fit tools and validators | `scripts/face-gate.sh` | `release.sh` step 2 |
+  | The face's key, its pin and its freshness | `release.sh` step 3 (pin `watchface/face-release-cert.sha256`) | `release.sh`; `scripts/release-face.sh` holds the pin too |
+  | The face inside the watch app: its package, code, key and token | `tools/watchface/check-bundle.sh` | `release.sh` step 5 |
+  | The watch's R8 build: mapping, no debug code or test data, permissions, `wear-sdk` | `tools/wear-release-check.sh release` | `release.sh` step 5 |
+  | The phone's permissions | `androidApp/permissions.txt` | `release.sh` step 5 |
+  | One key for the phone and the watch, the versions built, the face and its token as bundled, no test data | `release.sh` step 5 | `release.sh` |
+  | The dry run, its refusals and its outputs | `scripts/test-release.sh` | by hand, before a cut |
+  | No release build signs by accident | `scripts/test-unsigned-release.sh` | by hand, before a cut |
+  | The face's release tools | `scripts/test-face-release.sh` | by hand, before a cut |
+  | The Apple Watch bundles: ids, one version, no location or network, the app group, sizes | `scripts/check-watch-bundle.sh` | `scripts/ios-build.sh` (every build, CI too); `--release` in `ios-release.sh check` (the archive) and `export-check` (the IPA) |
+  | The bundle check's Release signal and each signature's keys | `scripts/test-watch-bundle-signing.sh` | `scripts/ios-build.sh` |
+  | The archive: the watch inside, every bundle at V (C) | `scripts/ios-release.sh check` | `ios-release.sh archive`'s report |
 - **Prayer-time stamps**: `scripts/release.sh` and `scripts/ios-release.sh` both run
   `./gradlew -p tools/timetables checkStamps` first and refuse to build on a stale or red stamp
   (spec §5, ruling R86).

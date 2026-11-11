@@ -1,0 +1,82 @@
+today (one size): 2106 forms under 7 px
+  longer         31.50 px (14.00 u)  21266 forms; least room  -4.3 px (الثلاثاء 10 تشرين الأول); widest 346.4 px (الخميس 10 تشرين الثاني)
+    ar-SA  14.00 u: 365 days;  size changes overnight   0 times
+    ar-EG  14.00 u: 365 days;  size changes overnight   0 times
+    ar-LY  14.00 u: 365 days;  size changes overnight   0 times
+    ar-MA  14.00 u: 365 days;  size changes overnight   0 times
+    ar-TN  14.00 u: 365 days;  size changes overnight   0 times
+    ar-DZ  14.00 u: 365 days;  size changes overnight   0 times
+    ar-IQ  14.00 u: 365 days;  size changes overnight   0 times
+    ar-SY  14.00 u: 365 days;  size changes overnight   0 times
+    ar-JO  14.00 u: 365 days;  size changes overnight   0 times
+    ar-LB  14.00 u: 365 days;  size changes overnight   0 times
+    ar-AE  14.00 u: 365 days;  size changes overnight   0 times
+    ur-PK  14.00 u: 365 days;  size changes overnight   0 times
+    ur-IN  14.00 u: 365 days;  size changes overnight   0 times
+2 steps, 14u kept where it can be: 0 forms under 7 px
+  up to 13       31.50 px (14.00 u)   6704 forms; least room   8.1 px (السبت 1 أغسطس); widest 260.0 px (السبت 1 أغسطس)
+  longer         25.31 px (11.25 u)  14562 forms; least room   7.9 px (الخميس 10 تشرين الأول); widest 277.7 px (الخميس 10 تشرين الثاني)
+    ar-SA  14.00 u:  34 days  11.25 u: 331 days;  size changes overnight  32 times
+    ar-EG  14.00 u:  34 days  11.25 u: 331 days;  size changes overnight  32 times
+    ar-LY  14.00 u:  34 days  11.25 u: 331 days;  size changes overnight  32 times
+    ar-MA  14.00 u:  61 days  11.25 u: 304 days;  size changes overnight  42 times
+    ar-TN  14.00 u:  65 days  11.25 u: 300 days;  size changes overnight  44 times
+    ar-DZ  14.00 u:  65 days  11.25 u: 300 days;  size changes overnight  44 times
+    ar-IQ  14.00 u:  73 days  11.25 u: 292 days;  size changes overnight  46 times
+    ar-SY  14.00 u:  73 days  11.25 u: 292 days;  size changes overnight  46 times
+    ar-JO  14.00 u:  73 days  11.25 u: 292 days;  size changes overnight  46 times
+    ar-LB  14.00 u:  73 days  11.25 u: 292 days;  size changes overnight  46 times
+    ar-AE  14.00 u:  34 days  11.25 u: 331 days;  size changes overnight  32 times
+    ur-PK  14.00 u: 276 days  11.25 u:  89 days;  size changes overnight 142 times
+    ur-IN  14.00 u: 276 days  11.25 u:  89 days;  size changes overnight 142 times
+3 steps (built): 0 forms under 7 px
+  up to 13       31.50 px (14.00 u)   6704 forms; least room   8.1 px (السبت 1 أغسطس); widest 260.0 px (السبت 1 أغسطس)
+  up to 18       29.25 px (13.00 u)  12392 forms; least room   8.7 px (الخميس 10 أغسطس); widest 275.2 px (الخميس 10 أغسطس)
+  longer         25.31 px (11.25 u)   2170 forms; least room   7.9 px (الخميس 10 تشرين الأول); widest 277.7 px (الخميس 10 تشرين الثاني)
+    ar-SA  14.00 u:  34 days  13.00 u: 331 days;  size changes overnight  32 times
+    ar-EG  14.00 u:  34 days  13.00 u: 331 days;  size changes overnight  32 times
+    ar-LY  14.00 u:  34 days  13.00 u: 331 days;  size changes overnight  32 times
+    ar-MA  14.00 u:  61 days  13.00 u: 304 days;  size changes overnight  42 times
+    ar-TN  14.00 u:  65 days  13.00 u: 300 days;  size changes overnight  44 times
+    ar-DZ  14.00 u:  65 days  13.00 u: 300 days;  size changes overnight  44 times
+    ar-IQ  14.00 u:  73 days  13.00 u: 169 days  11.25 u: 123 days;  size changes overnight  48 times
+    ar-SY  14.00 u:  73 days  13.00 u: 169 days  11.25 u: 123 days;  size changes overnight  48 times
+    ar-JO  14.00 u:  73 days  13.00 u: 169 days  11.25 u: 123 days;  size changes overnight  48 times
+    ar-LB  14.00 u:  73 days  13.00 u: 169 days  11.25 u: 123 days;  size changes overnight  48 times
+    ar-AE  14.00 u:  34 days  13.00 u: 331 days;  size changes overnight  32 times
+    ur-PK  14.00 u: 276 days  13.00 u:  89 days;  size changes overnight 142 times
+    ur-IN  14.00 u: 276 days  13.00 u:  89 days;  size changes overnight 142 times
+2 steps, no 14u: 0 forms under 7 px
+  up to 18       29.25 px (13.00 u)  19096 forms; least room   8.7 px (الخميس 10 أغسطس); widest 275.2 px (الخميس 10 أغسطس)
+  longer         25.31 px (11.25 u)   2170 forms; least room   7.9 px (الخميس 10 تشرين الأول); widest 277.7 px (الخميس 10 تشرين الثاني)
+    ar-SA  13.00 u: 365 days;  size changes overnight   0 times
+    ar-EG  13.00 u: 365 days;  size changes overnight   0 times
+    ar-LY  13.00 u: 365 days;  size changes overnight   0 times
+    ar-MA  13.00 u: 365 days;  size changes overnight   0 times
+    ar-TN  13.00 u: 365 days;  size changes overnight   0 times
+    ar-DZ  13.00 u: 365 days;  size changes overnight   0 times
+    ar-IQ  13.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-SY  13.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-JO  13.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-LB  13.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-AE  13.00 u: 365 days;  size changes overnight   0 times
+    ur-PK  13.00 u: 365 days;  size changes overnight   0 times
+    ur-IN  13.00 u: 365 days;  size changes overnight   0 times
+non-monotonic, 14u at 16-18 too: 0 forms under 7 px
+  up to 13       31.50 px (14.00 u)   6704 forms; least room   8.1 px (السبت 1 أغسطس); widest 260.0 px (السبت 1 أغسطس)
+  up to 15       29.25 px (13.00 u)   7312 forms; least room   8.7 px (الخميس 10 أغسطس); widest 275.2 px (الخميس 10 أغسطس)
+  up to 18       31.50 px (14.00 u)   5080 forms; least room   8.0 px (الخميس 10 ديسمبر); widest 274.5 px (الخميس 10 ديسمبر)
+  longer         25.31 px (11.25 u)   2170 forms; least room   7.9 px (الخميس 10 تشرين الأول); widest 277.7 px (الخميس 10 تشرين الثاني)
+    ar-SA  14.00 u: 200 days  13.00 u: 165 days;  size changes overnight 135 times
+    ar-EG  14.00 u: 200 days  13.00 u: 165 days;  size changes overnight 135 times
+    ar-LY  14.00 u: 200 days  13.00 u: 165 days;  size changes overnight 135 times
+    ar-MA  14.00 u: 193 days  13.00 u: 172 days;  size changes overnight 128 times
+    ar-TN  14.00 u: 205 days  13.00 u: 160 days;  size changes overnight 129 times
+    ar-DZ  14.00 u: 205 days  13.00 u: 160 days;  size changes overnight 129 times
+    ar-IQ  14.00 u: 140 days  13.00 u: 102 days  11.25 u: 123 days;  size changes overnight 100 times
+    ar-SY  14.00 u: 140 days  13.00 u: 102 days  11.25 u: 123 days;  size changes overnight 100 times
+    ar-JO  14.00 u: 140 days  13.00 u: 102 days  11.25 u: 123 days;  size changes overnight 100 times
+    ar-LB  14.00 u: 140 days  13.00 u: 102 days  11.25 u: 123 days;  size changes overnight 100 times
+    ar-AE  14.00 u: 200 days  13.00 u: 165 days;  size changes overnight 135 times
+    ur-PK  14.00 u: 282 days  13.00 u:  83 days;  size changes overnight 142 times
+    ur-IN  14.00 u: 282 days  13.00 u:  83 days;  size changes overnight 142 times

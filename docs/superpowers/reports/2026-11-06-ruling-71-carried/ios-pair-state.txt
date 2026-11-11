@@ -1,0 +1,15 @@
+# Found (19:30, ios-pair taken)
+phone found: 54434 entries, content hash b2b38a6858eac807e0272c1ad107e172
+phone clone: 54434 entries, content hash b2b38a6858eac807e0272c1ad107e172
+watch found: 7078 entries, content hash 4c49f056fc41a40e30d75373fa46785a
+total 24
+-rw-r-----  1 mohamedabulgasem  wheel  60 Nov  6 13:07 secondary-815656076.021788-1
+-rw-r-----  1 mohamedabulgasem  wheel   0 Nov  6 13:08 secondary-815656091.659861-0
+-rw-r-----  1 mohamedabulgasem  wheel  60 Nov  6 13:50 secondary-815658615.112298-1
+-rw-r-----  1 mohamedabulgasem  wheel  60 Nov  6 14:55 secondary-815662557.830466-1
+== Device Pairs ==
+
+# Put back (19:41)
+phone now: 54434 entries, content hash b2b38a6858eac807e0272c1ad107e172
+phone entries incl. locScoreInfo: 54439 (found 54439)
+watch now: 7078 entries, content hash 4c49f056fc41a40e30d75373fa46785a

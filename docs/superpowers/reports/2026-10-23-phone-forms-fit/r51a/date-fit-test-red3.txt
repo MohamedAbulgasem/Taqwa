@@ -1,0 +1,78 @@
+......EFE.FFE.......
+======================================================================
+ERROR: test_a_face_drawing_a_step_at_another_size_fails (__main__.TheFace.test_a_face_drawing_a_step_at_another_size_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 165, in test_a_face_drawing_a_step_at_another_size_fails
+    xml = self.in_group(self.face(), "الخميس ١٠ أغسطس", 'size="%g"' % (13 * K), 'size="%g"' % (14 * K))
+          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 138, in in_group
+    i = xml.index('<Group name="greg_arch_rtl_%s"' % D.step_for(steps(), text).name)
+ValueError: substring not found
+
+======================================================================
+ERROR: test_a_face_without_the_months_test_fails (__main__.TheFace.test_a_face_without_the_months_test_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 154, in test_a_face_without_the_months_test_fails
+    xml = self.in_group(self.face(), "الخميس ١٠ أغسطس", ' &amp;&amp; %s == "%s"' % (LAST5, AUGUST), "")
+          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 138, in in_group
+    i = xml.index('<Group name="greg_arch_rtl_%s"' % D.step_for(steps(), text).name)
+ValueError: substring not found
+
+======================================================================
+ERROR: test_the_sample_is_drawn_in_the_base_faces_own_box (__main__.TheFace.test_the_sample_is_drawn_in_the_base_faces_own_box)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 150, in test_the_sample_is_drawn_in_the_base_faces_own_box
+    rest = next(row for row in D.written_steps() if row[0] == D.step_for(steps(), "الأحد ١٨ أكتوبر").name)
+           ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+StopIteration
+
+======================================================================
+FAIL: test_a_face_that_spells_august_otherwise_fails (__main__.TheFace.test_a_face_that_spells_august_otherwise_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 160, in test_a_face_that_spells_august_otherwise_fails
+    self.assertEqual(xml.count('"%s"' % AUGUST), 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2
+
+======================================================================
+FAIL: test_every_form_shows_the_one_group_its_step_names (__main__.TheFace.test_every_form_shows_the_one_group_its_step_names)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 147, in test_every_form_shows_the_one_group_its_step_names
+    self.assertEqual(D.face_steps_check(D.written_steps(), steps(), RTL_DATES + [""]), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["watchface.xml draws Arch's right-to-left[1029 chars]est'] != []
+
+First list contains 12 additional elements.
+First extra element 0:
+"watchface.xml draws Arch's right-to-left Gregorian steps as [('13', 31.5, 118, 72), ('18', 29.25, 122, 66), ('more', 25.3125, 127, 58)], and ARCH_GREGORIAN_STEPS says [('long', 25.3125, 127, 58), ('august', 29.25, 122, 66), ('rest', 31.5, 118, 72)]: run tools/face-centre.py"
+
+Diff is 1135 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_the_face_draws_the_tables_groups (__main__.TheFace.test_the_face_draws_the_tables_groups)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 144, in test_the_face_draws_the_tables_groups
+    self.assertEqual([row[:4] for row in D.written_steps()], D.expected_steps(steps()))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [('13', 31.5, 118, 72), ('18', 29.25, 122, 6[26 chars] 58)] != [('long', 25.3125, 127, 58), ('august', 29.2[32 chars] 72)]
+
+First differing element 0:
+('13', 31.5, 118, 72)
+('long', 25.3125, 127, 58)
+
+- [('13', 31.5, 118, 72), ('18', 29.25, 122, 66), ('more', 25.3125, 127, 58)]
++ [('long', 25.3125, 127, 58),
++  ('august', 29.25, 122, 66),
++  ('rest', 31.5, 118, 72)]
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.070s
+
+FAILED (failures=3, errors=3)

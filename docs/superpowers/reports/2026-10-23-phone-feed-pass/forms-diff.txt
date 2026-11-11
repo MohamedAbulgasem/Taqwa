@@ -1,0 +1,6 @@
+device tags 30 committed tags 30 same order True
+differences: 0
+ar-SA August: أغسطس is أغسطس: True digitSets: ['٠١٢٣٤٥٦٧٨٩', '0123456789']
+ar-EG August: أغسطس is أغسطس: True digitSets: ['٠١٢٣٤٥٦٧٨٩', '0123456789']
+ar-LY August: أغسطس is أغسطس: True digitSets: ['0123456789', '٠١٢٣٤٥٦٧٨٩']
+ar-AE August: أغسطس is أغسطس: True digitSets: ['0123456789', '٠١٢٣٤٥٦٧٨٩']

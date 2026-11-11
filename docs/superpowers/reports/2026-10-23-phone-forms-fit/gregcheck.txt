@@ -1,0 +1,12 @@
+الأحد 18 أكتوبر ('arch', False)
+  shot  top 133.8 bottom 170.5 left 126.9 right 320.2
+  model top 133.3 bottom 171.5 left 126.2 right 322.4
+SUN 18 OCT ('arch', False)
+  shot  top 142.7 bottom 164.5 left 129.8 right 319.2
+  model top 142.7 bottom 164.7 left 128.2 right 321.8
+الأحد ١٨ أكتوبر ('ring', False)
+  shot  top 126.9 bottom 163.5 left 126.9 right 320.2
+  model top 126.3 bottom 164.5 left 126.2 right 322.4
+SUN 18 OCT ('ring', False)
+  shot  top 135.8 bottom 157.6 left 129.8 right 319.2
+  model top 135.7 bottom 157.7 left 128.2 right 321.8

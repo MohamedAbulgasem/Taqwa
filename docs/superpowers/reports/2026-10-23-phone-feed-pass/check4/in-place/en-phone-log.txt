@@ -1,0 +1,2 @@
+10-31 13:10:16.070 I/System.out( 7577): TaqwaWatch RESCHEDULED SENT 48ms
+10-31 13:10:16.107 I/System.out( 7577): TaqwaWatch ACK 5/6071cb0943b4f33b

@@ -1,0 +1,12 @@
+--------- beginning of main
+10-31 12:24:32.596 I/System.out( 4772): TaqwaWatch no Wear API 16
+10-31 12:24:32.597 I/TaqwaWatchHarness( 4772): nodes: no Wear API
+10-31 12:24:32.915 I/System.out( 4772): TaqwaWatch no Wear API 16
+10-31 12:24:32.915 I/System.out( 4772): TaqwaWatch RESCHEDULED NO_WATCH 2ms
+10-31 12:24:32.915 I/TaqwaWatchHarness( 4772): place: stored London id=2643743 zone=Europe/London at 51.507,-0.128; plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+10-31 12:24:32.996 I/System.out( 4772): TaqwaWatch no Wear API 16
+10-31 12:24:32.997 I/System.out( 4772): TaqwaWatch RESCHEDULED NO_WATCH 1ms
+10-31 12:24:32.997 I/TaqwaWatchHarness( 4772): reschedule: plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+10-31 12:24:33.024 I/System.out( 4772): TaqwaWatch no Wear API 16
+10-31 12:24:33.024 I/TaqwaWatchHarness( 4772): nodes: no Wear API
+10-31 12:24:33.051 I/TaqwaWatchHarness( 4772): language: en

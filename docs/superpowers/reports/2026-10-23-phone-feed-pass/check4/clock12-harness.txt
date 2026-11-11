@@ -1,0 +1,1 @@
+13:06:08 h clock --es format 12: clock TWELVE_HOUR; plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true

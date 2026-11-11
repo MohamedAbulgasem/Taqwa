@@ -1,0 +1,98 @@
+Plan 2 Task 3 Step 4 (P2.3b), Ruling 51 item 4's same-session proof: the sample as P2.3a regenerated it ("new": place as
+Ruling 39 rounds it, 23.0 / "6,600" / -27.0) against the same feed with the place it had before P2.3a ("old": 32826332^1's
+23.352542268995705 / "6,558" ("6558", "٦٥٥٨") / -25.41184382938471), both stored with tools/watchface/store.sh on the face as
+committed, shot at the same moments in one session on emulator-5558 (ab-place.sh; the four samples' place objects in
+ab-place/), 25 Oct 2026 12:45-13:07 SAST, rounds new, old, new2; then the Sun alone 13:08-13:17, rounds old2, new3, old3, new4.
+The two files of each sample differ in "place" alone (checked before the rounds). Trailing spaces trimmed.
+
+abdiff.py new old:
+arch-ar-ly-12h-1458-awake.png             0 px differ
+arch-ar-sa-1458-awake.png                 0 px differ
+arch-en-12h-1258-awake.png                0 px differ
+arch-en-1458-aod.png                      0 px differ
+arch-en-1458-awake.png                    0 px differ
+moon-ar-ly-12h-1458-awake.png          1262 px differ, worst 133 levels, box (220, 32, 240, 264)
+moon-ar-sa-1458-awake.png               709 px differ, worst  14 levels, box (221, 32, 237, 264)
+moon-en-1458-aod.png                      0 px differ
+moon-en-1458-awake.png                  709 px differ, worst   8 levels, box (221, 32, 236, 263)
+ring-ar-ly-12h-1458-awake.png             0 px differ
+ring-ar-sa-1458-awake.png                 1 px differ, worst   1 levels, box (422, 342, 422, 342)
+ring-en-12h-1258-awake.png                0 px differ
+ring-en-1458-aod.png                      0 px differ
+ring-en-1458-awake.png                    0 px differ
+sun-ar-ly-12h-1458-awake.png              0 px differ
+sun-ar-sa-1458-awake.png                  0 px differ
+sun-en-12h-1258-awake.png               102 px differ, worst   1 levels, box (313, 17, 435, 137)
+sun-en-1458-aod.png                       1 px differ, worst   1 levels, box (206, 0, 206, 0)
+sun-en-1458-awake.png                     6 px differ, worst   1 levels, box (206, 0, 301, 12)
+
+passdiff.py's set-asides (the Moon's seconds hand at :00), new against old, then new against new2:
+arch-ar-ly-12h-1458-awake.png       differ      0  moon   0  left     0  worst   0  over 2 levels     0
+arch-ar-sa-1458-awake.png           differ      0  moon   0  left     0  worst   0  over 2 levels     0
+arch-en-12h-1258-awake.png          differ      0  moon   0  left     0  worst   0  over 2 levels     0
+arch-en-1458-aod.png                differ      0  moon   0  left     0  worst   0  over 2 levels     0
+arch-en-1458-awake.png              differ      0  moon   0  left     0  worst   0  over 2 levels     0
+moon-ar-ly-12h-1458-awake.png       differ   1262  moon   0  left     0  worst   0  over 2 levels     0
+moon-ar-sa-1458-awake.png           differ    709  moon   0  left     0  worst   0  over 2 levels     0
+moon-en-1458-aod.png                differ      0  moon   0  left     0  worst   0  over 2 levels     0
+moon-en-1458-awake.png              differ    709  moon   0  left     0  worst   0  over 2 levels     0
+ring-ar-ly-12h-1458-awake.png       differ      0  moon   0  left     0  worst   0  over 2 levels     0
+ring-ar-sa-1458-awake.png           differ      1  moon   0  left     1  worst   1  over 2 levels     0
+ring-en-12h-1258-awake.png          differ      0  moon   0  left     0  worst   0  over 2 levels     0
+ring-en-1458-aod.png                differ      0  moon   0  left     0  worst   0  over 2 levels     0
+ring-en-1458-awake.png              differ      0  moon   0  left     0  worst   0  over 2 levels     0
+sun-ar-ly-12h-1458-awake.png        differ      0  moon   0  left     0  worst   0  over 2 levels     0
+sun-ar-sa-1458-awake.png            differ      0  moon   0  left     0  worst   0  over 2 levels     0
+sun-en-12h-1258-awake.png           differ    102  moon   0  left   102  worst   1  over 2 levels     0
+sun-en-1458-aod.png                 differ      1  moon   0  left     1  worst   1  over 2 levels     0
+sun-en-1458-awake.png               differ      6  moon   0  left     6  worst   1  over 2 levels     0
+left in all: 110
+
+arch-ar-ly-12h-1458-awake.png       differ      0  moon   0  left     0  worst   0  over 2 levels     0
+arch-ar-sa-1458-awake.png           differ      0  moon   0  left     0  worst   0  over 2 levels     0
+arch-en-12h-1258-awake.png          differ      0  moon   0  left     0  worst   0  over 2 levels     0
+arch-en-1458-aod.png                differ      0  moon   0  left     0  worst   0  over 2 levels     0
+arch-en-1458-awake.png              differ      0  moon   0  left     0  worst   0  over 2 levels     0
+moon-ar-ly-12h-1458-awake.png       differ   1234  moon   0  left     0  worst   0  over 2 levels     0
+moon-ar-sa-1458-awake.png           differ   1017  moon   0  left     0  worst   0  over 2 levels     0
+moon-en-1458-aod.png                differ      0  moon   0  left     0  worst   0  over 2 levels     0
+moon-en-1458-awake.png              differ   1423  moon   0  left     0  worst   0  over 2 levels     0
+ring-ar-ly-12h-1458-awake.png       differ      1  moon   0  left     1  worst   1  over 2 levels     0
+ring-ar-sa-1458-awake.png           differ      0  moon   0  left     0  worst   0  over 2 levels     0
+ring-en-12h-1258-awake.png          differ      0  moon   0  left     0  worst   0  over 2 levels     0
+ring-en-1458-aod.png                differ      0  moon   0  left     0  worst   0  over 2 levels     0
+ring-en-1458-awake.png              differ      1  moon   0  left     1  worst   1  over 2 levels     0
+sun-ar-ly-12h-1458-awake.png        differ      0  moon   0  left     0  worst   0  over 2 levels     0
+sun-ar-sa-1458-awake.png            differ      0  moon   0  left     0  worst   0  over 2 levels     0
+sun-en-12h-1258-awake.png           differ      0  moon   0  left     0  worst   0  over 2 levels     0
+sun-en-1458-aod.png                 differ      0  moon   0  left     0  worst   0  over 2 levels     0
+sun-en-1458-awake.png               differ      0  moon   0  left     0  worst   0  over 2 levels     0
+left in all: 2
+
+The Sun's English frames, which differ by 1 level between rounds whatever the place (abdiff.py, Sun lines only):
+  old vs old2:
+    sun-en-12h-1258-awake.png               102 px differ, worst   1 levels, box (313, 17, 435, 137)
+    sun-en-1458-aod.png                       2 px differ, worst   1 levels, box (197, 0, 206, 1)
+    sun-en-1458-awake.png                    80 px differ, worst   1 levels, box (135, 0, 453, 238)
+  new vs new3:
+    sun-en-12h-1258-awake.png                93 px differ, worst   1 levels, box (313, 17, 435, 137)
+    sun-en-1458-aod.png                       1 px differ, worst   1 levels, box (197, 1, 197, 1)
+    sun-en-1458-awake.png                     6 px differ, worst   1 levels, box (191, 0, 302, 12)
+  new3 vs old3:
+    sun-en-12h-1258-awake.png                 0 px differ
+    sun-en-1458-aod.png                       1 px differ, worst   1 levels, box (197, 1, 197, 1)
+    sun-en-1458-awake.png                     8 px differ, worst   1 levels, box (191, 0, 302, 12)
+  old3 vs new4:
+    sun-en-12h-1258-awake.png                 0 px differ
+    sun-en-1458-aod.png                       1 px differ, worst   1 levels, box (197, 1, 197, 1)
+    sun-en-1458-awake.png                     8 px differ, worst   1 levels, box (191, 0, 302, 12)
+  new3 vs new4:
+    sun-en-12h-1258-awake.png                 0 px differ
+    sun-en-1458-aod.png                       0 px differ
+    sun-en-1458-awake.png                     0 px differ
+
+Read: of Arch's, Ring's and Sun's 15 frames, 11 are 0 px from old to new, and the other four differ by 1 level: Ring's one
+pixel, which new and new2 differ by too, and the Sun's English frames (6 to 102 px, worst 1 level), which differ between two rounds of the
+same feed as much (old vs old2 102 px, new vs new3 93 px) and are equal across feeds in others (new3 vs old3 0 px at 12:58):
+the Sun dial's run-to-run noise, not the place. The Moon's always-on frame is 0 px, and its awake frames differ only in the
+seconds hand's band at twelve (x 220-241), which passdiff sets aside (0 px left), as between new and new2. So the regenerated sample draws no pixel of its own.

@@ -1,0 +1,24 @@
+649c649
+< |    |    |    +--- com.google.android.gms:play-services-basement:18.4.0 -> 18.9.0
+---
+> |    |    |    +--- com.google.android.gms:play-services-basement:18.4.0 -> 18.10.0
+654,655c654,655
+< |    |    |         \--- com.google.android.gms:play-services-basement:18.4.0 -> 18.9.0 (*)
+< |    |    +--- com.google.android.gms:play-services-basement:18.9.0 (*)
+---
+> |    |    |         \--- com.google.android.gms:play-services-basement:18.4.0 -> 18.10.0 (*)
+> |    |    +--- com.google.android.gms:play-services-basement:18.9.0 -> 18.10.0 (*)
+656a657,669
+> |    +--- androidx.wear:wear-remote-interactions:1.2.0
+> |    |    +--- androidx.annotation:annotation:1.8.1 -> 1.9.1 (*)
+> |    |    +--- androidx.concurrent:concurrent-futures-ktx:1.1.0 -> 1.2.0 (*)
+> |    |    +--- androidx.wear:wear-core:1.0.0
+> |    |    |    +--- androidx.annotation:annotation:1.8.1 -> 1.9.1 (*)
+> |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib -> 2.4.10 (*)
+> |    |    |    +--- org.jspecify:jspecify:1.0.0
+> |    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.4.10 (c)
+> |    |    +--- com.google.android.gms:play-services-basement:18.10.0 (*)
+> |    |    +--- com.google.android.gms:play-services-wearable:17.1.0 -> 20.0.1 (*)
+> |    |    +--- com.google.guava:listenablefuture:1.0 -> 9999.0-empty-to-avoid-conflict-with-guava
+> |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.4.10 (*)
+> |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0 -> 1.10.2 (*)

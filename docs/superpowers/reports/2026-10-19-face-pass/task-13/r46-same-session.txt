@@ -1,0 +1,48 @@
+Task 13's closing fix (Ruling 46): the face before the ruling (ec8f1bd4's debug face, sha1 585bf7bf) and as rebuilt
+(this fix's, sha1 3047782d), installed in turn on emulator-5558 in one session, 24 Oct 2026 about 21:51-22:02 SAST:
+each moment shot with the old face, then the new, then the old again (old2, the run-to-run baseline), with
+tools/watchface/shoot.sh (battery 100, the emulator's own step count; Libyan Arabic is SAMPLE=ar-ly12). The columns
+are windowdiff.py's: the pixels that differ; those inside the moon window's box; always-on, the window's fill pixels
+(the emulator's 6, 8, 7) in the first frame and in the second; those set aside as task-12/passdiff.py sets them
+aside (the moon's picture, the step count's box with the slots filled, awake the seconds hand's band, whose tail
+crosses the window at second 0); and what is left, with its largest difference: always-on outside the window, and
+awake anywhere, the window included (Ruling 49: awake the window is held to the rest of the frame, so its pixels
+are set aside or left as any other's; the tables are windowdiff.py's again on the same frames).
+
+Between the two faces, nothing outside the moon window differs at all, awake or always-on (0 px left in every
+frame, as between two shots of the same face); awake nothing differs, the window included, but the seconds hand
+and the step count; and always-on every fill pixel of the window went black (1,662-1,811 before; 0-2 after, which
+are the hairline's inner edge or the moon's dark disc's, blended over the black, as in ref.py's drawing).
+
+== old vs old2 (the same face twice: the baseline)
+moon-ar-ly-12h-2055-aod.png              differ     0; in the window     0 (fill px before 1809, now 1809); set aside    0; left    0, worst   0, over 2 levels 0
+moon-ar-ly-12h-slots-2055-aod.png        differ   299; in the window     0 (fill px before 1804, now 1804); set aside  299; left    0, worst   0, over 2 levels 0
+moon-en-1458-aod.png                     differ     0; in the window     0 (fill px before 1803, now 1803); set aside    0; left    0, worst   0, over 2 levels 0
+moon-en-1458-awake.png                   differ  1058; in the window     0 (awake: the fill as drawn); set aside 1058; left    0, worst   0, over 2 levels 0
+moon-en-slots-0440-aod.png               differ   288; in the window     0 (fill px before 1662, now 1662); set aside  288; left    0, worst   0, over 2 levels 0
+moon-slots-1010-aod.png                  differ   313; in the window     0 (fill px before 1811, now 1811); set aside  313; left    0, worst   0, over 2 levels 0
+moon-slots-1010-awake.png                differ  1390; in the window    18 (awake: the fill as drawn); set aside 1390; left    0, worst   0, over 2 levels 0
+
+The baseline above is this session's: its two shots of the old face left 0 px. Two runs do not always agree so well.
+Review round 1 (spec lens, 24 Oct 22:51-23:36 SAST, its own builds of both faces, 8 moments on emulator-5558)
+measured the same face shot twice differing by up to 74 levels in 62 px at the chapter arc's pointer, outside the
+window; its matched retakes left 0 px outside the window. So "0 px elsewhere" holds for each matched run, as here,
+and not for any two runs: the run-to-run noise is up to 74 levels in 62 px, at the arc's pointer.
+
+== old vs new (the face before Ruling 46, then as rebuilt)
+moon-ar-ly-12h-2055-aod.png              differ  2027; in the window  2027 (fill px before 1809, now    2); set aside    0; left    0, worst   0, over 2 levels 0
+moon-ar-ly-12h-slots-2055-aod.png        differ  2319; in the window  2027 (fill px before 1804, now    0); set aside  292; left    0, worst   0, over 2 levels 0
+moon-en-1458-aod.png                     differ  2028; in the window  2028 (fill px before 1803, now    0); set aside    0; left    0, worst   0, over 2 levels 0
+moon-en-1458-awake.png                   differ  1074; in the window     0 (awake: the fill as drawn); set aside 1074; left    0, worst   0, over 2 levels 0
+moon-en-slots-0440-aod.png               differ  2205; in the window  1893 (fill px before 1662, now    0); set aside  312; left    0, worst   0, over 2 levels 0
+moon-slots-1010-aod.png                  differ  2321; in the window  2026 (fill px before 1811, now    1); set aside  295; left    0, worst   0, over 2 levels 0
+moon-slots-1010-awake.png                differ  1581; in the window    23 (awake: the fill as drawn); set aside 1581; left    0, worst   0, over 2 levels 0
+
+== old2 vs new
+moon-ar-ly-12h-2055-aod.png              differ  2027; in the window  2027 (fill px before 1809, now    2); set aside    0; left    0, worst   0, over 2 levels 0
+moon-ar-ly-12h-slots-2055-aod.png        differ  2364; in the window  2027 (fill px before 1804, now    0); set aside  337; left    0, worst   0, over 2 levels 0
+moon-en-1458-aod.png                     differ  2028; in the window  2028 (fill px before 1803, now    0); set aside    0; left    0, worst   0, over 2 levels 0
+moon-en-1458-awake.png                   differ   779; in the window     0 (awake: the fill as drawn); set aside  779; left    0, worst   0, over 2 levels 0
+moon-en-slots-0440-aod.png               differ  2206; in the window  1893 (fill px before 1662, now    0); set aside  313; left    0, worst   0, over 2 levels 0
+moon-slots-1010-aod.png                  differ  2353; in the window  2026 (fill px before 1811, now    1); set aside  327; left    0, worst   0, over 2 levels 0
+moon-slots-1010-awake.png                differ  1732; in the window    23 (awake: the fill as drawn); set aside 1732; left    0, worst   0, over 2 levels 0

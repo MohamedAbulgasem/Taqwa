@@ -1,0 +1,2 @@
+after the heal: delivery 677789a581af4ba0/15/048de2e7a0ed0eb7
+days=31 first=2026-10-30 last=2026-11-29 city='Tripoli' place={"qiblaBearing": 109.0, "qiblaKm": "2,900", "declination": 3.0, "southern": false} lang=en-US rtl=False zero='0' 12h=True version=1 tasbeeh=1 writtenAt=1793445409

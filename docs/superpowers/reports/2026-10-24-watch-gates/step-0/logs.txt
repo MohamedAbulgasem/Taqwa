@@ -1,0 +1,52 @@
+# P5.12 Step 0 on emulator-5558, staging build (R8, debug key), 6 Nov 2026 (the watch's clock)
+
+## 1. A feed stored from the paired phone (emulator-5562: 'TaqwaWatch WATCH_ASKED SENT 59ms', 'ACK 84') after install -r of staging
+$ adb -s emulator-5558 logcat -d -T <before the install> -v time -s TaqwaComplications TaqwaWearFeed TaqwaFace
+11-06 18:03:25.163 D/TaqwaComplications(17561): day dial: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.165 I/TaqwaFace(17561): TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 18:03:25.179 D/TaqwaComplications(17561): next prayer, RANGED_VALUE: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.192 I/TaqwaFace(17561): TaqwaFace bundled 41 copied
+11-06 18:03:25.215 D/TaqwaComplications(17561): day: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.218 D/TaqwaComplications(17561): dates, LONG_TEXT: 4 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.227 D/TaqwaComplications(17561): next prayer, LONG_TEXT: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.239 I/TaqwaFace(17561): TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa true
+11-06 18:03:25.273 I/TaqwaFace(17561): TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 18:03:25.273 I/TaqwaFace(17561): TaqwaFace capability unchanged 4007
+11-06 18:03:25.283 I/TaqwaFace(17561): TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa true
+11-06 18:03:25.293 D/TaqwaComplications(17561): dates, SHORT_TEXT: 4 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.294 I/TaqwaFace(17561): TaqwaFace capability unchanged 4007
+11-06 18:03:25.452 I/TaqwaComplications(17561): asked again (feed)
+11-06 18:03:25.531 D/TaqwaComplications(17561): next prayer, RANGED_VALUE: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.552 D/TaqwaComplications(17561): next prayer, LONG_TEXT: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.565 D/TaqwaComplications(17561): day: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.566 D/TaqwaComplications(17561): day dial: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.566 D/TaqwaComplications(17561): dates, LONG_TEXT: 4 steps, last until 2026-11-08T14:34:00Z
+11-06 18:03:25.567 D/TaqwaComplications(17561): dates, SHORT_TEXT: 4 steps, last until 2026-11-08T14:34:00Z
+
+## 2. The compass's log, Qibla opened afresh each time (tools/watchface/app.sh qibla), 6-8 s each
+### log.tag.TaqwaWearQibla unset (as found): 0 lines
+### setprop log.tag.TaqwaWearQibla DEBUG, then a fresh open: 8 lines
+11-06 18:04:45.122 D/TaqwaWearQibla(17561): rv 3, mag none, field none, not trusted, raw pair on, tilt none, rotation 0, heading none
+11-06 18:04:46.130 D/TaqwaWearQibla(17561): rv 3, mag 3, field 48.8 µT, trusted, raw pair off, tilt 85°, rotation 0, heading 0°
+11-06 18:04:47.131 D/TaqwaWearQibla(17561): rv 3, mag 3, field 48.8 µT, trusted, raw pair off, tilt 85°, rotation 0, heading 0°
+11-06 18:04:48.139 D/TaqwaWearQibla(17561): rv 3, mag 3, field 48.8 µT, trusted, raw pair off, tilt 85°, rotation 0, heading 0°
+11-06 18:04:49.140 D/TaqwaWearQibla(17561): rv 3, mag 3, field 48.8 µT, trusted, raw pair off, tilt 85°, rotation 0, heading 0°
+11-06 18:04:50.150 D/TaqwaWearQibla(17561): rv 3, mag 3, field 48.8 µT, trusted, raw pair off, tilt 85°, rotation 0, heading 0°
+11-06 18:04:51.150 D/TaqwaWearQibla(17561): rv 3, mag 3, field 48.8 µT, trusted, raw pair off, tilt 85°, rotation 0, heading 0°
+11-06 18:04:52.150 D/TaqwaWearQibla(17561): rv 3, mag 3, field 48.8 µT, trusted, raw pair off, tilt 85°, rotation 0, heading 0°
+### setprop log.tag.TaqwaWearQibla INFO, then a fresh open (8 s from the open's 'asked again (app start)'): 0 lines
+11-06 18:05:14.863 I/TaqwaComplications(17561): asked again (app start)
+11-06 18:05:14.882 D/TaqwaComplications(17561): next prayer, RANGED_VALUE: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:05:14.885 D/TaqwaComplications(17561): dates, SHORT_TEXT: 4 steps, last until 2026-11-08T14:34:00Z
+11-06 18:05:14.885 D/TaqwaComplications(17561): day: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:05:14.885 D/TaqwaComplications(17561): dates, LONG_TEXT: 4 steps, last until 2026-11-08T14:34:00Z
+11-06 18:05:14.886 D/TaqwaComplications(17561): next prayer, LONG_TEXT: 13 steps, last until 2026-11-08T14:34:00Z
+11-06 18:05:14.892 D/TaqwaComplications(17561): day dial: 13 steps, last until 2026-11-08T14:34:00Z
+
+## 3. The face in Taqwa's slot at each install -r (Ruling 71 item 5)
+face-before-staging: face: versionCode=41 minSdk=33 targetSdk=36 lastUpdateTime=2026-11-06 14:49:22 sha1=f13548e6
+face-after-staging-45s: face: versionCode=41 minSdk=33 targetSdk=36 lastUpdateTime=2026-11-06 18:03:25 sha1=e35e76f5
+face-before-debug: face: versionCode=41 minSdk=33 targetSdk=36 lastUpdateTime=2026-11-06 18:03:25 sha1=e35e76f5
+face-after-debug: face: versionCode=41 minSdk=33 targetSdk=36 lastUpdateTime=2026-11-06 18:05:40 sha1=e35e76f5
+face-after-staging2: face: versionCode=41 minSdk=33 targetSdk=36 lastUpdateTime=2026-10-18 14:58:02 sha1=e35e76f5
+after restore.sh (the found debug app reinstalled): face: versionCode=41 minSdk=33 targetSdk=36 sha1=f13548e6

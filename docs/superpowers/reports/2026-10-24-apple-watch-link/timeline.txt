@@ -1,0 +1,15 @@
+watch launch 11:20:17
+phone launch 11:20:25
+watch terminate+relaunch 11:21:53
+watch app terminated 11:24:55
+phone app terminated 11:24:56
+phone app launched (Cape Town) 11:24:58
+phone app terminated 11:26:07
+watch app (background) terminated 11:26:07
+watch app opened 11:26:11
+probe context 11:26:49
+probe userInfo 11:27:21
+phone app reinstalled (fill) 11:30:14
+probe context random 11:30:23
+probe userInfo random 11:31:06
+probe userInfo random fine 11:31:30

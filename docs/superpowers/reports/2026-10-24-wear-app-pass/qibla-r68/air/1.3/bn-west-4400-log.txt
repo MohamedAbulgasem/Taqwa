@@ -1,0 +1,3 @@
+10-18 15:07:15.591  8932  8932 D TaqwaWearQibla: detail '৬,৬০০ km' at font size 1.3: size 12.0, y 155.00, least letter gap 1.25 as drawn (1.25 at the judged size), ticks 22.26, caption y 138.20, a digit's ink 0.766 em
+10-18 15:07:22.006  8932  8932 D TaqwaWearQibla: detail '৬,৬০০ km' at font size 1.3: size 12.0, y 155.00, least letter gap 1.25 as drawn (1.25 at the judged size), ticks 22.26, caption y 121.67, a digit's ink 0.766 em
+10-18 14:58:00.564  9213  9213 D TaqwaWearQibla: detail '4,400 km' at font size 1.3: size 11.5, y 155.00, least letter gap 1.05 as drawn (1.05 at the judged size), ticks 22.18, caption y 138.20, a digit's ink 0.766 em

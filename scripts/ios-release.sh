@@ -1,9 +1,28 @@
 #!/usr/bin/env bash
 # Builds the App Store archive of the iOS app and uploads it to App Store Connect:
 #
-#   scripts/ios-release.sh            archive, then upload
-#   scripts/ios-release.sh archive    only the archive → build/ios-archive/Taqwa-<version>-<build>.xcarchive
-#   scripts/ios-release.sh upload     upload the archive the last `archive` made
+#   scripts/ios-release.sh                  archive, then export-check, then upload, stopping at the first failure
+#   scripts/ios-release.sh archive          only the archive → build/ios-archive/Taqwa-<version>-<build>.xcarchive
+#   scripts/ios-release.sh export-check     export the last archive locally and check the IPA; uploads nothing
+#   scripts/ios-release.sh upload           upload the archive the last `archive` made
+#   scripts/ios-release.sh check <archive>  check an archive's bundles (archive's report runs it)
+#
+# `check <xcarchive>` exits 1 unless the archive's Taqwa.app holds the Apple Watch app under Watch/
+# with its widget extension, every app and app-extension bundle's Info.plist reads the iPhone app's
+# version and build (Taqwa.app, its PlugIns/*.appex, Watch/*.app and their PlugIns/*.appex;
+# frameworks keep their own and are not read), and scripts/check-watch-bundle.sh --release passes on
+# the archive's Taqwa.app (TAQWA_WATCH_BUNDLE_CHECK names another command for the bundle check, for
+# scripts/test-release.sh alone). It prints the watch app's and its widgets' sizes. The archive is
+# signed with an Apple Development identity (automatic signing, below), so it proves the Release
+# bundle (no sample feeds) and the development signature's keys; the App Store signature is applied
+# only at export, and `export-check` checks that one: it exports the last archive with method
+# app-store-connect and destination export into build/ios-archive/export-check-<version>-<build>/,
+# as an upload would sign it, unzips the IPA into a fresh directory there, runs
+# check-watch-bundle.sh --release on its Payload/Taqwa.app, and deletes the IPA and its copy, keeping
+# the export's logs and DistributionSummary.plist. The Lead runs archive and export-check, each with
+# Mohamed's OK in chat (the first archive registers the watch's ids under his team). Both refuse
+# (exit 2) a set TAQWA_CODESIGN or TAQWA_WATCH_BUNDLE_CHECK, which only the tests give, and so does
+# the bare script (all), before anything is built.
 #
 # Signing is automatic under the team named in iosApp/Configuration/Config.xcconfig (TEAM_ID),
 # through the Apple account signed into Xcode › Settings › Accounts — no credentials pass
@@ -16,6 +35,18 @@
 # release; the iOS build number is the Android versionCode of the same commit.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+COMMAND="${1:-all}"
+case "$COMMAND" in
+    archive | export-check | all)
+        for var in TAQWA_CODESIGN TAQWA_WATCH_BUNDLE_CHECK; do
+            if [ -n "${!var+set}" ]; then  # set at all, even empty
+                echo "$var is set: it gives the bundle check another codesign or check, for scripts/test-release.sh alone; unset it to $COMMAND" >&2
+                exit 2
+            fi
+        done
+        ;;
+esac
 . scripts/xcode.sh
 
 XCCONFIG=iosApp/Configuration/Config.xcconfig
@@ -78,6 +109,106 @@ report() {
         exit 1
     fi
     echo "  widget:    ${size_mb} MB (limit ${APPEX_LIMIT_MB} MB)"
+    echo
+    check "$ARCHIVE"
+}
+
+# check <xcarchive>: the watch app is inside, every bundle is at the iPhone app's version, and the
+# bundle check passes on the archive as a release (the header says what each means).
+check() {
+    local archive="${1%/}"
+    local app="$archive/Products/Applications/Taqwa.app"
+    local bad=0 bundle want_v want_c v c
+    if [ ! -f "$app/Info.plist" ]; then
+        echo "ERROR: $archive has no Products/Applications/Taqwa.app." >&2
+        return 1
+    fi
+    if ! compgen -G "$app/Watch/*.app" > /dev/null; then
+        echo "ERROR: $(basename "$archive")'s Taqwa.app holds no Apple Watch app under Watch/." >&2
+        return 1
+    fi
+    if ! compgen -G "$app/Watch/*.app/PlugIns/*.appex" > /dev/null; then
+        echo "ERROR: the Apple Watch app in $(basename "$archive") holds no widget extension (Watch/*.app/PlugIns/*.appex)." >&2
+        bad=1
+    fi
+    want_v="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Info.plist")"
+    want_c="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Info.plist")"
+    echo "Check: $archive, the iPhone app at $want_v ($want_c)"
+    for bundle in "$app" "$app"/PlugIns/*.appex "$app"/Watch/*.app "$app"/Watch/*.app/PlugIns/*.appex; do
+        [ -d "$bundle" ] || continue
+        v="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$bundle/Info.plist" 2> /dev/null || echo none)"
+        c="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$bundle/Info.plist" 2> /dev/null || echo none)"
+        if [ "$v" = "$want_v" ] && [ "$c" = "$want_c" ]; then
+            printf '  %-48s %s (%s)\n' "Taqwa.app${bundle#"$app"}" "$v" "$c"
+        else
+            echo "ERROR: ${bundle#"$archive"/} is $v ($c), not the iPhone app's $want_v ($want_c)." >&2
+            bad=1
+        fi
+    done
+    local watch widgets
+    for watch in "$app"/Watch/*.app; do
+        echo "  size: $(basename "$watch") $(du -sk "$watch" | cut -f1) KB, its widgets included"
+        for widgets in "$watch"/PlugIns/*.appex; do
+            if [ -d "$widgets" ]; then echo "  size: $(basename "$widgets") $(du -sk "$widgets" | cut -f1) KB"; fi
+        done
+    done
+    if ! "${TAQWA_WATCH_BUNDLE_CHECK:-scripts/check-watch-bundle.sh}" --release "$app"; then
+        echo "ERROR: the watch bundle check fails on $app as a release." >&2
+        bad=1
+    fi
+    if [ "$bad" -ne 0 ]; then
+        echo "ERROR: $archive does not pass the archive check." >&2
+        return 1
+    fi
+    echo "Check: $(basename "$archive") passes: the watch app inside, one version, and the bundle check as a release."
+}
+
+# The App Store signature, checked without an upload: the last archive exported as an upload would
+# sign it, its watch bundles checked as a release, and the IPA deleted again.
+export_check() {
+    if [ ! -d "$ARCHIVE" ]; then
+        echo "No archive at $ARCHIVE — run 'scripts/ios-release.sh archive' first." >&2
+        exit 1
+    fi
+    # Globals, not locals: the EXIT trap below runs after this function has returned.
+    EXPORT_CHECK_DIR="$OUT/export-check-$VERSION-$BUILD"
+    EXPORT_CHECK_COPY=""
+    rm -rf "$EXPORT_CHECK_DIR"
+    mkdir -p "$EXPORT_CHECK_DIR"
+    cat > "$EXPORT_CHECK_DIR/ExportOptions.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>method</key><string>app-store-connect</string>
+    <key>destination</key><string>export</string>
+    <key>signingStyle</key><string>automatic</string>
+    <key>teamID</key><string>$TEAM_ID</string>
+    <key>uploadSymbols</key><false/>
+    <key>manageAppVersionAndBuildNumber</key><false/>
+</dict>
+</plist>
+PLIST
+    # The IPA and its unzipped copy go whatever happens; the logs and the summary stay.
+    trap 'rm -rf "$EXPORT_CHECK_DIR"/*.ipa ${EXPORT_CHECK_COPY:+"$EXPORT_CHECK_COPY"}' EXIT
+    xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportOptionsPlist "$EXPORT_CHECK_DIR/ExportOptions.plist" \
+        -exportPath "$EXPORT_CHECK_DIR" -allowProvisioningUpdates
+    local ipa
+    ipa="$(find "$EXPORT_CHECK_DIR" -maxdepth 1 -name '*.ipa' | sort | sed -n 1p)"
+    if [ -z "$ipa" ]; then
+        echo "ERROR: the export left no IPA in $EXPORT_CHECK_DIR." >&2
+        exit 1
+    fi
+    EXPORT_CHECK_COPY="$(mktemp -d "$EXPORT_CHECK_DIR/unzipped.XXXXXX")"
+    unzip -q "$ipa" -d "$EXPORT_CHECK_COPY"
+    echo
+    echo "Export check: $(basename "$ipa"), exported locally ($(($(wc -c < "$ipa") / 1024)) KB); nothing is uploaded."
+    if scripts/check-watch-bundle.sh --release "$EXPORT_CHECK_COPY/Payload/Taqwa.app"; then
+        echo "Export check: the App Store signature passes the watch bundle check as a release."
+    else
+        echo "ERROR: the exported IPA fails the watch bundle check as a release (above)." >&2
+        exit 1
+    fi
 }
 
 upload() {
@@ -106,9 +237,17 @@ PLIST
     echo "Uploaded Taqwa $VERSION ($BUILD) to App Store Connect. It shows under TestFlight once Apple has processed it (10–30 minutes)."
 }
 
-case "${1:-all}" in
+case "$COMMAND" in
     archive) archive ;;
+    export-check) export_check ;;
     upload) upload ;;
-    all) archive; upload ;;
-    *) echo "usage: scripts/ios-release.sh [archive|upload]" >&2; exit 2 ;;
+    # set -e stops at the first that fails, so nothing is uploaded that export-check did not pass.
+    all) archive; export_check; upload ;;
+    check)
+        if [ "$#" -ne 2 ] || [ ! -d "$2" ]; then
+            echo "usage: scripts/ios-release.sh check <xcarchive>" >&2
+            exit 2
+        fi
+        check "$2" ;;
+    *) echo "usage: scripts/ios-release.sh [archive|export-check|upload|check <xcarchive>]" >&2; exit 2 ;;
 esac

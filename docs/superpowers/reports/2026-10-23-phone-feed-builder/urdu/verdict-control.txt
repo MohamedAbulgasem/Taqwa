@@ -1,0 +1,10 @@
+old-face-runtime-app-language-ur: arch 16:47 Hijri day | semibold 28.125 u | ۶: Urdu 0.707, Persian 0.991 -> PERSIAN
+old-face-runtime-app-language-ur: arch 16:47 clock | light 126.0 u | ۴: Urdu 0.483, Persian 0.990 -> PERSIAN; ۶: Urdu 0.578, Persian 0.992 -> PERSIAN; ۷: Urdu 0.348, Persian 0.985 -> PERSIAN
+old-face-runtime-app-language-ur: arch 16:47 Maghrib's time | semibold 30.375 u | ۶: Urdu 0.744, Persian 0.989 -> PERSIAN
+old-face-system-ur: arch 16:47 Hijri day | semibold 28.125 u | ۶: Urdu 0.979, Persian 0.678 -> Urdu
+old-face-system-ur: arch 16:47 clock | light 126.0 u | ۴: Urdu 0.483, Persian 0.990 -> PERSIAN; ۶: Urdu 0.578, Persian 0.992 -> PERSIAN; ۷: Urdu 0.348, Persian 0.985 -> PERSIAN
+old-face-system-ur: arch 16:47 Maghrib's time | semibold 30.375 u | ۶: Urdu 0.984, Persian 0.523 -> Urdu
+old-face-watch-en: arch 16:47 Hijri day | semibold 28.125 u | ۶: Urdu 0.707, Persian 0.991 -> PERSIAN
+old-face-watch-en: arch 16:47 clock | light 126.0 u | ۴: Urdu 0.483, Persian 0.990 -> PERSIAN; ۶: Urdu 0.578, Persian 0.992 -> PERSIAN; ۷: Urdu 0.348, Persian 0.985 -> PERSIAN
+old-face-watch-en: arch 16:47 Maghrib's time | semibold 30.375 u | ۶: Urdu 0.744, Persian 0.989 -> PERSIAN
+sheet-control.png

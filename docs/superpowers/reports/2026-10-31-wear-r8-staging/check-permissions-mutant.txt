@@ -1,0 +1,9 @@
+APK: wearApp/build/outputs/apk/release/wearApp-release-unsigned.apk
+ok - R8's mapping: wearApp/build/outputs/mapping/release/mapping.txt
+ok - the dex holds no DEBUG_FEED, SampleFeed or sample-feed
+ok - no sample feed or test vector among the APK's files
+FAIL: the manifest's permissions differ from wearApp/permissions.txt (< asked only, > listed only):
+    < android.permission.VIBRATE
+    > android.permission.INTERNET
+size: 4441328 bytes (4.2 MB)
+wear-release-check release: 1 failed

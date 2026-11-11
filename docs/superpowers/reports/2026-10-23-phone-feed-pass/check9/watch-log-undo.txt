@@ -1,0 +1,5 @@
+10-31 13:17:08.019 I/System.out( 5230): TaqwaWearFeed ACCEPTED 16/4e439885f310dae4
+10-31 13:17:08.019 I/System.out( 5230): TaqwaWearFeed ACK HELD
+10-31 13:17:28.039 I/System.out( 5230): TaqwaWearFeed ACK 16/4e439885f310dae4 sent
+10-31 13:17:28.063 I/System.out( 5230): TaqwaWearFeed ACCEPTED 17/048de2e7a0ed0eb7
+10-31 13:17:28.069 I/System.out( 5230): TaqwaWearFeed ACK 17/048de2e7a0ed0eb7 sent

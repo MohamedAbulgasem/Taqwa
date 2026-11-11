@@ -1,0 +1,808 @@
+/* Taqwa watch screens for the round-two mockups. Galaxy screens are drawn in a 200 x 200 space
+   (centre 100,100, radius 100), Apple screens in 172 x 212. Example: Cape Town, Sunday 18 October
+   2026, 6 Jumada al-Ula 1448. The times are calculated for the example, not taken from the app. */
+var TW = (function () {
+  'use strict';
+
+  var C = { hair: '#232825', ink: '#F1F3F1', mist: '#8C948F', slate: '#5A625D', surface: '#131614', well: '#0B0D0C' };
+  var ACCENTS = { amber: '#F0B429', pearl: '#E9E2D2', sage: '#93BFA3', night: '#9FB3EC' };
+  var DAY = { fajr: 273, sunrise: 361, dhuhr: 753, asr: 970, maghrib: 1144, isha: 1224 };
+  var PRAYERS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+  var FONT = {
+    ui: "Manrope, system-ui, -apple-system, 'Segoe UI', sans-serif",
+    ar: "'Noto Sans Arabic', 'Geeza Pro', 'Segoe UI', sans-serif",
+    naskh: "'Noto Naskh Arabic', 'Geeza Pro', serif",
+    sys: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, 'Segoe UI', sans-serif"
+  };
+
+  var LANG = {
+    en: {
+      rtl: false, upper: true,
+      names: { fajr: 'Fajr', sunrise: 'Sunrise', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' },
+      hijri: '6 Jumada al-Ula', greg: 'Sun 18 Oct', weekday: 'SUN', day: '18', city: 'Cape Town',
+      count: function (h, m) {
+        if (h > 0) return m > 0 ? 'in ' + h + ' h ' + m + ' min' : 'in ' + h + ' h';
+        return 'in ' + Math.max(m, 1) + ' min';
+      },
+      nextIn: function (n) { return (n + ' in').toUpperCase(); }
+    },
+    ar: {
+      rtl: true, upper: false,
+      names: { fajr: 'الفجر', sunrise: 'الشروق', dhuhr: 'الظهر', asr: 'العصر', maghrib: 'المغرب', isha: 'العشاء' },
+      hijri: '6 جمادى الأولى', greg: 'الأحد 18 أكتوبر', weekday: 'الأحد', day: '18', city: 'كيب تاون',
+      count: function (h, m) {
+        if (h > 0) return m > 0 ? 'بعد ' + h + ' س ' + m + ' د' : 'بعد ' + h + ' س';
+        return 'بعد ' + Math.max(m, 1) + ' د';
+      },
+      nextIn: function (n) { return 'متبقٍّ على ' + n; }
+    }
+  };
+
+  function lang(code) { return code === 'en' ? LANG.en : LANG.ar; }
+  function indic(code) { return code === 'ar-SA'; }
+  function dg(s, code) {
+    return indic(code) ? String(s).replace(/[0-9]/g, function (d) { return '٠١٢٣٤٥٦٧٨٩'.charAt(+d); }) : String(s);
+  }
+  function f(n) { return Math.round(n * 100) / 100; }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  /* 24-hour times as the app writes them: the hour is not padded (PlatformFormat.clockTime). */
+  function hhmm(m) {
+    m = ((Math.round(m) % 1440) + 1440) % 1440;
+    var h = Math.floor(m / 60), mm = m % 60;
+    return h + ':' + (mm < 10 ? '0' : '') + mm;
+  }
+
+  /* The ring's rule (TimelineBuilder): it fills from the latest start that has arrived to the next
+     one; Sunrise is not a start. */
+  function state(t) {
+    var list = [{ k: 'isha', m: DAY.isha - 1440 }];
+    PRAYERS.forEach(function (k) { list.push({ k: k, m: DAY[k] }); });
+    list.push({ k: 'fajr', m: DAY.fajr + 1440 }, { k: 'dhuhr', m: DAY.dhuhr + 1440 });
+    var i = 0;
+    while (i + 2 < list.length && list[i + 1].m <= t) i++;
+    var prev = list[i], next = list[i + 1], after = list[i + 2], rem = next.m - t;
+    return {
+      prev: prev, next: next, after: after,
+      progress: (t - prev.m) / (next.m - prev.m),
+      h: Math.floor(rem / 60), m: rem % 60,
+      day: t >= DAY.sunrise && t < DAY.maghrib
+    };
+  }
+
+  /* Degrees: 0 at the top, clockwise. */
+  function pol(cx, cy, r, deg) {
+    var a = (deg - 90) * Math.PI / 180;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  }
+  function arcPath(cx, cy, r, d0, d1) {
+    var p0 = pol(cx, cy, r, d0), p1 = pol(cx, cy, r, d1), span = d1 - d0;
+    return 'M' + f(p0[0]) + ' ' + f(p0[1]) + ' A' + r + ' ' + r + ' 0 ' + (Math.abs(span) > 180 ? 1 : 0) + ' ' +
+      (span >= 0 ? 1 : 0) + ' ' + f(p1[0]) + ' ' + f(p1[1]);
+  }
+  function op(name, v) { return v != null && v < 1 ? ' ' + name + '="' + v + '"' : ''; }
+  function ring(cx, cy, r, color, w, o) {
+    return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="' + w + '"' +
+      op('stroke-opacity', o) + '/>';
+  }
+  function arc(cx, cy, r, d0, d1, color, w, o, cap) {
+    var span = d1 - d0;
+    if (Math.abs(span) < 0.05) return '';
+    if (Math.abs(span) >= 359.9) return ring(cx, cy, r, color, w, o);
+    return '<path d="' + arcPath(cx, cy, r, d0, d1) + '" fill="none" stroke="' + color + '" stroke-width="' + w + '"' +
+      op('stroke-opacity', o) + ' stroke-linecap="' + (cap || 'round') + '"/>';
+  }
+  function radial(cx, cy, r0, r1, deg, color, w, o, cap) {
+    var a = pol(cx, cy, r0, deg), b = pol(cx, cy, r1, deg);
+    return '<line x1="' + f(a[0]) + '" y1="' + f(a[1]) + '" x2="' + f(b[0]) + '" y2="' + f(b[1]) + '" stroke="' + color +
+      '" stroke-width="' + w + '"' + op('stroke-opacity', o) + ' stroke-linecap="' + (cap || 'round') + '"/>';
+  }
+  function dot(x, y, r, fill, o) {
+    return '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + r + '" fill="' + fill + '"' + op('fill-opacity', o) + '/>';
+  }
+  function T(x, y, s, size, weight, fill, o) {
+    o = o || {};
+    var a = '<text x="' + f(x) + '" y="' + f(y) + '" font-size="' + size + '" font-weight="' + weight + '" fill="' + fill +
+      '" font-family="' + FONT[o.fam || 'ui'] + '" text-anchor="' + (o.anchor || 'middle') + '"';
+    if (o.ls) a += ' letter-spacing="' + o.ls + '"';
+    if (o.rtl) a += ' direction="rtl"';
+    if (o.op != null && o.op < 1) a += ' fill-opacity="' + o.op + '"';
+    if (o.tnum) a += ' class="tw-tnum"';
+    return a + '>' + (o.raw ? s : esc(s)) + '</text>';
+  }
+  function uiFam(code) { return code === 'en' ? 'ui' : 'ar'; }
+  function numFam(code) { return indic(code) ? 'ar' : 'ui'; }
+
+  /* "ASR 16:10": the phone ring's label (accent, tracked capitals in Latin) and the clock time. */
+  function prayerLine(x, y, s, code, A, aod, scale, q) {
+    var lg = lang(code), k = scale || 1, name = lg.names[s.next.k];
+    var label = '<tspan fill="' + A + '"' + (aod ? ' fill-opacity=".7"' : '') + ' font-weight="' + (lg.rtl ? 700 : 800) +
+      '" font-size="' + f((lg.rtl ? 13 : 11.5) * k) + '"' + (lg.upper ? ' letter-spacing="' + f(1.3 * k) + '"' : '') +
+      ' font-family="' + FONT[uiFam(code)] + '">' + esc(lg.upper ? name.toUpperCase() : name) + '</tspan>';
+    var time = '<tspan fill="' + (aod ? C.mist : C.ink) + '" font-weight="600" font-size="' + f(13.5 * k) + '" font-family="' +
+      FONT[numFam(code)] + '">' + esc(dg(q ? shortTime(s.next.m, q) : hhmm(s.next.m), code)) + '</tspan>';
+    return '<text x="' + f(x) + '" y="' + f(y) + '" font-size="' + f(11 * k) + '" font-family="' + FONT.ui +
+      '" text-anchor="middle"' + (lg.rtl ? ' direction="rtl"' : '') + '>' + label + ' ' + time + '</text>';
+  }
+
+  /* Two of the wearer's own complications (the watch's battery and steps here), along the bottom. */
+  function userComps(code, aod, y) {
+    var col = aod ? C.slate : C.mist, val = aod ? C.mist : C.ink, yy = y || 177;
+    var batt = '<g fill="none" stroke="' + col + '" stroke-width="1.1"><rect x="65" y="' + (yy - 9) + '" width="6.4" height="10" rx="1.6"/></g>' +
+      '<rect x="66.9" y="' + (yy - 10.6) + '" width="2.6" height="1.4" rx=".5" fill="' + col + '"/>' +
+      '<rect x="66.5" y="' + (yy - 6.4) + '" width="3.4" height="6" rx=".6" fill="' + col + '"/>';
+    var steps = dot(108.2, yy - 6.4, 1.6, col) + dot(111.9, yy - 3.2, 1.6, col) +
+      '<ellipse cx="108.2" cy="' + (yy - 3.1) + '" rx="1.2" ry="1.4" fill="' + col + '"/>' +
+      '<ellipse cx="111.9" cy="' + (yy + 0.1) + '" rx="1.2" ry="1.4" fill="' + col + '"/>';
+    return batt + T(75, yy, dg('82%', code), 10, 700, val, { anchor: 'start', fam: numFam(code) }) +
+      steps + T(116, yy, dg('6,410', code), 10, 700, val, { anchor: 'start', fam: numFam(code) });
+  }
+
+  function opts(o) {
+    var code = o.lang || 'en';
+    return {
+      code: code, lg: lang(code), A: ACCENTS[o.accent] || ACCENTS.amber, aod: !!o.aod, comps: !!o.comps,
+      t: o.t != null ? o.t : 898, s: state(o.t != null ? o.t : 898), dateStyle: o.dateStyle, glint: o.glint !== false,
+      mark: o.mark !== false, clock: o.clock === '12' ? '12' : '24', key: o.accent && ACCENTS[o.accent] ? o.accent : 'amber'
+    };
+  }
+
+  /* The clock time in the face's own format: 24-hour as the app writes it, or 12-hour with the day
+     period beside it (the phone's setting decides). */
+  function clockParts(m, q) {
+    m = ((Math.round(m) % 1440) + 1440) % 1440;
+    if (q.clock !== '12') return { time: hhmm(m), period: '' };
+    var h = Math.floor(m / 60), mm = m % 60, h12 = h % 12 || 12;
+    return { time: h12 + ':' + (mm < 10 ? '0' : '') + mm, period: q.lg.rtl ? (h < 12 ? 'ص' : 'م') : (h < 12 ? 'AM' : 'PM') };
+  }
+  function shortTime(m, q) { return clockParts(m, q).time; }
+
+  /* The big time. The hour is set in proportional figures and the minutes in tabular ones: the hour
+     changes once an hour, so nothing jitters, and a leading 1 no longer leaves a hole. A 12-hour
+     time carries its day period after it in reading order, top-aligned with the figures. */
+  function figureWidth(str, size) {
+    var w = 0, i, ch;
+    for (i = 0; i < str.length; i++) {
+      ch = str.charAt(i);
+      w += ch === ':' ? 0.28 : (i < str.indexOf(':') && ch === '1' ? 0.38 : 0.6);
+    }
+    return w * size;
+  }
+  function bigTime(q, y, size) {
+    var c = clockParts(q.t, q), code = q.code, fam = numFam(code), rtl = q.lg.rtl, out = [];
+    var parts = c.time.split(':'), x = 100;
+    var body = '<tspan class="tw-pnum">' + esc(dg(parts[0], code)) + '</tspan><tspan class="tw-tnum">' + esc(dg(':' + parts[1], code)) + '</tspan>';
+    if (c.period) {
+      var ps = rtl ? size * 0.27 : size * 0.2, pw = rtl ? ps * 0.75 : ps * 1.45, gap = size * 0.07, tw = figureWidth(c.time, size);
+      x = rtl ? 100 + (gap + pw) / 2 : 100 - (gap + pw) / 2;
+      var px = rtl ? x - tw / 2 - gap : x + tw / 2 + gap, py = y - 0.72 * size + 0.72 * ps * (rtl ? 0.9 : 1);
+      out.push(T(px, py, c.period, f(ps), 800, q.aod ? C.mist : C.ink, { anchor: rtl ? 'end' : 'start', fam: uiFam(code), ls: rtl ? 0 : 0.6 }));
+    }
+    out.unshift('<text x="' + f(x) + '" y="' + f(y) + '" font-size="' + size + '" font-weight="' + (q.aod ? 200 : 300) + '" fill="' + C.ink +
+      '" font-family="' + FONT[fam] + '" text-anchor="middle"' + (indic(code) ? '' : ' letter-spacing="' + f(-size * 0.02) + '"') +
+      (q.aod ? ' fill-opacity=".82"' : '') + '>' + body + '</text>');
+    return out.join('');
+  }
+
+  /* The dates, the time and the next prayer, shared by Arch, Ring and Sun: five lines in four
+     voices. Hijri first, as on the Prayer screen; the Gregorian in the prayer label's capitals, as
+     large as the prayer's time; the countdown in the Hijri date's quieter voice. */
+  function centre(q, y, size, size12) {
+    var lg = q.lg, code = q.code, ui = uiFam(code), out = [], caps = !lg.rtl;
+    if (q.mark && !q.comps) out.push(archMark(100, y.m || 24, 11, q.aod ? C.slate : C.mist, q.aod ? null : q.A, 1.7));
+    out.push(T(100, y.h, dg(lg.hijri, code), lg.rtl ? 12.5 : 12, 600, q.aod ? C.slate : C.mist, { fam: ui, rtl: lg.rtl }));
+    out.push(caps
+      ? T(100, y.g, lg.greg.toUpperCase(), 13, 800, q.aod ? C.mist : C.ink, { ls: 1.3 })
+      : T(100, y.g, dg(lg.greg, code), 14, 700, q.aod ? C.mist : C.ink, { fam: ui, rtl: true }));
+    out.push(bigTime(q, y.t, q.clock === '12' ? (size12 || size - 5) : size));
+    out.push(prayerLine(100, y.p, q.s, code, q.A, q.aod, 1, q));
+    out.push(T(100, y.c, dg(lg.count(q.s.h, q.s.m), code), lg.rtl ? 12.5 : 12, 600, C.mist, { fam: ui, rtl: lg.rtl, op: q.aod ? 0.85 : 1 }));
+    if (q.comps) out.push(userComps(code, q.aod, y.u));
+    return out.join('');
+  }
+  var LAYOUT = { h: 54, g: 70, t: 126, p: 151, c: 167 };
+  var LAYOUT_COMPS = { h: 49, g: 65, t: 119, p: 143, c: 158, u: 179 };
+
+  /* Style 1, Ring: the app's countdown ring at the edge, the time first. */
+  function ringFace(o) {
+    var q = opts(o), dir = q.lg.rtl ? -1 : 1, p = o.progress != null ? o.progress : q.s.progress, R = 93, w = 3.4, out = [];
+    out.push(ring(100, 100, R, C.slate, q.aod ? 0.8 : 0.8, q.aod ? 0.5 : 0.9));
+    out.push(arc(100, 100, R, 0, dir * 360 * p, q.A, q.aod ? 2 : w, q.aod ? 0.6 : 1));
+    if (q.glint && !q.aod && p > 0.01) {
+      // Now: a point of light where the arc has reached, in the face's own colour.
+      var e = pol(100, 100, R, dir * 360 * p);
+      out.push('<circle cx="' + f(e[0]) + '" cy="' + f(e[1]) + '" r="8" fill="url(#tw-glint-' + q.key + ')"/>', dot(e[0], e[1], 1.6, '#FFFFFF', 0.9));
+    }
+    out.push(centre(q, q.comps ? LAYOUT_COMPS : LAYOUT, 60, 55));
+    return out.join('');
+  }
+
+  function crescent(x, y, r, fill, o) {
+    // A crescent opening to the upper right, cut from a disc by a second, offset disc.
+    var p0 = [x + r * 0.42, y - r * 0.91], p1 = [x + r * 0.42, y + r * 0.91];
+    return '<path d="M' + f(p0[0]) + ' ' + f(p0[1]) + ' A' + r + ' ' + r + ' 0 1 0 ' + f(p1[0]) + ' ' + f(p1[1]) +
+      ' A' + f(r * 0.8) + ' ' + f(r * 0.8) + ' 0 1 1 ' + f(p0[0]) + ' ' + f(p0[1]) + 'Z" fill="' + fill + '"' + op('fill-opacity', o) + '/>';
+  }
+
+  /* Style 2, Sun: the day as a 24-hour dial, Dhuhr at the top and midnight at the bottom. */
+  function sunFace(o) {
+    // A 24-hour dial is a clock: like analog hands it turns clockwise in every language. The sun,
+    // its daylight and its sky keep the sun's own gold whatever the face's colour.
+    var q = opts(o), R = 92, out = [], s = q.s, t = q.t, gold = ACCENTS.amber;
+    function ang(m) { return (m - DAY.dhuhr) / 4; }
+    if (!q.aod) {
+      var g = pol(100, 100, 74, ang(t));
+      out.push('<circle cx="' + f(g[0]) + '" cy="' + f(g[1]) + '" r="96" fill="url(' + (s.day ? '#tw-sky' : '#tw-night') + ')"/>');
+    }
+    out.push(ring(100, 100, R, q.aod ? C.slate : C.hair, q.aod ? 1 : 2.4, q.aod ? 0.5 : 1));
+    out.push(arc(100, 100, R, ang(DAY.sunrise), ang(DAY.maghrib), gold, q.aod ? 1 : 2.4, q.aod ? 0.3 : 0.34, 'butt'));
+    if (!q.aod) out.push(arc(100, 100, R, ang(DAY.fajr), ang(DAY.sunrise), gold, 2.4, 0.15, 'butt'), arc(100, 100, R, ang(DAY.maghrib), ang(DAY.isha), gold, 2.4, 0.15, 'butt'));
+    out.push(arc(100, 100, R, ang(s.prev.m), ang(t), q.A, q.aod ? 2 : 3.6, q.aod ? 0.6 : 1));
+    PRAYERS.forEach(function (k) {
+      var lit = k === s.next.k || k === s.prev.k;
+      var col = lit ? q.A : (DAY[k] < t ? C.slate : C.mist);
+      out.push(radial(100, 100, R - 5.5, R + 5.5, ang(DAY[k]), col, 1.6, q.aod ? 0.7 : 1));
+    });
+    var sr = pol(100, 100, R, ang(DAY.sunrise));
+    out.push(dot(sr[0], sr[1], 1.7, C.mist, q.aod ? 0.6 : 1));
+    var n = pol(100, 100, R, ang(t));
+    if (s.day) {
+      if (!q.aod) out.push('<circle cx="' + f(n[0]) + '" cy="' + f(n[1]) + '" r="13" fill="url(#tw-sunglow)"/>');
+      out.push(q.aod ? '<circle cx="' + f(n[0]) + '" cy="' + f(n[1]) + '" r="3.6" fill="#000" stroke="' + gold + '" stroke-width="1.2"/>'
+        : dot(n[0], n[1], 4.6, '#FFF1C9'));
+    } else {
+      out.push(dot(n[0], n[1], 6.2, '#000'));
+      out.push(crescent(n[0], n[1], 4.6, q.aod ? C.mist : '#E9E2D2'));
+    }
+    out.push(centre(q, q.comps ? LAYOUT_COMPS : LAYOUT, 60, 55));
+    return out.join('');
+  }
+
+  /* The moon as seen from the southern hemisphere (waxing = lit on the left), k = lit fraction. */
+  function moon(x, y, r, k, southern, lit, darkFill) {
+    var rx = f(Math.abs(2 * k - 1) * r), top = f(x) + ' ' + f(y - r), bottom = f(x) + ' ' + f(y + r);
+    var first = southern ? 0 : 1, term = southern ? (k > 0.5 ? 0 : 1) : (k > 0.5 ? 1 : 0);
+    return dot(x, y, r, darkFill) + '<path d="M' + top + ' A' + r + ' ' + r + ' 0 0 ' + first + ' ' + bottom + ' A' + rx + ' ' + r +
+      ' 0 0 ' + term + ' ' + top + 'Z" fill="' + lit + '"/>';
+  }
+
+  /* Text along a circle: over the top it reads clockwise, under the bottom anticlockwise, so it is
+     upright in both places. */
+  function curved(id, r, d0, d1, inner) {
+    return '<path id="' + id + '" d="' + arcPath(100, 100, r, d0, d1) + '" fill="none"/>' +
+      '<text text-anchor="middle"' + inner.attrs + '><textPath href="#' + id + '" startOffset="50%">' + inner.body + '</textPath></text>';
+  }
+
+  /* Style 3, Moon: analog. The prayer and its countdown curve along the top of the dial, beyond the
+     hour hand's reach, and the Hijri date along the bottom under the moon; the minute hand passes
+     over each only briefly. The chapter ring carries the arc from the hour hand to the next prayer. */
+  function moonFace(o) {
+    var q = opts(o), s = q.s, t = q.t, out = [], lg = q.lg, code = q.code, ui = uiFam(code), id = 'tw-m' + (o.uid || 0);
+    var sec = o.sec != null ? o.sec : 8;
+    function a12(m) { return m / 2; }
+    var i;
+    // A sunray finish on the dial, the way a dress watch catches the light. Awake only.
+    if (!q.aod) {
+      var rays = '';
+      for (i = 0; i < 120; i++) {
+        var p1 = pol(100, 100, 88, i * 3);
+        rays += 'M100 100L' + f(p1[0]) + ' ' + f(p1[1]);
+      }
+      out.push('<circle cx="100" cy="100" r="88" fill="url(#tw-dial)"/>',
+        '<path d="' + rays + '" stroke="#FFFFFF" stroke-opacity=".035" stroke-width=".7"/>');
+    }
+    if (!q.aod) for (i = 0; i < 60; i++) if (i % 5) out.push(radial(100, 100, 89.4, 91.8, i * 6, C.slate, 0.8, 1, 'butt'));
+    for (i = 1; i < 12; i++) {
+      if (q.aod && i % 3) continue;
+      out.push(radial(100, 100, 80.5, 91.5, i * 30, q.aod ? C.slate : C.ink, q.aod ? 1.6 : 2.4, 1, 'butt'));
+    }
+    // twelve o'clock carries the Taqwa arch, where a watchmaker puts the maker's mark
+    out.push(archMark(100, 9, 13, q.aod ? C.slate : C.mist, q.aod ? null : q.A, q.aod ? 1.4 : 2.1));
+    // The arc runs from the hour hand (now) to the next prayer, at most a full turn of the dial.
+    var a0 = a12(s.prev.m), aNow = a0 + (t - s.prev.m) / 2, aNext = Math.min(a0 + (s.next.m - s.prev.m) / 2, aNow + 359);
+    out.push(arc(100, 100, 96.6, a0, aNow, q.A, q.aod ? 1 : 1.4, q.aod ? 0.22 : 0.3, 'butt'));
+    out.push(arc(100, 100, 96.6, aNow, aNext, q.A, q.aod ? 1.6 : 2.8, q.aod ? 0.6 : 1));
+    var tip = pol(100, 100, 92.2, aNext), b1 = pol(100, 100, 99.4, aNext - 2.6), b2 = pol(100, 100, 99.4, aNext + 2.6);
+    out.push('<path d="M' + f(tip[0]) + ' ' + f(tip[1]) + ' L' + f(b1[0]) + ' ' + f(b1[1]) + ' L' + f(b2[0]) + ' ' + f(b2[1]) +
+      'Z" fill="' + q.A + '"' + op('fill-opacity', q.aod ? 0.6 : 1) + '/>');
+    // the prayer and the countdown, curved over the top
+    var name = lg.names[s.next.k], label = lg.upper ? name.toUpperCase() : name;
+    out.push(curved(id + 't', 64.5, -62, 62, {
+      attrs: ' font-family="' + FONT.ui + '" font-size="12"' + (lg.rtl ? ' direction="rtl"' : ''),
+      body: '<tspan fill="' + q.A + '"' + (q.aod ? ' fill-opacity=".7"' : '') + ' font-weight="' + (lg.rtl ? 700 : 800) + '" font-family="' + FONT[ui] +
+        '"' + (lg.upper ? ' letter-spacing="1.4"' : '') + ' font-size="' + (lg.rtl ? 13 : 11.5) + '">' + esc(label) + '</tspan>\u2002<tspan fill="' +
+        (q.aod ? C.mist : C.ink) + '" font-weight="700" font-size="13" font-family="' + FONT[numFam(code)] + '">' + esc(dg(shortTime(s.next.m, q), code)) + '</tspan>'
+    }));
+    out.push(curved(id + 'c', 52.5, -62, 62, {
+      attrs: ' font-family="' + FONT[ui] + '" font-size="' + (lg.rtl ? 12 : 11) + '" font-weight="600" fill="' + C.mist + '"' + (lg.rtl ? ' direction="rtl"' : '') +
+        (q.aod ? ' fill-opacity=".85"' : ''),
+      body: esc(dg(lg.count(s.h, s.m), code))
+    }));
+    // three o'clock: the date window, the number at its outer end in both languages so the hour
+    // hand only ever covers the weekday
+    var wx = lg.rtl ? 120 : 126, ww = lg.rtl ? 52 : 44;
+    out.push('<rect x="' + wx + '" y="91" width="' + ww + '" height="18" rx="3.6" fill="' + C.well + '" stroke="' + C.hair + '" stroke-width="1"/>');
+    out.push(T(wx + 5, 104, lg.weekday, lg.rtl ? 10 : 9, 700, C.mist, { anchor: 'start', fam: ui, ls: lg.rtl ? 0 : 0.6 }));
+    out.push(T(wx + ww - 5, 104.4, dg(lg.day, code), 11.5, 800, q.aod ? C.mist : C.ink, { anchor: 'end', fam: numFam(code) }));
+    // six o'clock: the moon window, and the Hijri date curved under it
+    out.push('<rect x="77" y="121" width="46" height="27" rx="13.5" fill="#070908" stroke="' + C.hair + '" stroke-width="1"/>');
+    if (!q.aod) out.push(dot(86, 128.6, 0.6, C.mist), dot(115.4, 131.4, 0.7, C.mist), dot(110.6, 142.2, 0.5, C.slate), dot(89.4, 141, 0.5, C.slate));
+    out.push(moon(100, 134.5, 9.4, 0.565, true, q.aod ? '#8C8A82' : '#E8E2D2', '#1A1E1C'));
+    out.push(curved(id + 'h', 71, 232, 128, {
+      attrs: ' font-family="' + FONT[ui] + '" font-size="' + (lg.rtl ? 12 : 11) + '" font-weight="600" fill="' + C.mist + '"' + (lg.rtl ? ' direction="rtl"' : '') +
+        (q.aod ? ' fill-opacity=".7"' : ''),
+      body: esc(dg(lg.hijri, code))
+    }));
+    // nine o'clock: one of the wearer's own complications, when they add it
+    if (q.comps) {
+      out.push(ring(56, 100, 14, C.hair, 2.2), arc(56, 100, 14, 0, 360 * 0.82, q.aod ? C.slate : C.mist, 2.2, 1));
+      out.push(T(56, 103.6, dg('82%', code), 9.5, 800, q.aod ? C.mist : C.ink, { fam: numFam(code) }));
+    }
+    // the hands: faceted dauphine, a lit side and a shaded side, as on a dress watch
+    var H = (t % 720) / 2 + sec / 120, M = (t % 60) * 6 + sec / 10, S = sec * 6;
+    function hand(deg, tipY, half, tail) {
+      var g = '<g transform="rotate(' + f(deg) + ' 100 100)">';
+      var left = 'M100 ' + tipY + ' L' + f(100 - half) + ' 96 L100 ' + (100 + tail) + 'Z';
+      var right = 'M100 ' + tipY + ' L' + f(100 + half) + ' 96 L100 ' + (100 + tail) + 'Z';
+      var whole = 'M100 ' + tipY + ' L' + f(100 + half) + ' 96 L100 ' + (100 + tail) + ' L' + f(100 - half) + ' 96Z';
+      if (q.aod) {
+        return g + '<path d="' + whole + '" fill="none" stroke="' + C.ink + '" stroke-opacity=".85" stroke-width="1" stroke-linejoin="round"/></g>';
+      }
+      return g + '<path d="' + whole + '" fill="#000" stroke="#000" stroke-width="1.4" stroke-linejoin="round"/>' +
+        '<path d="' + left + '" fill="#F4F5F2"/><path d="' + right + '" fill="#A9AFAB"/></g>';
+    }
+    out.push(hand(H, 52, 4.2, 9), hand(M, 20, 3.1, 10));
+    if (!q.aod) {
+      // the seconds hand stays neutral: amber here belongs to the prayer
+      out.push('<g transform="rotate(' + f(S) + ' 100 100)"><line x1="100" y1="116" x2="100" y2="15" stroke="' + C.mist +
+        '" stroke-width="1" stroke-linecap="round"/><circle cx="100" cy="112.5" r="2" fill="' + C.mist + '"/></g>');
+    }
+    out.push(dot(100, 100, 4.4, q.aod ? '#000' : C.ink), q.aod ? ring(100, 100, 4.4, C.ink, 1, 0.85) : '', dot(100, 100, 1.8, q.A));
+    return out.join('');
+  }
+
+  /* The Taqwa mark: the app icon's arch (ic_launcher_monochrome.xml, a 1024 grid) and its dot,
+     apex at (x, y0), h tall. */
+  function archMark(x, y0, h, stroke, dotFill, w) {
+    var k = h / 564, L = x - 220 * k, Rr = x + 220 * k;
+    var d = 'M' + f(L) + ' ' + f(y0 + 564 * k) + ' L' + f(L) + ' ' + f(y0 + 304 * k) + ' C' + f(L) + ' ' + f(y0 + 156 * k) + ' ' +
+      f(x - 132 * k) + ' ' + f(y0 + 52 * k) + ' ' + f(x) + ' ' + f(y0) + ' C' + f(x + 132 * k) + ' ' + f(y0 + 52 * k) + ' ' + f(Rr) + ' ' +
+      f(y0 + 156 * k) + ' ' + f(Rr) + ' ' + f(y0 + 304 * k) + ' L' + f(Rr) + ' ' + f(y0 + 564 * k);
+    return '<path d="' + d + '" fill="none" stroke="' + stroke + '" stroke-width="' + f(w || 88 * k) +
+      '" stroke-linecap="round" stroke-linejoin="round"/>' + (dotFill ? dot(x, y0 + 130 * k, f(46 * k), dotFill) : '');
+  }
+
+  /* Style 4, Arch: the icon's arch as the face's frame, its feet standing on the screen's edge. The
+     crown keeps the icon's proportions (curve controls from the 1024 grid); the progress lights from
+     the apex down both sides at once, so it reads the same in either direction. */
+  var ARCH2 = (function () {
+    // The feet run to the screen's edge: at x = 100 +/- 80 the round screen ends at y = 160.
+    var half = 80, spring = 118, apex = 8, foot = 160, ch = spring - apex;   // crown height 110
+    var c1y = f(spring - 0.487 * ch), c2y = f(spring - 0.829 * ch);
+    function side(dir) {
+      return 'M100 ' + apex + ' C' + f(100 + dir * 132 / 220 * half) + ' ' + c2y + ' ' + (100 + dir * half) + ' ' + c1y + ' ' +
+        (100 + dir * half) + ' ' + spring + ' L' + (100 + dir * half) + ' ' + foot;
+    }
+    return { right: side(1), left: side(-1) };
+  })();
+
+  function archFace(o) {
+    var q = opts(o), p = o.progress != null ? o.progress : q.s.progress, out = [], w = q.aod ? 2 : 3.8;
+    // The outline stays drawn, in slate, awake and always-on alike, so the arch reads before it lights.
+    [ARCH2.left, ARCH2.right].forEach(function (d) {
+      out.push('<path d="' + d + '" fill="none" stroke="' + C.slate + '" stroke-width="' + (q.aod ? 1 : 1.4) + '"' +
+        op('stroke-opacity', q.aod ? 0.7 : 1) + ' stroke-linecap="butt" stroke-linejoin="round"/>');
+    });
+    if (p > 0.002) {
+      [ARCH2.left, ARCH2.right].forEach(function (d) {
+        out.push('<path d="' + d + '" pathLength="1000" fill="none" stroke="' + q.A + '" stroke-width="' + w + '"' +
+          op('stroke-opacity', q.aod ? 0.6 : 1) + ' stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="' + f(p * 1000) + ' 1000"/>');
+      });
+    }
+    // the icon's dot, the lamp under the crown, lighting the niche faintly
+    if (!q.aod) {
+      var cid = 'tw-ac' + (o.uid || 0);
+      out.push('<clipPath id="' + cid + '"><path d="' + ARCH2.left + ' L180 160 ' + ARCH2.right.replace('M100 8', 'L100 8') + 'Z"/></clipPath>' +
+        '<rect x="0" y="0" width="200" height="200" fill="url(#tw-niche-' + q.key + ')" clip-path="url(#' + cid + ')"/>');
+      out.push('<circle cx="100" cy="33" r="13" fill="url(#tw-glint-' + q.key + ')"/>');
+    }
+    out.push(dot(100, 33, 4.2, q.A, q.aod ? 0.6 : 1));
+    q.mark = false;
+    out.push(centre(q, q.comps ? { h: 56, g: 72, t: 121, p: 144, c: 159, u: 181 } : { h: 57, g: 73, t: 127, p: 151, c: 167 }, 56, 47));
+    return out.join('');
+  }
+
+  var FACES = { ring: ringFace, sun: sunFace, moon: moonFace, arch: archFace };
+
+  function galaxy(content, label) {
+    var ticks = '', i;
+    for (i = 0; i < 60; i++) {
+      var long = i % 5 === 0;
+      ticks += radial(130, 130, long ? 105.4 : 106.8, 110.8, i * 6, long ? '#A4AAA6' : '#5E6461', long ? 1.4 : 0.8, 1, 'butt');
+    }
+    return '<svg class="tw-dev tw-g" viewBox="0 0 260 260" role="img" aria-label="' + esc(label || 'Galaxy Watch') + '">' +
+      '<rect x="244" y="80" width="11" height="26" rx="4.5" fill="url(#tw-case)"/>' +
+      '<rect x="244" y="154" width="11" height="26" rx="4.5" fill="url(#tw-case)"/>' +
+      '<circle cx="130" cy="130" r="124" fill="url(#tw-case)"/>' +
+      '<circle cx="130" cy="130" r="120.4" fill="none" stroke="#101211" stroke-width="5" stroke-dasharray="1.3 1.35"/>' +
+      '<circle cx="130" cy="130" r="117.2" fill="url(#tw-bezel)"/>' + ticks +
+      '<circle cx="130" cy="130" r="103.6" fill="#000"/>' +
+      '<g transform="translate(30 30)"><g clip-path="url(#tw-gclip)">' + content + '</g></g>' +
+      '<circle cx="130" cy="130" r="103.6" fill="url(#tw-glass)" pointer-events="none"/></svg>';
+  }
+
+  function apple(content, label) {
+    var ridges = '', i;
+    for (i = 0; i < 9; i++) ridges += '<line x1="' + (201.5 + 0) + '" y1="' + (65.5 + i * 3.9) + '" x2="211.5" y2="' + (65.5 + i * 3.9) + '" stroke="#1D1F22" stroke-width=".9"/>';
+    return '<svg class="tw-dev tw-a" viewBox="0 0 216 256" role="img" aria-label="' + esc(label || 'Apple Watch') + '">' +
+      '<rect x="198" y="62" width="14" height="38" rx="5" fill="url(#tw-crown)"/>' + ridges +
+      '<rect x="200" y="120" width="7" height="48" rx="3.5" fill="url(#tw-acase)"/>' +
+      '<rect x="6" y="6" width="198" height="244" rx="56" fill="url(#tw-acase)"/>' +
+      '<rect x="10.5" y="10.5" width="189" height="235" rx="51.5" fill="#050606"/>' +
+      '<g transform="translate(19 22)"><g clip-path="url(#tw-aclip)">' + content + '</g></g>' +
+      '<rect x="10.5" y="10.5" width="189" height="235" rx="51.5" fill="url(#tw-glass)" pointer-events="none"/></svg>';
+  }
+
+  var DEFS = '<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
+    '<radialGradient id="tw-case" cx="34%" cy="28%" r="82%"><stop offset="0" stop-color="#5B605E"/><stop offset=".5" stop-color="#2F3332"/><stop offset="1" stop-color="#181A19"/></radialGradient>' +
+    '<linearGradient id="tw-bezel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2B2E2D"/><stop offset=".55" stop-color="#171918"/><stop offset="1" stop-color="#0E100F"/></linearGradient>' +
+    '<radialGradient id="tw-glass" cx="28%" cy="18%" r="75%"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".07"/><stop offset=".55" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>' +
+    '<linearGradient id="tw-acase" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4C5055"/><stop offset=".5" stop-color="#2C2F33"/><stop offset="1" stop-color="#1B1D20"/></linearGradient>' +
+    '<linearGradient id="tw-crown" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2A2C30"/><stop offset=".6" stop-color="#55595F"/><stop offset="1" stop-color="#2E3135"/></linearGradient>' +
+    '<radialGradient id="tw-sunglow"><stop offset="0" stop-color="#FFD978" stop-opacity=".55"/><stop offset="1" stop-color="#FFD978" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="tw-sky"><stop offset="0" stop-color="#F0B429" stop-opacity=".13"/><stop offset=".5" stop-color="#F0B429" stop-opacity=".04"/><stop offset="1" stop-color="#F0B429" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="tw-night"><stop offset="0" stop-color="#9FB3EC" stop-opacity=".09"/><stop offset=".55" stop-color="#9FB3EC" stop-opacity=".025"/><stop offset="1" stop-color="#9FB3EC" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="tw-dial" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#161A18"/><stop offset=".6" stop-color="#070908"/><stop offset="1" stop-color="#000000"/></radialGradient>' +
+    '<radialGradient id="tw-glint-amber"><stop offset="0" stop-color="#FFD978" stop-opacity=".75"/><stop offset=".45" stop-color="#FFD978" stop-opacity=".22"/><stop offset="1" stop-color="#FFD978" stop-opacity="0"/></radialGradient><radialGradient id="tw-glint-pearl"><stop offset="0" stop-color="#F4EFE4" stop-opacity=".75"/><stop offset=".45" stop-color="#F4EFE4" stop-opacity=".22"/><stop offset="1" stop-color="#F4EFE4" stop-opacity="0"/></radialGradient><radialGradient id="tw-glint-sage"><stop offset="0" stop-color="#B8E0C4" stop-opacity=".75"/><stop offset=".45" stop-color="#B8E0C4" stop-opacity=".22"/><stop offset="1" stop-color="#B8E0C4" stop-opacity="0"/></radialGradient><radialGradient id="tw-glint-night"><stop offset="0" stop-color="#C4D2FA" stop-opacity=".75"/><stop offset=".45" stop-color="#C4D2FA" stop-opacity=".22"/><stop offset="1" stop-color="#C4D2FA" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="tw-niche-amber" gradientUnits="userSpaceOnUse" cx="100" cy="33" r="135"><stop offset="0" stop-color="#F0B429" stop-opacity=".11"/><stop offset=".45" stop-color="#F0B429" stop-opacity=".035"/><stop offset="1" stop-color="#F0B429" stop-opacity="0"/></radialGradient><radialGradient id="tw-niche-pearl" gradientUnits="userSpaceOnUse" cx="100" cy="33" r="135"><stop offset="0" stop-color="#E9E2D2" stop-opacity=".11"/><stop offset=".45" stop-color="#E9E2D2" stop-opacity=".035"/><stop offset="1" stop-color="#E9E2D2" stop-opacity="0"/></radialGradient><radialGradient id="tw-niche-sage" gradientUnits="userSpaceOnUse" cx="100" cy="33" r="135"><stop offset="0" stop-color="#93BFA3" stop-opacity=".11"/><stop offset=".45" stop-color="#93BFA3" stop-opacity=".035"/><stop offset="1" stop-color="#93BFA3" stop-opacity="0"/></radialGradient><radialGradient id="tw-niche-night" gradientUnits="userSpaceOnUse" cx="100" cy="33" r="135"><stop offset="0" stop-color="#9FB3EC" stop-opacity=".11"/><stop offset=".45" stop-color="#9FB3EC" stop-opacity=".035"/><stop offset="1" stop-color="#9FB3EC" stop-opacity="0"/></radialGradient>' +
+    '<radialGradient id="tw-glint"><stop offset="0" stop-color="#FFF4D2" stop-opacity=".7"/><stop offset=".45" stop-color="#FFE7A0" stop-opacity=".22"/><stop offset="1" stop-color="#FFE7A0" stop-opacity="0"/></radialGradient>' +
+    '<clipPath id="tw-gclip"><circle cx="100" cy="100" r="100"/></clipPath>' +
+    '<clipPath id="tw-aclip"><rect x="0" y="0" width="172" height="212" rx="38"/></clipPath>' +
+    '</defs></svg>';
+
+  function mount(root) {
+    if (!document.getElementById('tw-defs')) {
+      var d = document.createElement('div');
+      d.id = 'tw-defs';
+      d.innerHTML = DEFS;
+      document.body.insertBefore(d, document.body.firstChild);
+    }
+    (root || document).querySelectorAll('[data-face]').forEach(function (el) { draw(el); });
+  }
+
+  var uid = 0;
+  function draw(el, extra) {
+    var d = el.dataset, o = {
+      t: d.t != null ? +d.t : 898, lang: d.lang || 'en', aod: d.aod === '1', accent: d.accent || 'amber',
+      comps: d.comps === '1', sec: d.sec != null ? +d.sec : undefined, dateStyle: d.dateStyle, glint: d.glint !== '0',
+      mark: d.mark !== '0', preset: d.preset, count: d.count != null ? +d.count : undefined, round: d.round != null ? +d.round : undefined,
+      heading: d.heading != null ? +d.heading : undefined, uid: ++uid, clock: d.clock
+    };
+    if (extra) for (var k in extra) o[k] = extra[k];
+    var fn = FACES[d.face] || SCREENS[d.face];
+    var content = fn(o);
+    el.innerHTML = (d.device === 'apple') ? apple(content, d.label) : galaxy(content, d.label);
+  }
+
+  /* ---------------------------------------------------------------- shared pieces for screens */
+
+  /* A linear day, midnight to midnight: the five prayers as ticks, daylight faint, lit from the
+     last prayer to now, the sun at now. Used where a ring does not fit (rectangular, Smart Stack). */
+  function dayBar(x, y, w, t, A, k) {
+    k = k || 1;
+    var s = state(t), out = [];
+    function X(m) { return x + w * Math.min(Math.max(m, 0), 1440) / 1440; }
+    out.push('<line x1="' + f(x) + '" y1="' + f(y) + '" x2="' + f(x + w) + '" y2="' + f(y) + '" stroke="' + C.hair + '" stroke-width="' + f(3 * k) + '" stroke-linecap="round"/>');
+    out.push('<line x1="' + f(X(DAY.sunrise)) + '" y1="' + f(y) + '" x2="' + f(X(DAY.maghrib)) + '" y2="' + f(y) + '" stroke="' + A + '" stroke-opacity=".3" stroke-width="' + f(3 * k) + '"/>');
+    out.push('<line x1="' + f(X(s.prev.m)) + '" y1="' + f(y) + '" x2="' + f(X(t)) + '" y2="' + f(y) + '" stroke="' + A + '" stroke-width="' + f(3.4 * k) + '" stroke-linecap="round"/>');
+    PRAYERS.forEach(function (key) {
+      var lit = key === s.next.k || key === s.prev.k;
+      out.push('<line x1="' + f(X(DAY[key])) + '" y1="' + f(y - 4.5 * k) + '" x2="' + f(X(DAY[key])) + '" y2="' + f(y + 4.5 * k) + '" stroke="' +
+        (lit ? A : (DAY[key] < t ? C.slate : C.mist)) + '" stroke-width="' + f(1.4 * k) + '" stroke-linecap="round"/>');
+    });
+    out.push(dot(X(t), y, f(3.3 * k), s.day ? '#FFF1C9' : C.mist));
+    return out.join('');
+  }
+
+  /* The app's ring at any size: hairline track, accent arc from the top, ticks at fractions. */
+  function appRing(cx, cy, r, p, A, w, rtl, ticks) {
+    var dir = rtl ? -1 : 1, out = [ring(cx, cy, r, C.hair, w), arc(cx, cy, r, 0, dir * 360 * Math.min(Math.max(p, 0), 1), A, w, 1)];
+    (ticks || []).forEach(function (fr) {
+      out.push(radial(cx, cy, r - w / 2 - 0.3, r + w / 2 + 0.3, dir * 360 * fr, C.hair, 1.1, 1, 'butt'));
+    });
+    return out.join('');
+  }
+
+  /* The app's row pip: current = accent disc in a halo, passed = tertiary dot, upcoming = hollow. */
+  function pip(x, y, status, A) {
+    if (status === 'current') return dot(x, y, 5.6, A, 0.2) + dot(x, y, 3.3, A);
+    if (status === 'passed') return dot(x, y, 2.4, C.slate);
+    return '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="2.3" fill="#000" stroke="' + C.hair + '" stroke-width="1.3"/>';
+  }
+  function rowStatus(key, t) {
+    var s = state(t);
+    // The highlight rule (TimelineBuilder): the latest of today's prayers to begin, except that Fajr
+    // stops being current at sunrise; before Fajr, yesterday's Isha is current and lights no row.
+    var current = s.prev.m < 0 || (s.prev.k === 'fajr' && t >= DAY.sunrise) ? null : s.prev.k;
+    if (key === current) return 'current';
+    return DAY[key] <= t ? 'passed' : 'upcoming';
+  }
+
+  function cube(x, y, size, A, halo) {
+    var h = size / 2;
+    return (halo ? dot(x, y, size * 0.95, A, 0.22) : '') +
+      '<rect x="' + f(x - h) + '" y="' + f(y - h) + '" width="' + size + '" height="' + size + '" rx="' + f(size * 0.16) + '" fill="' + A + '"/>' +
+      '<rect x="' + f(x - h) + '" y="' + f(y - h + size * 0.26) + '" width="' + size + '" height="' + f(size * 0.17) + '" fill="#000"/>';
+  }
+
+  /* The Qibla dial: the dial turns with the heading, the Kaaba marker sits at the bearing on the
+     rim, the needle points at it, and the rim lights when the needle is straight up (QiblaDial.kt). */
+  function qiblaDial(cx, cy, r, heading, bearing, A, k) {
+    k = k || 1;
+    var rel = bearing - heading, aligned = Math.abs(((rel % 360) + 540) % 360 - 180) < 3, out = [], i;
+    if (aligned) out.push(ring(cx, cy, r, A, 9 * k, 0.18));
+    out.push(ring(cx, cy, r, aligned ? A : C.hair, aligned ? 2.6 * k : 1.4 * k));
+    for (i = 0; i < 24; i++) {
+      out.push(radial(cx, cy, r - 9 * k, r - 5 * k, i * 15 - heading, i % 6 === 0 ? C.mist : C.slate, (i % 6 === 0 ? 1.4 : 1) * k, 1, 'butt'));
+    }
+    [['N', 0], ['E', 90], ['S', 180], ['W', 270]].forEach(function (c) {
+      var p = pol(cx, cy, r - 19 * k, c[1] - heading);
+      out.push(T(p[0], p[1] + 3.6 * k, c[0], f((c[0] === 'N' ? 11 : 9.5) * k), c[0] === 'N' ? 800 : 700, c[0] === 'N' ? C.ink : C.mist));
+    });
+    var tip = pol(cx, cy, r - 26 * k, rel), m = pol(cx, cy, r, rel);
+    out.push('<line x1="' + cx + '" y1="' + cy + '" x2="' + f(tip[0]) + '" y2="' + f(tip[1]) + '" stroke="' + A + '" stroke-width="' + f(3 * k) + '" stroke-linecap="round"/>');
+    out.push(dot(cx, cy, f(4.6 * k), A), cube(m[0], m[1], f(11 * k), A, true));
+    return { svg: out.join(''), aligned: aligned };
+  }
+
+  var DHIKR = {
+    subhanallah: { ar: 'سُبْحَانَ ٱللَّٰهِ', tr: 'SubhanAllah' },
+    alhamdulillah: { ar: 'ٱلْحَمْدُ لِلَّٰهِ', tr: 'Alhamdulillah' },
+    allahu_akbar: { ar: 'ٱللَّٰهُ أَكْبَرُ', tr: 'Allahu Akbar' },
+    astaghfirullah: { ar: 'أَسْتَغْفِرُ ٱللَّٰهَ', tr: 'Astaghfirullah' },
+    la_ilaha_illallah: { ar: 'لَا إِلَٰهَ إِلَّا ٱللَّٰهُ', tr: 'La ilaha illallah' },
+    subhanallahi_wa_bihamdihi: { ar: 'سُبْحَانَ ٱللَّٰهِ وَبِحَمْدِهِ', tr: 'SubhanAllahi wa bihamdihi' }
+  };
+  /* TasbeehPresets.kt: the post-prayer set is 33 · 33 · 34, every single dhikr counts to 100. */
+  var PRESETS = [
+    { id: 'after_prayer', name: 'After prayer', parts: [['subhanallah', 33], ['alhamdulillah', 33], ['allahu_akbar', 34]] },
+    { id: 'subhanallah', name: 'SubhanAllah', parts: [['subhanallah', 100]] },
+    { id: 'alhamdulillah', name: 'Alhamdulillah', parts: [['alhamdulillah', 100]] },
+    { id: 'allahu_akbar', name: 'Allahu Akbar', parts: [['allahu_akbar', 100]] },
+    { id: 'astaghfirullah', name: 'Astaghfirullah', parts: [['astaghfirullah', 100]] },
+    { id: 'la_ilaha_illallah', name: 'La ilaha illallah', parts: [['la_ilaha_illallah', 100]] },
+    { id: 'subhanallahi_wa_bihamdihi', name: 'SubhanAllahi wa bihamdihi', parts: [['subhanallahi_wa_bihamdihi', 100]] }
+  ];
+  function preset(id) { for (var i = 0; i < PRESETS.length; i++) if (PRESETS[i].id === id) return PRESETS[i]; return PRESETS[0]; }
+  function ends(p) { var run = 0; return p.parts.map(function (x) { run += x[1]; return run; }); }
+  function total(p) { var e = ends(p); return e[e.length - 1]; }
+  function partIndex(p, count) {
+    var e = ends(p);
+    for (var i = 0; i < e.length; i++) if (e[i] > count) return i;
+    return e.length - 1;
+  }
+
+  /* ---------------------------------------------------------------- Galaxy Watch screens (200 x 200) */
+
+  /* The tasbeeh counter, as the phone draws it: the dhikr, the round, the count, "of 100", the
+     ring with notches at 33 and 66, and the set's three parts as dots. */
+  function gTasbeeh(o) {
+    var p = preset(o.preset || 'after_prayer'), A = ACCENTS[o.accent] || ACCENTS.amber, count = o.count != null ? o.count : 27;
+    var round = o.round || 1, tot = total(p), e = ends(p), idx = partIndex(p, count), dh = DHIKR[p.parts[idx][0]], out = [];
+    out.push(appRing(100, 100, 92, count / tot, A, 5.6, false, e.slice(0, -1).map(function (x) { return x / tot; })));
+    if (o.flash) out.push(ring(100, 100, 92, A, o.flash === 'set' ? 14 : 10, 0.22));
+    out.push(T(100, 56, dh.ar, 16.5, 700, C.ink, { fam: 'naskh', rtl: true }));
+    out.push(T(100, 72, dh.tr, 10, 600, C.mist));
+    out.push(T(100, 92, 'ROUND ' + round, 10, 800, A, { ls: 1.3 }));
+    out.push(T(100, 134, String(count), 46, 300, C.ink, { tnum: true, ls: -0.8 }));
+    out.push(T(100, 151, 'of ' + tot, 11, 600, C.mist));
+    if (p.parts.length > 1) {
+      p.parts.forEach(function (part, i) {
+        var x = 100 + (i - 1) * 13, cur = i === idx, done = i < idx;
+        out.push(cur || done ? dot(x, 168, 2.6, cur ? A : C.slate) : '<circle cx="' + x + '" cy="168" r="2.2" fill="#000" stroke="' + C.slate + '" stroke-width="1"/>');
+      });
+    }
+    if (count === 0 && round === 1) out.push(T(100, 184, 'Turn the bezel or tap', 10, 600, C.mist));
+    return out.join('');
+  }
+
+  function gTasbeehList(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, out = [T(100, 34, 'Tasbeeh', 12.5, 800, C.ink)];
+    PRESETS.slice(0, 5).forEach(function (p, i) {
+      var y = 50 + i * 29, sel = p.id === 'after_prayer', fade = i === 4 ? 0.45 : 1;
+      out.push('<g' + (fade < 1 ? ' opacity="' + fade + '"' : '') + '><rect x="28" y="' + y + '" width="144" height="25" rx="12.5" fill="' + C.surface + '"' +
+        (sel ? ' stroke="' + A + '" stroke-width="1.3"' : '') + '/>' +
+        T(40, y + 16.4, p.name, 11, 700, sel ? A : C.ink, { anchor: 'start' }) +
+        T(160, y + 16.4, p.parts.length > 1 ? '33·33·34' : '100', 10, 600, C.mist, { anchor: 'end', tnum: true }) + '</g>');
+    });
+    return out.join('');
+  }
+
+  function gQibla(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, heading = o.heading != null ? o.heading : 340;
+    // The dial fills the round screen, its rim on the edge inside the bezel (Mohamed, 20 Oct); the
+    // bearing and distance sit in its lower half.
+    var d = qiblaDial(100, 100, 92, heading, 23, A, 1.05), out = [d.svg];
+    out.push(d.aligned ? T(100, 141, 'Facing qibla', 13, 800, A) : T(100, 141, '23°', 15, 800, C.ink));
+    // The watch's short form (Ruling 66 item 1): the figure and the unit alone, so the line keeps clear
+    // of the turning letters; a screen reader still hears the phone's 'Makkah · 6,558 km away'.
+    out.push(T(100, 155, '6,558 km', 10, 600, C.mist));
+    return out.join('');
+  }
+
+  /* The watch app's first screen: the phone's countdown ring, H:MM:SS as on the Prayer screen. */
+  function gToday(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, t = o.t != null ? o.t : 898, s = state(t), out = [];
+    out.push(appRing(100, 100, 90, s.progress, A, 7.4));
+    out.push(T(100, 78, 'ASR IN', 10.5, 800, A, { ls: 1.6 }));
+    out.push(T(100, 117, '1:11:36', 38, 300, C.ink, { tnum: true, ls: -0.6 }));
+    out.push(T(100, 137, hhmm(s.next.m), 13, 600, C.mist));
+    out.push('<path d="M93 160 L100 166 L107 160" fill="none" stroke="' + C.slate + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>');
+    return out.join('');
+  }
+
+  /* The Tile: swipe from the face. The app's timeline, the current prayer lit, the countdown on top. */
+  function gTile(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, t = o.t != null ? o.t : 898, s = state(t), out = [];
+    out.push('<text x="100" y="40" text-anchor="middle" font-family="' + FONT.ui + '"><tspan fill="' + A + '" font-size="10.5" font-weight="800" letter-spacing="1.3">' +
+      LANG.en.names[s.next.k].toUpperCase() + '</tspan><tspan fill="' + C.ink + '" font-size="12" font-weight="700"> ' + esc(LANG.en.count(s.h, s.m)) + '</tspan></text>');
+    var rows = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'], y = 64;
+    rows.forEach(function (key) {
+      var small = key === 'sunrise', st = small ? (DAY.sunrise <= t ? 'passed' : 'upcoming') : rowStatus(key, t);
+      var nameCol = st === 'current' ? A : (st === 'passed' ? C.slate : C.ink), size = small ? 10 : 12;
+      if (!small) out.push(pip(46, y - 4, st, A));
+      out.push(T(56, y, LANG.en.names[key], size, st === 'current' ? 800 : 600, small ? C.slate : nameCol, { anchor: 'start' }));
+      out.push(T(150, y, hhmm(DAY[key]), size, 600, small ? C.slate : (st === 'passed' ? C.slate : C.ink), { anchor: 'end', tnum: true }));
+      y += small ? 17 : 21;
+    });
+    out.push(T(100, 184, 'Cape Town', 10.5, 600, C.mist));
+    return out.join('');
+  }
+
+  /* One of Samsung's own analog faces, with Taqwa in two of its slots. */
+  function gSamsung(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, t = 609, s = state(t), out = [], i;
+    for (i = 0; i < 12; i++) out.push(radial(100, 100, 82, 92, i * 30, i % 3 === 0 ? C.ink : C.mist, i % 3 === 0 ? 3 : 1.6, 1, 'butt'));
+    out.push(T(100, 44, 'SUN 18', 11, 800, C.mist, { ls: 1 }));
+    // left slot: Taqwa's ranged value (the ring)
+    out.push(appRing(60, 100, 17, s.progress, A, 2.6), T(60, 98.5, 'DHUHR', 6.8, 800, A, { ls: 0.4 }), T(60, 109, hhmm(s.next.m), 9, 700, C.ink, { tnum: true }));
+    // right slot: steps, someone else's
+    out.push(appRing(140, 100, 17, 0.64, C.mist, 2.6), T(140, 98.5, 'STEPS', 6.6, 800, C.mist, { ls: 0.4 }), T(140, 109, '6,410', 9, 700, C.ink, { tnum: true }));
+    // bottom slot: Taqwa's long text, short enough for the pill
+    out.push('<rect x="50" y="131" width="100" height="22" rx="11" fill="' + C.surface + '"/>');
+    out.push('<text x="100" y="145.6" text-anchor="middle" font-family="' + FONT.ui + '" font-size="10"><tspan fill="' + A + '" font-weight="800" letter-spacing=".6">DHUHR</tspan>' +
+      '<tspan fill="' + C.ink + '" font-weight="700"> ' + esc(LANG.en.count(s.h, s.m)) + '</tspan></text>');
+    var H = (t % 720) / 2, M = (t % 60) * 6;
+    out.push('<rect x="97.4" y="50" width="5.2" height="56" rx="2.6" fill="' + C.ink + '" transform="rotate(' + f(H) + ' 100 100)"/>');
+    out.push('<rect x="98.4" y="22" width="3.2" height="84" rx="1.6" fill="' + C.ink + '" transform="rotate(' + f(M) + ' 100 100)"/>');
+    out.push(dot(100, 100, 3.6, C.ink), dot(100, 100, 1.4, '#000'));
+    return out.join('');
+  }
+
+  /* ---------------------------------------------------------------- Apple Watch screens (172 x 212) */
+
+  /* The ring's model laid flat: from the last prayer to the next, filled to now. */
+  function periodBar(x, y, w, t, A) {
+    var s = state(t), e = x + w * s.progress;
+    return '<line x1="' + f(x) + '" y1="' + f(y) + '" x2="' + f(x + w) + '" y2="' + f(y) + '" stroke="' + C.hair + '" stroke-width="4" stroke-linecap="round"/>' +
+      '<line x1="' + f(x) + '" y1="' + f(y) + '" x2="' + f(e) + '" y2="' + f(y) + '" stroke="' + A + '" stroke-width="4" stroke-linecap="round"/>';
+  }
+
+  function aRect(x, y, t, A, k) {
+    var s = state(t), out = [];
+    out.push('<text x="' + x + '" y="' + (y + 14) + '" font-family="' + FONT.ui + '"><tspan fill="' + A + '" font-size="11.5" font-weight="800" letter-spacing="1.1">' +
+      LANG.en.names[s.next.k].toUpperCase() + '</tspan><tspan fill="' + C.ink + '" font-size="15" font-weight="700"> ' + hhmm(s.next.m) + '</tspan></text>');
+    out.push(T(x, y + 31, LANG.en.count(s.h, s.m), 12.5, 600, C.mist, { anchor: 'start' }));
+    out.push(periodBar(x + 2, y + 45, 140, t, A));
+    return out.join('');
+  }
+
+  function aCircular(cx, cy, t, A) {
+    var s = state(t);
+    return appRing(cx, cy, 20, s.progress, A, 3.6) + T(cx, cy - 2, LANG.en.names[s.next.k].toUpperCase(), 7.6, 800, A, { ls: 0.5 }) +
+      T(cx, cy + 9.5, hhmm(s.next.m), 10, 700, C.ink, { tnum: true });
+  }
+
+  /* An Apple digital face of the Modular kind: Taqwa's rectangular in the middle, its circular at
+     the bottom left, someone else's at the bottom right. */
+  function aModular(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, t = 898, out = [];
+    out.push(T(12, 32, 'SUN 18', 13, 700, A, { anchor: 'start', fam: 'sys', ls: 0.4 }));
+    out.push(T(162, 36, '14:58', 31, 500, C.ink, { anchor: 'end', fam: 'sys', tnum: true }));
+    out.push(aRect(12, 60, t, A));
+    out.push(aCircular(40, 170, t, A));
+    out.push(ring(132, 170, 20, C.hair, 3.6), arc(132, 170, 20, 0, 360 * 0.82, C.mist, 3.6, 1),
+      T(132, 174, '82%', 10.5, 700, C.ink, { fam: 'sys' }));
+    return out.join('');
+  }
+
+  /* An Apple analog face with corners: Taqwa in the top-left corner and at six. */
+  function aAnalog(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, t = 609, s = state(t), out = [], i;
+    for (i = 0; i < 12; i++) out.push(radial(86, 112, 66, 76, i * 30, i % 3 === 0 ? C.ink : C.mist, i % 3 === 0 ? 2.6 : 1.4, 1, 'butt'));
+    // corner: a gauge holding the mark, and the next prayer along the curve of the corner
+    out.push(appRing(30, 34, 10, s.progress, A, 2.4), archMark(30, 28.8, 10, C.mist, A, 1.4));
+    out.push('<path id="tw-corner-' + (o.uid || 0) + '" d="' + arcPath(48, 48, 43, 276, 354) + '" fill="none"/>');
+    out.push('<text font-family="' + FONT.ui + '" font-size="7.8" font-weight="800" fill="' + A + '" letter-spacing=".5" text-anchor="middle"><textPath href="#tw-corner-' +
+      (o.uid || 0) + '" startOffset="50%">DHUHR 12:33</textPath></text>');
+    out.push(T(146, 34, '22°', 15, 600, C.mist, { fam: 'sys' }));
+    // six o'clock: Taqwa's circular
+    out.push(aCircular(86, 158, t, A));
+    var H = (t % 720) / 2, M = (t % 60) * 6;
+    out.push('<rect x="83.6" y="70" width="4.8" height="46" rx="2.4" fill="' + C.ink + '" transform="rotate(' + f(H) + ' 86 112)"/>');
+    out.push('<rect x="84.5" y="44" width="3" height="72" rx="1.5" fill="' + C.ink + '" transform="rotate(' + f(M) + ' 86 112)"/>');
+    out.push(dot(86, 112, 3.4, C.ink), dot(86, 112, 1.3, A));
+    return out.join('');
+  }
+
+  /* An Apple face with a line of text at the top: Taqwa's inline complication. */
+  function aUtility(o) {
+    var t = 898, out = [], i;
+    out.push(T(86, 25, 'ASR in 1 h 12 min', 11, 600, C.ink, { fam: 'sys' }));
+    for (i = 0; i < 60; i++) out.push(radial(86, 116, i % 5 ? 70 : 64, 74, i * 6, i % 5 ? C.slate : C.ink, i % 5 ? 0.8 : 2.2, 1, 'butt'));
+    out.push(T(86, 158, 'SUN 18', 9.5, 700, C.mist, { fam: 'sys', ls: 0.6 }));
+    var H = (t % 720) / 2, M = (t % 60) * 6;
+    out.push('<rect x="83.6" y="76" width="4.8" height="44" rx="2.4" fill="' + C.ink + '" transform="rotate(' + f(H) + ' 86 116)"/>');
+    out.push('<rect x="84.5" y="48" width="3" height="72" rx="1.5" fill="' + C.ink + '" transform="rotate(' + f(M) + ' 86 116)"/>');
+    out.push(dot(86, 116, 3.4, C.ink), dot(86, 116, 1.3, '#000'));
+    return out.join('');
+  }
+
+  function aStack(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, t = 898, out = [];
+    out.push(T(160, 24, '14:58', 15, 600, C.ink, { anchor: 'end', fam: 'sys', tnum: true }));
+    out.push('<rect x="8" y="34" width="156" height="98" rx="20" fill="#1A1D1C"/>');
+    out.push(archMark(26, 44, 11, C.mist, A, 1.6), T(36, 54, 'Taqwa', 10.5, 700, C.mist, { anchor: 'start' }));
+    out.push(aRect(20, 62, t, A));
+    out.push('<rect x="8" y="140" width="156" height="80" rx="20" fill="#121514"/>');
+    out.push('<rect x="22" y="156" width="60" height="7" rx="3.5" fill="#2A2F2C"/><rect x="22" y="172" width="110" height="7" rx="3.5" fill="#222724"/>');
+    return out.join('');
+  }
+
+  function aToday(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, t = 898, s = state(t), out = [];
+    out.push(appRing(86, 66, 52, s.progress, A, 5.4));
+    out.push(T(86, 52, 'ASR IN', 8.8, 800, A, { ls: 1.2 }));
+    out.push(T(86, 77, '1:11:36', 23, 300, C.ink, { tnum: true, ls: -0.4 }));
+    out.push(T(86, 92, '16:10', 10.5, 600, C.mist));
+    var rows = ['dhuhr', 'asr', 'maghrib', 'isha'], y = 144;
+    rows.forEach(function (key, i) {
+      var st = rowStatus(key, t), g = i === 3 ? '<g opacity=".32">' : '<g>';
+      out.push(g + pip(20, y - 4, st, A));
+      out.push(T(32, y, LANG.en.names[key], 13, st === 'current' ? 800 : 600, st === 'current' ? A : (st === 'passed' ? C.slate : C.ink), { anchor: 'start' }));
+      out.push(T(156, y, hhmm(DAY[key]), 13, 600, st === 'passed' ? C.slate : C.ink, { anchor: 'end', tnum: true }) + '</g>');
+      y += 21;
+    });
+    return out.join('');
+  }
+
+  function aTasbeeh(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, p = preset('astaghfirullah'), count = 64, dh = DHIKR.astaghfirullah, out = [];
+    out.push(T(86, 30, dh.ar, 15, 700, C.ink, { fam: 'naskh', rtl: true }), T(86, 45, dh.tr, 9.5, 600, C.mist));
+    out.push(appRing(86, 118, 54, count / total(p), A, 5.2));
+    out.push(T(86, 99, 'ROUND 1', 9.5, 800, A, { ls: 1.2 }), T(86, 131, '64', 36, 300, C.ink, { tnum: true }), T(86, 147, 'of 100', 10.5, 600, C.mist));
+    // the crown sits beside the top right of the screen: up counts one, down takes one back
+    out.push('<path d="M161 54 L165 50 L169 54 M161 64 L165 68 L169 64" fill="none" stroke="' + A + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>');
+    out.push(T(86, 198, 'Turn the crown or tap', 10, 600, C.mist));
+    return out.join('');
+  }
+
+  function aQibla(o) {
+    var A = ACCENTS[o.accent] || ACCENTS.amber, d = qiblaDial(86, 90, 62, 23, 23, A, 0.86), out = [d.svg];
+    // The watch's short form (Ruling 66 items 1 and 8), the phone's phrase spoken.
+    out.push(T(86, 180, 'Facing qibla', 14, 800, A), T(86, 196, '6,558 km', 10, 600, C.mist));
+    return out.join('');
+  }
+
+  var SCREENS = {
+    'g-tasbeeh': gTasbeeh, 'g-tasbeeh-list': gTasbeehList, 'g-qibla': gQibla, 'g-today': gToday, 'g-tile': gTile, 'g-samsung': gSamsung,
+    'a-modular': aModular, 'a-analog': aAnalog, 'a-utility': aUtility, 'a-stack': aStack, 'a-today': aToday, 'a-tasbeeh': aTasbeeh, 'a-qibla': aQibla
+  };
+
+  return {
+    C: C, ACCENTS: ACCENTS, DAY: DAY, PRAYERS: PRAYERS, FONT: FONT, LANG: LANG,
+    lang: lang, dg: dg, hhmm: hhmm, state: state, pol: pol, arc: arc, ring: ring, radial: radial, dot: dot, T: T,
+    esc: esc, f: f, prayerLine: prayerLine, moon: moon, crescent: crescent, uiFam: uiFam, numFam: numFam, indic: indic,
+    FACES: FACES, SCREENS: SCREENS, galaxy: galaxy, apple: apple, mount: mount, draw: draw,
+    PRESETS: PRESETS, DHIKR: DHIKR, preset: preset, total: total, ends: ends, partIndex: partIndex, archMark: archMark
+  };
+})();

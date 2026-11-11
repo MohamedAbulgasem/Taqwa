@@ -50,6 +50,7 @@ kotlin {
             // public surface (SettingsRepository, PrayerViewModel, androidApp's Glance widgets),
             // and `export` above requires an `api` dependency.
             api(project(":widgetcore"))
+            implementation(project(":watchcore"))
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -89,6 +90,15 @@ kotlin {
             // anything this app draws.
             implementation(libs.media3.exoplayer)
             implementation(libs.media3.session)
+            // Plan 2 Task 5: the watch feed goes to the user's own watch over the Wear Data Layer's
+            // MessageClient, to nodes directly connected at the send (never DataClient). Mohamed's
+            // condition for this one Google library: no tracker and no new permission, checked on
+            // the merged manifest and the APK (docs/superpowers/reports/2026-10-23-wearable-library-check.md).
+            implementation(libs.play.services.wearable)
+            // Plan 5 Task 6: Settings › Watch opens Taqwa's Play page, or the Taqwa face's screen, on
+            // the user's own watch (RemoteActivityHelper). Checked like the one above: no tracker and no
+            // new permission (docs/superpowers/reports/2026-11-06-phone-watch-rows.md).
+            implementation(libs.wear.remote.interactions)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)
@@ -118,6 +128,12 @@ sqldelight {
     }
 }
 
+// The tasbeeh rules live in :watchcore, which the Compose compiler does not see: this file declares
+// them stable again, as they inferred while they lived here (Ruling 45).
+composeCompiler {
+    stabilityConfigurationFiles.add(layout.projectDirectory.file("compose-stability.conf"))
+}
+
 compose.resources {
     publicResClass = true
     packageOfResClass = "world.taqwa.app.resources"
@@ -131,8 +147,49 @@ kotlin {
 // The androidHostTest classes that check the bundled quran.db and city files read them straight
 // from src/commonMain/composeResources/files, which Gradle does not otherwise count as a test
 // input: a regenerated database on its own left those tests UP-TO-DATE, green from the file before.
+// WatchWordsResourcesTest reads the values*/strings.xml files the same way. Today a value edit also
+// changes the generated accessors' content hash, but that is Compose's hot-reload aid, off under
+// org.jetbrains.compose.resources.content.hash.generation.disable, and the test was then left
+// UP-TO-DATE, green over a changed prayer_jumuah.
 tasks.withType<Test>().configureEach {
     inputs.dir("src/commonMain/composeResources/files")
         .withPropertyName("bundledFiles")
         .withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files(fileTree("src/commonMain/composeResources") { include("values*/strings.xml") })
+        .withPropertyName("stringResources")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    // WatchFeedGoldenTest holds the golden feeds in watchcore/vectors/phone/ to what the builder
+    // writes from the frozen times in its times/ folder, and rewrites the feeds (never the times)
+    // under -Ptaqwa.updateVectors; -Ptaqwa.recordTimes records the times from the engine, once.
+    // Each flag reaches the test as the system property of its name, and a run with either has a
+    // side effect, so it is never skipped as up to date or taken from the build cache.
+    // WatchFeedSampleTest reads :watchcore's sample feeds beside them, so those are inputs too.
+    inputs.files(rootProject.fileTree("watchcore/vectors/phone"))
+        .withPropertyName("phoneVectors")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    inputs.files(rootProject.fileTree("watchcore/vectors") { include("sample-feed-capetown*.json") })
+        .withPropertyName("sampleFeeds")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    // FaceFormsTest holds tools/watchface/phone-forms.json, which the face's fit tools read, to the
+    // forms the phone writes (PhoneForms), and rewrites it under -Ptaqwa.updateVectors.
+    inputs.files(rootProject.fileTree("tools/watchface") { include("phone-forms.json") })
+        .withPropertyName("phoneForms")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    // WatchScreenWordsReaderTest holds the two notices the phone sends the watch to the Wear app's
+    // own lines (open_taqwa_on_phone, update_taqwa_on_watch), so an edit to its strings re-runs it.
+    inputs.files(rootProject.fileTree("wearApp/src/main/res") { include("values*/strings.xml") })
+        .withPropertyName("wearStrings")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    // PhoneWatchListenerServiceTest holds :androidApp's listener filters and its Wear capability to
+    // WatchLinkContract's constants (Ruling 54 item 2), so an edit to either file re-runs it.
+    inputs.files(rootProject.files("androidApp/src/main/AndroidManifest.xml", "androidApp/src/main/res/values/wear.xml"))
+        .withPropertyName("phoneWearDeclarations")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    for (flag in listOf("taqwa.updateVectors", "taqwa.recordTimes")) {
+        if (providers.gradleProperty(flag).map { it != "false" }.getOrElse(false)) {
+            systemProperty(flag, "true")
+            outputs.upToDateWhen { false }
+            outputs.doNotCacheIf("it rewrites the vectors") { true }
+        }
+    }
 }

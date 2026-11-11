@@ -1,0 +1,2 @@
+10-31 13:14:02.727 I/System.out( 7924): TaqwaWatch DEBUG version 2 SENT 9/9c6aae003f912399
+10-31 13:14:02.727 I/TaqwaWatchHarness( 7924): send: version 2 SENT

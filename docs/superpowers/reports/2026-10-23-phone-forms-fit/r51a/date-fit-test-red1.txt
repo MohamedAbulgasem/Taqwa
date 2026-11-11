@@ -1,0 +1,314 @@
+EEEEEEEEEEFEEE.EEEEEEEEEEEEEE.E
+======================================================================
+ERROR: test_a_function_or_source_it_does_not_know_fails (__main__.FaceExpressions.test_a_function_or_source_it_does_not_know_fails) (expression='icuText("EEE")')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 108, in test_a_function_or_source_it_does_not_know_fails
+    D.shows(expression, "الخميس")
+    ^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'shows'
+
+======================================================================
+ERROR: test_a_function_or_source_it_does_not_know_fails (__main__.FaceExpressions.test_a_function_or_source_it_does_not_know_fails) (expression='[COMPLICATION.TITLE]')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 108, in test_a_function_or_source_it_does_not_know_fails
+    D.shows(expression, "الخميس")
+    ^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'shows'
+
+======================================================================
+ERROR: test_a_function_or_source_it_does_not_know_fails (__main__.FaceExpressions.test_a_function_or_source_it_does_not_know_fails) (expression='textLength([COMPLICATION.TEXT]) * 2')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 108, in test_a_function_or_source_it_does_not_know_fails
+    D.shows(expression, "الخميس")
+    ^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'shows'
+
+======================================================================
+ERROR: test_a_function_or_source_it_does_not_know_fails (__main__.FaceExpressions.test_a_function_or_source_it_does_not_know_fails) (expression='subText([COMPLICATION.TEXT], 0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 108, in test_a_function_or_source_it_does_not_know_fails
+    D.shows(expression, "الخميس")
+    ^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'shows'
+
+======================================================================
+ERROR: test_a_string_is_never_compared_with_a_number (__main__.FaceExpressions.test_a_string_is_never_compared_with_a_number)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 116, in test_a_string_is_never_compared_with_a_number
+    D.shows("%s == 5" % LAST5, "الخميس ١٠ أغسطس")
+    ^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'shows'
+
+======================================================================
+ERROR: test_a_subtext_outside_the_text_fails (__main__.FaceExpressions.test_a_subtext_outside_the_text_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 112, in test_a_subtext_outside_the_text_fails
+    D.shows("subText(%s, %s - 5, %s)" % (TEXT, N, N), "abc")
+    ^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'shows'
+
+======================================================================
+ERROR: test_an_empty_text_is_read (__main__.FaceExpressions.test_an_empty_text_is_read)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 96, in test_an_empty_text_is_read
+    self.assertEqual(D.shows("(%s <= 18 && %s != \"%s\") ? 255 : 0" % (N, LAST5, AUGUST), ""), 255)
+                     ^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'shows'
+
+======================================================================
+ERROR: test_numbers_and_logic (__main__.FaceExpressions.test_numbers_and_logic)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 99, in test_numbers_and_logic
+    self.assertEqual(D.shows("(%s > 18) ? 255 : 0" % N, "x" * 19), 255)
+                     ^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'shows'
+
+======================================================================
+ERROR: test_the_length_and_the_last_five_characters (__main__.FaceExpressions.test_the_length_and_the_last_five_characters)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 90, in test_the_length_and_the_last_five_characters
+    self.assertEqual(D.shows(august, "الخميس ١٠ أغسطس"), 255)
+                     ^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'shows'
+
+======================================================================
+ERROR: test_a_face_drawing_a_step_at_another_size_fails (__main__.TheFace.test_a_face_drawing_a_step_at_another_size_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 165, in test_a_face_drawing_a_step_at_another_size_fails
+    xml = self.in_group(self.face(), "الخميس ١٠ أغسطس", 'size="%g"' % (13 * K), 'size="%g"' % (14 * K))
+          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 138, in in_group
+    i = xml.index('<Group name="greg_arch_rtl_%s"' % D.step_for(steps(), text).name)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'name'
+
+======================================================================
+ERROR: test_a_face_without_the_months_test_fails (__main__.TheFace.test_a_face_without_the_months_test_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 154, in test_a_face_without_the_months_test_fails
+    xml = self.in_group(self.face(), "الخميس ١٠ أغسطس", ' &amp;&amp; %s == "%s"' % (LAST5, AUGUST), "")
+          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 138, in in_group
+    i = xml.index('<Group name="greg_arch_rtl_%s"' % D.step_for(steps(), text).name)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'name'
+
+======================================================================
+ERROR: test_a_form_outside_the_basic_multilingual_plane_fails (__main__.TheFace.test_a_form_outside_the_basic_multilingual_plane_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 171, in test_a_form_outside_the_basic_multilingual_plane_fails
+    failures = D.face_steps_check(D.written_steps(), steps(), ["الخميس \U0001D7D9 أغسطس"])
+               ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'face_steps_check'
+
+======================================================================
+ERROR: test_every_form_shows_the_one_group_its_step_names (__main__.TheFace.test_every_form_shows_the_one_group_its_step_names)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 147, in test_every_form_shows_the_one_group_its_step_names
+    self.assertEqual(D.face_steps_check(D.written_steps(), steps(), RTL_DATES + [""]), [])
+                     ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'date_fit' has no attribute 'face_steps_check'
+
+======================================================================
+ERROR: test_the_sample_is_drawn_in_the_base_faces_own_box (__main__.TheFace.test_the_sample_is_drawn_in_the_base_faces_own_box)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 150, in test_the_sample_is_drawn_in_the_base_faces_own_box
+    rest = next(row for row in D.written_steps() if row[0] == D.step_for(steps(), "الأحد ١٨ أكتوبر").name)
+           ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 150, in <genexpr>
+    rest = next(row for row in D.written_steps() if row[0] == D.step_for(steps(), "الأحد ١٨ أكتوبر").name)
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'name'
+
+======================================================================
+ERROR: test_august_as_the_phone_writes_it_is_13_units_at_every_length (__main__.TheRule.test_august_as_the_phone_writes_it_is_13_units_at_every_length) (text='السبت ١ أغسطس')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 54, in test_august_as_the_phone_writes_it_is_13_units_at_every_length
+    self.assertEqual(units(text), 13)
+                     ~~~~~^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_august_as_the_phone_writes_it_is_13_units_at_every_length (__main__.TheRule.test_august_as_the_phone_writes_it_is_13_units_at_every_length) (text='الخميس ١٠ أغسطس')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 54, in test_august_as_the_phone_writes_it_is_13_units_at_every_length
+    self.assertEqual(units(text), 13)
+                     ~~~~~^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_august_as_the_phone_writes_it_is_13_units_at_every_length (__main__.TheRule.test_august_as_the_phone_writes_it_is_13_units_at_every_length) (text='الخميس 10 أغسطس')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 54, in test_august_as_the_phone_writes_it_is_13_units_at_every_length
+    self.assertEqual(units(text), 13)
+                     ~~~~~^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_august_as_the_phone_writes_it_is_13_units_at_every_length (__main__.TheRule.test_august_as_the_phone_writes_it_is_13_units_at_every_length) (text='الثلاثاء ٣١ أغسطس')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 54, in test_august_as_the_phone_writes_it_is_13_units_at_every_length
+    self.assertEqual(units(text), 13)
+                     ~~~~~^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_eighteen_characters_not_in_august_are_14_units (__main__.TheRule.test_eighteen_characters_not_in_august_are_14_units)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 65, in test_eighteen_characters_not_in_august_are_14_units
+    self.assertEqual(units(text), 14)
+                     ~~~~~^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_every_other_august_the_phones_write_is_14_units (__main__.TheRule.test_every_other_august_the_phones_write_is_14_units) (month='آب')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 73, in test_every_other_august_the_phones_write_is_14_units
+    self.assertEqual(units("الخميس ١٠ " + month), 14)
+                     ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_every_other_august_the_phones_write_is_14_units (__main__.TheRule.test_every_other_august_the_phones_write_is_14_units) (month='أوت')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 73, in test_every_other_august_the_phones_write_is_14_units
+    self.assertEqual(units("الخميس ١٠ " + month), 14)
+                     ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_every_other_august_the_phones_write_is_14_units (__main__.TheRule.test_every_other_august_the_phones_write_is_14_units) (month='اگست')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 73, in test_every_other_august_the_phones_write_is_14_units
+    self.assertEqual(units("الخميس ١٠ " + month), 14)
+                     ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_every_other_august_the_phones_write_is_14_units (__main__.TheRule.test_every_other_august_the_phones_write_is_14_units) (month='غشت')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 73, in test_every_other_august_the_phones_write_is_14_units
+    self.assertEqual(units("الخميس ١٠ " + month), 14)
+                     ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_nineteen_characters_or_more_are_11_25_units (__main__.TheRule.test_nineteen_characters_or_more_are_11_25_units) (text='الأحد ١ كانون الأول', length=19)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 60, in test_nineteen_characters_or_more_are_11_25_units
+    self.assertEqual(units(text), 11.25)
+                     ~~~~~^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_nineteen_characters_or_more_are_11_25_units (__main__.TheRule.test_nineteen_characters_or_more_are_11_25_units) (text='الخميس 10 تشرين الأول', length=21)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 60, in test_nineteen_characters_or_more_are_11_25_units
+    self.assertEqual(units(text), 11.25)
+                     ~~~~~^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_nineteen_characters_or_more_are_11_25_units (__main__.TheRule.test_nineteen_characters_or_more_are_11_25_units) (text='الثلاثاء ١٠ تشرين الأول', length=23)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 60, in test_nineteen_characters_or_more_are_11_25_units
+    self.assertEqual(units(text), 11.25)
+                     ~~~~~^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+ERROR: test_the_last_step_takes_every_form (__main__.TheRule.test_the_last_step_takes_every_form)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 81, in test_the_last_step_takes_every_form
+    self.assertIsNone(last.least)
+                      ^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'least'
+
+======================================================================
+ERROR: test_the_sample_keeps_the_base_faces_14_units (__main__.TheRule.test_the_sample_keeps_the_base_faces_14_units)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 48, in test_the_sample_keeps_the_base_faces_14_units
+    self.assertEqual(units("الأحد ١٨ أكتوبر"), 14)
+                     ~~~~~^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 41, in units
+    return D.step_for(steps(), text).line.size / K
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'tuple' object has no attribute 'line'
+
+======================================================================
+FAIL: test_a_face_that_spells_august_otherwise_fails (__main__.TheFace.test_a_face_that_spells_august_otherwise_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 160, in test_a_face_that_spells_august_otherwise_fails
+    self.assertEqual(xml.count('"%s"' % AUGUST), 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.010s
+
+FAILED (failures=1, errors=28)

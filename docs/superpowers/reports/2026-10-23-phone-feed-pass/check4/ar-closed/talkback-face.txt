@@ -1,0 +1,10 @@
+== Arabic feed (per-app ar-SA, app closed), the Arch face, 13:08:44
+TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+1: الظهر بعد ٤٠ دقيقة، الساعة ⁨١١:٤٩ ص⁩
+2: ١٩ جمادى الأولى ١٤٤٨، السبت ٣١ أكتوبر
+3: No data
+4: No data
+5: Charging. Image
+6:
+7: 10-31 13:09:16.331  3960  3960 V talkback: SpeechControllerImpl: Speaking fragment text="1:09 PM
+8: الظهر بعد ٣٩ دقيقة، الساعة ⁨١١:٤٩ ص⁩

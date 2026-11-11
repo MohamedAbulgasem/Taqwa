@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Taqwa arch with its lamp: the phone's themed-icon layer (androidApp's ic_launcher_monochrome)
+     drawn white on a square cut to the arch, which is what a complication and the picker take as a
+     single-colour mark. The faces tint it. The geometry is the phone's own, moved up and left so
+     that the arch, its 88-wide round-capped stroke included, sits in the middle of the square with
+     the same margin on all four sides (36 of 724) and not in the launcher icon's 1024 canvas. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp" android:height="48dp"
+    android:viewportWidth="724" android:viewportHeight="724">
+    <group android:translateX="-150" android:translateY="-136">
+        <path
+            android:pathData="M 292 780 L 292 520 C 292 372 380 268 512 216 C 644 268 732 372 732 520 L 732 780"
+            android:strokeColor="#FFFFFF" android:strokeWidth="88"
+            android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000"/>
+        <path android:pathData="M 512 346 a 46 46 0 1 0 0.1 0 z" android:fillColor="#FFFFFF"/>
+    </group>
+</vector>

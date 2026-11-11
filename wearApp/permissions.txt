@@ -1,0 +1,11 @@
+# Every permission the Wear app's merged release manifest asks for, and nothing else: the one list
+# its checks read (tools/wear-release-check.sh, and plan 3's WearManifestTest since plan 5 Task 4).
+# One permission a line: <name> <origin> # <reason>. <origin> is `manifest` (declared in
+# src/main/AndroidManifest.xml) or `library:<group:artifact>` (added by the manifest merge). A
+# permission joins this file in the same commit as the line that brings it. What may never join
+# it is spec 2.1's list, which WearManifestTest's NEVER holds: the watch learns everything from the
+# phone's feed.
+android.permission.VIBRATE manifest # the tasbeeh counter's ticks and the Qibla's buzz (app/WatchHaptics)
+world.taqwa.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION library:androidx.core:core # androidx.core's own, so that a receiver it registers at run time cannot be reached by another app
+com.google.wear.permission.PUSH_WATCH_FACES manifest # installs and updates the Taqwa face (Watch Face Push)
+com.google.wear.permission.SET_PUSHED_WATCH_FACE_AS_ACTIVE manifest # makes the Taqwa face active once, on the wearer’s tap

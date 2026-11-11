@@ -1,0 +1,51 @@
+# The phone's main buffer, 14:24:26-14:24:42, as the reviewer saved it (long lines cut at its width): Taqwa's frames (pid 13764) and artd checking Play services' modules while the handshake waited and was served.
+10-31 14:24:26.017 I/Choreographer(13764): Skipped 38 frames!  The application may be doing too much work on its main thread.
+10-31 14:24:26.070 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000009/dl-VisionOcr.optional_250834100000.apk has no usable artifacts
+10-31 14:24:26.079 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000001/CronetDynamite.apk has no usable artifacts
+10-31 14:24:26.119 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000002/DynamiteLoader.apk has no usable artifacts
+10-31 14:24:26.203 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000005/GoogleCertificates.apk has no usable artifacts
+10-31 14:24:26.218 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000015/dl-MlkitBarcodeUi.optional_264231100400.apk has no usable artifacts
+10-31 14:24:26.241 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000a/dl-MlkitOcrCommon.optional_250834100400.apk has no usable artifacts
+10-31 14:24:26.257 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000010/dl-Appsearch.optional_264231100400.apk has no usable artifacts
+10-31 14:24:26.268 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000c/dl-TfliteDynamiteDynamite.integ_264010405100400.apk has no usable artifacts
+10-31 14:24:26.273 I/artd    ( 3041): GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/AAEF584C0030E52846AF790022AA2BF836A591DF/oat/arm64/the.vdex) is kOatUpToDate with filter 'verify' executable 'fal
+10-31 14:24:26.287 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000018/dl-IdentityCredentialsPlatform.optional_264231100400.apk has no usable artifacts
+10-31 14:24:26.322 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000f/dl-Appsearch.optional_250834100400.apk has no usable artifacts
+10-31 14:24:26.512 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000b/dl-MlkitBarcodeUi.optional_250834100400.apk has no usable artifacts
+10-31 14:24:26.582 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000012/dl-VisionOcr.optional_264231100000.apk has no usable artifacts
+10-31 14:24:26.585 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000007/MeasurementDynamite.apk has no usable artifacts
+10-31 14:24:26.980 I/HWUI    (13764): Davey! duration=9874ms; Flags=0, FrameTimelineVsyncId=287185, IntendedVsync=6303567661051, Vsync=6303584327717, InputEventId=0, HandleInputStart=6303591473214, AnimationStart=6303591473922, PerformTrave
+10-31 14:24:27.100 I/Choreographer(13764): Skipped 61 frames!  The application may be doing too much work on its main thread.
+10-31 14:24:27.167 I/HWUI    (13764): Davey! duration=2773ms; Flags=0, FrameTimelineVsyncId=287266, IntendedVsync=6311750994057, Vsync=6311900994051, InputEventId=0, HandleInputStart=6311915479551, AnimationStart=6311915480301, PerformTrave
+10-31 14:24:28.316 I/Choreographer(13764): Skipped 33 frames!  The application may be doing too much work on its main thread.
+10-31 14:24:33.679 I/HWUI    (13764): Davey! duration=4489ms; Flags=0, FrameTimelineVsyncId=287301, IntendedVsync=6312934327343, Vsync=6313567660651, InputEventId=0, HandleInputStart=6313568975677, AnimationStart=6313568976677, PerformTrave
+10-31 14:24:35.405 I/Choreographer(13764): Skipped 418 frames!  The application may be doing too much work on its main thread.
+10-31 14:24:35.995 I/artd    ( 3041): GetBestInfo: odex next to the dex file (/data/app/~~ye4TPOmNX50su0fP_CDtxw==/com.google.android.gms-BBJ16pcjYKRIlJToMM96Gg==/oat/arm64/base.odex) is kOatUpToDate with filter 'speed-profile' executable '
+10-31 14:24:35.996 I/HWUI    (13764): Davey! duration=6735ms; Flags=0, FrameTimelineVsyncId=287330, IntendedVsync=6314667660607, Vsync=6314700993939, InputEventId=0, HandleInputStart=6314712430761, AnimationStart=6314712431511, PerformTrave
+10-31 14:24:36.875 I/artd    ( 3041): GetBestInfo: odex next to the dex file (/data/app/~~ye4TPOmNX50su0fP_CDtxw==/com.google.android.gms-BBJ16pcjYKRIlJToMM96Gg==/oat/arm64/split_AdsDynamite_installtime.odex) is kOatUpToDate with filter 'sp
+10-31 14:24:36.926 I/Choreographer(13764): Skipped 66 frames!  The application may be doing too much work on its main thread.
+10-31 14:24:37.033 I/artd    ( 3041): GetBestInfo: odex next to the dex file (/data/app/~~ye4TPOmNX50su0fP_CDtxw==/com.google.android.gms-BBJ16pcjYKRIlJToMM96Gg==/oat/arm64/split_CronetDynamite_installtime.odex) is kOatUpToDate with filter
+10-31 14:24:37.131 I/GoogleSignatureVerifier(13764): package info is not set correctly
+10-31 14:24:37.194 I/artd    ( 3041): GetBestInfo: odex next to the dex file (/data/app/~~ye4TPOmNX50su0fP_CDtxw==/com.google.android.gms-BBJ16pcjYKRIlJToMM96Gg==/oat/arm64/split_DynamiteLoader_installtime.odex) is kOatUpToDate with filter
+10-31 14:24:37.231 I/artd    ( 3041): GetBestInfo: odex next to the dex file (/data/app/~~ye4TPOmNX50su0fP_CDtxw==/com.google.android.gms-BBJ16pcjYKRIlJToMM96Gg==/oat/arm64/split_DynamiteModulesA_installtime.odex) is kOatUpToDate with filte
+10-31 14:24:37.338 I/artd    ( 3041): GetBestInfo: odex next to the dex file (/data/app/~~ye4TPOmNX50su0fP_CDtxw==/com.google.android.gms-BBJ16pcjYKRIlJToMM96Gg==/oat/arm64/split_DynamiteModulesC_installtime.odex) is kOatUpToDate with filte
+10-31 14:24:37.349 I/artd    ( 3041): GetBestInfo: odex next to the dex file (/data/app/~~ye4TPOmNX50su0fP_CDtxw==/com.google.android.gms-BBJ16pcjYKRIlJToMM96Gg==/oat/arm64/split_GoogleCertificates_installtime.odex) is kOatUpToDate with fil
+10-31 14:24:39.586 I/artd    ( 3041): GetBestInfo: odex next to the dex file (/data/app/~~ye4TPOmNX50su0fP_CDtxw==/com.google.android.gms-BBJ16pcjYKRIlJToMM96Gg==/oat/arm64/split_MapsDynamite_installtime.odex) is kOatUpToDate with filter 's
+10-31 14:24:40.277 I/HWUI    (13764): Davey! duration=5882ms; Flags=0, FrameTimelineVsyncId=287367, IntendedVsync=6315884327225, Vsync=6315934327223, InputEventId=0, HandleInputStart=6315937337219, AnimationStart=6315937337969, PerformTrave
+10-31 14:24:40.399 I/artd    ( 3041): GetBestInfo: odex next to the dex file (/data/app/~~ye4TPOmNX50su0fP_CDtxw==/com.google.android.gms-BBJ16pcjYKRIlJToMM96Gg==/oat/arm64/split_MeasurementDynamite_installtime.odex) is kOatUpToDate with fi
+10-31 14:24:40.422 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000014/dl-MlkitOcrCommon.optional_264231100400.apk has no usable artifacts
+10-31 14:24:40.424 D/BoundBrokerSvc( 3586): onRebind: Intent { act=com.google.android.gms.libs.gmscorelogger.service.START dat=chimera-action:/... xflg=0x4 cmp=com.google.android.gms/.chimera.PersistentDirectBootAwareApiService }
+10-31 14:24:40.426 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000011/dl-PlayCloudSearch.optional_264231100000.apk has no usable artifacts
+10-31 14:24:40.437 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000009/dl-VisionOcr.optional_250834100000.apk has no usable artifacts
+10-31 14:24:40.441 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000001/CronetDynamite.apk has no usable artifacts
+10-31 14:24:40.441 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000002/DynamiteLoader.apk has no usable artifacts
+10-31 14:24:40.442 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000005/GoogleCertificates.apk has no usable artifacts
+10-31 14:24:40.443 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000015/dl-MlkitBarcodeUi.optional_264231100400.apk has no usable artifacts
+10-31 14:24:41.143 I/Choreographer(13764): Skipped 219 frames!  The application may be doing too much work on its main thread.
+10-31 14:24:41.189 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000a/dl-MlkitOcrCommon.optional_250834100400.apk has no usable artifacts
+10-31 14:24:41.853 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000010/dl-Appsearch.optional_264231100400.apk has no usable artifacts
+10-31 14:24:41.859 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000c/dl-TfliteDynamiteDynamite.integ_264010405100400.apk has no usable artifacts
+10-31 14:24:41.867 I/artd    ( 3041): GetBestInfo: vdex next to the dex file (/data/user/0/com.google.android.gms/app_dg_cache/AAEF584C0030E52846AF790022AA2BF836A591DF/oat/arm64/the.vdex) is kOatUpToDate with filter 'verify' executable 'fal
+10-31 14:24:41.875 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/00000018/dl-IdentityCredentialsPlatform.optional_264231100400.apk has no usable artifacts
+10-31 14:24:41.902 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000f/dl-Appsearch.optional_250834100400.apk has no usable artifacts
+10-31 14:24:41.911 I/artd    ( 3041): GetBestInfo: /data/user_de/0/com.google.android.gms/app_chimera/m/0000000b/dl-MlkitBarcodeUi.optional_250834100400.apk has no usable artifacts

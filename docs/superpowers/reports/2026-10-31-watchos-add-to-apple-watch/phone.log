@@ -1,0 +1,27 @@
+2026-10-31 13:49:22.332 TaqwaWatch activate() asked
+2026-10-31 13:49:22.541 TaqwaWatch activated=true state=2 error=none, calling watchActivated()
+2026-10-31 13:49:22.542 TaqwaWatch isReady()=true activated=true paired=true installed=true
+2026-10-31 13:49:23.026 TaqwaWatch key new
+2026-10-31 13:49:23.029 TaqwaWatch isReady()=true activated=true paired=true installed=true
+2026-10-31 13:49:23.029 TaqwaWatch send queued: bytes=21032 delivery=1/81d79d3c10e92a17
+2026-10-31 13:49:23.031 TaqwaWatch isReady()=true activated=true paired=true installed=true
+2026-10-31 13:49:23.067 TaqwaWatch key kept
+2026-10-31 13:49:30.768 TaqwaWatch face offered=false activated=true paired=true bundled=false
+2026-10-31 13:50:17.213 TaqwaWatch activate() asked
+2026-10-31 13:50:17.219 TaqwaWatch activated=true state=2 error=none, calling watchActivated()
+2026-10-31 13:50:17.269 TaqwaWatch isReady()=true activated=true paired=true installed=true
+2026-10-31 13:50:18.421 TaqwaWatch key kept
+2026-10-31 13:50:18.421 TaqwaWatch isReady()=true activated=true paired=true installed=true
+2026-10-31 13:50:18.452 TaqwaWatch key kept
+2026-10-31 13:50:24.668 TaqwaWatch face offered=true activated=true paired=true bundled=true
+2026-10-31 13:50:37.107 TaqwaWatch face refused: invalidFile code=2 domain=CLKWatchFaceLibraryErrorDomain
+2026-10-31 13:50:57.022 TaqwaWatch activate() asked
+2026-10-31 13:50:57.026 TaqwaWatch activated=true state=2 error=none, calling watchActivated()
+2026-10-31 13:50:57.056 TaqwaWatch isReady()=true activated=true paired=true installed=true
+2026-10-31 13:50:57.575 TaqwaWatch key kept
+2026-10-31 13:50:57.577 TaqwaWatch isReady()=true activated=true paired=true installed=true
+2026-10-31 13:50:57.578 TaqwaWatch send queued: bytes=24457 delivery=2/c3b3719df599556c
+2026-10-31 13:50:57.581 TaqwaWatch isReady()=true activated=true paired=true installed=true
+2026-10-31 13:50:57.626 TaqwaWatch key kept
+2026-10-31 13:51:04.885 TaqwaWatch face offered=true activated=true paired=true bundled=true
+2026-10-31 13:51:14.953 TaqwaWatch face refused: invalidFile code=2 domain=CLKWatchFaceLibraryErrorDomain

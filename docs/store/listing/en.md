@@ -26,7 +26,7 @@ PRAYER TIMES
 • A 24-hour or 12-hour clock, as you prefer.
 
 THE QURAN
-• The complete Uthmani text, in the same script as the Madinah Mushaf, with the traditional page layout when you want to read as from the printed Mushaf.
+• The complete Uthmani text, in the same script as the Madinah Mushaf, and the printed Mushaf's page layout if you want it.
 • Translations in English, Arabic tafsir, French, Turkish, Indonesian, Urdu and Bengali, shown under each ayah.
 • Search across the Arabic text and the translations.
 • Bookmarks, copy and share, and a card that takes you back to where you stopped.
@@ -44,24 +44,21 @@ ADHKAR
 TASBEEH
 • A dhikr counter with the post-prayer set built in.
 
+On your wrist: on Wear OS watches such as Galaxy Watch, Taqwa shows the next prayer and its countdown on its own watch face, in complications for any face and in a Tile, counts tasbeeh with the bezel or the crown, and points to the Qibla. The times come from your phone, so your watch and your phone always agree.
+
 MADE TO BE TRUSTED
 • No account, no adverts, no analytics and no tracking of any kind.
-• Your location is used on your phone to calculate times and never sent anywhere.
-• The internet is used only for recitation: the audio you ask for, and a daily check of the reciter list once you have used it.
+• Your location is used on your phone to calculate times. Only your own devices can see your location.
+• The internet is used for recitation: the audio you ask for, and a daily check of the reciter list once you have used it. If you add Taqwa to your watch, Google may carry its data over the internet, encrypted.
 • Free and open source under the GPL, with every source and licence credited in the app.
-
-Available in English, Arabic, French, Turkish, Indonesian, Urdu and Bengali.
 
 Prayer times from Taqwa's own engine; the Qibla bearing uses the Adhan library. Quran text from the Tanzil Project. Adhkar texts from OpenDua. Recitations from the Islamic Network, licensed by the reciters for free distribution. Taqwa is not affiliated with the religious authorities whose timetables it follows.
 
-Website: https://taqwa.world
-Support: support@taqwa.world
+(Plan 5 Task 10's cut, which makes room for the wrist paragraph within Play's 4,000 characters, for Mohamed's approval: the website and support lines are left out, since both stores show them in their own fields, and so is the line of interface languages, which the App Store lists itself; and the Mushaf bullet says the same in fewer words.)
 
 ### Release notes (500)
-What's new in 1.5.1:
-• Quran: the vowel and reading marks on screen now follow the printed Madinah Mushaf more closely
-• "Report a problem" now adds two short lines about how your phone handles notifications
-• Notifications: more reliable after an app update on some phones
+What's new in 1.6.0:
+• Taqwa on your watch: a watch face, complications and a Tile, tasbeeh and Qibla, on Wear OS watches such as Galaxy Watch
 
 ## App Store
 
@@ -88,11 +85,51 @@ times,salah,salat,azan,athan,koran,islam,recitation,tasbih,mosque,dhikr,ramadan,
 (App Store Connect Help states the keyword limit as 100 bytes, so it is counted in UTF-8 bytes here. "mosque" for "counter", for Match my mosque, is a proposal of 29 September; without it: times,salah,salat,azan,athan,koran,islam,recitation,tasbih,counter,dhikr,ramadan,namaz,hijri,compass)
 
 ### Description (4000)
-(The same text as the Play full description above.)
+Taqwa gives you the essentials of the day in one quiet place: prayer times where you are, a takbir or the adhan at each prayer, the whole Quran to read and listen to, the morning and evening adhkar, and the Qibla. It works offline, costs nothing, shows no adverts and asks for no account.
+
+PRAYER TIMES
+• Times for where you are, from your phone's location or a city you choose from more than 34,000.
+• Times from the timetable the mosques near you follow. Where Taqwa holds it, it reproduces it and checks it day by day against the published tables: on every day checked, no prayer starts before the published time. Where a timetable is not yet fully checked, Taqwa adds a safety margin; where mosques follow different timetables, it shows cautious times, each prayer once all have begun it; and where no timetable is known, it calculates on the safe side.
+• Tap the (i) on the Prayer screen to see whose times these are, and About these times for how they are made and checked. Match my mosque looks for your mosque's timetable from two times on its board, and the usual calculation methods (Muslim World League, Egyptian, Karachi, ISNA and more) and a per-prayer adjustment are there too.
+• Rules for high latitudes, where the night is too short for the usual angles.
+• A notification for each prayer: a clear tone, a takbir, or the adhan in a choice of voices, among them Makkah and Madinah, or a recording from your phone, with an optional reminder before it, an Iqama reminder a chosen number of minutes after the adhan, and a Duha reminder at its best time.
+• A Jumu'ah pill on Friday's Dhuhr, home-screen widgets with today's times and the countdown to the next prayer, and the Hijri date alongside the Gregorian one.
+• A 24-hour or 12-hour clock, as you prefer.
+
+THE QURAN
+• The complete Uthmani text, in the same script as the Madinah Mushaf, and the printed Mushaf's page layout if you want it.
+• Translations in English, Arabic tafsir, French, Turkish, Indonesian, Urdu and Bengali, shown under each ayah.
+• Search across the Arabic text and the translations.
+• Bookmarks, copy and share, and a card that takes you back to where you stopped.
+• Recitation by ten reciters, downloaded once per surah and played offline, with lock-screen controls; when a surah ends the next one follows.
+• During recitation, your phone's own voice can read the translation or tafsir aloud after each ayah, where the phone has a voice for that language.
+• An ayah-of-the-day widget.
+
+QIBLA
+• A compass pointing to Makkah, with the bearing and distance, and an honest word when the phone's compass cannot be trusted.
+
+ADHKAR
+• The morning and evening adhkar in Arabic, with a translation in your language, each counted on screen.
+• The Quranic ones recited by your chosen reciter, and a reminder for each set if you want one.
+
+TASBEEH
+• A dhikr counter with the post-prayer set built in.
+
+On your wrist: on Apple Watch, Taqwa shows the next prayer and its countdown in your watch face's complications, counts tasbeeh with the Digital Crown, and points to the Qibla. The times come from your iPhone, so your watch and your iPhone always agree.
+
+MADE TO BE TRUSTED
+• No account, no adverts, no analytics and no tracking of any kind.
+• Your location is used on your phone to calculate times. Only your own devices can see your location.
+• The internet is used for recitation: the audio you ask for, and a daily check of the reciter list once you have used it. If you add Taqwa to your watch, Apple may carry its data over the internet, encrypted.
+• Free and open source under the GPL, with every source and licence credited in the app.
+
+Prayer times from Taqwa's own engine; the Qibla bearing uses the Adhan library. Quran text from the Tanzil Project. Adhkar texts from OpenDua. Recitations from the Islamic Network, licensed by the reciters for free distribution. Taqwa is not affiliated with the religious authorities whose timetables it follows.
+
+(Its own text since 1.6.0, as each store names only its own watch (App Store Review Guideline 2.3.10): the Play full description above, with the Apple Watch paragraph in place of the Wear OS one, and Apple in place of Google in the bullet after the location one.)
 
 ### What's new (4000)
-What's new in 1.5.1:
-• Quran: the vowel and reading marks on screen now follow the printed Madinah Mushaf more closely
+What's new in 1.6.0:
+• Taqwa on your Apple Watch: the next prayer in your complications, tasbeeh with the Digital Crown, and Qibla
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Prayer times where you are
@@ -106,6 +143,6 @@ What's new in 1.5.1:
 9. Morning and evening adhkar
 
 ## Review notes (App Store and Play, English only)
-No account or sign-in. Location is optional: Settings › Location lets a reviewer choose any city instead. Everything works offline except recitation downloads, which fetch audio from a public GitHub release on request. To see the lock-screen player, play a surah and lock the phone. Widgets are added from the home screen's widget gallery. Nothing is collected or sent anywhere; the privacy policy is at https://taqwa.world/privacy/.
+No account or sign-in. Location is optional: Settings › Location lets a reviewer choose any city instead. Everything works offline except recitation downloads, which fetch audio from a public GitHub release on request. To see the lock-screen player, play a surah and lock the phone. Widgets are added from the home screen's widget gallery. Nothing is collected, and nothing is sent anywhere but to the user's own watch, if they add Taqwa to it; the privacy policy is at https://taqwa.world/privacy/.
 
-App Store Connect's Notes field carries the longer answers to App Review's information request of 23 September 2026 instead, brought up to date for the engine build on 29 September, for build 35 on 2 October and for build 42 on 7 November: `docs/store/app-review/2026-11-07-notes-1.5.1-42.txt` (the 23 September reply and the earlier notes stay as the record of what was sent then). Apple asked for them to stay there for future submissions, so update the newest file and the field together when a feature, a network use or a licence changes. The field holds 4,000 bytes.
+App Store Connect's Notes field carries the longer answers to App Review's information request of 23 September 2026 instead, brought up to date for the watch release: `docs/store/app-review/2026-10-30-notes-1.6.0-43.txt` (the 23 September reply and the earlier notes files stay as the record of what was sent then). Apple asked for them to stay there for future submissions, so update the file named above and the field together when a feature, a network use or a licence changes. The field holds 4,000 bytes.

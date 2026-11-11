@@ -1,0 +1,7 @@
+APK: wearApp/build/outputs/apk/debug/wearApp-debug.apk
+FAIL: no R8 mapping at wearApp/build/outputs/mapping/debug/mapping.txt: the debug build is not minified
+FAIL: the dex holds debug code: 1 DEBUG_FEED 16 SampleFeed 2 sample-feed
+FAIL: the APK carries test data: assets/sample-feed-capetown-ar-ly12.json assets/sample-feed-capetown-ar-sa.json assets/sample-feed-capetown-en12.json assets/sample-feed-capetown.json
+ok - the manifest asks for exactly wearApp/permissions.txt: android.permission.VIBRATE world.taqwa.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+size: 37799468 bytes (36.0 MB)
+wear-release-check debug: 3 failed

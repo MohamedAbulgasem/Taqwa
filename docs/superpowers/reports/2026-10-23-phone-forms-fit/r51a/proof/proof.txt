@@ -1,0 +1,28 @@
+proofmeasure.py on the proof face's shots (proof.sh), emulator-5558, 25 Oct 2026 06:31-06:38 SAST. The proof face is a scratch
+copy of 72c7bcb5 whose watchface.xml alone was edited by proof-edit.py: Arch's right-to-left Gregorian Groups test
+subText([COMPLICATION.TEXT], clamp(textLength - 5, 0, 99), textLength) == / != "أغسطس" (the 14-unit and 13-unit Groups) beside
+the length; built with :watchface:assembleDebug, signed with the face's test key, installed with adb install -r.
+
+sample           الأحد ١٨ أكتوبر          awake ink 193.3 px wide (x 126.9..320.2, y 133.8..170.5); model 14u 196.2, 13u 182.5, 11.25u 157.5 -> drawn at 14 units, rule A says 14: OK
+    against r51/shots/old/arch-ar-sa-1458-awake.png (14 units): 0 px of the band differ over 2 levels (max 0) -> equal
+    against r51/shots/new/greg-sample-awake.png (13 units): 2733 px of the band differ over 2 levels (max 240) -> different
+sample           الأحد ١٨ أكتوبر          aod   ink 192.3 px wide (x 127.9..320.2, y 125.9..170.5); model 14u 196.2, 13u 182.5, 11.25u 157.5 -> drawn at 14 units, rule A says 14: OK
+    against r51/shots/old/arch-ar-sa-1458-aod.png (14 units): 0 px of the band differ over 2 levels (max 0) -> equal
+    against r51/shots/new/greg-sample-aod.png (13 units): 1324 px of the band differ over 2 levels (max 123) -> different
+sat-aug-1        السبت ١ أغسطس            awake ink 238.9 px wide (x 105.1..343.9, y 135.8..170.5); model 14u 260.0, 13u 241.5, 11.25u 208.5 -> drawn at 13 units, rule A says 13: OK
+    against r51/shots/new/greg-sat-aug-1-awake.png (14 units): 3125 px of the band differ over 2 levels (max 240) -> different
+sat-aug-1        السبت ١ أغسطس            aod   ink 238.9 px wide (x 105.1..343.9, y 125.9..170.5); model 14u 260.0, 13u 241.5, 11.25u 208.5 -> drawn at 13 units, rule A says 13: OK
+    against r51/shots/new/greg-sat-aug-1-aod.png (14 units): 1518 px of the band differ over 2 levels (max 123) -> different
+thu-aug-10       الخميس ١٠ أغسطس          awake ink 272.6 px wide (x  88.2..360.8, y 135.8..170.5); model 14u 296.2, 13u 275.2, 11.25u 237.5 -> drawn at 13 units, rule A says 13: OK
+    against r51/shots/new/greg-thu-aug-10-awake.png (13 units): 0 px of the band differ over 2 levels (max 0) -> equal
+thu-aug-10       الخميس ١٠ أغسطس          aod   ink 273.6 px wide (x  88.2..361.8, y 125.9..170.5); model 14u 296.2, 13u 275.2, 11.25u 237.5 -> drawn at 13 units, rule A says 13: OK
+    against r51/shots/new/greg-thu-aug-10-aod.png (13 units): 0 px of the band differ over 2 levels (max 0) -> equal
+thu-aug-10-latn  الخميس 10 أغسطس          awake ink 272.6 px wide (x  88.2..360.8, y 135.8..170.5); model 14u 296.2, 13u 275.2, 11.25u 237.5 -> drawn at 13 units, rule A says 13: OK
+thu-aug-10-latn  الخميس 10 أغسطس          aod   ink 273.6 px wide (x  88.2..361.8, y 125.9..170.5); model 14u 296.2, 13u 275.2, 11.25u 237.5 -> drawn at 13 units, rule A says 13: OK
+wed-dec-30       الأربعاء ٣٠ ديسمبر       awake ink 247.8 px wide (x  99.1..346.9, y 135.8..170.5); model 14u 252.0, 13u 234.0, 11.25u 202.0 -> drawn at 14 units, rule A says 14: OK
+wed-dec-30       الأربعاء ٣٠ ديسمبر       aod   ink 247.8 px wide (x  99.1..346.9, y 125.9..170.5); model 14u 252.0, 13u 234.0, 11.25u 202.0 -> drawn at 14 units, rule A says 14: OK
+tue-oct-10       الثلاثاء ١٠ تشرين الأول  awake ink 241.9 px wide (x 103.1..344.9, y 141.7..169.5); model 14u 309.8, 13u 287.8, 11.25u 248.5 -> drawn at 11.25 units, rule A says 11.25: OK
+    against r51/shots/new/greg-tue-oct-10-awake.png (11.25 units): 0 px of the band differ over 2 levels (max 0) -> equal
+tue-oct-10       الثلاثاء ١٠ تشرين الأول  aod   ink 242.8 px wide (x 103.1..345.9, y 125.9..169.5); model 14u 309.8, 13u 287.8, 11.25u 248.5 -> drawn at 11.25 units, rule A says 11.25: OK
+    against r51/shots/new/greg-tue-oct-10-aod.png (11.25 units): 0 px of the band differ over 2 levels (max 0) -> equal
+PROOF PASSES: the face's subText(...) == "أغسطس" picks each case's size, awake and always-on

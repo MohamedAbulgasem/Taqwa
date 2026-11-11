@@ -191,4 +191,29 @@ internal object SettingsKeys {
      * recitation never opens a socket.
      */
     val RECITATION_ENGAGED = booleanPreferencesKey("recitation_engaged")
+
+    /*
+     * The phone's one record of its watch (`WatchFeedRecord`, Ruling 50), so that an unchanged feed
+     * is not sent again, even after a restart, and a delivery number is never used twice. Always
+     * written together, in one edit, and the origin first read makes the whole record. None of it
+     * names a place or a person: a random number, counters, fingerprints and a random watch key.
+     */
+
+    /** This install's random origin, 16 hex characters, made once; absent: no record yet. */
+    val WATCH_FEED_ORIGIN = stringPreferencesKey("watch_feed_origin")
+
+    /** The highest delivery number this install has used, written before the link is called. */
+    val WATCH_FEED_LAST_SEQ = longPreferencesKey("watch_feed_last_seq")
+
+    /** The fingerprint of the feed that number's send stood for. */
+    val WATCH_FEED_LAST_STANDS_FOR = stringPreferencesKey("watch_feed_last_stands_for")
+
+    /** The fingerprint that number travelled with (the times alone after a `TOO_LARGE`). */
+    val WATCH_FEED_LAST_SENT = stringPreferencesKey("watch_feed_last_sent")
+
+    /** The number the watch last confirmed; absent when nothing is confirmed. */
+    val WATCH_FEED_CONFIRMED_SEQ = longPreferencesKey("watch_feed_confirmed_seq")
+
+    /** The watch that confirmation counts for: the iPhone's watch key; absent on Android. */
+    val WATCH_FEED_CONFIRMED_FOR = stringPreferencesKey("watch_feed_confirmed_for")
 }

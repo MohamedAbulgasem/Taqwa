@@ -1,0 +1,4 @@
+# NotificationRecord lines of 'dumpsys notification --noredact' (notifications-after); the full dump is not kept
+    NotificationRecord(0x02a03828: pkg=com.android.vending user=UserHandle{0} id=951340667 tag=null importance=2 key=0|com.android.vending|951340667|null|10144
+    NotificationRecord(0x06cb387d: pkg=android user=UserHandle{-1} id=19 tag=null importance=2 key=-1|android|19|null|1000
+# NotificationRecords from com.google.android.gms or world.taqwa.app: 0

@@ -1,0 +1,6 @@
+Broadcast completed: result=-1, data="CLEARED"
+Broadcast completed: result=-1, data="NEWER_VERSION for epoch 1792328322, version 2"
+Broadcast completed: result=-1, data="ACCEPTED for epoch 1792328280"
+Broadcast completed: result=-1, data="ACCEPTED for epoch 1792328280"
+Broadcast completed: result=-1, data="NEWER_VERSION for epoch 1792328280, version 2"
+Broadcast completed: result=-1, data="ACCEPTED for epoch 1792328323"

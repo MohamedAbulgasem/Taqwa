@@ -1,0 +1,18 @@
+time: Sat Oct 31 16:26:59 SAST 2026
+app: versionCode=100038 minSdk=30 targetSdk=36
+app sha1: 2b2d77c9
+face: versionCode=38 minSdk=33 targetSdk=36 sha1=d4f50b1d
+files: . .. feed.json nudge.anchor profileInstalled
+shared_prefs: 
+feed sha1: 0b3f92ef writtenAt=1792821600 en
+nudge.anchor: 1793363799
+auto_time=1 auto_time_zone=1 tz=Africa/Johannesburg
+font_scale=1.0 display_density=Physical density: 320
+talkback: services=null enabled=0
+locale: persist.sys.locale=en-US system_locales=null app-locales=Locales for world.taqwa.app for user 0 are []
+battery: AC powered: true level: 100 Capacity level: -1
+rotation: user_rotation=0 accel_rotation=1
+alarms (taqwa): 0
+tiles: 0
+READ_PHONE_STATE (talkback): android.permission.READ_PHONE_STATE
+deviceidle: ACTIVE

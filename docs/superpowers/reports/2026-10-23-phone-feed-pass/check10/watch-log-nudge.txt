@@ -1,0 +1,1 @@
+10-31 13:26:27.391 I/System.out( 1754): TaqwaWearFeed ASK DAILY sent

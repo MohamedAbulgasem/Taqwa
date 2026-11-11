@@ -11,6 +11,9 @@ kotlinx-coroutines = "1.10.2"
 datastore = "1.1.7"
 androidx-activity = "1.9.3"
 androidx-core = "1.15.0"
+# The watch app's launch screen on Wear OS 3 (:wearApp, plan 5 Task 3), which has no system splash
+# screen; from API 31 it hands to the system's. 1.2.0 is the latest stable.
+androidx-core-splashscreen = "1.2.0"
 androidx-glance = "1.1.1"
 # Slice 3a: surah downloads survive the app being backgrounded, which on Android means
 # WorkManager. 2.11.2 is the latest stable; 2.12.0 is still RC.
@@ -32,6 +35,44 @@ okio = "3.18.2"
 # so ExoPlayer cannot leak into common code (spec §10). 1.11.1 is the latest stable; 1.12.0 is
 # still alpha.
 media3 = "1.11.1"
+play-services-wearable = "20.0.1"
+# The Wear OS app (:wearApp). Compose for Wear OS is AndroidX's own library, not Compose
+# Multiplatform's, and it is numbered on its own: 1.7.1 (7 Oct 2026) is the latest stable
+# material3 and foundation, and 1.8.0 is still alpha. The activity and lifecycle pins are the latest
+# stable too (checked on Google's Maven, 20 Oct 2026; activity-compose 1.14 and lifecycle 2.12 are
+# alphas). They are the watch's own, apart from the phone's androidx-activity and
+# jetbrains-lifecycle above, so that bringing the watch up to date moves nothing the phone builds on.
+wear-compose = "1.7.1"
+wear-activity = "1.13.0"
+wear-lifecycle = "2.11.0"
+# The watch app's complications (:wearApp): the data source library (with its coroutine wrapper)
+# and the dynamic values the countdown and the ring are written in, which the system evaluates on
+# the watch while the app is not running (docs/superpowers/reports/2026-10-19-wear-spike.md).
+# 1.3.0 (25 Feb 2026) and 1.4.2 (29 Jul 2026) are the latest stable of each, checked on Google's
+# Maven on 20 Oct 2026; the spike ran both. Neither adds a permission to the merged manifest.
+wear-watchface = "1.3.0"
+# Watch Face Push (:wearApp, plan 5 Task 5): the app installs, updates and makes active the Taqwa
+# face in its one slot. 1.0.0 is the only stable release (8 April 2026); its AAR's minSdk is 33 and
+# it works from API 36 alone, so the manifest overrides both (tools:overrideLibrary, and wear-sdk not
+# required) and AndroidFacePushPort calls it only where the system has it.
+wear-watchfacepush = "1.0.0"
+wear-protolayout = "1.4.2"
+# The watch app's tests only (:wearApp testImplementation): Robolectric runs a complication source
+# itself at the API levels it branches on, Wear OS 3's 30 and Wear OS 4's 33 (Ruling 74 item 3).
+# 4.17 (10 Sep 2026) is the latest stable, checked on Maven Central on 6 Nov 2026 (4.18 is a beta).
+# It never reaches an APK: no runtime classpath of the watch app names it.
+robolectric = "4.17"
+# The phone's watch rows (:shared androidMain, plan 5 Task 6): RemoteActivityHelper opens Taqwa's
+# Play page, or the Taqwa face's screen, on the user's own watch. 1.2.0 (25 Feb 2026) is the latest
+# stable (1.3.0 is an RC), checked on Google's Maven on 6 Nov 2026. It adds no permission to the
+# phone (docs/superpowers/reports/2026-11-06-phone-watch-rows.md).
+wear-remote-interactions = "1.2.0"
+# The watch app's Tile (:wearApp, plan 3 Task 8): 1.6.2 is the latest stable Tiles release, and the
+# newest whose POM names protolayout 1.4.x (1.4.2, the pin above), checked on Google's Maven on 30
+# Oct 2026. concurrent-futures-ktx 1.3.0 is the latest stable (1.4.0 is an alpha): its
+# SuspendToFutureAdapter answers the Tile's requests from a coroutine, so no Guava call is made.
+wear-concurrent-futures = "1.3.0"
+wear-tiles = "1.6.2"
 
 [libraries]
 sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
@@ -56,8 +97,26 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 datastore-preferences = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidx-core-splashscreen" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "androidx-glance" }
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
+play-services-wearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "play-services-wearable" }
+wear-compose-material3 = { module = "androidx.wear.compose:compose-material3", version.ref = "wear-compose" }
+wear-compose-foundation = { module = "androidx.wear.compose:compose-foundation", version.ref = "wear-compose" }
+wear-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "wear-activity" }
+wear-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "wear-lifecycle" }
+wear-complications-data-source = { module = "androidx.wear.watchface:watchface-complications-data-source-ktx", version.ref = "wear-watchface" }
+wear-concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "wear-concurrent-futures" }
+wear-protolayout = { module = "androidx.wear.protolayout:protolayout", version.ref = "wear-protolayout" }
+wear-protolayout-expression = { module = "androidx.wear.protolayout:protolayout-expression", version.ref = "wear-protolayout" }
+# What protolayout-expression builds its expressions from, and what the unit tests read them back
+# in (the countdown is checked by evaluating it): the app itself never names them.
+wear-protolayout-proto = { module = "androidx.wear.protolayout:protolayout-proto", version.ref = "wear-protolayout" }
+wear-protolayout-protobuf = { module = "androidx.wear.protolayout:protolayout-external-protobuf", version.ref = "wear-protolayout" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+wear-remote-interactions = { module = "androidx.wear:wear-remote-interactions", version.ref = "wear-remote-interactions" }
+wear-tiles = { module = "androidx.wear.tiles:tiles", version.ref = "wear-tiles" }
+wear-watchfacepush = { module = "androidx.wear.watchfacepush:watchfacepush", version.ref = "wear-watchfacepush" }
 
 [plugins]
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

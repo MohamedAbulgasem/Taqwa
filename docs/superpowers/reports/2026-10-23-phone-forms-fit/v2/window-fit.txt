@@ -1,0 +1,14 @@
+  ESTIMATE: figure '۷''s left side bearing is 0.058 em, the face takes 0.002
+  ESTIMATE: figure '۶''s left side bearing is 0.041 em, the face takes 0.066
+The Moon's date window (tools/face-moon.py WD_GAP 3 px, WD_MIN 0.5), the ink at least 3 px from the day, for the phones' weekdays in tools/watchface/phone-forms.json:
+  en,en-GB,en-US and 6 more      123…           217 dates,  59% at full size, least scale 0.80 (MON 20), nearest 3.8 px (SAT 20)
+  ar-SA,ar-EG,ar-LY and 8 more   Arabic-Indic   217 dates,  58% at full size, least scale 0.75 (الخميس ٣٠), nearest 3.9 px (الخميس ٢٠)
+  ar-SA,ar-EG,ar-LY and 8 more   123…           217 dates,  49% at full size, least scale 0.72 (الخميس 20), nearest 3.8 px (الخميس 20)
+  fr-FR,fr-MA,fr-DZ,fr-CA        123…           217 dates,  63% at full size, least scale 0.84 (MAR 20), nearest 4.3 px (MAR 20)
+  tr-TR                          123…           217 dates,  63% at full size, least scale 0.80 (CUM 20), nearest 3.6 px (CMT 20)
+  id-ID                          123…           217 dates,  71% at full size, least scale 0.84 (KAM 20), nearest 4.3 px (RAB 20)
+  ur-PK,ur-IN                    123…           217 dates,  86% at full size, least scale 0.76 (جمعرات 20), nearest 3.3 px (جمعرات 20)
+  DOES NOT FIT: جمعرات ۶, 2.9 px from the day
+  ur-PK,ur-IN                    Arabic-Indic   217 dates,  86% at full size, least scale 0.79 (جمعرات ۳۰), nearest 2.9 px (جمعرات ۶)
+  bn-BD,bn-IN                    ১২৩…           217 dates,  31% at full size, least scale 0.50 (বৃহস্পতি ১০), nearest 8.7 px (বৃহস্পতি ৩০)
+tools/watchface/window-fit.py: 1 dates do not fit, 2 estimates are off, 0 windows not checked

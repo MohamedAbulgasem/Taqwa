@@ -1,0 +1,6 @@
+litshare.py (../r51/litshare.py; tools/watchface/lit.py undither) on Arch's always-on Arabic frame, the committed one before
+this fix round (old, the face at 14 units) and this pass's (new, 13 units). Google's limit is 15%.
+
+old          pass-arch-ar-ly-12h-1458-aod.png     raw  5.10%  face  10.26%
+new          pass-arch-ar-ly-12h-1458-aod.png     raw  4.98%  face  10.02%
+highest as the face draws it: 10.26% (lit-old/pass-arch-ar-ly-12h-1458-aod.png), under 15%: True

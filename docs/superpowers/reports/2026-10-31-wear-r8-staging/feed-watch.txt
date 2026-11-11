@@ -1,0 +1,7 @@
+10-31 16:28:03.033  4637  4661 I System.out: TaqwaWearFeed NUDGE armed in 0s found=false stopped=false
+10-31 16:28:03.054  4637  4662 I System.out: TaqwaWearFeed ASK STARTED no phone
+10-31 16:28:06.906  4637  4691 I System.out: TaqwaWearFeed ASK PHONE_NEARBY sent
+10-31 16:28:10.456  4637  4693 I System.out: TaqwaWearFeed ACCEPTED 2/6efab8e0696fdd95
+10-31 16:28:10.457  4637  4693 I System.out: TaqwaWearFeed ACK 2/6efab8e0696fdd95 sent
+10-31 16:28:10.605  4637  4693 I System.out: TaqwaWearFeed ACCEPTED 3/6efab8e0696fdd95
+10-31 16:28:10.606  4637  4693 I System.out: TaqwaWearFeed ACK 3/6efab8e0696fdd95 sent

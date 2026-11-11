@@ -1,0 +1,244 @@
+{
+    "locales": {
+        "en": {
+            "language": "en",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+            "countdown": {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"}
+        },
+        "en-GB": {
+            "language": "en",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"],
+            "countdown": {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"}
+        },
+        "en-US": {
+            "language": "en",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+            "countdown": {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"}
+        },
+        "en-ZA": {
+            "language": "en",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"],
+            "countdown": {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"}
+        },
+        "ar-SA": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["٠١٢٣٤٥٦٧٨٩", "0123456789"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-EG": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["٠١٢٣٤٥٦٧٨٩", "0123456789"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-LY": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["0123456789", "٠١٢٣٤٥٦٧٨٩"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-MA": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["0123456789", "٠١٢٣٤٥٦٧٨٩"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["يناير", "فبراير", "مارس", "أبريل", "ماي", "يونيو", "يوليوز", "غشت", "شتنبر", "أكتوبر", "نونبر", "دجنبر"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-TN": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["0123456789", "٠١٢٣٤٥٦٧٨٩"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["جانفي", "فيفري", "مارس", "أفريل", "ماي", "جوان", "جويلية", "أوت", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-DZ": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["0123456789", "٠١٢٣٤٥٦٧٨٩"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["جانفي", "فيفري", "مارس", "أفريل", "ماي", "جوان", "جويلية", "أوت", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-IQ": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["٠١٢٣٤٥٦٧٨٩", "0123456789"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران", "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-SY": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["٠١٢٣٤٥٦٧٨٩", "0123456789"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران", "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-JO": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["٠١٢٣٤٥٦٧٨٩", "0123456789"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران", "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-LB": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["٠١٢٣٤٥٦٧٨٩", "0123456789"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["كانون الثاني", "شباط", "آذار", "نيسان", "أيار", "حزيران", "تموز", "آب", "أيلول", "تشرين الأول", "تشرين الثاني", "كانون الأول"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "ar-AE": {
+            "language": "ar",
+            "rtl": true,
+            "digitSets": ["0123456789", "٠١٢٣٤٥٦٧٨٩"],
+            "weekdays": ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+            "months": ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+            "countdown": {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"}
+        },
+        "fr-FR": {
+            "language": "fr",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"],
+            "months": ["JANV", "FÉVR", "MARS", "AVR", "MAI", "JUIN", "JUIL", "AOÛT", "SEPT", "OCT", "NOV", "DÉC"],
+            "countdown": {"hoursMinutes": "dans %1$s h %2$s min", "hours": "dans %1$s h", "minutes": "dans %1$s min", "underAMinute": "d’ici une minute"}
+        },
+        "fr-MA": {
+            "language": "fr",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"],
+            "months": ["JAN", "FÉV", "MAR", "AVR", "MAI", "JUI", "JUIL", "AOÛT", "SEPT", "OCT", "NOV", "DÉC"],
+            "countdown": {"hoursMinutes": "dans %1$s h %2$s min", "hours": "dans %1$s h", "minutes": "dans %1$s min", "underAMinute": "d’ici une minute"}
+        },
+        "fr-DZ": {
+            "language": "fr",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"],
+            "months": ["JANV", "FÉVR", "MARS", "AVR", "MAI", "JUIN", "JUIL", "AOÛT", "SEPT", "OCT", "NOV", "DÉC"],
+            "countdown": {"hoursMinutes": "dans %1$s h %2$s min", "hours": "dans %1$s h", "minutes": "dans %1$s min", "underAMinute": "d’ici une minute"}
+        },
+        "fr-CA": {
+            "language": "fr",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"],
+            "months": ["JANV", "FÉVR", "MARS", "AVR", "MAI", "JUIN", "JUILL", "AOÛT", "SEPT", "OCT", "NOV", "DÉC"],
+            "countdown": {"hoursMinutes": "dans %1$s h %2$s min", "hours": "dans %1$s h", "minutes": "dans %1$s min", "underAMinute": "d’ici une minute"}
+        },
+        "tr-TR": {
+            "language": "tr",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["PAZ", "PZT", "SAL", "ÇAR", "PER", "CUM", "CMT"],
+            "months": ["OCA", "ŞUB", "MAR", "NİS", "MAY", "HAZ", "TEM", "AĞU", "EYL", "EKİ", "KAS", "ARA"],
+            "countdown": {"hoursMinutes": "%1$s sa %2$s dk sonra", "hours": "%1$s sa sonra", "minutes": "%1$s dk sonra", "underAMinute": "bir dakika içinde"}
+        },
+        "id-ID": {
+            "language": "id",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["MIN", "SEN", "SEL", "RAB", "KAM", "JUM", "SAB"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MEI", "JUN", "JUL", "AGU", "SEP", "OKT", "NOV", "DES"],
+            "countdown": {"hoursMinutes": "%1$s j %2$s mnt lagi", "hours": "%1$s j lagi", "minutes": "%1$s mnt lagi", "underAMinute": "kurang dari semenit"}
+        },
+        "ur-PK": {
+            "language": "ur",
+            "rtl": true,
+            "digitSets": ["0123456789", "۰۱۲۳۴۵۶۷۸۹"],
+            "weekdays": ["اتوار", "پیر", "منگل", "بدھ", "جمعرات", "جمعہ", "ہفتہ"],
+            "months": ["جنوری", "فروری", "مارچ", "اپریل", "مئی", "جون", "جولائی", "اگست", "ستمبر", "اکتوبر", "نومبر", "دسمبر"],
+            "countdown": {"hoursMinutes": "%1$s گھنٹے %2$s منٹ میں", "hours": "%1$s گھنٹے میں", "minutes": "%1$s منٹ میں", "underAMinute": "ایک منٹ سے کم میں"}
+        },
+        "ur-IN": {
+            "language": "ur",
+            "rtl": true,
+            "digitSets": ["۰۱۲۳۴۵۶۷۸۹", "0123456789"],
+            "weekdays": ["اتوار", "پیر", "منگل", "بدھ", "جمعرات", "جمعہ", "ہفتہ"],
+            "months": ["جنوری", "فروری", "مارچ", "اپریل", "مئی", "جون", "جولائی", "اگست", "ستمبر", "اکتوبر", "نومبر", "دسمبر"],
+            "countdown": {"hoursMinutes": "%1$s گھنٹے %2$s منٹ میں", "hours": "%1$s گھنٹے میں", "minutes": "%1$s منٹ میں", "underAMinute": "ایک منٹ سے کم میں"}
+        },
+        "bn-BD": {
+            "language": "bn",
+            "rtl": false,
+            "digitSets": ["০১২৩৪৫৬৭৮৯"],
+            "weekdays": ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহস্পতি", "শুক্র", "শনি"],
+            "months": ["জানু", "ফেব", "মার্চ", "এপ্রি", "মে", "জুন", "জুল", "আগ", "সেপ", "অক্টো", "নভে", "ডিসে"],
+            "countdown": {"hoursMinutes": "%1$s ঘ %2$s মি পরে", "hours": "%1$s ঘ পরে", "minutes": "%1$s মি পরে", "underAMinute": "এক মিনিটের কম সময়ে"}
+        },
+        "bn-IN": {
+            "language": "bn",
+            "rtl": false,
+            "digitSets": ["০১২৩৪৫৬৭৮৯"],
+            "weekdays": ["রবি", "সোম", "মঙ্গল", "বুধ", "বৃহস্পতি", "শুক্র", "শনি"],
+            "months": ["জানু", "ফেব", "মার্চ", "এপ্রি", "মে", "জুন", "জুল", "আগ", "সেপ্টেঃ", "অক্টোঃ", "নভেঃ", "ডিসেঃ"],
+            "countdown": {"hoursMinutes": "%1$s ঘ %2$s মি পরে", "hours": "%1$s ঘ পরে", "minutes": "%1$s মি পরে", "underAMinute": "এক মিনিটের কম সময়ে"}
+        },
+        "hi-IN": {
+            "language": "en",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+            "countdown": {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"}
+        },
+        "he-IL": {
+            "language": "en",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+            "countdown": {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"}
+        },
+        "fa-IR": {
+            "language": "en",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+            "countdown": {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"}
+        },
+        "mr-IN": {
+            "language": "en",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+            "countdown": {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"}
+        },
+        "zh-CN": {
+            "language": "en",
+            "rtl": false,
+            "digitSets": ["0123456789"],
+            "weekdays": ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+            "months": ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"],
+            "countdown": {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"}
+        }
+    }
+}

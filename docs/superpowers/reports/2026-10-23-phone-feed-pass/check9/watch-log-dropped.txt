@@ -1,0 +1,1 @@
+10-31 13:16:38.275 I/System.out( 5230): TaqwaWearFeed DROPPED

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The watch's Wear Data Layer capability (plan 2 Task 6): Taqwa's phone app sends its feed only to
+  nearby nodes that declare taqwa_watch (WatchLinkContract.WATCH_CAPABILITY), and only Taqwa's own
+  watch app, of the same package and signing key, declares it. Read by Play services alone, never
+  by the app's code, so it is kept from resource shrinking. Not a word anyone sees.
+  LinkManifestTest holds it to the contract's constant.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@array/android_wear_capabilities">
+    <string-array name="android_wear_capabilities" translatable="false">
+        <item>taqwa_watch</item>
+    </string-array>
+</resources>

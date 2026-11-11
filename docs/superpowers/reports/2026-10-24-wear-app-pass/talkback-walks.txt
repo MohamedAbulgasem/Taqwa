@@ -1,0 +1,320 @@
+What TalkBack 16 for Wear said on emulator-5558, 31 October 2026 (plan 3 Task 9 Step 3), read from
+its own log (tools/watchface/talkback.sh, its Diagnosis mode on). The watch's language is English;
+the feeds are the debug build's samples at 14:58 on Sunday 18 October in Cape Town. Each walk line is
+one "next item" swipe (one finger, left to right, through the emulator's touch screen) and what was
+said for it, its fragments joined by "|", without TalkBack's "Double-tap to activate" hints. An empty
+line is the end of the list, after which TalkBack starts again at the first item it holds.
+
+- "opening" is what TalkBack said within 5 s of the page being opened with TalkBack on. "Home screen"
+  and "Prayer times" are the face's (TalkBack turned on over the face, before the app opened), and
+  "Taqwa" is the app's window.
+- "idle" counts what was said with nothing touched: 10 s in the middle of a minute, then 10 s
+  across the turn of a minute (the ring's sentence, which changes once a minute, is read again once).
+- tap2 is TalkBack's double tap; "stored" is the count the app saved (shared_prefs/tasbeeh.xml),
+  which shows a tap2 counted where its words fell outside the script's 3 s window.
+- actions draws "Swipe down then right", which opens the TalkBack menu with "Actions" first on the
+  counter; its tap2 lists the counter's actions, "Take one away" then "Choose a dhikr".
+- "the pager, turned with TalkBack on" swipes with adb's input, which reaches the app and not
+  TalkBack, as a sighted wearer's swipe would: it shows what TalkBack says at each change of page
+  (the page's pane title). TalkBack's own way between pages is a two-finger swipe, which the
+  harness cannot draw.
+- Not kept: an en12 Tasbeeh run whose actions menu opened late, so that its taps landed on "Read
+  from top" and TalkBack's continuous-reading tutorial (never confirmed; the tutorial's box stayed
+  as found), and an ar-sa Tasbeeh run whose script checked for the English "Take one away". Both
+  were run again, below.
+
+
+== en Today (14:58) ==
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  opening TODAY: Taqwa|Asr in 1 hour 11 minutes, at 16:10
+  idle 10 s on Today, mid-minute (from 14:58:45): said []
+  10 s across the minute (to 14:59:04): said [Asr in 1 hour 10 minutes, at 16:10]
+  the walk from the ring, one swipe right at a time:
+    1: Passed. Fajr, 4:33
+    2: Passed. Sunrise, 6:01
+    3: Current prayer. Dhuhr, 12:33
+    4: Next prayer. Asr, 16:10
+    5: Maghrib, 19:04
+    6: Isha, 20:24
+    7: Cape Town
+    8:
+    9: Passed. Fajr, 4:33
+    10: Passed. Sunrise, 6:01
+    11: Current prayer. Dhuhr, 12:33
+    12: Next prayer. Asr, 16:10
+    13: Maghrib, 19:04
+    14: Isha, 20:24
+== en Tasbeeh ==
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  opening TASBEEH: Taqwa|27 of 100. SubhanAllah. Page|Tasbeeh
+  walk to the counter:
+    1:
+    2: 27 of 100. SubhanAllah. Page
+  tap2 227 227:
+  stored after tap2: count.after_prayer">28,1</string>
+  actions: TalkBack menu|Actions
+  tap2 on Actions: tap2 227 227: Actions|Take one away
+  tap2 (Take one away): tap2 227 227: 27 of 100|Taqwa|27 of 100. SubhanAllah. Page
+  stored after: count.after_prayer">27,1</string>
+  actions: TalkBack menu|Actions
+  tap2 on Actions: tap2 227 227: Actions|Take one away
+  walk 1 to the next action:
+    1: Choose a dhikr
+  tap2 (Choose a dhikr): tap2 227 227: Taqwa|Tasbeeh
+  the list, walked:
+    1: Selected. After prayer, 100
+    2: Not selected. SubhanAllah, 100
+    3: Not selected. Alhamdulillah, 100
+    4: Not selected. Allahu Akbar, 100
+    5: Not selected. Astaghfirullah, 100
+    6: Not selected. La ilaha illallah, 100
+    7: Not selected. SubhanAllahi wa bihamdihi, 100
+    8: Not selected. سبحان الله وبحمده، سبحان الله العظيم, 100
+    9: Not selected. Astaghfirullah wa atubu ilayh, 33
+    10: Reset. Button
+    11:
+    12: Not selected. La ilaha illallah, 100
+    13: Not selected. SubhanAllahi wa bihamdihi, 100
+  from the counter, the walk on:
+  opening TASBEEH: Home screen|Asr in 1 hour 10 minutes, at 16:10|Taqwa|27 of 100. SubhanAllah. Page
+    1:
+    2: 27 of 100. SubhanAllah. Page
+    3:
+    4: 27 of 100. SubhanAllah. Page
+    5:
+    6: 27 of 100. SubhanAllah. Page
+    7:
+    8: 27 of 100. SubhanAllah. Page
+== en Qibla ==
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  opening QIBLA: Prayer times|Home screen|Asr in 1 hour 11 minutes, at 16:10
+  walk at true 340:
+    1: 23°
+    2: Makkah · 6,600 km away
+    3:
+    4: Turn right about 45 degrees
+  turned to true 23, untouched: Turn right about 30 degrees|Turn right about 15 degrees|Facing qibla
+  turned back to true 340, untouched: Turn right about 15 degrees|23°|Turn right about 30 degrees|Turn right about 45 degrees
+  spoken in 8 s untouched: 0 (steady heading)
+== en Tile (14:58) ==
+tile tile-en.png: found 'Cape Town' (try 2)
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  the walk on the Tile:
+    1: Passed. Fajr, 4:33
+    2: Passed. Sunrise, 6:01
+    3: Current prayer. Dhuhr, 12:33
+    4: Next prayer. Asr, 16:10
+    5: Maghrib, 19:04
+    6: Isha, 20:24
+    7: Cape Town
+    8:
+    9: Asr in 1 hour 10 minutes, at 16:10
+    10: Passed. Fajr, 4:33
+== en the pager, turned with TalkBack on ==
+  swipe to Tasbeeh: Tasbeeh|27 of 100. SubhanAllah. Page
+  swipe to Qibla: 23°|Qibla|Turn right about 45 degrees
+  swipe to Tasbeeh: Turn right about 45 degrees|Tasbeeh|27 of 100. SubhanAllah. Page
+  swipe to Today: Today
+
+== en12 Today (14:58) ==
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  opening TODAY: Prayer times|Home screen|Asr in 1 hour 11 minutes, at ⁨4:10 PM⁩
+  idle 10 s on Today, mid-minute (from 14:58:45): said []
+  10 s across the minute (to 14:59:04): said [Asr in 1 hour 10 minutes, at ⁨4:10 PM⁩]
+  the walk from the ring, one swipe right at a time:
+    1: Passed. Fajr, ⁨4:33 AM⁩
+    2: Passed. Sunrise, ⁨6:01 AM⁩
+    3: Current prayer. Dhuhr, ⁨12:33 PM⁩
+    4: Next prayer. Asr, ⁨4:10 PM⁩
+    5: Maghrib, ⁨7:04 PM⁩
+    6: Isha, ⁨8:24 PM⁩
+    7: Cape Town
+    8:
+    9: Passed. Fajr, ⁨4:33 AM⁩
+    10: Passed. Sunrise, ⁨6:01 AM⁩
+    11: Current prayer. Dhuhr, ⁨12:33 PM⁩
+    12: Next prayer. Asr, ⁨4:10 PM⁩
+    13: Maghrib, ⁨7:04 PM⁩
+    14: Isha, ⁨8:24 PM⁩
+== en12 Tasbeeh ==
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  opening TASBEEH: Taqwa|27 of 100. SubhanAllah. Page
+  walk to the counter:
+    1:
+    2: 27 of 100. SubhanAllah. Page
+  tap2 227 227:
+  stored after tap2: count.after_prayer">28,1</string>
+  actions: TalkBack menu|Actions
+  tap2 on Actions: tap2 227 227: Actions|Take one away
+  tap2 (Take one away): tap2 227 227: 27 of 100|Taqwa|27 of 100. SubhanAllah. Page
+  stored after: count.after_prayer">27,1</string>
+  actions: TalkBack menu|Actions
+  tap2 on Actions: tap2 227 227: Actions|Take one away
+  walk 1 to the next action:
+    1: Choose a dhikr
+  tap2 (Choose a dhikr): tap2 227 227: Taqwa|Tasbeeh
+  the list, walked:
+    1: Selected. After prayer, 100
+    2: Not selected. SubhanAllah, 100
+    3: Not selected. Alhamdulillah, 100
+    4: Not selected. Allahu Akbar, 100
+    5: Not selected. Astaghfirullah, 100
+    6: Not selected. La ilaha illallah, 100
+    7: Not selected. SubhanAllahi wa bihamdihi, 100
+    8: Reset. Button
+    9:
+    10: Not selected. Allahu Akbar, 100
+    11: Not selected. Astaghfirullah, 100
+    12: Not selected. La ilaha illallah, 100
+    13: Not selected. SubhanAllahi wa bihamdihi, 100
+  from the counter, the walk on:
+  opening TASBEEH: Home screen|Asr in 1 hour 10 minutes, at ⁨4:10 PM⁩|Taqwa
+    1:
+    2: 27 of 100. SubhanAllah. Page
+    3:
+    4: 27 of 100. SubhanAllah. Page
+    5:
+    6: 27 of 100. SubhanAllah. Page
+    7:
+    8: 27 of 100. SubhanAllah. Page
+== en12 Qibla ==
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  opening QIBLA: Taqwa|28 of 100. SubhanAllah. Page|Turn right about 45 degrees
+  walk at true 340:
+    1: 23°
+    2: Makkah · 6,600 km away
+    3:
+    4: Turn right about 45 degrees
+  turned to true 23, untouched: Turn right about 30 degrees|Turn right about 15 degrees|Facing qibla
+  turned back to true 340, untouched: Turn right about 15 degrees|23°|Turn right about 30 degrees|Turn right about 45 degrees
+  spoken in 8 s untouched: 0 (steady heading)
+== en12 Tile (14:58) ==
+tile tile-en12.png: found 'Cape Town' (try 3)
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  the walk on the Tile:
+    1: Passed. Fajr, ⁨4:33 AM⁩
+    2: Passed. Sunrise, ⁨6:01 AM⁩
+    3: Current prayer. Dhuhr, ⁨12:33 PM⁩
+    4: Next prayer. Asr, ⁨4:10 PM⁩
+    5: Maghrib, ⁨7:04 PM⁩
+    6: Isha, ⁨8:24 PM⁩
+    7: Cape Town
+    8:
+    9: Asr in 1 hour 10 minutes, at ⁨4:10 PM⁩
+    10: Passed. Fajr, ⁨4:33 AM⁩
+
+== ar-sa Today (14:58) ==
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  opening TODAY: Prayer times|Home screen
+  idle 10 s on Today, mid-minute (from 14:58:45): said [Taqwa|العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠]
+  10 s across the minute (to 14:59:04): said [العصر بعد ١ ساعة و١٠ دقائق، الساعة ١٦:١٠]
+  the walk from the ring, one swipe right at a time:
+    1: انقضت. الفجر, ٤:٣٣
+    2: انقضت. الشروق, ٦:٠١
+    3: الصلاة الحالية. الظهر, ١٢:٣٣
+    4: الصلاة التالية. العصر, ١٦:١٠
+    5: المغرب, ١٩:٠٤
+    6: العشاء, ٢٠:٢٤
+    7: كيب تاون
+    8:
+    9: انقضت. الفجر, ٤:٣٣
+    10: انقضت. الشروق, ٦:٠١
+    11: الصلاة الحالية. الظهر, ١٢:٣٣
+    12: الصلاة التالية. العصر, ١٦:١٠
+    13: المغرب, ١٩:٠٤
+    14: العشاء, ٢٠:٢٤
+== ar-sa Tasbeeh ==
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  opening TASBEEH: Taqwa|٢٧ من ١٠٠. سبحان الله. Page
+  walk to the counter:
+    1:
+    2: ٢٧ من ١٠٠. سبحان الله. Page
+  tap2 227 227: ٢٨ من ١٠٠
+  stored after tap2: count.after_prayer">28,1</string>
+  actions: TalkBack menu|Actions
+  tap2 on Actions: tap2 227 227: Actions|أنقِص واحدة
+  tap2 (Take one away): tap2 227 227: ٢٧ من ١٠٠|Taqwa|٢٧ من ١٠٠. سبحان الله. Page
+  stored after: count.after_prayer">27,1</string>
+  actions: TalkBack menu|Actions
+  tap2 on Actions: tap2 227 227: Actions|أنقِص واحدة
+  walk 1 to the next action:
+    1: اختر ذكرًا
+  tap2 (Choose a dhikr): tap2 227 227: Taqwa|التسبيح
+  the list, walked:
+    1: Selected. بعد الصلاة, ١٠٠
+    2: Not selected. سبحان الله, ١٠٠
+    3: Not selected. الحمد لله, ١٠٠
+    4: Not selected. الله أكبر, ١٠٠
+    5: Not selected. أستغفر الله, ١٠٠
+    6: Not selected. لا إله إلا الله, ١٠٠
+    7: Not selected. سبحان الله وبحمده, ١٠٠
+    8: إعادة العدّ. Button
+    9:
+    10: Not selected. الله أكبر, ١٠٠
+    11: Not selected. أستغفر الله, ١٠٠
+    12: Not selected. لا إله إلا الله, ١٠٠
+    13: Not selected. سبحان الله وبحمده, ١٠٠
+  from the counter, the walk on:
+  opening TASBEEH: العصر بعد ١ ساعة و١٠ دقائق، الساعة ١٦:١٠|Taqwa|٢٧ من ١٠٠. سبحان الله. Page
+    1:
+    2: ٢٧ من ١٠٠. سبحان الله. Page
+    3:
+    4: ٢٧ من ١٠٠. سبحان الله. Page
+    5:
+    6: ٢٧ من ١٠٠. سبحان الله. Page
+    7:
+    8: ٢٧ من ١٠٠. سبحان الله. Page
+== ar-sa Qibla ==
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  opening QIBLA: Taqwa|٢٨ من ١٠٠. سبحان الله. Page|٢٣°|استدر يمينًا حوالي ٤٥ درجة
+  walk at true 340:
+    1: ٢٣°
+    2: مكة · على بُعد ٦٬٦٠٠ كم
+    3:
+    4: استدر يمينًا حوالي ٤٥ درجة
+  turned to true 23, untouched: استدر يمينًا حوالي ٣٠ درجة|استدر يمينًا حوالي ١٥ درجة|أنت باتجاه القبلة
+  turned back to true 340, untouched: استدر يمينًا حوالي ١٥ درجة|٢٣°|استدر يمينًا حوالي ٣٠ درجة|استدر يمينًا حوالي ٤٥ درجة
+  spoken in 8 s untouched: 0 (steady heading)
+== ar-sa Tile (14:58) ==
+tile tile-ar-sa.png: found 'كيب تاون' (try 3)
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  the walk on the Tile:
+    1: انقضت. الفجر, ٤:٣٣
+    2: انقضت. الشروق, ٦:٠١
+    3: الصلاة الحالية. الظهر, ١٢:٣٣
+    4: الصلاة التالية. العصر, ١٦:١٠
+    5: المغرب, ١٩:٠٤
+    6: العشاء, ٢٠:٢٤
+    7: كيب تاون
+    8:
+    9: العصر بعد ١ ساعة و١٠ دقائق، الساعة ١٦:١٠
+    10: انقضت. الفجر, ٤:٣٣
+== ar-sa the pager, turned with TalkBack on ==
+  swipe to Tasbeeh: التسبيح|٢٧ من ١٠٠. سبحان الله. Page
+  swipe to Qibla: ٢٣°|القبلة|استدر يمينًا حوالي ٤٥ درجة
+  swipe to Tasbeeh: التسبيح|٢٧ من ١٠٠. سبحان الله. Page
+  swipe to Today: اليوم|العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+
+== TalkBack on a two-sided entry: Isha 20:24 ==
+tile tb-start.png: found 'Cape Town' (try 3)
+  TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+  at 20:22:19, the walk:
+    1: Isha in 1 minute, at 20:24
+    2: Passed. Fajr, 4:33
+    3: Passed. Sunrise, 6:01
+    4: Passed. Dhuhr, 12:33
+    5: Passed. Asr, 16:10
+    6: Current prayer. Maghrib, 19:04
+    7: Next prayer. Isha, 20:24
+    8: Cape Town
+    9:
+  at 20:24:03, the walk:
+    1: Fajr in 8 hours 8 minutes, at 4:33
+    2: Passed. Fajr, 4:33
+    3: Passed. Sunrise, 6:01
+    4: Passed. Dhuhr, 12:33
+    5: Passed. Asr, 16:10
+    6: Passed. Maghrib, 19:04
+    7: Current prayer. Isha, 20:24
+    8: Cape Town
+    9:

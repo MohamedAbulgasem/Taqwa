@@ -1,0 +1,9 @@
+== English feed (per-app en-US set in place), the Arch face, 13:10:41
+TalkBack on: com.google.android.marvin.talkback/com.google.android.marvin.talkback.TalkBackService
+1: Dhuhr in 38 minutes, at ⁨11:49 AM⁩
+2: 19 Jumada al-Ula 1448, Saturday 31 October
+3: No data
+4: No data
+5: Charging. Image
+6:
+TalkBack off

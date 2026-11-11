@@ -1,0 +1,2 @@
+10-31 13:16:38.557 I/System.out( 7924): TaqwaWatch RESCHEDULED SENT 160ms
+10-31 13:16:38.559 I/TaqwaWatchHarness( 7924): place: stored Tripoli id=2210247 zone=Africa/Tripoli at 32.887,13.191; plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T13:55:00Z; settled=true

@@ -1,0 +1,69 @@
+11:30:24.330 TaqwaWatch probe context from=60000 to=300000 step=4096 fill=random reachable=true
+11:30:24.332 WC check acceptable: YES, type: 1, size: 60015
+11:30:24.333 TaqwaWatch probe context 60000 accepted
+11:30:24.346 WC check acceptable: NO, type: 1, size: 300015
+11:30:24.353 TaqwaWatch probe context 300000 refused
+11:30:24.360 WC check acceptable: YES, type: 1, size: 180015
+11:30:24.360 TaqwaWatch probe context 180000 accepted
+11:30:24.369 WC check acceptable: YES, type: 1, size: 240015
+11:30:24.369 TaqwaWatch probe context 240000 accepted
+11:30:24.378 WC check acceptable: NO, type: 1, size: 270015
+11:30:24.378 TaqwaWatch probe context 270000 refused
+11:30:24.387 WC check acceptable: YES, type: 1, size: 255015
+11:30:24.387 TaqwaWatch probe context 255000 accepted
+11:30:24.396 WC check acceptable: NO, type: 1, size: 262515
+11:30:24.396 TaqwaWatch probe context 262500 refused
+11:30:24.406 WC check acceptable: YES, type: 1, size: 258765
+11:30:24.406 TaqwaWatch probe context 258750 accepted
+11:30:24.407 TaqwaWatch probe context random 258750 262500
+11:30:24.407 TaqwaWatch probe restore
+11:30:24.475 WC check acceptable: YES, type: 1, size: 6240
+11:30:24.563 WC check acceptable: YES, type: 1, size: 6244
+11:31:06.650 TaqwaWatch probe userInfo from=60000 to=300000 step=4096 fill=random reachable=true
+11:31:06.652 WC check acceptable: YES, type: 2, size: 60015
+11:31:06.669 TaqwaWatch probe userInfo 60000 accepted
+11:31:06.681 WC check acceptable: NO, type: 2, size: 300015
+11:31:06.681 TaqwaWatch probe userInfo 300000 refused
+11:31:06.688 WC check acceptable: NO, type: 2, size: 180015
+11:31:06.688 TaqwaWatch probe userInfo 180000 refused
+11:31:06.693 WC check acceptable: NO, type: 2, size: 120015
+11:31:06.694 TaqwaWatch probe userInfo 120000 refused
+11:31:06.698 WC check acceptable: NO, type: 2, size: 90015
+11:31:06.698 TaqwaWatch probe userInfo 90000 refused
+11:31:06.702 WC check acceptable: NO, type: 2, size: 75015
+11:31:06.702 TaqwaWatch probe userInfo 75000 refused
+11:31:06.704 WC check acceptable: NO, type: 2, size: 67515
+11:31:06.705 TaqwaWatch probe userInfo 67500 refused
+11:31:06.707 WC check acceptable: YES, type: 2, size: 63765
+11:31:07.288 TaqwaWatch probe userInfo 63750 accepted
+11:31:07.288 TaqwaWatch probe userInfo random 63750 67500
+11:31:07.288 TaqwaWatch probe userInfo cancelled 0 outstanding
+11:31:07.288 TaqwaWatch probe restore
+11:31:07.321 WC check acceptable: YES, type: 1, size: 6244
+11:31:30.319 TaqwaWatch probe userInfo from=63750 to=67500 step=8 fill=random reachable=true
+11:31:30.322 WC check acceptable: YES, type: 2, size: 63765
+11:31:30.333 TaqwaWatch probe userInfo 63750 accepted
+11:31:30.336 WC check acceptable: NO, type: 2, size: 67515
+11:31:30.336 TaqwaWatch probe userInfo 67500 refused
+11:31:30.339 WC check acceptable: NO, type: 2, size: 65640
+11:31:30.339 TaqwaWatch probe userInfo 65625 refused
+11:31:30.342 WC check acceptable: YES, type: 2, size: 64702
+11:31:31.284 TaqwaWatch probe userInfo 64687 accepted
+11:31:31.287 WC check acceptable: YES, type: 2, size: 65171
+11:31:32.295 TaqwaWatch probe userInfo 65156 accepted
+11:31:32.300 WC check acceptable: YES, type: 2, size: 65405
+11:31:33.294 TaqwaWatch probe userInfo 65390 accepted
+11:31:33.299 WC check acceptable: YES, type: 2, size: 65522
+11:31:34.289 TaqwaWatch probe userInfo 65507 accepted
+11:31:34.293 WC check acceptable: NO, type: 2, size: 65581
+11:31:34.293 TaqwaWatch probe userInfo 65566 refused
+11:31:34.296 WC check acceptable: NO, type: 2, size: 65551
+11:31:34.296 TaqwaWatch probe userInfo 65536 refused
+11:31:34.299 WC check acceptable: YES, type: 2, size: 65536
+11:31:35.295 TaqwaWatch probe userInfo 65521 accepted
+11:31:35.299 WC check acceptable: NO, type: 2, size: 65543
+11:31:35.299 TaqwaWatch probe userInfo 65528 refused
+11:31:35.300 TaqwaWatch probe userInfo random 65521 65528
+11:31:35.300 TaqwaWatch probe userInfo cancelled 0 outstanding
+11:31:35.300 TaqwaWatch probe restore
+11:31:35.338 WC check acceptable: YES, type: 1, size: 6240

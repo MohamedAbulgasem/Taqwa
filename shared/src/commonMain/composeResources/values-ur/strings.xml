@@ -15,7 +15,7 @@
     <string name="onboarding_welcome_body">نماز کے اوقات، قبلہ اور قرآن۔ ہمیشہ کے لیے مفت۔ نہ اشتہار، نہ اکاؤنٹ، اور آف لائن بھی چلتا ہے۔</string>
     <string name="onboarding_welcome_cta">شروع کریں</string>
     <string name="onboarding_location_title">آپ کہاں ہیں؟</string>
-    <string name="onboarding_location_body">نماز کے اوقات آپ کے مقام پر منحصر ہیں۔ سارا حساب آپ کے فون پر ہوتا ہے، اور آپ کا مقام کبھی فون سے باہر نہیں جاتا۔</string>
+    <string name="onboarding_location_body">نماز کے اوقات آپ کے مقام پر منحصر ہیں۔ سارا حساب آپ کے فون پر ہوتا ہے۔ آپ کا مقام صرف آپ کے اپنے آلات دیکھ سکتے ہیں۔</string>
     <string name="onboarding_continue">جاری رکھیں</string>
     <string name="onboarding_notifications_title">نماز کی اطلاعات</string>
     <string name="onboarding_notifications_body">ہر نماز کے لیے ایک اطلاع۔ ہر نماز کی آواز آپ الگ الگ چن سکتے ہیں، اور جب چاہیں بدل سکتے ہیں۔</string>
@@ -117,6 +117,22 @@
     <string name="settings_appearance">ظاہری شکل</string>
     <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">زبان</string>
+    <!-- Settings › App, after Language (plan 4 Task 10): the iPhone’s "Add to Apple Watch", shown
+         while a watch is paired and the Taqwa face is bundled, and the line under it when the
+         face was not added. "Apple Watch" and "Watch" (Apple’s app) are Apple’s names, never
+         translated. -->
+    <string name="settings_add_to_apple_watch">Apple Watch میں شامل کریں</string>
+    <string name="settings_add_to_apple_watch_failed">واچ فیس شامل نہیں ہو سکا۔ Watch ایپ سے دوبارہ کوشش کریں۔</string>
+    <!-- Settings › Watch, between App and About (plan 5 Task 6): on Android, "Install on your
+         watch" (its value the watch’s name, as the system gives it) opens Taqwa’s Play page on a
+         watch without Taqwa, and "Add the Taqwa face" (the watch’s own face_add) opens the watch’s
+         face screen; a tap says "Continue on your watch" or "Couldn’t reach your watch" as the
+         row’s value. On the iPhone the section holds "Add to Apple Watch" alone. -->
+    <string name="settings_group_watch">گھڑی</string>
+    <string name="settings_watch_install">اپنی گھڑی پر انسٹال کریں</string>
+    <string name="settings_watch_face">تقویٰ واچ فیس شامل کریں</string>
+    <string name="settings_watch_continue">اپنی گھڑی پر جاری رکھیں</string>
+    <string name="settings_watch_unreachable">آپ کی گھڑی تک رسائی نہیں ہو سکی</string>
     <string name="settings_about">تقویٰ کے بارے میں</string>
     <string name="settings_attribution">اعتراف اور لائسنس</string>
     <string name="settings_rate">تقویٰ کو ریٹ کریں</string>
@@ -125,15 +141,16 @@
     <string name="settings_not_set">مقرر نہیں</string>
     <string name="settings_notifications_off">بند</string>
     <string name="settings_notifications_on_count">%1$s فعال</string>
-    <string name="settings_version_value">1.5.1</string>
+    <string name="settings_version_value">1.6.0</string>
 
     <!-- «تقویٰ کے بارے میں» کی اسکرین۔ -->
     <string name="about_tagline">مفت، سب کے لیے، ہمیشہ کے لیے۔</string>
     <string name="about_privacy_label">رازداری</string>
-    <string name="about_stays_title">آپ کے فون پر رہتا ہے</string>
-    <string name="about_stays_body">مقام، ترتیبات، محفوظ آیات اور گنتی کبھی فون سے باہر نہیں جاتیں۔</string>
-    <string name="about_online_title">آن لائن صرف جب آپ کہیں</string>
-    <string name="about_online_body">انٹرنیٹ صرف ایک کام کے لیے استعمال ہوتا ہے: وہ تلاوتیں جو آپ خود ڈاؤن لوڈ کرنا چاہیں، GitHub پر تقویٰ کے عوامی مخزن سے۔</string>
+    <string name="about_stays_title">آپ کے آلات پر رہتا ہے</string>
+    <string name="about_stays_body">آپ کا مقام، ترتیبات، محفوظ آیات اور گنتی صرف آپ کے اپنے آلات دیکھ سکتے ہیں۔</string>
+    <string name="about_online_title">آن لائن صرف اس کے لیے جو آپ چنیں</string>
+    <string name="about_online_body_android">انٹرنیٹ اُن تلاوتوں کے لیے استعمال ہوتا ہے جو آپ خود ڈاؤن لوڈ کرنا چاہیں، GitHub پر تقویٰ کے عوامی مخزن سے۔ اگر آپ تقویٰ کو اپنی گھڑی میں شامل کریں تو Google اس کا ڈیٹا انٹرنیٹ کے ذریعے پہنچا سکتا ہے، خفیہ کاری کے ساتھ، تاکہ اسے صرف آپ کا فون اور آپ کی گھڑی پڑھ سکیں۔</string>
+    <string name="about_online_body_ios">انٹرنیٹ اُن تلاوتوں کے لیے استعمال ہوتا ہے جو آپ خود ڈاؤن لوڈ کرنا چاہیں، GitHub پر تقویٰ کے عوامی مخزن سے۔ اگر آپ تقویٰ کو اپنی گھڑی میں شامل کریں تو Apple اس کا ڈیٹا انٹرنیٹ کے ذریعے پہنچا سکتا ہے، خفیہ کاری کے ساتھ، تاکہ اسے صرف آپ کا فون اور آپ کی گھڑی پڑھ سکیں۔</string>
     <string name="about_nothing_title">نہ اکاؤنٹ، نہ اشتہار، نہ تجزیات</string>
     <string name="about_nothing_body">نہ کہیں سائن اِن کرنا ہے، نہ کچھ بیچنا ہے۔</string>
     <string name="about_privacy_policy">رازداری کی پالیسی</string>
@@ -220,7 +237,7 @@
     <string name="location_country">ملک</string>
     <string name="location_timezone">ٹائم زون</string>
     <string name="location_choose_city_instead">اس کے بجائے شہر چنیں</string>
-    <string name="location_privacy_note">آپ کے مقام کا طول و عرض آپ کے فون پر محفوظ رہتا ہے اور صرف اوقات کے حساب کے لیے استعمال ہوتا ہے۔ کچھ بھی کہیں نہیں بھیجا جاتا۔</string>
+    <string name="location_privacy_note">آپ کے مقام کا طول و عرض آپ کے فون پر محفوظ رہتا ہے اور صرف اوقات کے حساب کے لیے استعمال ہوتا ہے۔ آپ کا مقام صرف آپ کے اپنے آلات دیکھ سکتے ہیں۔</string>
     <string name="location_denied_note">مقام تک رسائی کی اجازت اس وقت نہیں ہے۔ آپ اسے اپنے آلے کی ترتیبات سے دے سکتے ہیں، یا اس کے بجائے کوئی شہر چن سکتے ہیں۔</string>
 
     <!-- City search -->

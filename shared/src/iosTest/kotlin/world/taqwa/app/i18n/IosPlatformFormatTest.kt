@@ -1,8 +1,10 @@
 package world.taqwa.app.i18n
 
+import kotlinx.datetime.LocalDate
 import platform.Foundation.NSLocale
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
@@ -62,5 +64,79 @@ class IosPlatformFormatTest {
             assertNotEquals(am, pm, language)
             assertEquals(pm, noon.substringAfter('\u00A0'), "$language noon is after noon")
         }
+    }
+
+    // The watch feed's words (plan 2, Task 1), the twins of AndroidPlatformFormatTest's: the date
+    // words and the day markers in the words locale, and the clock figures without a day period.
+
+    private val sunday = LocalDate(2026, 10, 18)
+
+    @Test
+    fun clockFiguresLeaveTheDayPeriodOut() {
+        val twelve = format("en_US", "en-US", ClockFormat.TWELVE_HOUR)
+        assertEquals("4:10", twelve.clockFigures(16, 10))
+        assertEquals("12:05", twelve.clockFigures(0, 5))
+        assertEquals("16:10", format("en_US", "en-US", ClockFormat.TWENTY_FOUR_HOUR).clockFigures(16, 10))
+    }
+
+    @Test
+    fun arabicIndicFiguresInTwelveHours() {
+        assertEquals("٤:١٠", format("ar_SA", "ar-SA", ClockFormat.TWELVE_HOUR).clockFigures(16, 10))
+    }
+
+    @Test
+    fun dayPeriodsAreTheLocalesOwn() {
+        assertEquals("AM" to "PM", format("en_US", "en-US", ClockFormat.TWELVE_HOUR).dayPeriods(UiLanguage.ENGLISH))
+        assertEquals("ص" to "م", format("ar_SA", "ar-SA", ClockFormat.TWELVE_HOUR).dayPeriods(UiLanguage.ARABIC))
+    }
+
+    @Test
+    fun shortWeekdayAndMonthAreCldrsAbbreviations() {
+        val english = format("en_US", "en-US", ClockFormat.TWENTY_FOUR_HOUR)
+        assertEquals("Sun" to "Oct", english.shortWeekday(sunday, UiLanguage.ENGLISH) to english.shortMonth(sunday, UiLanguage.ENGLISH))
+        // Foundation's CLDR abbreviates the Arabic weekday without its article, where the JVM's
+        // (AndroidPlatformFormatTest) writes it in full: the rule is the platform's own `EEE`, so
+        // the expectation follows Foundation and the code does not change. The month is the same.
+        val arabic = format("ar_SA", "ar-SA", ClockFormat.TWENTY_FOUR_HOUR)
+        assertEquals("أحد" to "أكتوبر", arabic.shortWeekday(sunday, UiLanguage.ARABIC) to arabic.shortMonth(sunday, UiLanguage.ARABIC))
+    }
+
+    @Test
+    fun longWeekdayAndMonthAreCldrsFullForms() {
+        val english = format("en_US", "en-US", ClockFormat.TWENTY_FOUR_HOUR)
+        assertEquals("Sunday" to "October", english.longWeekday(sunday, UiLanguage.ENGLISH) to english.longMonth(sunday, UiLanguage.ENGLISH))
+        val arabic = format("ar_SA", "ar-SA", ClockFormat.TWENTY_FOUR_HOUR)
+        assertEquals("الأحد" to "أكتوبر", arabic.longWeekday(sunday, UiLanguage.ARABIC) to arabic.longMonth(sunday, UiLanguage.ARABIC))
+        val hebrew = format("he_IL", "he-IL", ClockFormat.TWENTY_FOUR_HOUR)
+        assertEquals("Sunday" to "October", hebrew.longWeekday(sunday, UiLanguage.ENGLISH) to hebrew.longMonth(sunday, UiLanguage.ENGLISH))
+    }
+
+    @Test
+    fun outsideTheSevenTheDateWordsAreTheInterfaceLanguages() {
+        val f = format("he_IL", "he-IL", ClockFormat.TWENTY_FOUR_HOUR)
+        assertEquals("Sun" to "Oct", f.shortWeekday(sunday, UiLanguage.ENGLISH) to f.shortMonth(sunday, UiLanguage.ENGLISH))
+        assertEquals("Sunday" to "October", f.longWeekday(sunday, UiLanguage.ENGLISH) to f.longMonth(sunday, UiLanguage.ENGLISH))
+        assertEquals("AM" to "PM", f.dayPeriods(UiLanguage.ENGLISH))
+        assertEquals("${f.localizedDigits(16)}:${f.localizedDigits(10)}", f.clockFigures(16, 10))
+        // The app's own longDate and clockTime are unchanged: still the locale's own words and day
+        // period, never the words locale's.
+        val longDate = f.longDate(sunday)
+        assertFalse(longDate.contains("October"), "longDate: $longDate")
+        assertTrue(longDate.contains(f.localizedDigits(2026)), "longDate: $longDate")
+        val twelve = format("he_IL", "he-IL", ClockFormat.TWELVE_HOUR).clockTime(16, 10)
+        assertTrue(twelve.startsWith("4:10"), "clockTime: $twelve")
+        assertFalse(twelve.endsWith("PM"), "clockTime keeps the locale's own marker: $twelve")
+    }
+
+    @Test
+    fun theWordsFollowTheLanguageNotTheFormat() {
+        val english = format("en_US", "en-US", ClockFormat.TWELVE_HOUR)
+        assertEquals("أحد" to "أكتوبر", english.shortWeekday(sunday, UiLanguage.ARABIC) to english.shortMonth(sunday, UiLanguage.ARABIC))
+        assertEquals("ص" to "م", english.dayPeriods(UiLanguage.ARABIC))
+        assertEquals("18", english.localizedDigits(18))
+        val arabic = format("ar_SA", "ar-SA", ClockFormat.TWELVE_HOUR)
+        assertEquals("Sun" to "Oct", arabic.shortWeekday(sunday, UiLanguage.ENGLISH) to arabic.shortMonth(sunday, UiLanguage.ENGLISH))
+        assertEquals("AM" to "PM", arabic.dayPeriods(UiLanguage.ENGLISH))
+        assertEquals("١٨", arabic.localizedDigits(18))
     }
 }

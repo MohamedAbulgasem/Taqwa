@@ -2,6 +2,7 @@ package world.taqwa.app.i18n
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.isoDayNumber
 import kotlinx.datetime.number
 
 interface PlatformFormat {
@@ -51,7 +52,61 @@ interface PlatformFormat {
      * Defaulted to [languageName] itself, which already is sentence case everywhere but Android.
      */
     fun languageNameInSentence(code: String): String = languageName(code)
+
+    // The watch feed's words (plan 2, Task 1). Each date word and day marker below is CLDR's in
+    // the *words locale*: this format's own locale when the tag's own language is the interface
+    // [language] (`isTagsOwnLanguage`), otherwise the bare interface language. The format's tag
+    // only answers "can the phone's locale give these words?", never which language they are in,
+    // so a Hebrew phone on the English interface gets English words, in a script the watch face
+    // can draw. Each is defaulted to English so the test fakes compile.
+
+    /**
+     * The clock time without its day period: "4:10" in 12-hour and "16:10" in 24-hour, in this
+     * format's digits. The watch draws the marker itself, from [dayPeriods], where its language
+     * puts it. Defaulted to [clockTime], which is what a 24-hour format writes.
+     */
+    fun clockFigures(hour: Int, minute: Int): String = clockTime(hour, minute)
+
+    /** The platform's own day-period markers, the ones [clockTime] uses, in the words locale: "AM" and "PM", ص and م. */
+    fun dayPeriods(language: UiLanguage): Pair<String, String> = "AM" to "PM"
+
+    /**
+     * CLDR's abbreviated weekday, pattern `EEE`, Gregorian, in the words locale: "Sun", "dim.",
+     * "الأحد" in the JVM's CLDR, or "أحد" in Foundation's, which drops the article.
+     */
+    fun shortWeekday(date: LocalDate, language: UiLanguage): String = ENGLISH_WEEKDAYS[date.dayOfWeek.isoDayNumber - 1].take(3)
+
+    /** CLDR's abbreviated month, pattern `MMM`, Gregorian, in the words locale: "Oct", "oct.", "أكتوبر". */
+    fun shortMonth(date: LocalDate, language: UiLanguage): String = GREGORIAN_MONTHS[date.month.number - 1].take(3)
+
+    /** The weekday in full, pattern `EEEE`, for the screen reader's date: "Sunday", "dimanche". */
+    fun longWeekday(date: LocalDate, language: UiLanguage): String = ENGLISH_WEEKDAYS[date.dayOfWeek.isoDayNumber - 1]
+
+    /** The month in full, pattern `MMMM`, for the screen reader's date: "October", "octobre". */
+    fun longMonth(date: LocalDate, language: UiLanguage): String = GREGORIAN_MONTHS[date.month.number - 1]
 }
+
+/**
+ * Whether [languageTag]'s own language is the interface [language]: the tag's primary subtag
+ * (before the first `-` or `_`), lowercased, with Java's old spelling `in` read as `id`. Never
+ * `UiLanguage.of(tag) == language`: that answers English for every language outside the seven, so
+ * he-IL, hi-IN, fa-IR, mr-IN or zh-CN on the English interface would pass it, and their phones'
+ * words, in scripts the watch face's fonts lack, would reach the feed.
+ */
+internal fun isTagsOwnLanguage(languageTag: String, language: UiLanguage): Boolean {
+    val primary = languageTag.substringBefore('-').substringBefore('_').lowercase()
+    return (if (primary == "in") "id" else primary) == language.code
+}
+
+/**
+ * The words locale's tag: [languageTag] itself, written with `-`, when its own language is the
+ * interface [language]; otherwise the interface language's bare code. It is the locale the date
+ * words and the day markers come from, and the feed's `ui.language`, from which the watch takes
+ * letter case alone: an az-AZ phone on the English interface sends "en", so the watch writes
+ * "MAGHRIB", as the app does, and not Azerbaijani's "MAGHRİB".
+ */
+internal fun wordsLocaleTag(languageTag: String, language: UiLanguage): String =
+    if (isTagsOwnLanguage(languageTag, language)) languageTag.replace('_', '-') else language.code
 
 /**
  * The device's formatter, writing clock times in [clockFormat]. The default is declared here and
@@ -99,4 +154,9 @@ private val LANGUAGE_NAMES = mapOf(
 private val GREGORIAN_MONTHS = listOf(
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December",
+)
+
+/** Monday first, as ISO numbers the days. */
+private val ENGLISH_WEEKDAYS = listOf(
+    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
 )

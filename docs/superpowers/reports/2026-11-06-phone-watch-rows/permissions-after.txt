@@ -1,0 +1,12 @@
+android.permission.ACCESS_COARSE_LOCATION
+android.permission.SCHEDULE_EXACT_ALARM
+android.permission.POST_NOTIFICATIONS
+android.permission.RECEIVE_BOOT_COMPLETED
+android.permission.VIBRATE
+android.permission.INTERNET
+android.permission.FOREGROUND_SERVICE
+android.permission.FOREGROUND_SERVICE_DATA_SYNC
+android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK
+android.permission.ACCESS_NETWORK_STATE
+android.permission.WAKE_LOCK
+world.taqwa.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION

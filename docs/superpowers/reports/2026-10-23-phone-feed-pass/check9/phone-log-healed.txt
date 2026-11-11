@@ -1,0 +1,3 @@
+10-31 13:16:49.227 I/System.out( 7924): TaqwaWatch RESCHEDULED SENT 40ms
+10-31 13:16:49.227 I/TaqwaWatchHarness( 7924): reschedule: plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T13:55:00Z; settled=true
+10-31 13:16:49.386 I/System.out( 7924): TaqwaWatch ACK 15/048de2e7a0ed0eb7

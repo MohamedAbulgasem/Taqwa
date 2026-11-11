@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Debug builds only; this file is merged into no other build. The app starts as
+         DebugWearApp, which puts a sample feed in an empty store, and DEBUG_FEED puts the sample
+         in for a date of the developer's choosing (DebugFeedReceiver). The receiver is exported
+         so that adb, which is not this app, can send it, and asks for no permission: in a debug
+         build that is the point. The manifest's copy of it is for the explicit broadcast that
+         starts the app from nothing; DebugWearApp registers another for the plain one. -->
+    <application
+        android:name=".DebugWearApp"
+        tools:replace="android:name">
+        <receiver
+            android:name=".DebugFeedReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="world.taqwa.app.wear.DEBUG_FEED" />
+                <!-- The face's slots asked again from the store, after a tool wrote files/feed.json. -->
+                <action android:name="world.taqwa.app.wear.DEBUG_REBIND" />
+            </intent-filter>
+        </receiver>
+        <!-- Task 7's daily handshake on demand (DebugNudgeReceiver), exported and asking for no
+             permission as DebugFeedReceiver is, and for two reasons of its own: the daily alarm's
+             receiver is not exported, so a broadcast from adb shell (neither the app's uid nor
+             system, on a user build) is refused there; and a handshake a minute earlier leaves
+             refresh.asked inside RefreshPolicy.GAP_DAILY, so the daily path would not ask. This one
+             forgets the last ask first. Sent by name (-n), which starts the process from nothing. -->
+        <receiver
+            android:name=".link.DebugNudgeReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="world.taqwa.app.wear.DEBUG_NUDGE" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

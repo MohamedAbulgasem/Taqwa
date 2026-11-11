@@ -1,0 +1,7 @@
+ui.language en-US rtl False digitZero '0' twelveHour True am/pm AM PM
+ui.spoken == sample ui.spoken (sample-feed-capetown.json): True
+ui.screens == sample ui.screens: True
+place: {"city": "London", "qiblaBearing": 118.0, "qiblaKm": "4,800", "declination": 1.0, "southern": false} qiblaKm code points: U+0034 U+002C U+0038 U+0030 U+0030
+2026-10-30 | FRI 30 FRI 30 OCT | Friday 30 October | 18 Jumada al-Ula 1448 | 18 Jumada al-Ula | 2:49 2:49 PM | Asr
+2026-10-31 | SAT 31 SAT 31 OCT | Saturday 31 October | 19 Jumada al-Ula 1448 | 19 Jumada al-Ula | 2:47 2:47 PM | Asr
+2026-11-01 | SUN 1 SUN 1 NOV | Sunday 1 November | 20 Jumada al-Ula 1448 | 20 Jumada al-Ula | 2:45 2:45 PM | Asr

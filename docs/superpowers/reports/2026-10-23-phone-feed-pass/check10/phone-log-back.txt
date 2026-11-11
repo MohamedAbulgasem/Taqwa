@@ -1,0 +1,8 @@
+10-31 13:23:25.016 I/System.out( 7924): TaqwaWatch RESCHEDULED NO_WATCH 2ms
+10-31 13:23:25.016 I/TaqwaWatchHarness( 7924): place: stored London id=2643743 zone=Europe/London at 51.507,-0.128; plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+10-31 13:23:55.322 I/TaqwaWatchHarness( 7924): nodes: no nodes
+10-31 13:23:58.723 I/System.out( 7924): TaqwaWatch WATCH_APPEARED SENT 360ms
+10-31 13:23:59.284 I/System.out( 7924): TaqwaWatch WATCH_ASKED SENT 59ms
+10-31 13:23:59.418 I/System.out( 7924): TaqwaWatch ACK 18/23aee84e77b1f1f2
+10-31 13:23:59.690 I/System.out( 7924): TaqwaWatch ACK 19/23aee84e77b1f1f2
+10-31 13:24:00.397 I/TaqwaWatchHarness( 7924): nodes: node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=true

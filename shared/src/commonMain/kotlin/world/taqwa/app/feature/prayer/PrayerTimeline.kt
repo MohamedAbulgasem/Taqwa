@@ -170,7 +170,7 @@ private fun PrayerRow(
         if (row.isJumuah) stringResource(Res.string.prayer_jumuah) else null,
         if (setByRule) stringResource(Res.string.prayer_set_by_rule) else null,
     )
-    val description = prayerRowDescription(localizedPrayerName(row.prayer), pills, formatTime(row))
+    val description = prayerRowDescription(localizedPrayerName(row.prayer), pills, formatTime(row), uiLanguage())
     val state = when {
         row.status == PrayerStatus.CURRENT -> stringResource(Res.string.prayer_a11y_prayer_current)
         row.status == PrayerStatus.PASSED -> stringResource(Res.string.prayer_a11y_prayer_passed)

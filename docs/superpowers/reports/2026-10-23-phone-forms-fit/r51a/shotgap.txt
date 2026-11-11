@@ -1,0 +1,13 @@
+Arch on emulator-5558, the face as committed (Ruling 51a's month rule A), the Saudi sample at 14:58 with every day's Gregorian
+line rewritten by feedtext.sh (ab3.sh, 25 Oct 2026 06:50-06:57 SAST): the least distance in each awake shot from the line's ink
+(bright grey) to the lit stroke's pixels (amber), face px, beside date-fit.py's figure for the same form at its step (its ink to
+the stroke's edge), and the ink's x extent in the shot (shotgap.py, r51/shotgap.py on the new steps).
+الأحد ١٨ أكتوبر (15 chars, step rest, 31.50 px): in the shot 42.4 px between the line's ink and the stroke's pixels; model 41.1 px; the ink x 126.9..319.2
+السبت ١ أغسطس (13 chars, step august, 29.25 px): in the shot 23.5 px between the line's ink and the stroke's pixels; model 23.0 px; the ink x 105.1..343.0
+الخميس ١٠ أغسطس (15 chars, step august, 29.25 px): in the shot 9.1 px between the line's ink and the stroke's pixels; model 8.7 px; the ink x 88.2..359.8
+الثلاثاء ١٠ تشرين الأول (23 chars, step long, 25.31 px): in the shot 24.2 px between the line's ink and the stroke's pixels; model 21.2 px; the ink x 103.1..343.9
+الخميس 10 تشرين الأول (21 chars, step long, 25.31 px): in the shot 14.9 px between the line's ink and the stroke's pixels; model 11.6 px; the ink x 92.2..355.8
+الخميس ٣٠ تشرين الثاني (22 chars, step long, 25.31 px): in the shot 12.4 px between the line's ink and the stroke's pixels; model 8.5 px; the ink x 88.2..358.8
+
+r51/shotgap.txt's figures for the same six cases under Ruling 51's three steps: the sample 49.0 px at 13 units, السبت ١ أغسطس
+16.5 px at 14 units; the other four as above (they keep their step's size).

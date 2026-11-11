@@ -11,6 +11,10 @@ plugins {
  * every month name on a city page, and every day the gate checks, comes out of these files,
  * exactly as the app computes them. They must stay free of Compose and platform code; a change
  * that breaks that fails this build, and with it the website's nightly run, which is the point.
+ *
+ * They live in three modules, `:shared`, `:widgetcore` and `:watchcore` (whose `QiblaAngles` the
+ * Qibla maths delegates to, so both watches judge alignment with the phone's own code). A file
+ * moved between them must move here too; `scripts/test.sh` compiles this build to catch it.
  */
 val appSources = listOf(
     "world/taqwa/app/prayer/**",
@@ -19,6 +23,7 @@ val appSources = listOf(
     "world/taqwa/app/domain/PrayerSettings.kt",
     "world/taqwa/app/domain/GeoLocation.kt",
     "world/taqwa/app/qibla/QiblaMath.kt",
+    "world/taqwa/app/qibla/QiblaAngles.kt",
     "world/taqwa/app/hijri/TabularHijriCalendar.kt",
     "world/taqwa/app/hijri/HijriMonthNames.kt",
     "world/taqwa/app/i18n/UiLanguage.kt",
@@ -46,6 +51,7 @@ kotlin {
         commonMain {
             kotlin.srcDir(repoRoot.resolve("shared/src/commonMain/kotlin"))
             kotlin.srcDir(repoRoot.resolve("widgetcore/src/commonMain/kotlin"))
+            kotlin.srcDir(repoRoot.resolve("watchcore/src/commonMain/kotlin"))
             kotlin.include(appSources)
             dependencies {
                 implementation(libs.adhan2)

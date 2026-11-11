@@ -1,0 +1,14 @@
+task-13/handsdiff.py: the Moon's always-on pass frames of Task 13 (Ruling 41, the hands filled and dimmed) against
+the committed ones before it (d40776a7, the outline hands), emulator-5558, 24 Oct 2026. Inside the hands'
+footprint at the frame's minute they differ, as meant; outside it, once the moon's picture and the step count
+are set aside as task-12/passdiff.py does, every pixel is within 2 levels in 255. The three 10:10 frames the
+pass gained have no committed twin.
+
+pass-moon-ar-ly-12h-1010-aod.png         not in the committed pass
+pass-moon-ar-ly-12h-1458-aod.png         differ  2457: in the hands' footprint  2007 (over 8 levels 1862); set aside  62; left  388, worst   2, over 2 levels 0
+pass-moon-ar-ly-12h-slots-1010-aod.png   not in the committed pass
+pass-moon-ar-ly-12h-slots-1458-aod.png   differ  2790: in the hands' footprint  2007 (over 8 levels 1862); set aside 430; left  353, worst   2, over 2 levels 0
+pass-moon-en-1010-aod.png                not in the committed pass
+pass-moon-en-1458-aod.png                differ  2468: in the hands' footprint  1996 (over 8 levels 1863); set aside  62; left  410, worst   2, over 2 levels 0
+pass-moon-slots-1010-aod.png             differ  2858: in the hands' footprint  1951 (over 8 levels 1855); set aside 451; left  456, worst   2, over 2 levels 0
+pass-moon-slots-1458-aod.png             differ  2843: in the hands' footprint  1996 (over 8 levels 1863); set aside 472; left  375, worst   2, over 2 levels 0

@@ -1,0 +1,60 @@
+The full pass (tools/watchface/pass.sh) of the face at Task 13 (Ruling 41: the Moon's hands filled always-on), against
+the committed pass shots before it (d40776a7), emulator-5558, 24 Oct about 16:18-16:42 SAST. The columns are
+task-12/passdiff.py's: the pixels that differ; on the Moon, those in its moon picture; those left once that,
+the Moon's seconds hand and the step count's value are set aside; the largest difference of a left pixel in
+any channel, 0 to 255; and how many left pixels differ by more than 2, with their box.
+
+Every awake shot and every always-on shot of Arch, Ring and Sun is within 3 levels, as at Task 12's close,
+but pass-moon-ar-ly-12h-1458-awake.png: 44 pixels up to 17 levels at (399-415, 346-364), where the lit
+arc's round end meets Asr's pointer (3 of them over 8 levels), which moved between runs at Task 12's close
+too (pass-moon-ar-ly-12h-slots-1458-awake.png, 14 levels there); nothing awake changed in the face. The
+Moon's always-on shots differ in their hands, as Ruling 41 means them to: hands-vs-committed.txt shows that
+outside the hands' footprint they too are within 2 levels. The pass's three new shots (the Moon at 10:10
+with the slots empty in English and Arabic, and in Arabic with them filled) have no committed twin.
+
+pass-arch-ar-ly-12h-1258-awake.png       differ    342  moon   0  left   342  worst   1  over 2 levels     0  
+pass-arch-ar-ly-12h-1458-aod.png         differ     83  moon   0  left    83  worst   1  over 2 levels     0  
+pass-arch-ar-ly-12h-1458-awake.png       differ    354  moon   0  left   354  worst   1  over 2 levels     0  
+pass-arch-ar-ly-12h-2258-awake.png       differ    306  moon   0  left   306  worst   1  over 2 levels     0  
+pass-arch-en-1240-aod.png                differ    142  moon   0  left   142  worst   1  over 2 levels     0  
+pass-arch-en-1240-awake.png              differ    536  moon   0  left   536  worst   1  over 2 levels     0  
+pass-arch-en-12h-1258-awake.png          differ    538  moon   0  left   538  worst   2  over 2 levels     0  
+pass-arch-en-12h-2258-awake.png          differ    504  moon   0  left   504  worst   2  over 2 levels     0  
+pass-arch-en-1458-aod.png                differ    149  moon   0  left   149  worst   1  over 2 levels     0  
+pass-arch-en-1458-awake.png              differ    545  moon   0  left   545  worst   2  over 2 levels     0  
+pass-arch-en-1855-aod.png                differ    133  moon   0  left   133  worst   1  over 2 levels     0  
+pass-arch-en-1855-awake.png              differ    337  moon   0  left   337  worst   1  over 2 levels     0  
+pass-arch-night-1458-awake.png           differ    545  moon   0  left   545  worst   2  over 2 levels     0  
+pass-arch-pearl-1458-awake.png           differ    545  moon   0  left   545  worst   2  over 2 levels     0  
+pass-arch-sage-1458-awake.png            differ    545  moon   0  left   545  worst   2  over 2 levels     0  
+pass-arch-slots-1458-aod.png             differ    564  moon   0  left   146  worst   1  over 2 levels     0  
+pass-arch-slots-1458-awake.png           differ   1463  moon   0  left   786  worst   2  over 2 levels     0  
+pass-moon-ar-ly-12h-1458-aod.png         differ   2457  moon  62  left  2395  worst 198  over 2 levels  1943  (187, 47, 337, 250)
+pass-moon-ar-ly-12h-1458-awake.png       differ   2838  moon 105  left  1348  worst  17  over 2 levels    44  (194, 17, 415, 364)
+pass-moon-ar-ly-12h-slots-1458-aod.png   differ   2790  moon  94  left  2360  worst 198  over 2 levels  1943  (187, 47, 337, 250)
+pass-moon-ar-ly-12h-slots-1458-awake.png differ   2466  moon 129  left  1247  worst   3  over 2 levels     9  (194, 219, 377, 280)
+pass-moon-en-1458-aod.png                differ   2468  moon  62  left  2406  worst 198  over 2 levels  1934  (187, 47, 337, 250)
+pass-moon-en-1458-awake.png              differ   2589  moon 105  left  1278  worst   3  over 2 levels     6  (194, 219, 372, 291)
+pass-moon-slots-1010-aod.png             differ   2858  moon  96  left  2407  worst 190  over 2 levels  1917  (136, 134, 385, 240)
+pass-moon-slots-1010-awake.png           differ   3285  moon 129  left  1439  worst   3  over 2 levels     7  (194, 219, 372, 280)
+pass-moon-slots-1458-aod.png             differ   2843  moon  94  left  2371  worst 198  over 2 levels  1934  (187, 47, 337, 250)
+pass-moon-slots-1458-awake.png           differ   3547  moon 129  left  1251  worst   3  over 2 levels     7  (194, 219, 372, 280)
+pass-ring-ar-ly-12h-1258-awake.png       differ    301  moon   0  left   301  worst   1  over 2 levels     0  
+pass-ring-ar-ly-12h-1458-aod.png         differ     83  moon   0  left    83  worst   1  over 2 levels     0  
+pass-ring-ar-ly-12h-1458-awake.png       differ    328  moon   0  left   328  worst   1  over 2 levels     0  
+pass-ring-ar-ly-12h-2258-awake.png       differ    278  moon   0  left   278  worst   1  over 2 levels     0  
+pass-ring-ar-sa-1458-aod.png             differ     83  moon   0  left    83  worst   1  over 2 levels     0  
+pass-ring-ar-sa-1458-awake.png           differ    304  moon   0  left   304  worst   1  over 2 levels     0  
+pass-ring-en-12h-1258-awake.png          differ    508  moon   0  left   508  worst   1  over 2 levels     0  
+pass-ring-en-12h-2258-awake.png          differ    478  moon   0  left   478  worst   1  over 2 levels     0  
+pass-ring-en-1458-aod.png                differ    149  moon   0  left   149  worst   1  over 2 levels     0  
+pass-ring-en-1458-awake.png              differ    512  moon   0  left   512  worst   1  over 2 levels     0  
+pass-sun-ar-ly-12h-1258-awake.png        differ   1725  moon   0  left  1725  worst   2  over 2 levels     0  
+pass-sun-ar-ly-12h-1458-aod.png          differ    776  moon   0  left   776  worst   2  over 2 levels     0  
+pass-sun-ar-ly-12h-1458-awake.png        differ   1912  moon   0  left  1912  worst   3  over 2 levels     1  (229, 13, 229, 13)
+pass-sun-ar-ly-12h-2258-awake.png        differ   2691  moon   0  left  2691  worst   2  over 2 levels     0  
+pass-sun-en-12h-1258-awake.png           differ   1932  moon   0  left  1932  worst   2  over 2 levels     0  
+pass-sun-en-12h-2258-awake.png           differ   2880  moon   0  left  2880  worst   2  over 2 levels     0  
+pass-sun-en-1458-aod.png                 differ    842  moon   0  left   842  worst   2  over 2 levels     0  
+pass-sun-en-1458-awake.png               differ   2096  moon   0  left  2096  worst   3  over 2 levels     1  (229, 13, 229, 13)
+left in all: 42916

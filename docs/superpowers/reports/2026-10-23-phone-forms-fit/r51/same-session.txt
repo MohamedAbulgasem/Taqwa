@@ -1,0 +1,26 @@
+The base face against the face as committed, in one session on emulator-5558 (ab2.sh, 25 Oct 2026, 03:45-04:10 SAST):
+old = the face APK found installed (its li.xml is ff28cd5a's watchface.xml), new = the debug face built from the
+committed watchface.xml (Arch's right-to-left Gregorian steps, Ruling 51 item 1; the v2 fonts; the Moon window's
+Urdu estimate, Ruling 51 item 2), installed in turn and shot at the same moments on the committed samples
+(SAMPLE=ar-ly12, ar-sa, en). abdiff.py (beside this folder) old new: the pixels that differ, the largest
+difference in levels, and their box (x0, y0, x1, y1) in the 454 px shot:
+
+arch-ar-ly-12h-1458-aod.png            1519 px differ, worst 123 levels, box (127, 134, 323, 173)
+arch-ar-ly-12h-1458-awake.png          3142 px differ, worst 240 levels, box (127, 134, 323, 173)
+arch-ar-sa-1458-aod.png                1459 px differ, worst 123 levels, box (127, 134, 323, 173)
+arch-ar-sa-1458-awake.png              3010 px differ, worst 240 levels, box (127, 134, 323, 173)
+arch-en-1458-aod.png                      0 px differ
+arch-en-1458-awake.png                    0 px differ
+moon-ar-ly-12h-1458-aod.png               0 px differ
+moon-ar-ly-12h-1458-awake.png          1016 px differ, worst 108 levels, box (220, 32, 239, 264)
+moon-ar-sa-1010-aod.png                   0 px differ
+moon-ar-sa-1010-awake.png              1104 px differ, worst 123 levels, box (220, 32, 237, 264)
+ring-ar-sa-1458-aod.png                   0 px differ
+ring-ar-sa-1458-awake.png                 1 px differ, worst   1 levels, box (428, 331, 428, 331)
+sun-ar-ly-12h-1458-aod.png                0 px differ
+sun-ar-ly-12h-1458-awake.png              0 px differ
+
+Read: only Arch's Arabic Gregorian line differs (its band, y 134-173), on the two Arabic samples: their
+الأحد ١٨ أكتوبر and الأحد 18 أكتوبر are 15 characters, so the 13-unit step draws them. The Moon's two awake frames
+differ in the seconds hand alone (the band at twelve, x 220-239), Ring's awake frame in one pixel by one level at
+the ring's edge, as in the first run's same-session check; every other frame is 0 px.

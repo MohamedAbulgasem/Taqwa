@@ -1,0 +1,60 @@
+# The renderer's late entry change, emulator-5558, 30 October 2026 (review fix round 2)
+
+The Tile asked for at 15:05:00 on the mock Sunday (the en sample): its first entry runs to 15:10:00.
+SysUI's alarm for the change, read with dumpsys alarm 3 s after the request:
+
+      tag=*alarm*:ProtoTilesTimelineMgr
+      type=RTC origWhen=2026-10-18 15:10:00.000 window=+3m44s808ms repeatInterval=0 count=0 flags=0x0
+      policyWhenElapsed: requester=+4m56s879ms app_standby=-2s866ms device_idle=-- battery_saver=-2s866ms
+      whenElapsed=+4m56s879ms maxWhenElapsed=+8m41s687ms
+
+The countdown's words (uiautomator dump), every 5 s; what the rules say there in brackets:
+
+15:10:47 in 59 min   (in 59 min)
+15:10:52 in 59 min   (in 59 min)
+15:10:57 in 59 min   (in 59 min)
+15:11:02 in 59 min   (in 58 min)
+15:11:07 in 59 min   (in 58 min)
+15:11:12 in 59 min   (in 58 min)
+15:11:17 in 59 min   (in 58 min)
+15:11:22 in 59 min   (in 58 min)
+15:11:27 in 59 min   (in 58 min)
+15:11:32 in 59 min   (in 58 min)
+15:11:37 in 59 min   (in 58 min)
+15:11:42 in 59 min   (in 58 min)
+15:11:47 in 59 min   (in 58 min)
+15:11:52 in 59 min   (in 58 min)
+15:11:57 in 59 min   (in 58 min)
+15:12:02 in 59 min   (in 57 min)
+15:12:07 in 59 min   (in 57 min)
+15:12:12 in 59 min   (in 57 min)
+15:12:17 in 59 min   (in 57 min)
+15:12:22 in 59 min   (in 57 min)
+15:12:27 in 59 min   (in 57 min)
+15:12:32 in 59 min   (in 57 min)
+15:12:37 in 59 min   (in 57 min)
+15:12:42 in 59 min   (in 57 min)
+15:12:46 in 59 min   (in 57 min)
+15:12:52 in 59 min   (in 57 min)
+15:12:56 in 59 min   (in 57 min)
+15:13:01 in 59 min   (in 56 min)
+15:13:06 in 59 min   (in 56 min)
+15:13:11 in 59 min   (in 56 min)
+15:13:16 in 59 min   (in 56 min)
+15:13:21 in 59 min   (in 56 min)
+15:13:26 in 59 min   (in 56 min)
+15:13:31 in 59 min   (in 56 min)
+15:13:36 in 59 min   (in 56 min)
+15:13:41 in 59 min   (in 56 min)
+15:13:46 in 56 min   (in 56 min)
+15:13:51 in 56 min   (in 56 min)
+15:13:56 in 56 min   (in 56 min)
+15:14:01 in 55 min   (in 55 min)
+15:14:06 in 55 min   (in 55 min)
+15:14:11 in 55 min   (in 55 min)
+15:14:16 in 55 min   (in 55 min)
+15:14:21 in 55 min   (in 55 min)
+15:14:26 in 55 min   (in 55 min)
+15:14:31 in 55 min   (in 55 min)
+
+The Tile asked for at 19:00:55 (first entry to 19:02:30, this round's first build): the next entry's layout was first drawn at 19:03:40 (poll of the label's width, 19:02:27 to 19:03:45).

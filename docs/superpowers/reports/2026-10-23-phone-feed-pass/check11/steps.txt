@@ -1,0 +1,19 @@
+13:26:38 adb -s emulator-5558 emu kill
+OK: killing emulator, bye bye
+OK
+13:26:44 h nodes : node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=true
+13:26:44 h reschedule : plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+world.taqwa.app alarms pending on the phone: 59
+13:26:53 h nodes : node c76e057a "Taqwa_Wear_OS_6" nearby=false taqwa_watch=true
+13:26:53 h reschedule : plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+world.taqwa.app alarms pending on the phone: 59
+13:28:37
+Starting Taqwa_Wear_OS_6 as emulator-5558 (log: /var/folders/m9/c01w6f_573lg47hlr90bvw9w0000gn/T//Taqwa_Wear_OS_6.log)
+Taqwa_Wear_OS_6 booted: API level 36
+Taqwa_Phone_Wear is already running as emulator-5562
+Taqwa_Phone_Wear booted: API level 36
+5601
+5601
+Forwarded tcp:5601 to emulator-5562 and reversed emulator-5558's tcp:5601 to it; asking the harness for its nodes for up to 120 s
+The watch is back: node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=true
+13:29:00

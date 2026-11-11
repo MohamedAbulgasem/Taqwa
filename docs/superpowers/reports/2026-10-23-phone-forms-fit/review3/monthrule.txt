@@ -1,0 +1,54 @@
+python3 -I monthrule.py <repo> <fonts>, 25 Oct 2026 (the v2 fonts, fonts = emulator-5558's Bengali 2df70a74): each rule's forms under 7 px
+from Arch's lit stroke, each size's forms and least room (both of Arch's places), then the dates of 2027 at each size by tag (first digit set).
+Not tables by length (Ruling 51 item 1 asks for one): measured for the Lead; the face keeps the built three steps.
+3 steps (built), by length: (13, 14u), (18, 13u), (rest, 11.25u): 0 forms under 7 px; the sample الأحد ١٨ أكتوبر at 13 units
+  14.00 u    6704 forms; least room   8.1 px (السبت 1 أغسطس)
+  13.00 u   12392 forms; least room   8.7 px (الخميس 10 أغسطس)
+  11.25 u    2170 forms; least room   7.9 px (الخميس 10 تشرين الأول)
+    ar-SA  14.00 u:  34 days  13.00 u: 331 days;  size changes overnight  32 times
+    ar-EG  14.00 u:  34 days  13.00 u: 331 days;  size changes overnight  32 times
+    ar-LY  14.00 u:  34 days  13.00 u: 331 days;  size changes overnight  32 times
+    ar-MA  14.00 u:  61 days  13.00 u: 304 days;  size changes overnight  42 times
+    ar-TN  14.00 u:  65 days  13.00 u: 300 days;  size changes overnight  44 times
+    ar-DZ  14.00 u:  65 days  13.00 u: 300 days;  size changes overnight  44 times
+    ar-IQ  14.00 u:  73 days  13.00 u: 169 days  11.25 u: 123 days;  size changes overnight  48 times
+    ar-SY  14.00 u:  73 days  13.00 u: 169 days  11.25 u: 123 days;  size changes overnight  48 times
+    ar-JO  14.00 u:  73 days  13.00 u: 169 days  11.25 u: 123 days;  size changes overnight  48 times
+    ar-LB  14.00 u:  73 days  13.00 u: 169 days  11.25 u: 123 days;  size changes overnight  48 times
+    ar-AE  14.00 u:  34 days  13.00 u: 331 days;  size changes overnight  32 times
+    ur-PK  14.00 u: 276 days  13.00 u:  89 days;  size changes overnight 142 times
+    ur-IN  14.00 u: 276 days  13.00 u:  89 days;  size changes overnight 142 times
+A: 19+ chars 11.25u; else August (أغسطس) 13u; else 14u: 0 forms under 7 px; the sample الأحد ١٨ أكتوبر at 14 units
+  14.00 u   18662 forms; least room   8.0 px (الخميس 10 ديسمبر)
+  13.00 u     434 forms; least room   8.7 px (الخميس 10 أغسطس)
+  11.25 u    2170 forms; least room   7.9 px (الخميس 10 تشرين الأول)
+    ar-SA  14.00 u: 334 days  13.00 u:  31 days;  size changes overnight   2 times
+    ar-EG  14.00 u: 334 days  13.00 u:  31 days;  size changes overnight   2 times
+    ar-LY  14.00 u: 334 days  13.00 u:  31 days;  size changes overnight   2 times
+    ar-MA  14.00 u: 365 days;  size changes overnight   0 times
+    ar-TN  14.00 u: 365 days;  size changes overnight   0 times
+    ar-DZ  14.00 u: 365 days;  size changes overnight   0 times
+    ar-IQ  14.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-SY  14.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-JO  14.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-LB  14.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-AE  14.00 u: 334 days  13.00 u:  31 days;  size changes overnight   2 times
+    ur-PK  14.00 u: 365 days;  size changes overnight   0 times
+    ur-IN  14.00 u: 365 days;  size changes overnight   0 times
+B: 19+ chars 11.25u; else August of 14+ chars 13u; else 14u: 0 forms under 7 px; the sample الأحد ١٨ أكتوبر at 14 units
+  14.00 u   18698 forms; least room   8.0 px (الخميس 10 ديسمبر)
+  13.00 u     398 forms; least room   8.7 px (الخميس 10 أغسطس)
+  11.25 u    2170 forms; least room   7.9 px (الخميس 10 تشرين الأول)
+    ar-SA  14.00 u: 337 days  13.00 u:  28 days;  size changes overnight   4 times
+    ar-EG  14.00 u: 337 days  13.00 u:  28 days;  size changes overnight   4 times
+    ar-LY  14.00 u: 337 days  13.00 u:  28 days;  size changes overnight   4 times
+    ar-MA  14.00 u: 365 days;  size changes overnight   0 times
+    ar-TN  14.00 u: 365 days;  size changes overnight   0 times
+    ar-DZ  14.00 u: 365 days;  size changes overnight   0 times
+    ar-IQ  14.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-SY  14.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-JO  14.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-LB  14.00 u: 242 days  11.25 u: 123 days;  size changes overnight   2 times
+    ar-AE  14.00 u: 337 days  13.00 u:  28 days;  size changes overnight   4 times
+    ur-PK  14.00 u: 365 days;  size changes overnight   0 times
+    ur-IN  14.00 u: 365 days;  size changes overnight   0 times

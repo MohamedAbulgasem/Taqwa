@@ -1,0 +1,7 @@
+forwards: emulator-5562 tcp:60214 tcp:5601 emulator-5562 tcp:64922 tcp:5601
+watch reverse: host-18 tcp:5601 tcp:64922
+      1 connected out of 1
+        Config: ConnectionConfiguration[ Name=Taqwa_Wear_OS_6, Address=EmulatorAddr-c76e057a, Type=Network, Role=2, Enabled=true, IsConnected=true, PeerNodeId=c76e057a, BtlePriority=true, NodeId=c76e0
+        Current: 4e7c91b9: 2026-10-31 13:28:55.921+0200, writes/reads (19/57), bytes (6564/16371), duration 01:22
+      1 connected out of 1
+        Config: ConnectionConfiguration[ Name=network, Address=null, Type=Network, Role=1, Enabled=true, IsConnected=true, PeerNodeId=4e7c91b9, BtlePriority=true, NodeId=4e7c91b9, PackageName=null, Co

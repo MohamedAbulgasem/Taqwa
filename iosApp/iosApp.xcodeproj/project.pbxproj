@@ -7,17 +7,80 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01A3E0F23625F27BFD274894 /* AppClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F98A44CD13EE98DC418917 /* AppClock.swift */; };
+		028BEC6E7878268CC4F5BD8E /* CrownCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016185B4A125520C9E8324A3 /* CrownCounter.swift */; };
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
+		07532CE97693AD5D3E012E73 /* WatchSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = D51D1D89ABF5F2F36FD7A1A9 /* WatchSession.swift */; };
+		09F04F7B67E152D2C4528C51 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 36CB9381EB989D16C8DD6723 /* Localizable.strings */; };
+		0C957F9CCACD04CE8CBFBDF5 /* TasbeehCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CC0319066FB630D49C6C4D6 /* TasbeehCounter.swift */; };
+		0D512FE78CB3E01F02EEC14D /* NextPrayerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BA754D31209ABF14C9A10AE /* NextPrayerWidget.swift */; };
 		0F68438D4F7889E6AD51BAC5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6F9F039BD9EEAB6E8B1E6480 /* PrivacyInfo.xcprivacy */; };
+		1084FBD7D2272BD1D6817D85 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5043E9A28D70F042D14797C3 /* MessageView.swift */; };
+		10A1511E89B8BD40735CE7EE /* TasbeehSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462760518316BA5105D0DD16 /* TasbeehSpeech.swift */; };
+		10A9833DA44F081B0832F735 /* LanguagesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5563EC93F2E5ADEA6769A5 /* LanguagesTests.swift */; };
+		116C72361492B5591CC3225E /* Manrope-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9333093576F5A08E70B7B416 /* Manrope-SemiBold.ttf */; };
+		155A07301655E6F9BBA5F434 /* FeedDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86587D296A1CE629319DEE84 /* FeedDecoder.swift */; };
+		1AE1F45428DEBE6C63625281 /* TasbeehFeel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30D4DF0817B348729A6E321 /* TasbeehFeel.swift */; };
+		1DCCA923F581B3A5C2939AD3 /* Glance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6F7C860C694E57FA0E82C1 /* Glance.swift */; };
+		1F04323BDEEA07C2CE0F4B7D /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 836F47D486FCF23AB4EE83C8 /* Haptics.swift */; };
+		1F62C8CB738305B86CAF2142 /* TasbeehStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE38378590D66142E92C12B /* TasbeehStore.swift */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
+		2168D2EAE15A05A89F396928 /* DebugLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B447BCB5444DF8C151694ABE /* DebugLaunch.swift */; };
+		228DA8AA8F3CC8E99B1EE04A /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FB2E4A33B6958F850C695B /* AppModel.swift */; };
+		2327169288F197A1768280D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF0A49B169C6871F5544C734 /* Assets.xcassets */; };
+		26E56C613CC3830CD822411C /* NextPrayerViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF425D8B3D1A6AD328BB6005 /* NextPrayerViews.swift */; };
+		27D7C04C0BBB0C6D7D95434D /* DebugSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB115A9220EE9F7B256B064B /* DebugSample.swift */; };
+		295CE3D61A609B34FD50A4B2 /* WatchFaceShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59FE11200C977B06955C3A48 /* WatchFaceShare.swift */; };
+		3675007075AAA8CF6A7E12B8 /* TasbeehFeel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30D4DF0817B348729A6E321 /* TasbeehFeel.swift */; };
 		3856BCD57F75E6B0887D12EE /* TaqwaWidgetPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3074D7444A39CD9FE3AF7817 /* TaqwaWidgetPreviews.swift */; };
+		3A9641FF5646837AC4D460A6 /* adhan-makkah-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = CE0B81E97BCECD62D79F98B0 /* adhan-makkah-30s.caf */; };
 		3C09810600BD13C6140B3E88 /* TaqwaAyahWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0B3C716739212122BA26FA /* TaqwaAyahWidget.swift */; };
+		3C35BB9A7A195F5FB78196EF /* TaqwaWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 65D4390704FD5C7E2DF1268C /* TaqwaWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3DC60C29EEA112223CC35A52 /* HeadingSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87E2D57F12BFE897570EC7C /* HeadingSource.swift */; };
+		3F076A7ECDAF5B3E04CDF891 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8621E2766A65330E5DF2F115 /* Localizable.strings */; };
 		427E434635D5050BBA21CB6E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 048F1A4C04407F11D714D729 /* InfoPlist.strings */; };
+		4550F6319245FB7E64414CCE /* LaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC373A8F3673331E14D117EC /* LaunchTests.swift */; };
+		4873B96732E61A28B23A83C7 /* HandshakePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455882A71DB34A98AEC64973 /* HandshakePolicy.swift */; };
+		49A77E8D927BCD920071FD1F /* HandshakePolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 455882A71DB34A98AEC64973 /* HandshakePolicy.swift */; };
+		4B6E120EA56D00F77FD0E24B /* TodayReadingOrderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD1A02113F6F2D710AECA00 /* TodayReadingOrderTests.swift */; };
+		4D59ABBFA3B3E0EF4F39A504 /* TasbeehScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82E579F5B06D39166C0FEDA6 /* TasbeehScreen.swift */; };
+		4E3440D038CC13CA54F11F39 /* FeedIntake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413A40645AA572B8FE842804 /* FeedIntake.swift */; };
+		4F55772569134D3C17ACF861 /* QiblaScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD729ED90712F29799264D /* QiblaScreen.swift */; };
+		5164F19BDD4ADA98642E354F /* TasbeehCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CC0319066FB630D49C6C4D6 /* TasbeehCounter.swift */; };
+		51A8028986027F4543402E39 /* QiblaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5BA657F521808FBD8D60A4 /* QiblaTests.swift */; };
+		5213934E839A74ED3AD4E9DD /* WatchScreenWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B97DDC4277FC06C743F280C /* WatchScreenWords.swift */; };
+		530264F1302670A5EDB2469A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 97BB3CFA8738CF8EC3A4D32D /* PrivacyInfo.xcprivacy */; };
+		5A6FBF7E2D9DED1C9DDF0341 /* ConnectivityDrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1EEBEC1B4D5BCB5199FC27 /* ConnectivityDrain.swift */; };
+		5E2EFE863BA2CE9C6BCE0574 /* WatchRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C10A4984AECE40741A7042 /* WatchRules.swift */; };
+		61581DC93EA935F4D706D90C /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C4DE25DE8AE5C993B9EE89 /* Feed.swift */; };
+		64BE5FC0E1C722BB666C8DCF /* QiblaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8103CA6DC199FEB5454C7779 /* QiblaView.swift */; };
+		66CF2EAB78481D7DFCB900A1 /* FeedIntake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413A40645AA572B8FE842804 /* FeedIntake.swift */; };
+		6A4159D0ED2F5A22C788F8D5 /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C4DE25DE8AE5C993B9EE89 /* Feed.swift */; };
 		6CA2C2BFEDB0011E41F63B97 /* uthmanic_hafs.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1F7906672509335C684AB77C /* uthmanic_hafs.ttf */; };
+		6ECBCAF14FF175129F1F938F /* FeedDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86587D296A1CE629319DEE84 /* FeedDecoder.swift */; };
+		708221B93CBFE0440278A78F /* Today.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795B5DD4DC71F3A91E8297A /* Today.swift */; };
+		73B2FDE9D9707D5C78A71E41 /* WatchScreenWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B97DDC4277FC06C743F280C /* WatchScreenWords.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		77231680E0C5C8C0B2DD8E85 /* NextPrayerContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58735E322B6FC02C886AF627 /* NextPrayerContent.swift */; };
+		7871B5C00AB95CBDE09FE8A0 /* TasbeehView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A0EF31EE1C6ADCA6B49A876 /* TasbeehView.swift */; };
+		796C45C3B8F3334DBE981051 /* WatchProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C6EA41DEE58F9513234E0A5 /* WatchProbe.swift */; };
+		7BDF84EC48C1DF1C0B04B0CD /* OwnWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99ACCA2ED080D7DBDC1F3BBC /* OwnWords.swift */; };
+		7C119B23B8F3BF266EF4D425 /* CrownCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016185B4A125520C9E8324A3 /* CrownCounter.swift */; };
+		7D859A703402EC228FD70906 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8408A18FE7C69A244B2445 /* TodayView.swift */; };
+		7D97535C9BBCF31CE9F0EBDE /* OwnWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99ACCA2ED080D7DBDC1F3BBC /* OwnWords.swift */; };
+		80BD4757409435D10679CD33 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7407A969F285281E327383D8 /* InfoPlist.strings */; };
+		822F18E1CC6AD5BD4636B383 /* Tasbeeh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77DDC04E1F1ADECA5E9D34D3 /* Tasbeeh.swift */; };
+		82FC7B51303E72B814C503AB /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8A439BDE485A4DDDA8CFC2 /* Compass.swift */; };
 		85546997F5FF01050B5EF34A /* TaqwaWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */; };
+		8953345C013D9F662D83477C /* StateValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EA9B9CA153048B87A99320B /* StateValue.swift */; };
 		8EEF72B2D5882940D96711CA /* TaqwaWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 141F46CAB00A9A4AD7F9B5B7 /* TaqwaWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		93D784F167D8AEDC4ABDE788 /* TasbeehStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE38378590D66142E92C12B /* TasbeehStore.swift */; };
+		9557C6E20195A83B0FBFB322 /* takbir-makkah.caf in Resources */ = {isa = PBXBuildFile; fileRef = 853956501464B7B96F26CDBE /* takbir-makkah.caf */; };
+		993FECA6562F9BC658888677 /* Today.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795B5DD4DC71F3A91E8297A /* Today.swift */; };
+		9A772063459754A9B5AD7F41 /* adhan-makkah-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 3A3F703EC55A287946AA36F0 /* adhan-makkah-full.m4a */; };
+		9ACF8C87E22E6F9F4CD1A39F /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEE5ECDC9701FE02E285750 /* Style.swift */; };
+		9FA8F9AD20A1B1C70D74FFE3 /* FeedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB8857A1103B0C4D5D8744A /* FeedStore.swift */; };
 		A15B1E2D7E8F857B09C3FC37 /* TaqwaWidgetPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3074D7444A39CD9FE3AF7817 /* TaqwaWidgetPreviews.swift */; };
 		A1B2C3D4E5F6A1B2C3D4E502 /* takbir.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E501 /* takbir.caf */; };
 		A1B2C3D4E5F6A1B2C3D4E504 /* adhan-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E503 /* adhan-30s.caf */; };
@@ -27,26 +90,79 @@
 		A1B2C3D4E5F6A1B2C3D4E534 /* adhan-azeez-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E533 /* adhan-azeez-30s.caf */; };
 		A1B2C3D4E5F6A1B2C3D4E536 /* adhan-azeez-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E535 /* adhan-azeez-full.m4a */; };
 		A1B2C3D4E5F6A1B2C3D4E542 /* takbir-azemi.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E541 /* takbir-azemi.caf */; };
-		F1A46C4378A6D740000844F4 /* takbir-madinah.caf in Resources */ = {isa = PBXBuildFile; fileRef = 3798D69A01A7ACA5DBA0AB14 /* takbir-madinah.caf */; };
-		9557C6E20195A83B0FBFB322 /* takbir-makkah.caf in Resources */ = {isa = PBXBuildFile; fileRef = 853956501464B7B96F26CDBE /* takbir-makkah.caf */; };
 		A1B2C3D4E5F6A1B2C3D4E544 /* adhan-azemi-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E543 /* adhan-azemi-30s.caf */; };
-		B2EA1FFCABD4B208A9DDA38C /* adhan-madinah-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = 4B03D1B752E5670B396B2952 /* adhan-madinah-30s.caf */; };
-		3A9641FF5646837AC4D460A6 /* adhan-makkah-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = CE0B81E97BCECD62D79F98B0 /* adhan-makkah-30s.caf */; };
 		A1B2C3D4E5F6A1B2C3D4E546 /* adhan-azemi-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E545 /* adhan-azemi-full.m4a */; };
-		C3A2E19E4876F858066328FD /* adhan-madinah-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2E5658243E7990AC55B7FF42 /* adhan-madinah-full.m4a */; };
-		9A772063459754A9B5AD7F41 /* adhan-makkah-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 3A3F703EC55A287946AA36F0 /* adhan-makkah-full.m4a */; };
 		A1B2C3D4E5F6A1B2C3D4E552 /* recitation-artwork.png in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A1B2C3D4E551 /* recitation-artwork.png */; };
 		A7CF8ECCACEB4FAB893423B5 /* TaqwaWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B05AA9035AF4D3C9731B3E6 /* TaqwaWidgetBundle.swift */; };
+		A9F93AF82C4AB6184614C542 /* FeedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB8857A1103B0C4D5D8744A /* FeedStore.swift */; };
+		AC7220B427017E673F29459E /* WatchRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96C10A4984AECE40741A7042 /* WatchRules.swift */; };
+		AEA25E9CBF5A6B76BCE2EE63 /* PhraseListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB81D434BC6E79DB6E537BBC /* PhraseListView.swift */; };
+		AEBA6D791CE55D6B3DE8368A /* DebugSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB115A9220EE9F7B256B064B /* DebugSample.swift */; };
+		AF6F1962D141622CA6BBDC7B /* TaqwaWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6878927146B2D57A0DEB0B2E /* TaqwaWatchApp.swift */; };
+		B2EA1FFCABD4B208A9DDA38C /* adhan-madinah-30s.caf in Resources */ = {isa = PBXBuildFile; fileRef = 4B03D1B752E5670B396B2952 /* adhan-madinah-30s.caf */; };
+		B5B9573A7DCE5E5291C1E704 /* WatchQibla.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8121337EFDD6B35008AD9AF2 /* WatchQibla.swift */; };
+		B6E32F6404140CFCA5B50EBD /* TasbeehTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F7B431E414BE6FA57625C2 /* TasbeehTests.swift */; };
+		B7931A132CD8B66153306A7D /* TasbeehCrownTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408B138C63B11F4E193471BD /* TasbeehCrownTests.swift */; };
+		B8EB019D73CA644149A94770 /* WatchHarness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB07DEFCCC847DB444BF6E /* WatchHarness.swift */; };
+		B95CD0329CAA2E1BD004A19E /* ComplicationGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17717ECC70B45C8FC1ADE438 /* ComplicationGallery.swift */; };
+		BC05560F8E3E471799A4F835 /* TasbeehSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 462760518316BA5105D0DD16 /* TasbeehSpeech.swift */; };
+		BEFE599CF09FC0B328E47DC2 /* Glance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B6F7C860C694E57FA0E82C1 /* Glance.swift */; };
+		C12CA29DD34FC66F062D4962 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E3C7298070A3320734EE6B28 /* InfoPlist.strings */; };
+		C22399C58554A099597021C4 /* Manrope-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 41A91B788F441651479E96DB /* Manrope-ExtraBold.ttf */; };
+		C39945170E75E8414C5FC97B /* Manrope-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F005BD22349A6D6B8D2B2597 /* Manrope-Light.ttf */; };
+		C3A2E19E4876F858066328FD /* adhan-madinah-full.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2E5658243E7990AC55B7FF42 /* adhan-madinah-full.m4a */; };
+		C3ED51ACFB605911FF72AB57 /* WatchKeyFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF84B756FDC6B75BF2A1771 /* WatchKeyFile.swift */; };
+		C5152F7685EBE14E8FFDB720 /* Compass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8A439BDE485A4DDDA8CFC2 /* Compass.swift */; };
 		C7983528BFE48BBADC014C36 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D563877F07E6BEE4908C30A /* Foundation.framework */; };
+		CD837ABB401B879B0A3EE9E4 /* Manrope-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9333093576F5A08E70B7B416 /* Manrope-SemiBold.ttf */; };
+		CE42461E430E0562FE3EDC99 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9414264A30D1D46687D54B3C /* PrivacyInfo.xcprivacy */; };
+		D1E9828C9E6FBCB4AD6E4510 /* NextPrayerViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF425D8B3D1A6AD328BB6005 /* NextPrayerViews.swift */; };
 		D44246D1477DD56E7CED694A /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E742DE611961B877AB95E6B9 /* SwiftUI.framework */; };
+		D793AEBB8207A2A05DDD9CF0 /* Manrope-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 41A91B788F441651479E96DB /* Manrope-ExtraBold.ttf */; };
+		D809EDCADDD9F44F6C2543DA /* WatchAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B47ACDA380A309E742269DEF /* WatchAssets.xcassets */; };
 		DB24BBB0D26B3BD81E0C3701 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C108B61CAA620B3D841285 /* WidgetKit.framework */; };
+		DD8D9ED3B5006FB6016D01C7 /* TaqwaWatchWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A409969D21A2D9D6631DA0 /* TaqwaWatchWidgets.swift */; };
+		DE40EB5DD1FD42CC34A7A8B5 /* Manrope-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F005BD22349A6D6B8D2B2597 /* Manrope-Light.ttf */; };
+		E04083546358F7B8A96DCB04 /* TaqwaWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = ED4345F41941030A51843604 /* TaqwaWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E2A091FCCDAC1469C058AFFC /* TaqwaWidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */; };
+		E2E75611C53B6E67B9AE4A7D /* Style.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EEE5ECDC9701FE02E285750 /* Style.swift */; };
+		E4203F0071142CE5F25E4C0D /* WatchAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B47ACDA380A309E742269DEF /* WatchAssets.xcassets */; };
+		E691D11E46CBFCC5F3ECCE9E /* TasbeehScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82E579F5B06D39166C0FEDA6 /* TasbeehScreen.swift */; };
+		E849E108C792E84563312290 /* NextPrayerContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58735E322B6FC02C886AF627 /* NextPrayerContent.swift */; };
+		E9F82430730C04986F0A9047 /* RingGauge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E305095F3CE195C67E504E /* RingGauge.swift */; };
 		EA16D17443377A5A4AC28816 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8C4CA26036C23E171F096392 /* PrivacyInfo.xcprivacy */; };
 		ED048BDFB31EAB8FD61E291E /* TaqwaAyahWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0B3C716739212122BA26FA /* TaqwaAyahWidget.swift */; };
+		EEAED3BF458304CAB620ABB8 /* WatchQibla.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8121337EFDD6B35008AD9AF2 /* WatchQibla.swift */; };
+		F09A933654017074BAA8A4FF /* RingGauge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1E305095F3CE195C67E504E /* RingGauge.swift */; };
+		F1A46C4378A6D740000844F4 /* takbir-madinah.caf in Resources */ = {isa = PBXBuildFile; fileRef = 3798D69A01A7ACA5DBA0AB14 /* takbir-madinah.caf */; };
+		F347C6517637AC287421B4B5 /* Tasbeeh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77DDC04E1F1ADECA5E9D34D3 /* Tasbeeh.swift */; };
+		FDE0932666648E2C583C8693 /* ConnectivityDrain.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1EEBEC1B4D5BCB5199FC27 /* ConnectivityDrain.swift */; };
 		FE3B539268555B070C201CEF /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0F25BB6BB7980559A8042F3A /* Localizable.strings */; };
+		FF0804A799DC27F995514C38 /* QiblaScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD729ED90712F29799264D /* QiblaScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		10149EEC78630E2FB1675969 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7555FF73242A565900829871 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AEE966F5BCD65FDFFA8E4B5E;
+			remoteInfo = TaqwaWatch;
+		};
+		37CFB016FF0A7DB28F6356FC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7555FF73242A565900829871 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 571B786A97B053966BD6918E;
+			remoteInfo = TaqwaWatchWidgets;
+		};
+		98226CEB46331E29C9436456 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7555FF73242A565900829871 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AEE966F5BCD65FDFFA8E4B5E;
+			remoteInfo = TaqwaWatch;
+		};
 		E14FD7BAF3F0A5CD5A419D12 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7555FF73242A565900829871 /* Project object */;
@@ -68,35 +184,120 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3BA90C352D5C4C48C3E2A797 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				3C35BB9A7A195F5FB78196EF /* TaqwaWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		579F676A2A01D67AE424BAF9 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E04083546358F7B8A96DCB04 /* TaqwaWatchWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		016185B4A125520C9E8324A3 /* CrownCounter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CrownCounter.swift; sourceTree = "<group>"; };
+		037F43B16B4CC0FF6E5D4119 /* TaqwaWatchUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = TaqwaWatchUITests.xctest; path = TaqwaWatchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		058557BA273AAA24004C7B11 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		0AE38378590D66142E92C12B /* TasbeehStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TasbeehStore.swift; sourceTree = "<group>"; };
+		0F5BA657F521808FBD8D60A4 /* QiblaTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QiblaTests.swift; sourceTree = "<group>"; };
 		113DD7EF1BD0004BC720CBFD /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		141F46CAB00A9A4AD7F9B5B7 /* TaqwaWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = TaqwaWidget.appex; path = TaqwaWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		148EF9EE3A0B615FD2C6B95E /* bn */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = bn; path = bn.lproj/Localizable.strings; sourceTree = "<group>"; };
+		17717ECC70B45C8FC1ADE438 /* ComplicationGallery.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ComplicationGallery.swift; sourceTree = "<group>"; };
+		18A409969D21A2D9D6631DA0 /* TaqwaWatchWidgets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWatchWidgets.swift; sourceTree = "<group>"; };
+		19F7B431E414BE6FA57625C2 /* TasbeehTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TasbeehTests.swift; sourceTree = "<group>"; };
+		1C34CFC8A417B52F4C5BDB69 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1F7906672509335C684AB77C /* uthmanic_hafs.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = uthmanic_hafs.ttf; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
+		25F76489B28BD74456E10D69 /* id */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/Localizable.strings; sourceTree = "<group>"; };
+		26FB2E4A33B6958F850C695B /* AppModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		28C4DE25DE8AE5C993B9EE89 /* Feed.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Feed.swift; sourceTree = "<group>"; };
+		2A8A439BDE485A4DDDA8CFC2 /* Compass.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Compass.swift; sourceTree = "<group>"; };
+		2E5658243E7990AC55B7FF42 /* adhan-madinah-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-madinah-full.m4a"; sourceTree = "<group>"; };
+		2EEE5ECDC9701FE02E285750 /* Style.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Style.swift; sourceTree = "<group>"; };
 		3074D7444A39CD9FE3AF7817 /* TaqwaWidgetPreviews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWidgetPreviews.swift; sourceTree = "<group>"; };
+		349D455BD8B1D3FCDBF1F220 /* ar */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		3795B5DD4DC71F3A91E8297A /* Today.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Today.swift; sourceTree = "<group>"; };
+		3798D69A01A7ACA5DBA0AB14 /* takbir-madinah.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-madinah.caf"; sourceTree = "<group>"; };
+		388FE6B0E27F154F9889808C /* bn */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = bn; path = bn.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		3A3F703EC55A287946AA36F0 /* adhan-makkah-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-makkah-full.m4a"; sourceTree = "<group>"; };
+		3B97DDC4277FC06C743F280C /* WatchScreenWords.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchScreenWords.swift; sourceTree = "<group>"; };
+		3EA9B9CA153048B87A99320B /* StateValue.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StateValue.swift; sourceTree = "<group>"; };
+		408B138C63B11F4E193471BD /* TasbeehCrownTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TasbeehCrownTests.swift; sourceTree = "<group>"; };
+		413A40645AA572B8FE842804 /* FeedIntake.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FeedIntake.swift; sourceTree = "<group>"; };
+		41A91B788F441651479E96DB /* Manrope-ExtraBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Manrope-ExtraBold.ttf"; sourceTree = "<group>"; };
 		452BC13CA7208AE19800838D /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		455882A71DB34A98AEC64973 /* HandshakePolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HandshakePolicy.swift; sourceTree = "<group>"; };
+		462760518316BA5105D0DD16 /* TasbeehSpeech.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TasbeehSpeech.swift; sourceTree = "<group>"; };
+		4A0EF31EE1C6ADCA6B49A876 /* TasbeehView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TasbeehView.swift; sourceTree = "<group>"; };
+		4B03D1B752E5670B396B2952 /* adhan-madinah-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-madinah-30s.caf"; sourceTree = "<group>"; };
+		4C6EA41DEE58F9513234E0A5 /* WatchProbe.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchProbe.swift; sourceTree = "<group>"; };
+		4CC66BA6D8C2F6B1F160C2AC /* id */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/Localizable.strings; sourceTree = "<group>"; };
+		5043E9A28D70F042D14797C3 /* MessageView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		54ED17605D324E8561E5A4A5 /* ur */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ur; path = ur.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		58735E322B6FC02C886AF627 /* NextPrayerContent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NextPrayerContent.swift; sourceTree = "<group>"; };
+		59FE11200C977B06955C3A48 /* WatchFaceShare.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchFaceShare.swift; sourceTree = "<group>"; };
 		5B67F3D213C133D516C6CF6C /* id */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5CB8857A1103B0C4D5D8744A /* FeedStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FeedStore.swift; sourceTree = "<group>"; };
 		5EA382239B184DF8D65D0EA4 /* TaqwaWidgetViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWidgetViews.swift; sourceTree = "<group>"; };
 		61981D289C5D41637D0E073A /* TaqwaWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = TaqwaWidget.entitlements; sourceTree = "<group>"; };
+		65D4390704FD5C7E2DF1268C /* TaqwaWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = TaqwaWatch.app; path = TaqwaWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6878927146B2D57A0DEB0B2E /* TaqwaWatchApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWatchApp.swift; sourceTree = "<group>"; };
+		6A690BF3CD10E47A7397E583 /* TaqwaWatchWidgets.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = TaqwaWatchWidgets.entitlements; sourceTree = "<group>"; };
 		6AF89C75BDE40455786612CE /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6B6F7C860C694E57FA0E82C1 /* Glance.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Glance.swift; sourceTree = "<group>"; };
 		6C3A8CCE5F29E60CF77E1270 /* tr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		6CBB07DEFCCC847DB444BF6E /* WatchHarness.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchHarness.swift; sourceTree = "<group>"; };
+		6CC0319066FB630D49C6C4D6 /* TasbeehCounter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TasbeehCounter.swift; sourceTree = "<group>"; };
 		6F9F039BD9EEAB6E8B1E6480 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7347D790663EE1FED0E6C7A9 /* tr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		735E67FA6A1CE689047E6F36 /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* My application.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My application.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		77C108B61CAA620B3D841285 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		77DDC04E1F1ADECA5E9D34D3 /* Tasbeeh.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tasbeeh.swift; sourceTree = "<group>"; };
+		7A725378BE2FCFC1374B8517 /* bn */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = bn; path = bn.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7BA754D31209ABF14C9A10AE /* NextPrayerWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NextPrayerWidget.swift; sourceTree = "<group>"; };
+		7CFF100EFCCD95BB18024002 /* ur */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ur; path = ur.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		7D2213738CCB619C408D9A42 /* TaqwaWatch.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = TaqwaWatch.entitlements; sourceTree = "<group>"; };
+		8103CA6DC199FEB5454C7779 /* QiblaView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QiblaView.swift; sourceTree = "<group>"; };
+		8121337EFDD6B35008AD9AF2 /* WatchQibla.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchQibla.swift; sourceTree = "<group>"; };
+		8284FF4A7DC8B02452191E86 /* id */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8293053FDA4A6A7B3808978A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		82E579F5B06D39166C0FEDA6 /* TasbeehScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TasbeehScreen.swift; sourceTree = "<group>"; };
+		836F47D486FCF23AB4EE83C8 /* Haptics.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		84F628A8027D69D5881E885D /* ar */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		853956501464B7B96F26CDBE /* takbir-makkah.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-makkah.caf"; sourceTree = "<group>"; };
+		86587D296A1CE629319DEE84 /* FeedDecoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FeedDecoder.swift; sourceTree = "<group>"; };
 		8B05AA9035AF4D3C9731B3E6 /* TaqwaWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaWidgetBundle.swift; sourceTree = "<group>"; };
 		8C4CA26036C23E171F096392 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		8D3D41085F1CE64BDA3DCC8E /* ar */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8D563877F07E6BEE4908C30A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		8EC866E920E2C13A5D8A6342 /* ur */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ur; path = ur.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		9333093576F5A08E70B7B416 /* Manrope-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Manrope-SemiBold.ttf"; sourceTree = "<group>"; };
+		9414264A30D1D46687D54B3C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		95701A1CA94AFD2C74A0BAC3 /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		95F98A44CD13EE98DC418917 /* AppClock.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppClock.swift; sourceTree = "<group>"; };
+		96C10A4984AECE40741A7042 /* WatchRules.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchRules.swift; sourceTree = "<group>"; };
+		97BB3CFA8738CF8EC3A4D32D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		97BD729ED90712F29799264D /* QiblaScreen.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QiblaScreen.swift; sourceTree = "<group>"; };
+		99ACCA2ED080D7DBDC1F3BBC /* OwnWords.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OwnWords.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E501 /* takbir.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = takbir.caf; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E503 /* adhan-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-30s.caf"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E511 /* chime.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = chime.caf; sourceTree = "<group>"; };
@@ -105,27 +306,65 @@
 		A1B2C3D4E5F6A1B2C3D4E533 /* adhan-azeez-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azeez-30s.caf"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E535 /* adhan-azeez-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azeez-full.m4a"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E541 /* takbir-azemi.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-azemi.caf"; sourceTree = "<group>"; };
-		3798D69A01A7ACA5DBA0AB14 /* takbir-madinah.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-madinah.caf"; sourceTree = "<group>"; };
-		853956501464B7B96F26CDBE /* takbir-makkah.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "takbir-makkah.caf"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E543 /* adhan-azemi-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azemi-30s.caf"; sourceTree = "<group>"; };
-		4B03D1B752E5670B396B2952 /* adhan-madinah-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-madinah-30s.caf"; sourceTree = "<group>"; };
-		CE0B81E97BCECD62D79F98B0 /* adhan-makkah-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-makkah-30s.caf"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E545 /* adhan-azemi-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-azemi-full.m4a"; sourceTree = "<group>"; };
-		2E5658243E7990AC55B7FF42 /* adhan-madinah-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-madinah-full.m4a"; sourceTree = "<group>"; };
-		3A3F703EC55A287946AA36F0 /* adhan-makkah-full.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-makkah-full.m4a"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6A1B2C3D4E551 /* recitation-artwork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "recitation-artwork.png"; sourceTree = "<group>"; };
+		A59BA6DF64EC8BF60F847872 /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A8B595F3E3BC557D8462D5AF /* id */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		AC373A8F3673331E14D117EC /* LaunchTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LaunchTests.swift; sourceTree = "<group>"; };
+		ADD1A02113F6F2D710AECA00 /* TodayReadingOrderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayReadingOrderTests.swift; sourceTree = "<group>"; };
+		B04A01D5F86208811F08912A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B447BCB5444DF8C151694ABE /* DebugLaunch.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DebugLaunch.swift; sourceTree = "<group>"; };
+		B47ACDA380A309E742269DEF /* WatchAssets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = WatchAssets.xcassets; sourceTree = "<group>"; };
 		B6765399CE6FAD9760BEA061 /* bn */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = bn; path = bn.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		BA6F446E8FAAD5375D084DCD /* ur */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ur; path = ur.lproj/Localizable.strings; sourceTree = "<group>"; };
 		BB0B3C716739212122BA26FA /* TaqwaAyahWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaqwaAyahWidget.swift; sourceTree = "<group>"; };
+		BF425D8B3D1A6AD328BB6005 /* NextPrayerViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NextPrayerViews.swift; sourceTree = "<group>"; };
+		BF5563EC93F2E5ADEA6769A5 /* LanguagesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LanguagesTests.swift; sourceTree = "<group>"; };
 		C2B16F41B255509D484B45AD /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C2E3C3C75EAF300A6433E306 /* id */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C6CCB9A0B84C4712BBF4B824 /* ur */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ur; path = ur.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C7B096548DE29DD465607AA6 /* tr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CA3FC7BDB026895402EBEE72 /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		CB81D434BC6E79DB6E537BBC /* PhraseListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PhraseListView.swift; sourceTree = "<group>"; };
+		CC2DD8E223FA6086A9D36E56 /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		CC8408A18FE7C69A244B2445 /* TodayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		CD458D9B704A09583928A734 /* ar */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CE0B81E97BCECD62D79F98B0 /* adhan-makkah-30s.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "adhan-makkah-30s.caf"; sourceTree = "<group>"; };
+		CF0A49B169C6871F5544C734 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D381D370C3CDB874D8A04108 /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D4FBC354B1D40CC46B7B990A /* bn */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = bn; path = bn.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D51D1D89ABF5F2F36FD7A1A9 /* WatchSession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchSession.swift; sourceTree = "<group>"; };
 		D5D50647620835E92DA37009 /* iosApp.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
+		DAAA72959704B0A6A32ABC37 /* tr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		E162A431A337B8E92C70DD90 /* ar */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E1E305095F3CE195C67E504E /* RingGauge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RingGauge.swift; sourceTree = "<group>"; };
+		E30D4DF0817B348729A6E321 /* TasbeehFeel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TasbeehFeel.swift; sourceTree = "<group>"; };
+		E51FAD90711A568A942B8910 /* tr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E742DE611961B877AB95E6B9 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		E87E2D57F12BFE897570EC7C /* HeadingSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HeadingSource.swift; sourceTree = "<group>"; };
+		ECE3E3CFACA19180FE935044 /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		ED4345F41941030A51843604 /* TaqwaWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = TaqwaWatchWidgets.appex; path = TaqwaWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		EEED2298F882BB2CBD1D4670 /* ar */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F005BD22349A6D6B8D2B2597 /* Manrope-Light.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Manrope-Light.ttf"; sourceTree = "<group>"; };
 		F5033C19B9B8026FF6B81C55 /* tr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F6BF02164A8EA90EB9AF0B01 /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		F83AB3E9A17B74F4B333F3B5 /* bn */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = bn; path = bn.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		FAD4249FCD927C57F09AC2C6 /* ur */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = ur; path = ur.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FB115A9220EE9F7B256B064B /* DebugSample.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DebugSample.swift; sourceTree = "<group>"; };
+		FB1EEBEC1B4D5BCB5199FC27 /* ConnectivityDrain.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConnectivityDrain.swift; sourceTree = "<group>"; };
+		FFF84B756FDC6B75BF2A1771 /* WatchKeyFile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WatchKeyFile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		341CE4B5CD34FDC51D372824 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		42D060EB48C0C312E87ABB4A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -133,6 +372,20 @@
 				C7983528BFE48BBADC014C36 /* Foundation.framework in Frameworks */,
 				DB24BBB0D26B3BD81E0C3701 /* WidgetKit.framework in Frameworks */,
 				D44246D1477DD56E7CED694A /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D0A35CA4C4E7C0015FF69C01 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E4C8BC515A7DBB2D54E2160D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,6 +399,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		031BC80F11E37FED2139D41E /* TaqwaWatchUITests */ = {
+			isa = PBXGroup;
+			children = (
+				AC373A8F3673331E14D117EC /* LaunchTests.swift */,
+				ADD1A02113F6F2D710AECA00 /* TodayReadingOrderTests.swift */,
+				408B138C63B11F4E193471BD /* TasbeehCrownTests.swift */,
+				19F7B431E414BE6FA57625C2 /* TasbeehTests.swift */,
+				0F5BA657F521808FBD8D60A4 /* QiblaTests.swift */,
+				BF5563EC93F2E5ADEA6769A5 /* LanguagesTests.swift */,
+			);
+			path = TaqwaWatchUITests;
+			sourceTree = "<group>";
+		};
 		058557D7273AAEEB004C7B11 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
@@ -171,6 +437,18 @@
 			path = TaqwaWidget;
 			sourceTree = "<group>";
 		};
+		2C08DBC03A93C07F6886D2BE /* WatchShared */ = {
+			isa = PBXGroup;
+			children = (
+				99ACCA2ED080D7DBDC1F3BBC /* OwnWords.swift */,
+				B47ACDA380A309E742269DEF /* WatchAssets.xcassets */,
+				BF425D8B3D1A6AD328BB6005 /* NextPrayerViews.swift */,
+				2EEE5ECDC9701FE02E285750 /* Style.swift */,
+				E1E305095F3CE195C67E504E /* RingGauge.swift */,
+			);
+			path = WatchShared;
+			sourceTree = "<group>";
+		};
 		42799AB246E5F90AF97AA0EF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -189,6 +467,12 @@
 				7555FF7C242A565900829871 /* Products */,
 				42799AB246E5F90AF97AA0EF /* Frameworks */,
 				1035E4AC1373222B52A1183F /* TaqwaWidget */,
+				F49F3D3F061C02A7BD37585C /* WatchCore */,
+				2C08DBC03A93C07F6886D2BE /* WatchShared */,
+				A6A4BC13DE8F6063EDAD61BF /* TaqwaWatch */,
+				C2670A7BFDF027E2419F6911 /* TaqwaWatchWidgets */,
+				031BC80F11E37FED2139D41E /* TaqwaWatchUITests */,
+				96722A5393657C6FBEB5E56A /* Manrope (shared) */,
 			);
 			sourceTree = "<group>";
 		};
@@ -197,6 +481,9 @@
 			children = (
 				7555FF7B242A565900829871 /* My application.app */,
 				141F46CAB00A9A4AD7F9B5B7 /* TaqwaWidget.appex */,
+				65D4390704FD5C7E2DF1268C /* TaqwaWatch.app */,
+				ED4345F41941030A51843604 /* TaqwaWatchWidgets.appex */,
+				037F43B16B4CC0FF6E5D4119 /* TaqwaWatchUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -213,8 +500,23 @@
 				D5D50647620835E92DA37009 /* iosApp.entitlements */,
 				8C4CA26036C23E171F096392 /* PrivacyInfo.xcprivacy */,
 				048F1A4C04407F11D714D729 /* InfoPlist.strings */,
+				6CBB07DEFCCC847DB444BF6E /* WatchHarness.swift */,
+				4C6EA41DEE58F9513234E0A5 /* WatchProbe.swift */,
+				59FE11200C977B06955C3A48 /* WatchFaceShare.swift */,
+				FFF84B756FDC6B75BF2A1771 /* WatchKeyFile.swift */,
 			);
 			path = iosApp;
+			sourceTree = "<group>";
+		};
+		96722A5393657C6FBEB5E56A /* Manrope (shared) */ = {
+			isa = PBXGroup;
+			children = (
+				F005BD22349A6D6B8D2B2597 /* Manrope-Light.ttf */,
+				9333093576F5A08E70B7B416 /* Manrope-SemiBold.ttf */,
+				41A91B788F441651479E96DB /* Manrope-ExtraBold.ttf */,
+			);
+			name = "Manrope (shared)";
+			path = ../shared/src/commonMain/composeResources/font;
 			sourceTree = "<group>";
 		};
 		980F5C7F17E54ACF2A71FBBA /* Resources */ = {
@@ -250,6 +552,33 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		A6A4BC13DE8F6063EDAD61BF /* TaqwaWatch */ = {
+			isa = PBXGroup;
+			children = (
+				6878927146B2D57A0DEB0B2E /* TaqwaWatchApp.swift */,
+				CF0A49B169C6871F5544C734 /* Assets.xcassets */,
+				97BB3CFA8738CF8EC3A4D32D /* PrivacyInfo.xcprivacy */,
+				7407A969F285281E327383D8 /* InfoPlist.strings */,
+				8621E2766A65330E5DF2F115 /* Localizable.strings */,
+				1C34CFC8A417B52F4C5BDB69 /* Info.plist */,
+				7D2213738CCB619C408D9A42 /* TaqwaWatch.entitlements */,
+				95F98A44CD13EE98DC418917 /* AppClock.swift */,
+				26FB2E4A33B6958F850C695B /* AppModel.swift */,
+				B447BCB5444DF8C151694ABE /* DebugLaunch.swift */,
+				D51D1D89ABF5F2F36FD7A1A9 /* WatchSession.swift */,
+				17717ECC70B45C8FC1ADE438 /* ComplicationGallery.swift */,
+				5043E9A28D70F042D14797C3 /* MessageView.swift */,
+				CC8408A18FE7C69A244B2445 /* TodayView.swift */,
+				3EA9B9CA153048B87A99320B /* StateValue.swift */,
+				836F47D486FCF23AB4EE83C8 /* Haptics.swift */,
+				CB81D434BC6E79DB6E537BBC /* PhraseListView.swift */,
+				4A0EF31EE1C6ADCA6B49A876 /* TasbeehView.swift */,
+				E87E2D57F12BFE897570EC7C /* HeadingSource.swift */,
+				8103CA6DC199FEB5454C7779 /* QiblaView.swift */,
+			);
+			path = TaqwaWatch;
+			sourceTree = "<group>";
+		};
 		AB1DB47929225F7C00F7AF9C /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
@@ -258,9 +587,88 @@
 			path = Configuration;
 			sourceTree = "<group>";
 		};
+		C2670A7BFDF027E2419F6911 /* TaqwaWatchWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				18A409969D21A2D9D6631DA0 /* TaqwaWatchWidgets.swift */,
+				9414264A30D1D46687D54B3C /* PrivacyInfo.xcprivacy */,
+				E3C7298070A3320734EE6B28 /* InfoPlist.strings */,
+				36CB9381EB989D16C8DD6723 /* Localizable.strings */,
+				B04A01D5F86208811F08912A /* Info.plist */,
+				6A690BF3CD10E47A7397E583 /* TaqwaWatchWidgets.entitlements */,
+				7BA754D31209ABF14C9A10AE /* NextPrayerWidget.swift */,
+			);
+			path = TaqwaWatchWidgets;
+			sourceTree = "<group>";
+		};
+		F49F3D3F061C02A7BD37585C /* WatchCore */ = {
+			isa = PBXGroup;
+			children = (
+				28C4DE25DE8AE5C993B9EE89 /* Feed.swift */,
+				86587D296A1CE629319DEE84 /* FeedDecoder.swift */,
+				96C10A4984AECE40741A7042 /* WatchRules.swift */,
+				FB1EEBEC1B4D5BCB5199FC27 /* ConnectivityDrain.swift */,
+				FB115A9220EE9F7B256B064B /* DebugSample.swift */,
+				413A40645AA572B8FE842804 /* FeedIntake.swift */,
+				5CB8857A1103B0C4D5D8744A /* FeedStore.swift */,
+				455882A71DB34A98AEC64973 /* HandshakePolicy.swift */,
+				3B97DDC4277FC06C743F280C /* WatchScreenWords.swift */,
+				6B6F7C860C694E57FA0E82C1 /* Glance.swift */,
+				3795B5DD4DC71F3A91E8297A /* Today.swift */,
+				58735E322B6FC02C886AF627 /* NextPrayerContent.swift */,
+				016185B4A125520C9E8324A3 /* CrownCounter.swift */,
+				77DDC04E1F1ADECA5E9D34D3 /* Tasbeeh.swift */,
+				6CC0319066FB630D49C6C4D6 /* TasbeehCounter.swift */,
+				E30D4DF0817B348729A6E321 /* TasbeehFeel.swift */,
+				82E579F5B06D39166C0FEDA6 /* TasbeehScreen.swift */,
+				462760518316BA5105D0DD16 /* TasbeehSpeech.swift */,
+				0AE38378590D66142E92C12B /* TasbeehStore.swift */,
+				2A8A439BDE485A4DDDA8CFC2 /* Compass.swift */,
+				97BD729ED90712F29799264D /* QiblaScreen.swift */,
+				8121337EFDD6B35008AD9AF2 /* WatchQibla.swift */,
+			);
+			name = WatchCore;
+			path = WatchCore/Sources/WatchCore;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		25142AC7E1B731661F419AB4 /* TaqwaWatchUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 57155FD0B76D88FA4C137B8D /* Build configuration list for PBXNativeTarget "TaqwaWatchUITests" */;
+			buildPhases = (
+				1BF9340F1AEA569B3C5A8CC0 /* Sources */,
+				341CE4B5CD34FDC51D372824 /* Frameworks */,
+				FA3251270B8ACCD54DD0BE5F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				52CB755CA8D3C2168BB343EA /* PBXTargetDependency */,
+			);
+			name = TaqwaWatchUITests;
+			productName = TaqwaWatchUITests;
+			productReference = 037F43B16B4CC0FF6E5D4119 /* TaqwaWatchUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		571B786A97B053966BD6918E /* TaqwaWatchWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE0F7A626697B2936CBBBFB1 /* Build configuration list for PBXNativeTarget "TaqwaWatchWidgets" */;
+			buildPhases = (
+				3D29FB7EFE6F2F3036698218 /* Sources */,
+				E4C8BC515A7DBB2D54E2160D /* Frameworks */,
+				C12F9D6788786D1E9452A5D1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TaqwaWatchWidgets;
+			productName = TaqwaWatchWidgets;
+			productReference = ED4345F41941030A51843604 /* TaqwaWatchWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		7555FF7A242A565900829871 /* iosApp */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "iosApp" */;
@@ -269,12 +677,15 @@
 				7555FF77242A565900829871 /* Sources */,
 				7555FF79242A565900829871 /* Resources */,
 				F85CB1118929364A9C6EFABC /* Frameworks */,
+				3BA90C352D5C4C48C3E2A797 /* Embed Watch Content */,
+				C5D745DFA80A90F6A5523FFD /* Watch face */,
 				3986423AAEE92F67DF624BF2 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				71DDCBB786FDAC13159757CF /* PBXTargetDependency */,
+				15F715FA6149E9BAB691FA51 /* PBXTargetDependency */,
 			);
 			name = iosApp;
 			productName = iosApp;
@@ -298,6 +709,26 @@
 			productName = TaqwaWidget;
 			productReference = 141F46CAB00A9A4AD7F9B5B7 /* TaqwaWidget.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		AEE966F5BCD65FDFFA8E4B5E /* TaqwaWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2D59DDDD7933C92A4438CFDB /* Build configuration list for PBXNativeTarget "TaqwaWatch" */;
+			buildPhases = (
+				D79A0F765BB0E4C69ECC0933 /* Sources */,
+				D0A35CA4C4E7C0015FF69C01 /* Frameworks */,
+				1866AF354D6CC3E3875E412C /* Resources */,
+				3BE478B17C5CE546AA153350 /* Debug samples */,
+				579F676A2A01D67AE424BAF9 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E359EA093C39BBA6BE2011A7 /* PBXTargetDependency */,
+			);
+			name = TaqwaWatch;
+			productName = TaqwaWatch;
+			productReference = 65D4390704FD5C7E2DF1268C /* TaqwaWatch.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -335,11 +766,29 @@
 			targets = (
 				7555FF7A242A565900829871 /* iosApp */,
 				9C14AFFF33CB50DB42D37CA8 /* TaqwaWidget */,
+				AEE966F5BCD65FDFFA8E4B5E /* TaqwaWatch */,
+				571B786A97B053966BD6918E /* TaqwaWatchWidgets */,
+				25142AC7E1B731661F419AB4 /* TaqwaWatchUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		1866AF354D6CC3E3875E412C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2327169288F197A1768280D3 /* Assets.xcassets in Resources */,
+				E4203F0071142CE5F25E4C0D /* WatchAssets.xcassets in Resources */,
+				530264F1302670A5EDB2469A /* PrivacyInfo.xcprivacy in Resources */,
+				80BD4757409435D10679CD33 /* InfoPlist.strings in Resources */,
+				3F076A7ECDAF5B3E04CDF891 /* Localizable.strings in Resources */,
+				DE40EB5DD1FD42CC34A7A8B5 /* Manrope-Light.ttf in Resources */,
+				116C72361492B5591CC3225E /* Manrope-SemiBold.ttf in Resources */,
+				C22399C58554A099597021C4 /* Manrope-ExtraBold.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7555FF79242A565900829871 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -368,6 +817,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C12F9D6788786D1E9452A5D1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D809EDCADDD9F44F6C2543DA /* WatchAssets.xcassets in Resources */,
+				CE42461E430E0562FE3EDC99 /* PrivacyInfo.xcprivacy in Resources */,
+				C12CA29DD34FC66F062D4962 /* InfoPlist.strings in Resources */,
+				09F04F7B67E152D2C4528C51 /* Localizable.strings in Resources */,
+				C39945170E75E8414C5FC97B /* Manrope-Light.ttf in Resources */,
+				CD837ABB401B879B0A3EE9E4 /* Manrope-SemiBold.ttf in Resources */,
+				D793AEBB8207A2A05DDD9CF0 /* Manrope-ExtraBold.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D6705F0BD7B0C639106E61FB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -375,6 +838,13 @@
 				6CA2C2BFEDB0011E41F63B97 /* uthmanic_hafs.ttf in Resources */,
 				FE3B539268555B070C201CEF /* Localizable.strings in Resources */,
 				0F68438D4F7889E6AD51BAC5 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FA3251270B8ACCD54DD0BE5F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,6 +869,44 @@
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
 		};
+		3BE478B17C5CE546AA153350 /* Debug samples */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Debug samples";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The phone's four Cape Town sample feeds, in a Debug build only: the DEBUG launch arguments\n# store them (plan 4, Task 5). A Release build gets none, and loses any an earlier build left\n# (scripts/check-watch-bundle.sh, rule 8).\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nrm -f \"$DEST\"/sample-feed-capetown*.json\nif [ \"$CONFIGURATION\" = Debug ]; then\n  cp \"$SRCROOT/../watchcore/vectors/\"sample-feed-capetown*.json \"$DEST/\"\nfi\n";
+		};
+		C5D745DFA80A90F6A5523FFD /* Watch face */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Watch face";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The Taqwa face Settings offers as \"Add to Apple Watch\" (plan 4, Task 10). The file is made on a\n# real Apple Watch and is absent until then. A copy an earlier build left goes when the file\n# does, so the row is never offered for a face that is no longer bundled.\nSRC=\"$SRCROOT/iosApp/WatchFace/Taqwa.watchface\"\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Taqwa.watchface\"\nrm -rf \"$DEST\"\nif [ -e \"$SRC\" ]; then\n  cp -R \"$SRC\" \"$DEST\"\nfi\n";
+		};
 		D70CFD311451404A813042EC /* Compile Kotlin */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -420,6 +928,54 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1BF9340F1AEA569B3C5A8CC0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4550F6319245FB7E64414CCE /* LaunchTests.swift in Sources */,
+				4B6E120EA56D00F77FD0E24B /* TodayReadingOrderTests.swift in Sources */,
+				B7931A132CD8B66153306A7D /* TasbeehCrownTests.swift in Sources */,
+				B6E32F6404140CFCA5B50EBD /* TasbeehTests.swift in Sources */,
+				51A8028986027F4543402E39 /* QiblaTests.swift in Sources */,
+				10A9833DA44F081B0832F735 /* LanguagesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D29FB7EFE6F2F3036698218 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A4159D0ED2F5A22C788F8D5 /* Feed.swift in Sources */,
+				155A07301655E6F9BBA5F434 /* FeedDecoder.swift in Sources */,
+				AC7220B427017E673F29459E /* WatchRules.swift in Sources */,
+				7D97535C9BBCF31CE9F0EBDE /* OwnWords.swift in Sources */,
+				DD8D9ED3B5006FB6016D01C7 /* TaqwaWatchWidgets.swift in Sources */,
+				5A6FBF7E2D9DED1C9DDF0341 /* ConnectivityDrain.swift in Sources */,
+				AEBA6D791CE55D6B3DE8368A /* DebugSample.swift in Sources */,
+				4E3440D038CC13CA54F11F39 /* FeedIntake.swift in Sources */,
+				A9F93AF82C4AB6184614C542 /* FeedStore.swift in Sources */,
+				49A77E8D927BCD920071FD1F /* HandshakePolicy.swift in Sources */,
+				5213934E839A74ED3AD4E9DD /* WatchScreenWords.swift in Sources */,
+				BEFE599CF09FC0B328E47DC2 /* Glance.swift in Sources */,
+				26E56C613CC3830CD822411C /* NextPrayerViews.swift in Sources */,
+				E2E75611C53B6E67B9AE4A7D /* Style.swift in Sources */,
+				0D512FE78CB3E01F02EEC14D /* NextPrayerWidget.swift in Sources */,
+				708221B93CBFE0440278A78F /* Today.swift in Sources */,
+				77231680E0C5C8C0B2DD8E85 /* NextPrayerContent.swift in Sources */,
+				E9F82430730C04986F0A9047 /* RingGauge.swift in Sources */,
+				028BEC6E7878268CC4F5BD8E /* CrownCounter.swift in Sources */,
+				F347C6517637AC287421B4B5 /* Tasbeeh.swift in Sources */,
+				5164F19BDD4ADA98642E354F /* TasbeehCounter.swift in Sources */,
+				1AE1F45428DEBE6C63625281 /* TasbeehFeel.swift in Sources */,
+				4D59ABBFA3B3E0EF4F39A504 /* TasbeehScreen.swift in Sources */,
+				10A1511E89B8BD40735CE7EE /* TasbeehSpeech.swift in Sources */,
+				1F62C8CB738305B86CAF2142 /* TasbeehStore.swift in Sources */,
+				82FC7B51303E72B814C503AB /* Compass.swift in Sources */,
+				4F55772569134D3C17ACF861 /* QiblaScreen.swift in Sources */,
+				B5B9573A7DCE5E5291C1E704 /* WatchQibla.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		556DF3CAC0C46931AEA0B271 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -440,17 +996,86 @@
 				E2A091FCCDAC1469C058AFFC /* TaqwaWidgetViews.swift in Sources */,
 				A15B1E2D7E8F857B09C3FC37 /* TaqwaWidgetPreviews.swift in Sources */,
 				3C09810600BD13C6140B3E88 /* TaqwaAyahWidget.swift in Sources */,
+				B8EB019D73CA644149A94770 /* WatchHarness.swift in Sources */,
+				796C45C3B8F3334DBE981051 /* WatchProbe.swift in Sources */,
+				295CE3D61A609B34FD50A4B2 /* WatchFaceShare.swift in Sources */,
+				C3ED51ACFB605911FF72AB57 /* WatchKeyFile.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D79A0F765BB0E4C69ECC0933 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				61581DC93EA935F4D706D90C /* Feed.swift in Sources */,
+				6ECBCAF14FF175129F1F938F /* FeedDecoder.swift in Sources */,
+				5E2EFE863BA2CE9C6BCE0574 /* WatchRules.swift in Sources */,
+				7BDF84EC48C1DF1C0B04B0CD /* OwnWords.swift in Sources */,
+				AF6F1962D141622CA6BBDC7B /* TaqwaWatchApp.swift in Sources */,
+				FDE0932666648E2C583C8693 /* ConnectivityDrain.swift in Sources */,
+				27D7C04C0BBB0C6D7D95434D /* DebugSample.swift in Sources */,
+				66CF2EAB78481D7DFCB900A1 /* FeedIntake.swift in Sources */,
+				9FA8F9AD20A1B1C70D74FFE3 /* FeedStore.swift in Sources */,
+				4873B96732E61A28B23A83C7 /* HandshakePolicy.swift in Sources */,
+				01A3E0F23625F27BFD274894 /* AppClock.swift in Sources */,
+				228DA8AA8F3CC8E99B1EE04A /* AppModel.swift in Sources */,
+				2168D2EAE15A05A89F396928 /* DebugLaunch.swift in Sources */,
+				07532CE97693AD5D3E012E73 /* WatchSession.swift in Sources */,
+				73B2FDE9D9707D5C78A71E41 /* WatchScreenWords.swift in Sources */,
+				1DCCA923F581B3A5C2939AD3 /* Glance.swift in Sources */,
+				D1E9828C9E6FBCB4AD6E4510 /* NextPrayerViews.swift in Sources */,
+				9ACF8C87E22E6F9F4CD1A39F /* Style.swift in Sources */,
+				B95CD0329CAA2E1BD004A19E /* ComplicationGallery.swift in Sources */,
+				993FECA6562F9BC658888677 /* Today.swift in Sources */,
+				1084FBD7D2272BD1D6817D85 /* MessageView.swift in Sources */,
+				7D859A703402EC228FD70906 /* TodayView.swift in Sources */,
+				E849E108C792E84563312290 /* NextPrayerContent.swift in Sources */,
+				F09A933654017074BAA8A4FF /* RingGauge.swift in Sources */,
+				8953345C013D9F662D83477C /* StateValue.swift in Sources */,
+				7C119B23B8F3BF266EF4D425 /* CrownCounter.swift in Sources */,
+				822F18E1CC6AD5BD4636B383 /* Tasbeeh.swift in Sources */,
+				0C957F9CCACD04CE8CBFBDF5 /* TasbeehCounter.swift in Sources */,
+				3675007075AAA8CF6A7E12B8 /* TasbeehFeel.swift in Sources */,
+				E691D11E46CBFCC5F3ECCE9E /* TasbeehScreen.swift in Sources */,
+				BC05560F8E3E471799A4F835 /* TasbeehSpeech.swift in Sources */,
+				93D784F167D8AEDC4ABDE788 /* TasbeehStore.swift in Sources */,
+				1F04323BDEEA07C2CE0F4B7D /* Haptics.swift in Sources */,
+				AEA25E9CBF5A6B76BCE2EE63 /* PhraseListView.swift in Sources */,
+				7871B5C00AB95CBDE09FE8A0 /* TasbeehView.swift in Sources */,
+				C5152F7685EBE14E8FFDB720 /* Compass.swift in Sources */,
+				FF0804A799DC27F995514C38 /* QiblaScreen.swift in Sources */,
+				EEAED3BF458304CAB620ABB8 /* WatchQibla.swift in Sources */,
+				3DC60C29EEA112223CC35A52 /* HeadingSource.swift in Sources */,
+				64BE5FC0E1C722BB666C8DCF /* QiblaView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		15F715FA6149E9BAB691FA51 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TaqwaWatch;
+			target = AEE966F5BCD65FDFFA8E4B5E /* TaqwaWatch */;
+			targetProxy = 10149EEC78630E2FB1675969 /* PBXContainerItemProxy */;
+		};
+		52CB755CA8D3C2168BB343EA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TaqwaWatch;
+			target = AEE966F5BCD65FDFFA8E4B5E /* TaqwaWatch */;
+			targetProxy = 98226CEB46331E29C9436456 /* PBXContainerItemProxy */;
+		};
 		71DDCBB786FDAC13159757CF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = TaqwaWidget;
 			target = 9C14AFFF33CB50DB42D37CA8 /* TaqwaWidget */;
 			targetProxy = E14FD7BAF3F0A5CD5A419D12 /* PBXContainerItemProxy */;
+		};
+		E359EA093C39BBA6BE2011A7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TaqwaWatchWidgets;
+			target = 571B786A97B053966BD6918E /* TaqwaWatchWidgets */;
+			targetProxy = 37CFB016FF0A7DB28F6356FC /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -483,18 +1108,74 @@
 			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
+		36CB9381EB989D16C8DD6723 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				735E67FA6A1CE689047E6F36 /* en */,
+				E162A431A337B8E92C70DD90 /* ar */,
+				A59BA6DF64EC8BF60F847872 /* fr */,
+				7347D790663EE1FED0E6C7A9 /* tr */,
+				4CC66BA6D8C2F6B1F160C2AC /* id */,
+				BA6F446E8FAAD5375D084DCD /* ur */,
+				7A725378BE2FCFC1374B8517 /* bn */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		7407A969F285281E327383D8 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CC2DD8E223FA6086A9D36E56 /* en */,
+				EEED2298F882BB2CBD1D4670 /* ar */,
+				CA3FC7BDB026895402EBEE72 /* fr */,
+				E51FAD90711A568A942B8910 /* tr */,
+				8284FF4A7DC8B02452191E86 /* id */,
+				8EC866E920E2C13A5D8A6342 /* ur */,
+				388FE6B0E27F154F9889808C /* bn */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		8621E2766A65330E5DF2F115 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				95701A1CA94AFD2C74A0BAC3 /* en */,
+				CD458D9B704A09583928A734 /* ar */,
+				F6BF02164A8EA90EB9AF0B01 /* fr */,
+				C7B096548DE29DD465607AA6 /* tr */,
+				25F76489B28BD74456E10D69 /* id */,
+				C6CCB9A0B84C4712BBF4B824 /* ur */,
+				D4FBC354B1D40CC46B7B990A /* bn */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		E3C7298070A3320734EE6B28 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D381D370C3CDB874D8A04108 /* en */,
+				349D455BD8B1D3FCDBF1F220 /* ar */,
+				ECE3E3CFACA19180FE935044 /* fr */,
+				DAAA72959704B0A6A32ABC37 /* tr */,
+				A8B595F3E3BC557D8462D5AF /* id */,
+				7CFF100EFCCD95BB18024002 /* ur */,
+				F83AB3E9A17B74F4B333F3B5 /* bn */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		518413451CC6045D3DF9D7A6 /* Release */ = {
-			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = TaqwaWidget/TaqwaWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				DEVELOPMENT_TEAM = "$(TEAM_ID)";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -513,7 +1194,7 @@
 					"-framework",
 					widgetcore,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "${BUNDLE_ID}.widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID).widget";
 				PRODUCT_NAME = TaqwaWidget;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -525,15 +1206,67 @@
 			};
 			name = Release;
 		};
-		6729C1C2D7EBE76E1EFCB008 /* Debug */ = {
-			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
+		652CE6D8DA40C2516980CA47 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TaqwaWatch/TaqwaWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(TEAM_ID)";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TaqwaWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID).watchkitapp";
+				PRODUCT_NAME = TaqwaWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		653BEC4D690B952C7A2694EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TaqwaWatch/TaqwaWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(TEAM_ID)";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TaqwaWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID).watchkitapp";
+				PRODUCT_NAME = TaqwaWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		6729C1C2D7EBE76E1EFCB008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = TaqwaWidget/TaqwaWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				DEVELOPMENT_TEAM = "$(TEAM_ID)";
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -552,7 +1285,7 @@
 					"-framework",
 					widgetcore,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "${BUNDLE_ID}.widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID).widget";
 				PRODUCT_NAME = TaqwaWidget;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -562,6 +1295,23 @@
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
+		};
+		6A0CF0AD61046F08FE82874E /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(TEAM_ID)";
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID).watchkitapp.uitests";
+				PRODUCT_NAME = TaqwaWatchUITests;
+				SDKROOT = watchos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = TaqwaWatch;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
 		};
 		7555FFA3242A565B00829871 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -749,9 +1499,98 @@
 			};
 			name = Release;
 		};
+		99A67D5E00DBD41CCD1C17EF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(TEAM_ID)";
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID).watchkitapp.uitests";
+				PRODUCT_NAME = TaqwaWatchUITests;
+				SDKROOT = watchos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = TaqwaWatch;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		CE5B97BA5640A13EF5F31936 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = TaqwaWatchWidgets/TaqwaWatchWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(TEAM_ID)";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TaqwaWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID).watchkitapp.widgets";
+				PRODUCT_NAME = TaqwaWatchWidgets;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		E5CB1299823D944997C35C45 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = AB3632DC29227652001CCB65 /* Config.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = TaqwaWatchWidgets/TaqwaWatchWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "$(TEAM_ID)";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TaqwaWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_ID).watchkitapp.widgets";
+				PRODUCT_NAME = TaqwaWatchWidgets;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2D59DDDD7933C92A4438CFDB /* Build configuration list for PBXNativeTarget "TaqwaWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				653BEC4D690B952C7A2694EA /* Release */,
+				652CE6D8DA40C2516980CA47 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		57155FD0B76D88FA4C137B8D /* Build configuration list for PBXNativeTarget "TaqwaWatchUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A0CF0AD61046F08FE82874E /* Release */,
+				99A67D5E00DBD41CCD1C17EF /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		6A9ADED71164BB4A1F8BC872 /* Build configuration list for PBXNativeTarget "TaqwaWidget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -775,6 +1614,15 @@
 			buildConfigurations = (
 				7555FFA6242A565B00829871 /* Debug */,
 				7555FFA7242A565B00829871 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BE0F7A626697B2936CBBBFB1 /* Build configuration list for PBXNativeTarget "TaqwaWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E5CB1299823D944997C35C45 /* Release */,
+				CE5B97BA5640A13EF5F31936 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

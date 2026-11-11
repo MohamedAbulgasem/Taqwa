@@ -2,6 +2,7 @@ import SwiftUI
 import BackgroundTasks
 import UIKit
 import UserNotifications
+import WatchConnectivity
 import WidgetKit
 import shared
 
@@ -74,6 +75,8 @@ struct iOSApp: App {
 			Self.handleAppRefresh(task: task as! BGAppRefreshTask)
 		}
 		Self.installWidgetRefreshHook()
+		Self.installWatchSession()
+		Self.installWatchFaceShare()
 		Self.installWidgetPlacementHook()
 		Self.scheduleNextRefresh()
 	}
@@ -112,6 +115,7 @@ struct iOSApp: App {
 			.onOpenURL { url in
 				#if DEBUG
 				if RecitationHarness.handle(url) { return }
+				if WatchHarness.shared.handle(url) { return }
 				#endif
 				Self.openAyah(from: url)
 			}
@@ -185,6 +189,20 @@ struct iOSApp: App {
 	/// Kotlin cannot: it reloads only when the serialised snapshot has genuinely changed.
 	static func installWidgetRefreshHook() {
 		WidgetRefreshBridge.shared.onRefresh = { reloadWidgets() }
+	}
+
+	/// The watch feed's sender on the iPhone (plan 2 Task 8): WatchConnectivity is Swift-only, as
+	/// WidgetKit is, so the session is the hook the shared code sends through.
+	static func installWatchSession() {
+		TaqwaWatchSession.shared.start()
+	}
+
+	/// Settings' "Add to Apple Watch" (plan 4 Task 10): ClockKit's face library and the session's
+	/// `isPaired` are Swift-only too, so the row asks through this hook. It reads the session that
+	/// `installWatchSession()` activates, and never activates it itself; that session's delegate
+	/// says when to ask again (`WatchFaceShareBridge.sessionChanged()`).
+	static func installWatchFaceShare() {
+		WatchFaceShareBridge.shared.hook = WatchFaceShare.shared
 	}
 
 	/// Settings › Widgets and the Settings root ask which Taqwa widgets are placed; `WidgetCenter` is
@@ -263,6 +281,190 @@ struct iOSApp: App {
 	}
 }
 
+/// The iPhone's half of the watch feed (plan 2 Task 8, Ruling 50): `WatchFeedBridge`'s hook over
+/// `WCSession.default`. The shared code decides when to send and what (`WatchFeedSync`); this only
+/// hands the feed to WatchConnectivity, answers the watch's handshake and says when a watch may be
+/// back. Every key it uses is `WatchFeedBridge`'s, `:watchcore`'s contract, so Swift names none of
+/// its own.
+///
+/// Kotlin's `println` does not reach the unified log on iOS, so each decision is logged here, with
+/// the prefix `TaqwaWatch`: activation, each `isReady()` with its three facts, the watch key's
+/// read, each send with the feed's byte count and its delivery's number and fingerprint, and each
+/// call into the bridge. A delivery is logged as `WatchFeedBridge.logged(delivery:)` gives it,
+/// never with its origin (the install's one random number), and nothing logged names the place,
+/// the bearing or the person (Ruling 52 item 4). Every line is `NSLog("%@", line)`: no value is
+/// ever interpolated into NSLog's format string.
+///
+/// ```
+/// xcrun simctl spawn <udid> log show --last 5m --predicate 'eventMessage CONTAINS "TaqwaWatch"'
+/// ```
+final class TaqwaWatchSession: NSObject, WCSessionDelegate, WatchSessionHook {
+
+	static let shared = TaqwaWatchSession()
+
+	/// Guards `watchKey()`'s read and write: two first reads at once (the sync's worker and a
+	/// handshake on WatchConnectivity's queue) would otherwise each write a key of their own.
+	///
+	/// The key is Amendment A3's file (`WatchKeyFile`), inside `watchDirectoryURL`. Apple: a
+	/// directory "specific to the currently paired and active Apple Watch", whose URL "changes when
+	/// the active Apple Watch changes", and "If the user uninstalls your app or unpairs their Apple
+	/// Watch, iOS deletes this directory and its contents."
+	private let keyLock = NSLock()
+
+	/// Activated whenever WatchConnectivity is supported: `isPaired` and `isWatchAppInstalled` are
+	/// only valid once it is, so they are checked before each send instead. The hook is installed
+	/// before `activate()`, so the activation's ask can never find it missing; until activation
+	/// completes `isReady()` is false anyway.
+	func start() {
+		guard WCSession.isSupported() else {
+			NSLog("%@", "TaqwaWatch not supported: no session, no watch")
+			return
+		}
+		WatchFeedBridge.shared.hook = self
+		let session = WCSession.default
+		session.delegate = self
+		session.activate()
+		NSLog("%@", "TaqwaWatch activate() asked")
+	}
+
+	func isReady() -> Bool {
+		let session = WCSession.default
+		let activated = session.activationState == .activated
+		let paired = session.isPaired
+		let installed = session.isWatchAppInstalled
+		let ready = activated && paired && installed
+		NSLog("%@", "TaqwaWatch isReady()=\(ready) activated=\(activated) paired=\(paired) installed=\(installed)")
+		return ready
+	}
+
+	/// The watch directory is read only once the session is activated (Ruling 52 item 5). Apple:
+	/// while `activationState` is `notActivated` its URL "is undefined and should not be used",
+	/// and "If there is no paired watch, the value of this property is nil". The SDK header adds:
+	/// "If the watch app is not installed for the selected Watch the value will be nil", and the
+	/// directory "will be deleted upon next launch if the watch app is uninstalled for the selected
+	/// Watch, or that Watch is unpaired".
+	func watchKey() -> String? {
+		keyLock.lock()
+		defer { keyLock.unlock() }
+		let session = WCSession.default
+		guard session.activationState == .activated, let directory = session.watchDirectoryURL else { return nil }
+		// Read or written, and the file itself marked excluded from backup (Ruling 69 item 3).
+		let answer = WatchKeyFile.key(in: directory)
+		answer.log.forEach { NSLog("%@", $0) }
+		return answer.key
+	}
+
+	/// Checked again right before the call: a watch switch can make the session inactive between
+	/// `isReady()` and here, and `updateApplicationContext` on an inactive session is a programmer
+	/// error Swift may not be able to catch. So nothing is handed over then, and the answer is
+	/// `sendFailed`.
+	func send(feed: Data, delivery: String) -> Int32 {
+		let bridge = WatchFeedBridge.shared
+		let session = WCSession.default
+		guard session.activationState == .activated, session.isPaired, session.isWatchAppInstalled else {
+			NSLog("%@", "TaqwaWatch send refused, the session is not ready: bytes=\(feed.count) delivery=\(bridge.logged(delivery: delivery))")
+			return bridge.sendFailed
+		}
+		do {
+			try session.updateApplicationContext([bridge.contextFeedKey: feed, bridge.contextDeliveryKey: delivery])
+			NSLog("%@", "TaqwaWatch send queued: bytes=\(feed.count) delivery=\(bridge.logged(delivery: delivery))")
+			return bridge.sendQueued
+		} catch let error as WCError where error.code == .payloadTooLarge {
+			NSLog("%@", "TaqwaWatch send too large: bytes=\(feed.count) delivery=\(bridge.logged(delivery: delivery))")
+			return bridge.sendTooLarge
+		} catch {
+			NSLog("%@", "TaqwaWatch send failed: bytes=\(feed.count) delivery=\(bridge.logged(delivery: delivery)) error=\(error.localizedDescription)")
+			return bridge.sendFailed
+		}
+	}
+
+	// MARK: WCSessionDelegate
+	//
+	// Each of the four callbacks that can change "Add to Apple Watch" (the session's activation
+	// state, or `isPaired`) also tells Settings, which asks the row again if it is in front
+	// (`WatchFaceShareBridge.sessionChanged()`, the owner's report of 9 November). It never waits.
+
+	/// Every launch ends here, background refreshes included, so this is the damped ask
+	/// (`watchActivated()`), never `watchStateChanged()`: an undamped one would hand the whole feed
+	/// over again at every launch and reload every widget timeline on the watch.
+	func session(
+		_ session: WCSession,
+		activationDidCompleteWith activationState: WCSessionActivationState,
+		error: Error?
+	) {
+		let activated = activationState == .activated
+		NSLog("%@", "TaqwaWatch activated=\(activated) state=\(activationState.rawValue) error=\(error?.localizedDescription ?? "none"), calling watchActivated()")
+		WatchFeedBridge.shared.watchActivated()
+		WatchFaceShareBridge.shared.sessionChanged()
+	}
+
+	func sessionDidBecomeInactive(_ session: WCSession) {
+		NSLog("%@", "TaqwaWatch inactive")
+		WatchFaceShareBridge.shared.sessionChanged()
+	}
+
+	/// Another watch was switched to: Apple's pattern is to activate the session again for it.
+	func sessionDidDeactivate(_ session: WCSession) {
+		NSLog("%@", "TaqwaWatch deactivated, activate() again")
+		WatchFaceShareBridge.shared.sessionChanged()
+		WCSession.default.activate()
+	}
+
+	/// The watch app installed or removed, another watch paired, or the watch directory changed:
+	/// the confirmation is forgotten first (`watchStateChanged()`), then the feed goes.
+	func sessionWatchStateDidChange(_ session: WCSession) {
+		NSLog("%@", "TaqwaWatch watch state changed: paired=\(session.isPaired) installed=\(session.isWatchAppInstalled), calling watchStateChanged()")
+		WatchFeedBridge.shared.watchStateChanged()
+		WatchFaceShareBridge.shared.sessionChanged()
+	}
+
+	/// The watch's handshake, `[refresh: <its echo>]`. The reply is whether the watch has, or is
+	/// being given, the current feed. The bridge puts the ask on the sync's queue before it returns,
+	/// so the handshakes and watch-state changes are served in the order WatchConnectivity delivers
+	/// them (Ruling 53 item 4a), and it holds UIKit background time until it replies, so an app this
+	/// message woke in the background answers before it is suspended (item 4b). The reply comes
+	/// within `WatchFeedSync.CALLER_BOUND`, most often later, from the bridge's own coroutine;
+	/// nothing here waits for it, so WatchConnectivity's delegate queue never waits for the sync
+	/// (Ruling 52 item 6). The bridge calls the reply exactly once.
+	func session(
+		_ session: WCSession,
+		didReceiveMessage message: [String: Any],
+		replyHandler: @escaping ([String: Any]) -> Void
+	) {
+		let bridge = WatchFeedBridge.shared
+		guard let have = message[bridge.refreshMessageKey] else {
+			NSLog("%@", "TaqwaWatch message without a handshake, answered empty")
+			replyHandler([:])
+			return
+		}
+		let echo = have as? String ?? ""
+		NSLog("%@", "TaqwaWatch handshake have=\(bridge.logged(delivery: echo)), calling refreshRequested(have:reply:)")
+		bridge.refreshRequested(have: echo) { queued in
+			NSLog("%@", "TaqwaWatch handshake answered queued=\(queued.boolValue)")
+			replyHandler([bridge.refreshReplyKey: queued.boolValue])
+		}
+	}
+
+	func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+		let bridge = WatchFeedBridge.shared
+		guard let have = message[bridge.refreshMessageKey] else { return }
+		let echo = have as? String ?? ""
+		NSLog("%@", "TaqwaWatch handshake have=\(bridge.logged(delivery: echo)) without a reply handler, calling refreshRequested(have:reply:)")
+		bridge.refreshRequested(have: echo) { queued in
+			NSLog("%@", "TaqwaWatch handshake without a reply handler served: queued=\(queued.boolValue)")
+		}
+	}
+
+	#if DEBUG
+	/// `transferUserInfo`'s answer, which only the session's delegate hears, and this is the phone's
+	/// only one: handed to the size probe (`WatchHarness`, plan 4 Task 5B). The app itself never
+	/// transfers user info, so a release build does not implement it.
+	func session(_ session: WCSession, didFinish userInfoTransfer: WCSessionUserInfoTransfer, error: Error?) {
+		WatchHarness.shared.transferFinished(userInfoTransfer, error: error)
+	}
+	#endif
+}
+
 #if DEBUG
 import MediaPlayer
 
@@ -270,10 +472,17 @@ import MediaPlayer
 /// `RecitationHarnessReceiver`: slice 3a task 3 has to be verified on a simulator before task 4
 /// gives recitation any UI. `#if DEBUG`, so none of it is in a shipping build.
 ///
-/// It rides the `taqwa` URL scheme the widget already registers, because that is the only channel
-/// `simctl` has into a running app:
+/// It rides the `taqwa` URL scheme the widget already registers, by either of the two ways `simctl`
+/// hands the app a URL. On iOS 27 only the launch URLs serve a script: `simctl openurl` waits behind
+/// "Open in Taqwa?", which no script answers, while a launch hands each URL in `TAQWA_HARNESS_URLS`
+/// here as `onOpenURL` does (`runLaunchURLs`, below). `--terminate-running-process` makes it a new
+/// process: one already running has read its launch URLs, or had none:
 ///
 /// ```
+/// # iOS 27: a fresh launch with the URLs, space-separated, a second and a half apart
+/// SIMCTL_CHILD_TAQWA_HARNESS_URLS='taqwa://recite/load?surah=36&ayah=1&reciter=ar.alafasy taqwa://recite/next' \
+///   xcrun simctl launch --terminate-running-process <udid> world.taqwa.ios
+/// # openurl, where nothing asks "Open in Taqwa?" first
 /// xcrun simctl openurl <udid> "taqwa://recite/load?surah=36&ayah=1&reciter=ar.alafasy"
 /// xcrun simctl openurl <udid> "taqwa://recite/next"
 /// ```
@@ -295,9 +504,11 @@ enum RecitationHarness {
 	private static var launchURLsRun = false
 
 	/// The URLs in `TAQWA_HARNESS_URLS` (`SIMCTL_CHILD_TAQWA_HARNESS_URLS="url url …" xcrun simctl launch …`),
-	/// each handled as `onOpenURL` would, two seconds after launch and a second and a half apart. iOS 27 asks
+	/// each handled as `onOpenURL` would, two seconds after launch and a second and a half apart: recitation's
+	/// commands, then the watch probe's (`taqwa://watch/…`, `WatchHarness`), then the ayah route. iOS 27 asks
 	/// "Open in Taqwa?" before `simctl openurl` reaches the app, which no script can answer, so the store and
-	/// README captures relaunch with their URLs instead. Once per process: `onAppear` can run again.
+	/// README captures, and the probe on the paired simulators, relaunch with their URLs instead. Once per
+	/// process: `onAppear` can run again.
 	static func runLaunchURLs(openAyah: @escaping (URL) -> Void) {
 		guard !launchURLsRun, let list = ProcessInfo.processInfo.environment["TAQWA_HARNESS_URLS"] else { return }
 		launchURLsRun = true
@@ -305,7 +516,7 @@ enum RecitationHarness {
 		for (i, url) in urls.enumerated() {
 			DispatchQueue.main.asyncAfter(deadline: .now() + 2 + 1.5 * Double(i)) {
 				NSLog("TaqwaHarness launch url %@", url.absoluteString)
-				if !handle(url) { openAyah(url) }
+				if !handle(url) && !WatchHarness.shared.handle(url) { openAyah(url) }
 			}
 		}
 	}

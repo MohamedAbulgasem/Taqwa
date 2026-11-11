@@ -1,0 +1,5 @@
+androidx.core.splashscreen
+androidx.emoji2.viewsintegration
+androidx.fragment.app.strictmode
+androidx.resourceinspection
+androidx.resourceinspection.annotation

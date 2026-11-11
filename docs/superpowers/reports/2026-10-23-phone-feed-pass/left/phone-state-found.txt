@@ -1,0 +1,14 @@
+time: Sat Oct 31 12:56:27 SAST 2026
+build: 36 BE2A.250530.026.D1
+taqwa:
+pixel watch app: versionName=5.1.0.1005629187
+gms: versionName=26.42.31 (260400-1005867181)
+packages: 249
+accounts: 1
+auto_time=1 auto_time_zone=1 tz=Africa/Johannesburg
+font_scale=1.0
+locale: persist.sys.locale= system_locales=null
+talkback: services=null enabled=0
+airplane=0 wifi=1
+forward: emulator-5562 tcp:64922 tcp:5601
+reverse (watch): host-15 tcp:5601 tcp:64922

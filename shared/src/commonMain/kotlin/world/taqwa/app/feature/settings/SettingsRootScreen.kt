@@ -220,8 +220,9 @@ internal fun UriHandler.openFirst(links: List<String>) {
     for (link in links) if (runCatching { openUri(link) }.isSuccess) return
 }
 
+/** The air between two groups of the settings root, a section label and its card on each side. */
 @Composable
-private fun GroupGap() = Spacer(Modifier.fillMaxWidth().height(28.dp))
+internal fun GroupGap() = Spacer(Modifier.fillMaxWidth().height(28.dp))
 
 @Composable
 fun SettingsRootScreen(
@@ -308,6 +309,10 @@ fun SettingsRootScreen(
                 onClick = onOpenWidgets,
             )
         }
+
+        // Watch (plan 5 Task 6), with its own gap before it: only while a row applies, so on a phone
+        // with no watch, and on most iPhones, nothing at all.
+        WatchSection()
 
         GroupGap()
         SectionLabel(stringResource(Res.string.settings_group_about))

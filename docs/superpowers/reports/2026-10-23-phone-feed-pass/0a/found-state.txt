@@ -1,0 +1,12 @@
+time: Sat Oct 31 12:24:09 SAST 2026
+avd: Taqwa_Phone_Wear
+sdk: 36 build: google/sdk_gphone64_arm64/emu64a:16/BE2A.250530.026.D1/13818094:user/release-keys
+gms: versionName=25.08.34 (260400-739221510)
+play store: versionName=45.3.21-31 [0] [PR] 736181551
+Pixel Watch app (com.google.android.apps.wear.companion): (none)
+Wear OS app (com.google.android.wearable.app): (none)
+taqwa: (none)
+accounts: 0
+locale:  tz: Africa/Johannesburg auto_time=1
+font_scale=1.0
+packages: 246

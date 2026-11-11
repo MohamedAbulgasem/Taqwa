@@ -1,0 +1,5 @@
+--------- beginning of main
+10-31 12:24:59.709 I/System.out( 4772): TaqwaWatch no Wear API 16
+10-31 12:24:59.709 I/System.out( 4772): TaqwaWatch RESCHEDULED NO_WATCH 420ms
+10-31 12:25:00.072 I/System.out( 4772): TaqwaWatch no Wear API 16
+10-31 12:25:00.072 I/System.out( 4772): TaqwaWatch RESCHEDULED NO_WATCH 5ms

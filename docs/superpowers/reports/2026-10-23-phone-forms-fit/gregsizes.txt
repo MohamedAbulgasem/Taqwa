@@ -1,0 +1,7 @@
+21266 right-to-left forms, at Arch's baseline 164.02 px
+  31.50 px (14.0 units): least room  -4.3 px (الثلاثاء 10 تشرين الأول), 2106 forms under 7 px; widest 346.4 px (الخميس ٣١ تشرين الثاني)
+  29.25 px (13.0 units): least room  -4.3 px (الخميس 10 تشرين الأول), 1316 forms under 7 px; widest 321.6 px (الخميس ٣١ تشرين الثاني)
+  28.12 px (12.5 units): least room  -4.2 px (الخميس 10 تشرين الثاني),  670 forms under 7 px; widest 307.9 px (الخميس ٣١ تشرين الثاني)
+  27.00 px (12.0 units): least room  -0.4 px (الخميس 10 تشرين الثاني),  238 forms under 7 px; widest 296.9 px (الخميس ٣١ تشرين الثاني)
+  25.88 px (11.5 units): least room   4.8 px (الخميس 10 تشرين الثاني),   44 forms under 7 px; widest 285.9 px (الخميس ٣١ تشرين الثاني)
+  24.75 px (11.0 units): least room   9.4 px (الخميس 10 تشرين الثاني),    0 forms under 7 px; widest 272.2 px (الخميس ٣١ تشرين الثاني)

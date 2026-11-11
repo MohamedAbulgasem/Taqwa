@@ -1,0 +1,7 @@
+APK: wearApp/build/outputs/apk/staging/wearApp-staging.apk
+ok - R8's mapping: wearApp/build/outputs/mapping/staging/mapping.txt
+ok - the dex holds no DEBUG_FEED, SampleFeed or sample-feed
+ok - no sample feed or test vector among the APK's files
+ok - the manifest asks for exactly wearApp/permissions.txt: android.permission.VIBRATE world.taqwa.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+size: 4453616 bytes (4.2 MB)
+wear-release-check staging: PASS

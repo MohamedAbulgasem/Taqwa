@@ -95,6 +95,29 @@ there; the app never sends anything itself.
   body, ending with `… (trimmed)`. Android's mail intents and iOS Mail both take bodies of this
   size; the full file stays on the phone in case the trimmed version is not enough and support
   asks for it.
+- Layout (9 Nov 2026): every filled-in line forms one block at the top with no blank line inside
+  it: the report's lines (the blank one below its header left out in the mail), or the no-report
+  line directly above the device lines, then the two notification lines at most, directly below.
+  Then a gap, then the empty line where the person types: the body ends with three newlines,
+  for what Gmail for Android drew on the owner's Samsung S23 (Android 16) on 9 Nov 2026 from two
+  links built exactly like this body. Ending with two newlines, it showed three blank lines above
+  the cursor; ending with three, it showed two (below), the one he prefers. More newlines drawing
+  fewer blank lines is Gmail's own handling of the body, so the count follows what was seen.
+  Gmail adds his signature below the cursor. iOS Mail has not yet been seen with this body. The
+  1 800 characters count the whole decoded body, those newlines included.
+
+  ```
+  No crash report is saved on this phone.
+  app: 1.0.0 (20)
+  platform: Android 16 (SDK 36)
+  device: samsung SM-S918B
+  language: en
+  notifications: on, exact alarms: on, battery: not optimised, ringer: normal
+  last alarm: 3 h ago, app updated: 2 d ago
+
+
+  |
+  ```
 
 Subject and body are percent-encoded per RFC 3986 (space → `%20`, newline → `%0A`, `+` is not
 used, since some mail apps read it literally).

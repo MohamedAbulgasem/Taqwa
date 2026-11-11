@@ -1,0 +1,3 @@
+10-31 13:04:14.280 I/System.out( 7303): TaqwaWatch RESCHEDULED SENT 749ms
+10-31 13:04:14.280 I/TaqwaWatchHarness( 7303): place: stored London id=2643743 zone=Europe/London at 51.507,-0.128; plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+10-31 13:04:14.588 I/System.out( 7303): TaqwaWatch ACK 2/6efab8e0696fdd95

@@ -1,0 +1,11 @@
+--------- beginning of main
+11-07 09:50:42.300 28901 28901 I TaqwaComplications: asked again (tile)
+11-07 09:50:42.366 28901 28901 D TaqwaTile: Tile: 31 entries, 17 counting down, 142898 bytes, schema 1.600
+11-07 10:35:42.461 28901 28901 D TaqwaTile: Tile: 31 entries, 17 counting down, 143172 bytes, schema 1.600
+11-07 10:36:03.248 28901 28901 I TaqwaComplications: asked again (app start)
+11-07 10:36:03.337 28901 28901 D TaqwaComplications: dates, SHORT_TEXT: 4 steps, last until 2026-11-09T05:26:00Z
+11-07 10:36:03.338 28901 28901 D TaqwaComplications: dates, LONG_TEXT: 4 steps, last until 2026-11-09T05:26:00Z
+11-07 10:36:03.338 28901 28901 D TaqwaComplications: next prayer, RANGED_VALUE: 13 steps, last until 2026-11-09T05:26:00Z
+11-07 10:36:03.341 28901 28901 D TaqwaComplications: next prayer, LONG_TEXT: 13 steps, last until 2026-11-09T05:26:00Z
+11-07 10:36:03.345 28901 28901 D TaqwaComplications: day dial: 13 steps, last until 2026-11-09T05:26:00Z
+11-07 10:36:03.347 28901 28901 D TaqwaComplications: day: 13 steps, last until 2026-11-09T05:26:00Z

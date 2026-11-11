@@ -34,3 +34,7 @@ _data/
 keystore.properties
 *.jks
 *.keystore
+
+# The Apple Watch core's Swift package (swift test --package-path iosApp/WatchCore)
+iosApp/WatchCore/.build/
+iosApp/WatchCore/.swiftpm/

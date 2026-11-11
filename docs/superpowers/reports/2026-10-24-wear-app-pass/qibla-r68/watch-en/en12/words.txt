@@ -1,0 +1,15 @@
+== qibla-aligned
+text='Facing qibla'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'
+== qibla-besteffort
+text='Compass unavailable'
+content-desc='Compass unavailable, 23° · 6,600 km to Makkah'
+== qibla-low
+text='Magnetic interference'
+content-desc='Magnetic interference'
+== qibla-searching
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'

@@ -178,6 +178,6 @@ class TasbeehStore(
         // edit. The same separator the widget mirrors use.
         const val FIELD_SEP = '\u001F'
         const val MAX_PHRASE = 60
-        const val MAX_TARGET = 1000
+        const val MAX_TARGET = TasbeehPresets.MAX_TARGET
     }
 }

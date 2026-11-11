@@ -1,0 +1,35 @@
+Task 13 (Ruling 41): the Moon's always-on hand level, tried on emulator-5558 (24 Oct 2026, the face of
+77c7da3a with A_HANDS set to each level in turn; Amber, English, 24 hours, slots empty). Levels are the
+emulator's grey (0-255) as it draws always-on, which is about 15% under what the face asks for.
+The sheet: tuning-sheet.png (top row Arch, Ring and Sun always-on at 14:58 and the Moon before, with
+its outline hands; then the Moon at each level at 14:58 and at 10:10; every frame undithered).
+The lit share is lit.py undither's as fix round 2 corrected it (twice the checkerboard's lit parity,
+a face colour over 8, which the emulator draws at 8 or more), and the mean light the frame's
+undithered (twice its mean); round 1 is the figure first written here, from each black pixel filled
+from its neighbours (a point high on Arch, Ring and Sun, which have more edges, and a point and a
+half low on the Moon, whose window fill the dimming takes under the threshold).
+
+What the others draw always-on (the committed pass, 14:58): the time at 168.7, the brightest thing on
+each face; Arch's dates at 123 and its countdown at 106 (lit.py). The Moon's own texts always-on
+(lit.py on the 10:10 frame): the day in the window 126, the prayer's time 123, the countdown 106, the
+Hijri date 88.
+
+level (A_HANDS)        lit facet (minute hand)    shaded facet               lit share (round 1)    mean light (frame)
+128 (50%) at 14:58        #686967 (105)          #484B49 ( 74)          12.16% (10.61%)        5.64
+128 (50%) at 10:10        #686967 (105)          #484B49 ( 74)          14.00% (12.55%)        6.58
+179 (70%) at 14:58        #929291 (146)          #656966 (104)          12.18% (10.63%)        6.20
+179 (70%) at 10:10        #929291 (146)          #656966 (104)          14.03% (12.57%)        7.14
+209 (82%) at 14:58        #AAABA8 (171)          #757A77 (121)          12.18% (10.63%)        6.53
+209 (82%) at 10:10        #AAABA8 (171)          #757A77 (121)          14.04% (12.58%)        7.47
+Arch at 14:58          (time 168.7)                                          11.76% (12.62%)       11.67
+Ring at 14:58          (time 168.7)                                          13.49% (14.50%)       13.34
+Sun at 14:58           (time 168.7)                                          12.90% (13.93%)       12.40
+
+Chosen: 209 (82%), face-centre.py's A_CLOCK, the level Arch, Ring and Sun draw their time at
+always-on. Its lit facet comes out at the others' time level (170 against 168.7), the brightest
+thing on the face as their time is, and its shaded facet at about the face's texts, so the facets
+still read. At 50% (128) the lit facet (105) is the countdown's level and dimmer than the prayer's
+time and the day, so the hands recede behind the texts they are the time of; 70% (179, lit 146)
+puts them only a step above the texts.
+The whole frame stays darker than the others' (mean light 6.5-8.0 against 9.6-13.3), at any
+level: the Moon has no large digits, and even full hands give about half a digital clock's light.

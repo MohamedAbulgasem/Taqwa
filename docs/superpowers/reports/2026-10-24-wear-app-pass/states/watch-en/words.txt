@@ -1,0 +1,71 @@
+== newerWithFeed-qibla
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='Makkah · 6,600 km away'
+== newerWithFeed-tasbeeh
+content-desc='SubhanAllah, round 2'
+== newerWithFeed-tile
+content-desc='Asr in 1 hour 11 minutes, at 16:10'
+text='ASR'
+text='in 1 h 11 min'
+content-desc='Fajr, 4:33'
+text='Fajr'
+text='4:33'
+content-desc='Sunrise, 6:01'
+text='Sunrise'
+text='6:01'
+content-desc='Dhuhr, 12:33'
+text='Dhuhr'
+text='12:33'
+content-desc='Asr, 16:10'
+text='Asr'
+text='16:10'
+content-desc='Maghrib, 19:04'
+text='Maghrib'
+text='19:04'
+content-desc='Isha, 20:24'
+text='Isha'
+text='20:24'
+content-desc='Update Taqwa on your watch'
+text='Update Taqwa on'
+text='your watch'
+== newerWithFeed-today
+content-desc='Asr in 1 hour 11 minutes, at 16:10, Update Taqwa on your watch'
+== noFeed-qibla
+text='Open Taqwa on your phone'
+== noFeed-tasbeeh
+text='Open Taqwa on your phone'
+== noFeed-tile
+text='Open Taqwa on your phone'
+== noFeed-today
+text='Open Taqwa on your phone'
+== noFeedNewer-qibla
+text='Update Taqwa on your watch'
+== noFeedNewer-tasbeeh
+text='Update Taqwa on your watch'
+== noFeedNewer-tile
+text='Update Taqwa on your watch'
+== noFeedNewer-today
+text='Update Taqwa on your watch'
+== noFeedNewerAfterForceStop-qibla
+text='Update Taqwa on your watch'
+== noFeedNewerAfterForceStop-tasbeeh
+text='Update Taqwa on your watch'
+== noFeedNewerAfterForceStop-tile
+text='Update Taqwa on your watch'
+== noFeedNewerAfterForceStop-today
+text='Update Taqwa on your watch'
+== spent-qibla
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='Makkah · 6,600 km away'
+== spent-tasbeeh
+content-desc='SubhanAllah, round 2'
+== spent-tile
+text='Open Taqwa on your phone'
+== spent-today
+text='Today'
+text='Open Taqwa on your phone'
+== spentNewer-today
+text='Today'
+text='Update Taqwa on your watch'

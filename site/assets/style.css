@@ -167,6 +167,9 @@ html[dir="rtl"] .month-head a, html[dir="rtl"] .tt-stale a { direction: rtl; }
 .card .glyph { width: 28px; height: 28px; color: var(--t1); }
 .card h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 .card p { font-size: 15px; line-height: 1.55; color: var(--t2); text-wrap: pretty; }
+/* A card that is a row of its own, last in the grid at any column count (On your wrist). */
+.card.wide { grid-column: 1 / -1; }
+.card.wide p { max-width: 68ch; }
 
 .screens { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px 20px; }
 .screen { display: flex; flex-direction: column; gap: 10px; align-items: center; }

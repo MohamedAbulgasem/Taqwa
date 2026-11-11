@@ -6115,3 +6115,44 @@ subject says "round 3"; the Lead counts these findings in round 2):
   `:androidApp:assembleDebug` build, the widget extension at 3 MB. The emulator and the simulator are back to
   their settings, and both are stopped.
 - The owner's decision (31 Oct): the Lock Screen picture's first line now says what the real accessory says, the "Maghrib in" phrase (`lockScreenHeadline` = `WidgetCountdown.headline`, the accessory's `entry.headline`, so the same words in all seven languages), closing the Open item above; `LockScreenHeadlineTest` failed first, `LockScreenAccessoryTest` adds Arabic at 3.2 times; host 2,157 and the iOS compile, strings and `ios-build.sh` green; Dev 1's iPhone 17 Pro shots in en and ar, light and dark, and all seven languages at AX XXXL, every line whole, in `settings-shots/round4`.
+
+## Watch words, native review (6 November 2026)
+
+This is plan 5 Task 11, up to M8, on the `watch-feed` lane. The report, with every phrase in six languages beside its English, is `docs/superpowers/reports/2026-10-24-watch-native-review.md`.
+
+- **The inventory:** 817 rows. They hold every key, paragraph and line of the watch release that differs from `main` (`bcafdfa9`), in the strings, the Apple strings, `WatchWords.kt`, the policies, the site and the store copy, and every native-review marker outside `docs/superpowers` (341 lines in 66 files, none unlisted).
+- **The reviews:** French, Turkish, Indonesian, Urdu and Bengali were each read whole against the English and against the app's own words. This run had no subagent tool, so the five reviews were done in one session, one language at a time. The plan asks for five independent subagents, so the Lead rules: accept these reviews, or have five independent readers go over the tables.
+  - Review rounds 1 to 4 raised it again, and their fix rounds had no subagent tool either, so it is still the Lead's. Their separate readings found no must. They covered the watch's own words and the support answers in all five languages, the French, Indonesian, Turkish, Urdu and Bengali policies, the listings' new lines, the home rows, the phone's About and onboarding lines, the store notes, and, in round 4, the last rows none had named (the Indonesian policy's remaining rows, the countdowns, and the widget's and location permission's Apple strings). So every row has been read by an agent other than the one that applied the corrections. What is left is the Lead's ruling: accept these reviews, or have one independent reader for each language. The report lists what each round covered and the native points still open.
+- **Applied: 5 musts and 20 shoulds, made as 57 edits in 26 files.** The main ones:
+  - Four support answers quoted a face button the watch does not show (Turkish, Indonesian, Urdu, Bengali).
+  - Bengali's face editor called the wearer's slots জটিলতা, a complication in the medical sense. It is now কমপ্লিকেশন.
+  - Turkish and Indonesian each used two words for the Galaxy watch's face (kadran beside saat yüzü, wajah jam beside tampilan jam). Each now uses the watch's word, saat yüzü and tampilan jam. Text about the Apple Watch keeps Apple's own word, saat kadranı and wajah jam.
+  - Urdu and Bengali now name the tap the same way on both watches (Ruling 60 item 4).
+  - Urdu's "hold your wrist level" is now افقی, as the phone says it. The Qibla ink model was regenerated and the fit tests still pass.
+  - Bengali's "its data" read as "the watch's data", and it now says "its data".
+  - Apple's features take the names Apple's own localized guides on support.apple.com give them. Smart Stack is « le défilement intelligent » in French and Akıllı Gruplama in Turkish, and stays Smart Stack in Indonesian. Advanced Data Protection is İleri Düzey Veri Koruma in Turkish, and « la protection avancée des données » in French, in lower case as Apple's prose writes it. The first round's names (Pile intelligente, Akıllı Yığın, Tumpukan Pintar, Gelişmiş Veri Koruma) were not Apple's, and review round 1 found them. The fix round checked each name against Apple's guide.
+  - The French policy's two new semicolons now take the narrow no-break space.
+  - The App Review notes now give the Attribution path in full, Settings first, and say what the Apple Watch shows before its first feed (Ruling 69 item 2). The notes stay within 4,000 bytes.
+- **The new checks, each seen red first:**
+  - `WatchWordsTest.theTwoWatchesHintsNameTheTapAlike`.
+  - `site/build.py --check`: each support answer names the watch's own face button and its "Open Taqwa on your phone" line.
+  - Eight privacy rows changed first.
+  - After review round 1: `tools/store-listing-check.py`'s `APPLE_WORDS`, for words Apple does not use in the App Store's text; `site/build.py --check`'s Smart Stack name on each home page; and the French and Turkish Backups rows again.
+  - After review round 2: `APPLE_WORDS` and the Smart Stack check read Turkish capitals (I and ı, İ and i); the Smart Stack check reads the watch card only, in any case; the watch answer's check fails on a missing watch string; and `WatchWordsResourcesTest.theWatchesTapIsThePhonesOwnWord` holds both watches' tap word to the phone's tasbeeh hint.
+- **Waiting for Mohamed (M8):** the English and the Arabic, with the eight style and colour names first and eight Arabic points.
+  - Every marker stays until he answers, the five reviewed languages' included.
+  - The marker grep, the two Arabic notes in the site check (the face button, A2, and Apple's Arabic Smart Stack, A6) and the two `DRAFT` rules in the Wear tests come out together when he does.
+- **The five independent readers (Ruling 71, 6 November 2026):** one fresh agent for each of French, Turkish, Indonesian, Urdu and Bengali read its whole table again and returned 3 musts, 45 shoulds and 44 nits. Every must and should is applied, two Indonesian ones in other words: the tilt notice is "Datarkan jam tangan", because the reader's two forms fail the Qibla page's T9, and the iPhone app takes Apple's own name. The six privacy rows they reword changed first in `tools/privacy-check.py`. Bengali's countdowns now use Google's own short units (ঘঃ, মিঃ), with `phone-forms.json` regenerated and the face gate green. Each of the six App Store What's New blocks now carries its own marker (Ruling 71 item 4b). Every marker stays until M8.
+- **M8, answered (6 November 2026):** Mohamed wrote "M8: approved with your recommendations (A1–A7, E4). Changes: none." Each recommendation is applied in one commit, with its check written first and seen red:
+  - Both watches spell the update line "حدّث تقوى على ساعتك", the shadda alone (A1). The support answer quotes the button, «أضِف واجهة تقوى» (A2).
+  - The store copy, the release notes, the support page and the home row say "إضافات" for complications, and no "مضاعفات" is left (A3). The Apple Watch widget says "الصلاة القادمة", as the Galaxy watch does (A4).
+  - Arabic and Urdu join a prayer's name and its time with "، " in the phone's prayer rows, the Wear Tile and the Apple Watch's Today (A5). Only those three places: the Apple Watch's complications keep ", ".
+  - Apple's Arabic names for the Smart Stack and Advanced Data Protection, the privacy row first (A6). A7, A8 and the English stand as he read them.
+  - The App Review notes keep change 4's true words and drop the GitHub link to the attribution list: 3,944 of 4,000 bytes (E4).
+  - Every native-review marker is gone: 347 lines in 66 files before, none after. The Wear tests' two marker rules now hold that no comment marks a draft. No Qibla short form changed, so Ruling 67's note had nothing to regenerate.
+- **After M8 (Ruling 73, 6 November 2026):** the Lead's ruling gave A5 a fourth place, so the A5 line above, where the complications keep ", ", no longer holds:
+  - The Apple Watch's complication now joins its row form, what an entry says without its countdown, with "، " in Arabic and Urdu, as the same watch's Today and the phone's rows do. Every other language keeps ", ". Nothing visible changed. `GlanceTests` was red first.
+  - It is the comma the Galaxy's complications put between their parts. Ruling 74 item 1 then gave them the comma between a prayer's name and its time too, and Ruling 75 the Apple Watch's empty form and its fallback.
+  - The phone's prayer rows now hand `prayerRowDescription` the interface's language (`uiLanguage()`), and the join is decided there. `CountdownSpeechTest` holds the Arabic and Urdu tags (`UiLanguage.of` folds by prefix), and a join told `rtl = false` fails it.
+  - The rest followed. The wear-app pass's drivers say "حدّث", with the shadda alone. Privacy row `3-4d-policy-backups` (ar) fails if the draft's name for Advanced Data Protection comes back. A comment heads the watch's own words in wearApp's and the face's six language folders, and no string changed.
+  - The native review report's M8 section gives each one's file and line, under "After M8 (Ruling 73)".

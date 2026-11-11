@@ -1,0 +1,55 @@
+emulator-5558, Ruling 51a (r51/state.sh at each step; APK and feed SHA-256).
+
+After the boot (it was OFF after the Lead's stop of the hung qemu; booted with tools/watchface/emulator.sh, 06:28):
+auto_time: 0
+40a5cadfc1d9d8f50c869e111201927bcad497342cdad0bf804c53fa838875aa  boot-state/world.taqwa.app-base.apk
+7ae6b630bb790dd32ee476504b94129dbe933a042aed12dc477a56c3713be8cd  boot-state/world.taqwa.app.watchfacepush.taqwa-base.apk
+746016449e7bab9b8a35f5982a67f0f10b181ea8f2f7ba89694d9ad7caf8d93a  boot-state/feed.json
+
+Plan 1's found state, the session scratchpad's p22r2spec/found (review round 2's spec lens, before the hang):
+found Sun Oct 25 05:23:31 SAST 2026
+auto_time: 1
+auto_time_zone: 1
+tz: Africa/Johannesburg
+font_scale: 1.0
+a11y services: null
+a11y enabled: 0
+locales: null /
+time_12_24: null
+battery:
+  AC powered: false
+  USB powered: false
+  status: 2
+  level: 100
+  Capacity level: -1
+package:world.taqwa.app.watchfacepush.taqwa
+package:world.taqwa.app
+40a5cadfc1d9d8f50c869e111201927bcad497342cdad0bf804c53fa838875aa  p22r2spec/found/world.taqwa.app-base.apk
+7ae6b630bb790dd32ee476504b94129dbe933a042aed12dc477a56c3713be8cd  p22r2spec/found/world.taqwa.app.watchfacepush.taqwa-base.apk
+0aa487715c80058c619ba2c8c2cd7909ac85e229993e637126be1e18f9acbf99  p22r2spec/found/feed.json
+
+== restored (before the proof) Sun Oct 25 06:30:34 SAST 2026
+40a5cadfc1d9d8f50c869e111201927bcad497342cdad0bf804c53fa838875aa  restored-1/world.taqwa.app-base.apk
+7ae6b630bb790dd32ee476504b94129dbe933a042aed12dc477a56c3713be8cd  restored-1/world.taqwa.app.watchfacepush.taqwa-base.apk
+0aa487715c80058c619ba2c8c2cd7909ac85e229993e637126be1e18f9acbf99  restored-1/feed.json
+settings: as found
+
+== restored (after the proof) Sun Oct 25 06:39:54 SAST 2026
+40a5cadfc1d9d8f50c869e111201927bcad497342cdad0bf804c53fa838875aa  restored-2/world.taqwa.app-base.apk
+7ae6b630bb790dd32ee476504b94129dbe933a042aed12dc477a56c3713be8cd  restored-2/world.taqwa.app.watchfacepush.taqwa-base.apk
+0aa487715c80058c619ba2c8c2cd7909ac85e229993e637126be1e18f9acbf99  restored-2/feed.json
+settings: as found
+
+== found (the shots) Sun Oct 25 06:49:55 SAST 2026
+40a5cadfc1d9d8f50c869e111201927bcad497342cdad0bf804c53fa838875aa  found-2/world.taqwa.app-base.apk
+7ae6b630bb790dd32ee476504b94129dbe933a042aed12dc477a56c3713be8cd  found-2/world.taqwa.app.watchfacepush.taqwa-base.apk
+0aa487715c80058c619ba2c8c2cd7909ac85e229993e637126be1e18f9acbf99  found-2/feed.json
+settings: as found
+
+== left (after the shots) Sun Oct 25 07:06:22 SAST 2026
+40a5cadfc1d9d8f50c869e111201927bcad497342cdad0bf804c53fa838875aa  left/world.taqwa.app-base.apk
+7ae6b630bb790dd32ee476504b94129dbe933a042aed12dc477a56c3713be8cd  left/world.taqwa.app.watchfacepush.taqwa-base.apk
+0aa487715c80058c619ba2c8c2cd7909ac85e229993e637126be1e18f9acbf99  left/feed.json
+settings: as found
+
+Each time: Arch, Amber, the wearer's slots empty, English, the stored sample (MON 19 OCT), automatic time, battery 100.

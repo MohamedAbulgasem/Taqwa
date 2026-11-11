@@ -1,0 +1,70 @@
+== nofeed-tile
+text='Open Taqwa on your phone'
+== nofeed-today
+text='Open Taqwa on your phone'
+== qibla-aligned
+text='Facing qibla'
+text='Makkah · 6,600 km away'
+== qibla-besteffort
+text='Compass unavailable'
+content-desc='Compass unavailable, 23° · 6,600 km to Makkah'
+== qibla-low-calibration
+text='Compass needs calibrating'
+content-desc='Compass needs calibrating'
+== qibla-searching
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='Makkah · 6,600 km away'
+== tasbeeh-0
+content-desc='SubhanAllah'
+== tasbeeh-27
+content-desc='SubhanAllah'
+== tasbeeh-list-end
+content-desc='La ilaha illallah, 100'
+content-desc='SubhanAllahi wa bihamdihi, 100'
+content-desc='سبحان الله وبحمده، سبحان الله العظيم, 100'
+content-desc='Astaghfirullah wa atubu ilayh, 33'
+content-desc='Reset'
+== tasbeeh-list
+text='Tasbeeh'
+content-desc='After prayer, 100'
+content-desc='SubhanAllah, 100'
+content-desc='Alhamdulillah, 100'
+content-desc='Allahu Akbar, 100'
+content-desc='Astaghfirullah, 100'
+== tasbeeh-phrase
+content-desc='سبحان الله وبحمده، سبحان الله العظيم'
+== tile-1458
+content-desc='Asr in 1 hour 11 minutes, at 16:10'
+text='ASR'
+text='in 1 h 11 min'
+content-desc='Fajr, 4:33'
+text='Fajr'
+text='4:33'
+content-desc='Sunrise, 6:01'
+text='Sunrise'
+text='6:01'
+content-desc='Dhuhr, 12:33'
+text='Dhuhr'
+text='12:33'
+content-desc='Asr, 16:10'
+text='Asr'
+text='16:10'
+content-desc='Maghrib, 19:04'
+text='Maghrib'
+text='19:04'
+content-desc='Isha, 20:24'
+text='Isha'
+text='20:24'
+content-desc='সান ফার্নান্দো ডে মোন্তে ক্রিস্টি'
+text='সান ফার্নান্দো ডে মোন্তে ক্রিস্টি'
+== today-1458
+content-desc='Asr in 1 hour 11 minutes, at 16:10'
+== today-list-end
+content-desc='Fajr, 4:33'
+content-desc='Sunrise, 6:01'
+content-desc='Dhuhr, 12:33'
+content-desc='Asr, 16:10'
+content-desc='Maghrib, 19:04'
+content-desc='Isha, 20:24'
+text='সান ফার্নান্দো ডে মোন্তে ক্রিস্টি'

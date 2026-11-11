@@ -1,0 +1,13 @@
+# Ruling 72 item 4: the phone's watch-feed lines from P5.12 Step 3 (emulator-5562, the dry-run candidate),
+# excerpted from Lane W's phone logcat (adb -s emulator-5562 logcat -v threadtime, phone clock, SAST).
+# Each line: the ask's reason, its answer and its time; ACK <delivery number>/<fingerprint>. No origin, place or person.
+11-06 20:22:00.087 26368 26435 I System.out: TaqwaWatch RESCHEDULED NO_WATCH 23ms
+11-06 20:25:29.319 26368 26443 I System.out: TaqwaWatch WATCH_APPEARED SENT 42ms
+11-06 20:25:29.463 26368 26445 I System.out: TaqwaWatch WATCH_ASKED SENT 14ms
+11-06 20:25:29.463 26368 26987 I System.out: TaqwaWatch ACK 1/5cb4f7c2d90cbbe6
+11-06 20:25:29.521 26368 26987 I System.out: TaqwaWatch ACK 3/5cb4f7c2d90cbbe6
+11-06 20:30:53.072 26368 26445 I System.out: TaqwaWatch WATCH_APPEARED UNCHANGED 10ms
+11-06 20:31:03.396 26368 26445 I System.out: TaqwaWatch WATCH_ASKED SENT 11ms
+11-06 20:31:03.407 26368 26444 I System.out: TaqwaWatch WATCH_ASKED SENT 9ms
+11-06 20:31:03.461 26368 27191 I System.out: TaqwaWatch ACK 5/5cb4f7c2d90cbbe6
+11-06 20:31:03.464 26368 27191 I System.out: TaqwaWatch ACK 7/5cb4f7c2d90cbbe6

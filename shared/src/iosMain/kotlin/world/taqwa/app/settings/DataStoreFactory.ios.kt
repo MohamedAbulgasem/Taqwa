@@ -11,10 +11,10 @@ import platform.Foundation.NSUserDomainMask
 
 /**
  * `Library/Application Support/Taqwa`, created on first use and marked excluded from iCloud
- * backup. The settings file holds the reader's coordinates or chosen city, and "your location
- * never leaves your phone" has to include Apple's backup; Documents, where the file lived until
- * 0.11, is backed up by default and there is no per-file rule that survives DataStore rewriting
- * the file on every edit — the directory attribute does.
+ * backup. The settings file holds the reader's coordinates or chosen city, and "Only your own
+ * devices can see your location." has to include Apple's backup; Documents, where the file lived
+ * until 0.11, is backed up by default and there is no per-file rule that survives DataStore
+ * rewriting the file on every edit — the directory attribute does.
  *
  * The first run after the upgrade moves the existing file out of Documents so nobody loses their
  * settings. Best effort throughout: if the directory cannot be made or the move fails, the old

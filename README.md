@@ -59,6 +59,15 @@ Taqwa is an Islamic app for Android and iPhone, built from one Kotlin Multiplatf
 - **Accessibility.** Taqwa works with TalkBack on Android and VoiceOver on iPhone. Controls say what they are and which option is chosen, each prayer is read as one line with its state, the countdown is one sentence that changes once a minute, and on iPhone VoiceOver's two-finger scrub goes back. In the Quran an ayah is read as its number and its translation, with Play, Bookmark, Copy and Share among its actions; each ayah on a Mushaf page is one stop, named by its number, and the ayah widget reads its reference and translation. The Quran's Arabic is never given to a screen reader, so the Quran is voiced only by your reciter. The Mushaf page keeps every word whole whatever the phone's text size.
 - **Light and dark**, following the system or fixed, in one amber accent.
 
+## On your wrist
+
+Taqwa comes to the watch too, on Galaxy Watch and other Wear OS watches and on Apple Watch. The phone sends the watch its own prayer times a month ahead, so the watch calculates nothing, always agrees with the phone and the site, and keeps working for weeks away from the phone.
+
+- **Wear OS, Galaxy Watch among them:** the Taqwa watch face in four styles (Arch, Ring, Sun and Moon) and four colours, with two slots of your own; complications for any face, Samsung's included; a Tile with the day's prayers; and three screens: Today, Tasbeeh counted with the rotating bezel or the crown, and Qibla on the watch's own compass. Install it from Settings › Watch on the phone or from the watch's Play Store, then choose Add the Taqwa face on the watch. The face needs Wear OS 6; the complications, the Tile and the screens work from Wear OS 3, where a complication's countdown moves only at each prayer.
+- **Apple Watch:** complications for the watch face, a Smart Stack widget, and the same three screens, with tasbeeh on the Digital Crown. The watch app comes with the iPhone app.
+- **The phone's words.** The watch speaks the phone app's language, with its digits and its 12- or 24-hour clock; the watch's own menus, such as the face editor, follow the watch's. TalkBack and VoiceOver read every screen and the face.
+- **Only your own devices can see your location.** Neither watch app asks for it, and the phone never gives the watch your coordinates. What it does give the watch, and who may carry it, is in the privacy policy's [Your watch](PRIVACY.md#your-watch) section.
+
 ## On your home screen
 
 <p align="center">
@@ -132,6 +141,7 @@ Taqwa is built in slices. Each slice ships as a complete, usable app.
 | 2 | Quran reader: Arabic text with translations, Mushaf mode, search, bookmarks, share; bundled offline | **Done** |
 | 3 | Quran audio: ten reciters, per-surah downloads, background playback with the page following | **Done** |
 | 4 | Dhikr: tasbeeh counter, morning and evening adhkar | **Done** |
+| 5 | On your wrist: the Taqwa face, complications, a Tile, Today, Tasbeeh and Qibla on Wear OS; complications, the Smart Stack and the same three screens on Apple Watch, all from the phone's own times | **Done** |
 
 Deliberately out of scope: mosque finder, zakat calculator, hadith collections, community features, anything that needs a server.
 
@@ -160,13 +170,26 @@ Open `iosApp/iosApp.xcodeproj` in Xcode and run the `iosApp` scheme, or from the
 
 The script builds for the simulator and checks the widget extension stays under its memory budget. Signing for a physical device needs your own team in Xcode.
 
+**The watches**
+
+The Wear OS app and the Taqwa face are two builds. The face is a Watch Face Format package, resources and no code, and is always signed with a key of its own, never the app's.
+
+```bash
+./scripts/face-debug-key.sh          # once: the face's throwaway debug key, in ~/.android
+./scripts/wear-emulator.sh           # the Wear OS 6 emulator, always emulator-5558
+./tools/watchface/install.sh         # builds the watch app with the face inside it, and installs the app there: the system installs the face
+./scripts/watch-build.sh             # the Apple Watch app, for the watch simulator
+```
+
+`scripts/face-gate.sh` is the face's gate before a release: the face's generators write exactly the committed `watchface.xml` and pictures, every form the phone can send fits it (the fit tools, measured on the watch's own fonts, which `tools/watchface/get-system-fonts.sh` pulls from the emulator once and pins by hash), and Google's wff-validator and Watch Face Push validator pass it. The face's release key is the owner's alone: `scripts/make-face-key.sh` makes it once, and `scripts/release-face.sh` signs each release's face with it, asking for its password every time. [`tools/watchface/README.md`](tools/watchface/README.md) lists every face tool.
+
 **Tests**
 
 ```bash
 ./scripts/test.sh
 ```
 
-Runs the shared and widget test suites on the JVM and on the iOS simulator. All the domain logic (prayer times, Qibla, Hijri conversion, notification planning, widget content, the recitation library and downloader) lives in `commonMain` and is tested there without a device. `scripts/check-strings.sh` checks every language's string files against English: the same keys and placeholders, the plural categories each language needs, bold marks that come in pairs, the widget names the Widgets screen's steps point to matching the Android picker and the iPhone gallery, the iPhone buttons those steps name being the words iOS shows, apostrophes written the way each resource system prints them, and the Indonesian twin (`values-in`) matching `values-id`. The `Tests` workflow runs the shared and widget suites, a debug build of the Android app and the string check on every push and pull request. The `iOS` workflow runs the same suites on the iOS simulator and builds the iOS app with its widget-size check, on GitHub's macOS runner, whenever a change can reach the iOS app.
+Runs the shared, widget and watch test suites on the JVM and on the iOS simulator, and the Wear OS app's unit tests on the JVM. All the domain logic (prayer times, Qibla, Hijri conversion, notification planning, widget content, the recitation library and downloader) lives in `commonMain` and is tested there without a device. `scripts/check-strings.sh` checks every language's string files against English: the same keys and placeholders, the plural categories each language needs, bold marks that come in pairs, the widget names the Widgets screen's steps point to matching the Android picker and the iPhone gallery, the iPhone buttons those steps name being the words iOS shows, apostrophes written the way each resource system prints them, and the Indonesian twin (`values-in`) matching `values-id`. The `Tests` workflow runs the shared, widget and watch suites, the Wear OS app's unit tests, debug builds of the Android and Wear OS apps and the string check on every push and pull request, and builds the Taqwa face (`:watchface`) as a release: it fails if the face holds any code, if a block of `watchface.xml` is not what its generator in `tools/` writes, or if Google's wff-validator rejects the face at its declared format version. `tools/watchface/validate.sh` also runs Watch Face Push's own validator on the debug and release faces, on the Mac, where the face's test key is. The `iOS` workflow runs the shared, widget and watch suites on the iOS simulator and builds the iOS app with its widget-size check, on GitHub's macOS runner, whenever a change can reach the iOS app.
 
 **Website**
 
@@ -187,13 +210,18 @@ Screenshots on the site are WebP: drop a PNG into `site/assets/img` and run `too
 ```
 shared/       Compose UI, domain logic, view models, expect/actual platform seams
 widgetcore/   Compose-free widget model, linked by the iOS widget extension
+watchcore/    Compose-free watch feed and the rules every watch surface applies to it
 androidApp/   Android entry point, Glance widgets, alarm and boot receivers, the recitation service
+wearApp/      Wear OS app: keeps the feed the phone sends and serves the complications, the Tile and its three screens from it
+watchface/    The Taqwa watch face, in Watch Face Format (resources and no code): drawn from the watch app's complication sources
 iosApp/       iOS entry point (SwiftUI shell), WidgetKit extension
+  WatchCore/  The Apple Watch's core: watchcore's feed and rules in Swift, tested against its vectors
+  TaqwaWatch/ The Apple Watch app (Today, Tasbeeh, Qibla), with TaqwaWatchWidgets/ (its complications and Smart Stack widget) and WatchShared/ (what both draw)
 site/         The website in seven languages, built by site/build.py
 assets/       Source audio and generators for the bundled sounds
 docs/         Design specs, implementation plans, build log, attribution, store answers
 scripts/      Test and build helpers
-tools/        City database builder, Quran database pipeline, the recitation audio pipeline, the site's prayer timetables
+tools/        City database builder, Quran database pipeline, the recitation audio pipeline, the site's prayer timetables, the watch face's pictures and its emulator checks
 ```
 
 The design specs the app is built from are in [`docs/superpowers/specs`](docs/superpowers/specs), and [`docs/BUILD-LOG.md`](docs/BUILD-LOG.md) is the narrative of every iteration since, including what was found on real devices and why things are the way they are.

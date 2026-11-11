@@ -1,0 +1,3 @@
+10-31 13:03:16.539 I/System.out( 3363): TaqwaWearFeed NUDGE armed in 5603s found=false stopped=false
+10-31 13:03:17.053 I/System.out( 3363): TaqwaWearFeed ASK STARTED no phone
+10-31 13:03:20.678 I/System.out( 3363): TaqwaWearFeed ASK PHONE_NEARBY sent

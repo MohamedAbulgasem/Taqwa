@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the phone's own words: androidApp's app_name and widget_small_label -->
+    <string name="watch_face_name">Taqwa</string>
+    <string name="slot_next_prayer">Salat berikutnya</string>
+    <!-- the watch's own words -->
+    <string name="style">Gaya</string>
+    <string name="style_arch">Lengkung</string>
+    <string name="style_ring">Cincin</string>
+    <string name="style_sun">Matahari</string>
+    <string name="style_moon">Bulan</string>
+    <string name="accent">Warna</string>
+    <string name="accent_amber">Ambar</string>
+    <string name="accent_pearl">Mutiara</string>
+    <string name="accent_sage">Hijau sage</string>
+    <string name="accent_night">Malam</string>
+    <string name="slot_day">Hari salat</string>
+    <string name="slot_dates">Tanggal</string>
+    <string name="slot_dates_short">Tanggal dan fase bulan</string>
+    <string name="slot_countdown">Waktu menuju salat berikutnya</string>
+    <string name="slot_day_dial">Dial hari salat</string>
+    <string name="slot_left">Komplikasi kiri</string>
+    <string name="slot_right">Komplikasi kanan</string>
+</resources>

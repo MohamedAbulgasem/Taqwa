@@ -1,0 +1,143 @@
+from tools/watchface/phone-forms.json: 30 tags (en, en-GB, en-US, en-ZA, ar-SA, ar-EG, ar-LY, ar-MA, ar-TN, ar-DZ, ar-IQ, ar-SY, ar-JO, ar-LB, ar-AE, fr-FR, fr-MA, fr-DZ, fr-CA, tr-TR, id-ID, ur-PK, ur-IN, bn-BD, bn-IN, hi-IN, he-IL, fa-IR, mr-IN, zh-CN)
+  count left to right manrope_semibold 27.00 px, box x 45..405; baselines Arch 376.34 and 358.34, Ring and Sun 376.34 and 356.34
+  count right to left noto_sans_arabic_subset_v2_semibold 28.12 px, box x 45..405; baselines Arch 375.94 and 357.94, Ring and Sun 375.94 and 355.94
+  greg  left to right manrope_extrabold 29.25 px tracked 0.1000 em, box x 45..405; baselines Arch 164.20, Ring and Sun 157.20 and 146.20
+  greg  right to left noto_sans_arabic_subset_v2_bold 31.50 px, box x 45..405; baselines Arch 164.02, Ring and Sun 157.02 and 146.02
+  Arch's right-to-left date by its length (tools/face-centre.py ARCH_GREGORIAN_STEPS):
+    longer          31.50 px (14.00 units), box y 118, height 72; baselines 164.02
+The Gregorian date on Arch, Ring and Sun: 111972 forms in 43 (tag, digit set) pairs; the widest of each, of the 360 px box, and its least room to Arch's lit stroke (min=7):
+  en     Western                2604  widest  211.7 px (MON 20 MAR)  nearest  34.6 px (MON 20 MAR)
+  en-GB  Western                2604  widest  223.7 px (MON 20 SEPT)  nearest  29.7 px (MON 20 SEPT)
+  en-US  Western                2604  widest  211.7 px (MON 20 MAR)  nearest  34.6 px (MON 20 MAR)
+  en-ZA  Western                2604  widest  223.7 px (MON 20 SEPT)  nearest  29.7 px (MON 20 SEPT)
+  ar-SA  Arabic-Indic           2604  widest  296.4 px (الخميس ٣١ أغسطس)  nearest  -1.3 px (الخميس ١٠ أغسطس)
+  ar-SA  Western                2604  widest  296.4 px (الخميس 31 أغسطس)  nearest  -1.3 px (الخميس 10 أغسطس)
+  ar-EG  Arabic-Indic           2604  widest  296.4 px (الخميس ٣١ أغسطس)  nearest  -1.3 px (الخميس ١٠ أغسطس)
+  ar-EG  Western                2604  widest  296.4 px (الخميس 31 أغسطس)  nearest  -1.3 px (الخميس 10 أغسطس)
+  ar-LY  Western                2604  widest  296.4 px (الخميس 31 أغسطس)  nearest  -1.3 px (الخميس 10 أغسطس)
+  ar-LY  Arabic-Indic           2604  widest  296.4 px (الخميس ٣١ أغسطس)  nearest  -1.3 px (الخميس ١٠ أغسطس)
+  ar-MA  Western                2604  widest  254.5 px (الخميس 31 غشت)  nearest  13.3 px (الخميس 10 أكتوبر)
+  ar-MA  Arabic-Indic           2604  widest  254.5 px (الخميس ٣١ غشت)  nearest  13.3 px (الخميس ١٠ أكتوبر)
+  ar-TN  Western                2604  widest  274.5 px (الخميس 31 ديسمبر)  nearest   8.0 px (الخميس 10 ديسمبر)
+  ar-TN  Arabic-Indic           2604  widest  274.5 px (الخميس ٣١ ديسمبر)  nearest   8.0 px (الخميس ١٠ ديسمبر)
+  ar-DZ  Western                2604  widest  274.5 px (الخميس 31 ديسمبر)  nearest   8.0 px (الخميس 10 ديسمبر)
+  ar-DZ  Arabic-Indic           2604  widest  274.5 px (الخميس ٣١ ديسمبر)  nearest   8.0 px (الخميس ١٠ ديسمبر)
+  ar-IQ  Arabic-Indic           2604  widest  346.4 px (الخميس ٣١ تشرين الثاني)  nearest  -4.3 px (الثلاثاء ١٠ تشرين الأول)
+  ar-IQ  Western                2604  widest  346.4 px (الخميس 31 تشرين الثاني)  nearest  -4.3 px (الثلاثاء 10 تشرين الأول)
+  ar-SY  Arabic-Indic           2604  widest  346.4 px (الخميس ٣١ تشرين الثاني)  nearest  -4.3 px (الثلاثاء ١٠ تشرين الأول)
+  ar-SY  Western                2604  widest  346.4 px (الخميس 31 تشرين الثاني)  nearest  -4.3 px (الثلاثاء 10 تشرين الأول)
+  ar-JO  Arabic-Indic           2604  widest  346.4 px (الخميس ٣١ تشرين الثاني)  nearest  -4.3 px (الثلاثاء ١٠ تشرين الأول)
+  ar-JO  Western                2604  widest  346.4 px (الخميس 31 تشرين الثاني)  nearest  -4.3 px (الثلاثاء 10 تشرين الأول)
+  ar-LB  Arabic-Indic           2604  widest  346.4 px (الخميس ٣١ تشرين الثاني)  nearest  -4.3 px (الثلاثاء ١٠ تشرين الأول)
+  ar-LB  Western                2604  widest  346.4 px (الخميس 31 تشرين الثاني)  nearest  -4.3 px (الثلاثاء 10 تشرين الأول)
+  ar-AE  Western                2604  widest  296.4 px (الخميس 31 أغسطس)  nearest  -1.3 px (الخميس 10 أغسطس)
+  ar-AE  Arabic-Indic           2604  widest  296.4 px (الخميس ٣١ أغسطس)  nearest  -1.3 px (الخميس ١٠ أغسطس)
+  fr-FR  Western                2604  widest  230.4 px (SAM 20 MARS)  nearest  24.8 px (MAR 20 AOÛT)
+  fr-MA  Western                2604  widest  226.7 px (SAM 20 AOÛT)  nearest  24.8 px (MAR 20 AOÛT)
+  fr-DZ  Western                2604  widest  230.4 px (SAM 20 MARS)  nearest  24.8 px (MAR 20 AOÛT)
+  fr-CA  Western                2604  widest  230.4 px (SAM 20 MARS)  nearest  24.8 px (MAR 20 AOÛT)
+  tr-TR  Western                2604  widest  211.3 px (CUM 20 MAR)  nearest  32.3 px (CUM 20 AĞU)
+  id-ID  Western                2604  widest  207.7 px (KAM 20 MAR)  nearest  36.2 px (KAM 20 MAR)
+  ur-PK  Western                2604  widest  255.7 px (جمعرات 31 دسمبر)  nearest  12.2 px (جمعرات 10 اگست)
+  ur-PK  extended Arabic-Indic  2604  widest  255.7 px (جمعرات ۳۱ دسمبر)  nearest  12.2 px (جمعرات ۱۰ اگست)
+  ur-IN  extended Arabic-Indic  2604  widest  255.7 px (جمعرات ۳۱ دسمبر)  nearest  12.2 px (جمعرات ۱۰ اگست)
+  ur-IN  Western                2604  widest  255.7 px (جمعرات 31 دسمبر)  nearest  12.2 px (جمعرات 10 اگست)
+  bn-BD  Bengali                2604  widest  226.1 px (বৃহস্পতি ৩১ অক্টো)  nearest  24.1 px (বৃহস্পতি ১০ অক্টো)
+  bn-IN  Bengali                2604  widest  242.9 px (বৃহস্পতি ৩১ সেপ্টেঃ)  nearest  17.2 px (বৃহস্পতি ১০ সেপ্টেঃ)
+  hi-IN  Western                2604  widest  211.7 px (MON 20 MAR)  nearest  34.6 px (MON 20 MAR)
+  he-IL  Western                2604  widest  211.7 px (MON 20 MAR)  nearest  34.6 px (MON 20 MAR)
+  fa-IR  Western                2604  widest  211.7 px (MON 20 MAR)  nearest  34.6 px (MON 20 MAR)
+  mr-IN  Western                2604  widest  211.7 px (MON 20 MAR)  nearest  34.6 px (MON 20 MAR)
+  zh-CN  Western                2604  widest  211.7 px (MON 20 MAR)  nearest  34.6 px (MON 20 MAR)
+  widest of all: الخميس ٣١ تشرين الثاني (ar-LB, Arabic-Indic), 346.4 px, 13.6 px under the box
+  nearest Arch's lit stroke: الثلاثاء 10 تشرين الأول (ar-LB, Western), -4.3 px
+The countdown on Arch, Ring and Sun: 258000 forms in 43 (tag, digit set) pairs; the widest of each, of the 360 px box, and the least room to Arch's lit feet (not a check: the box is the countdown's bound):
+  en     Western                6000  widest  222.3 px (in under a minute)  nearest  64.6 px (in under a minute)
+  en-GB  Western                6000  widest  222.3 px (in under a minute)  nearest  64.6 px (in under a minute)
+  en-US  Western                6000  widest  222.3 px (in under a minute)  nearest  64.6 px (in under a minute)
+  en-ZA  Western                6000  widest  222.3 px (in under a minute)  nearest  64.6 px (in under a minute)
+  ar-SA  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-SA  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-EG  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-EG  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-LY  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-LY  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-MA  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-MA  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-TN  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-TN  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-DZ  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-DZ  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-IQ  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-IQ  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-SY  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-SY  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-JO  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-JO  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-LB  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-LB  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-AE  Western                6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  ar-AE  Arabic-Indic           6000  widest  208.5 px (بعد أقل من دقيقة)  nearest  71.5 px (بعد أقل من دقيقة)
+  fr-FR  Western                6000  widest  216.4 px (dans 90 h 40 min)  nearest  67.5 px (dans 60 h 40 min)
+  fr-MA  Western                6000  widest  216.4 px (dans 90 h 40 min)  nearest  67.5 px (dans 60 h 40 min)
+  fr-DZ  Western                6000  widest  216.4 px (dans 90 h 40 min)  nearest  67.5 px (dans 60 h 40 min)
+  fr-CA  Western                6000  widest  216.4 px (dans 90 h 40 min)  nearest  67.5 px (dans 60 h 40 min)
+  tr-TR  Western                6000  widest  222.7 px (90 sa 40 dk sonra)  nearest  64.3 px (60 sa 40 dk sonra)
+  id-ID  Western                6000  widest  254.0 px (kurang dari semenit)  nearest  48.7 px (kurang dari semenit)
+  ur-PK  Western                6000  widest  263.8 px (99 گھنٹے 59 منٹ میں)  nearest  43.8 px (10 گھنٹے 10 منٹ میں)
+  ur-PK  extended Arabic-Indic  6000  widest  263.8 px (۹۹ گھنٹے ۵۹ منٹ میں)  nearest  43.8 px (۱۰ گھنٹے ۱۰ منٹ میں)
+  ur-IN  extended Arabic-Indic  6000  widest  263.8 px (۹۹ گھنٹے ۵۹ منٹ میں)  nearest  43.8 px (۱۰ گھنٹے ۱۰ منٹ میں)
+  ur-IN  Western                6000  widest  263.8 px (99 گھنٹے 59 منٹ میں)  nearest  43.8 px (10 گھنٹے 10 منٹ میں)
+  bn-BD  Bengali                6000  widest  260.7 px (এক মিনিটের কম সময়ে)  nearest  45.1 px (এক মিনিটের কম সময়ে)
+  bn-IN  Bengali                6000  widest  260.7 px (এক মিনিটের কম সময়ে)  nearest  45.1 px (এক মিনিটের কম সময়ে)
+  hi-IN  Western                6000  widest  222.3 px (in under a minute)  nearest  64.6 px (in under a minute)
+  he-IL  Western                6000  widest  222.3 px (in under a minute)  nearest  64.6 px (in under a minute)
+  fa-IR  Western                6000  widest  222.3 px (in under a minute)  nearest  64.6 px (in under a minute)
+  mr-IN  Western                6000  widest  222.3 px (in under a minute)  nearest  64.6 px (in under a minute)
+  zh-CN  Western                6000  widest  222.3 px (in under a minute)  nearest  64.6 px (in under a minute)
+  widest of all: ۹۹ گھنٹے ۵۹ منٹ میں (ur-IN, extended Arabic-Indic), 263.8 px, 96.2 px under the box
+  nearest Arch's lit stroke: 10 گھنٹے 10 منٹ میں (ur-IN, Western), 43.8 px
+Arch's right-to-left date by its step (ARCH_GREGORIAN_STEPS), its widest form and its least room to the lit stroke:
+  longer          31.50 px   21266 forms  widest  346.4 px (الخميس ٣١ تشرين الثاني)  nearest  -4.3 px (الثلاثاء 10 تشرين الأول)
+(2504 dates drawn row by row, their ink's box having come within 7.5 px of the lit stroke)
+2107 do not fit:
+  watchface.xml draws Arch's right-to-left Gregorian steps as [], and ARCH_GREGORIAN_STEPS says [(None, 31.5, 118, 72)]: run tools/face-centre.py
+  greg الأحد 1 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.5 px from Arch's lit stroke, under 7
+  greg الأحد 10 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 10 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7
+  greg الأحد 10 تشرين الأول (ar-IQ): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 10 كانون الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.9 px from Arch's lit stroke, under 7
+  greg الأحد 11 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 11 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7
+  greg الأحد 11 تشرين الأول (ar-IQ): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 11 كانون الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.9 px from Arch's lit stroke, under 7
+  greg الأحد 12 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 12 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7
+  greg الأحد 12 تشرين الأول (ar-IQ): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 12 كانون الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.9 px from Arch's lit stroke, under 7
+  greg الأحد 13 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 13 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7
+  greg الأحد 13 تشرين الأول (ar-IQ): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 13 كانون الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.9 px from Arch's lit stroke, under 7
+  greg الأحد 14 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 14 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7
+  greg الأحد 14 تشرين الأول (ar-IQ): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 14 كانون الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.9 px from Arch's lit stroke, under 7
+  greg الأحد 15 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 15 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7
+  greg الأحد 15 تشرين الأول (ar-IQ): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 15 كانون الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.9 px from Arch's lit stroke, under 7
+  greg الأحد 16 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 16 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7
+  greg الأحد 16 تشرين الأول (ar-IQ): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 16 كانون الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.9 px from Arch's lit stroke, under 7
+  greg الأحد 17 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 17 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7
+  greg الأحد 17 تشرين الأول (ar-IQ): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 17 كانون الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.9 px from Arch's lit stroke, under 7
+  greg الأحد 18 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 18 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7
+  greg الأحد 18 تشرين الأول (ar-IQ): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 18 كانون الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): 6.9 px from Arch's lit stroke, under 7
+  greg الأحد 19 تشرين الأول (ar-JO, ar-LB, ar-SY): 2.4 px from Arch's lit stroke, under 7
+  greg الأحد 19 تشرين الثاني (ar-IQ, ar-JO, ar-LB, ar-SY): -1.3 px from Arch's lit stroke, under 7

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the phone's own words: androidApp's app_name and widget labels -->
+    <string name="app_name">Taqwa</string>
+    <string name="complication_next_prayer">Sonraki vakit</string>
+    <string name="complication_mark">Taqwa</string>
+    <string name="complication_mark_description">Taqwa</string>
+    <string name="tile_label">Namaz vakitleri</string>
+    <!-- the watch's own words -->
+    <string name="open_taqwa_on_phone">Telefonunuzda Taqwa’yı açın</string>
+    <string name="update_taqwa_on_watch">Saatinizde Taqwa’yı güncelleyin</string>
+    <string name="complication_day">Günün vakitleri</string>
+    <string name="complication_day_dial">Taqwa kadranı: gün kadranı</string>
+    <string name="complication_dates">Tarihler</string>
+    <string name="complication_day_title">Gün</string>
+    <string name="complication_day_description">Bugünün namaz vakitleri</string>
+    <string name="preview_prayer_label">İKİNDİ</string>
+    <string name="preview_prayer_name">İkindi</string>
+    <string name="preview_prayer_time">16:10</string>
+    <string name="preview_countdown">1 sa 12 dk sonra</string>
+    <string name="preview_day_times">Sabah 4:33, Güneş 6:01, Öğle 12:33, İkindi 16:10, Akşam 19:04, Yatsı 20:24</string>
+    <string name="preview_hijri">6 Cemaziyelevvel 1448</string>
+    <string name="preview_hijri_day_month">6 Cemaziyelevvel</string>
+    <string name="preview_gregorian">PAZ 18 EKİ</string>
+    <string name="preview_weekday">PAZ</string>
+    <string name="preview_day_number">18</string>
+    <string name="tile_description">Bugünün vakitleri ve sonrakine geri sayım</string>
+
+    <string name="face_add">Taqwa saat yüzünü ekle</string>
+    <string name="face_about">Sonraki namaz ve geri sayımı saat yüzünüzde.</string>
+    <string name="face_active">Saat yüzünüz Taqwa.</string>
+    <string name="face_choose_it">Saat yüzünüze dokunup basılı tutun, ardından Taqwa’yı seçin.</string>
+    <string name="face_failed">Saat yüzü eklenemedi. Daha sonra yeniden deneyin.</string>
+</resources>

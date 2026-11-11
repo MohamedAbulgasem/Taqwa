@@ -1,0 +1,1 @@
+10-31 13:14:02.519 I/System.out( 3363): TaqwaWearFeed NEWER_VERSION 9/9c6aae003f912399

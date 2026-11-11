@@ -1,0 +1,7 @@
+    ELAPSED #22: Alarm{1ff1a79 type 3 origWhen 85849846 whenElapsed 85849846 world.taqwa.app}
+      tag=*alarm*:world.taqwa.app/.wear.link.DailyNudgeReceiver
+      type=ELAPSED origWhen=+23h49m47s801ms window=+18h0m0s0ms repeatInterval=86400000 count=0 flags=0x0
+      policyWhenElapsed: requester=+23h49m47s801ms app_standby=-44s199ms device_idle=-- battery_saver=-44s119ms
+      whenElapsed=+23h49m47s801ms maxWhenElapsed=+1d17h49m47s801ms
+      operation=PendingIntent{64553be: PendingIntentRecord{dfcbc1f world.taqwa.app broadcastIntent}}
+    ELAPSED_WAKEUP #23: Alarm{4e7bb6c type 2 origWhen 86409037 whenElapsed 86409037 android}

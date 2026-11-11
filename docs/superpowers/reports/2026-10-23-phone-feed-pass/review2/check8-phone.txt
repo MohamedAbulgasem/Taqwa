@@ -1,0 +1,9 @@
+# Review round 2's re-run of check 8 (14:23-14:25), the phone's TaqwaWatch and harness lines (logcat -s System.out TaqwaWatchHarness), as the reviewer saved them.
+10-31 14:23:08.992 I/TaqwaWatchHarness(13764): nodes: node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=false
+10-31 14:23:09.230 I/System.out(13764): TaqwaWatch RESCHEDULED NO_WATCH 12ms
+10-31 14:23:09.230 I/TaqwaWatchHarness(13764): reschedule: plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T14:47:00Z; settled=true
+10-31 14:23:11.832 I/System.out(13764): TaqwaWatch WATCH_APPEARED UNCHANGED 34ms
+10-31 14:24:42.632 I/System.out(13764): TaqwaWatch WATCH_ASKED FAILED 5262ms
+10-31 14:25:28.488 I/System.out(13764): TaqwaWatch RESCHEDULED SENT 67ms
+10-31 14:25:28.488 I/TaqwaWatchHarness(13764): reschedule: plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T14:47:00Z; settled=true
+10-31 14:25:28.599 I/System.out(13764): TaqwaWatch ACK 12/dcd0420ecdc97f21

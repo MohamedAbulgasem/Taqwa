@@ -1,0 +1,1 @@
+10-31 13:25:52.859 I/System.out( 1754): TaqwaWearFeed ASK PHONE_NEARBY sent

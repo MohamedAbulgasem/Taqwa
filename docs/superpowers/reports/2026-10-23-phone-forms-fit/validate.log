@@ -1,0 +1,32 @@
+== wff-validator, format version 2
+   INFO: WFF Validation Application Version 1.7.0. Maximum Supported Format Version #5
+   INFO: ✅  PASSED : /Users/mohamedabulgasem/Desktop/Workspace/apps/Taqwa/.claude/worktrees/watch-wear/watchface/src/main/res/raw/watchface.xml is valid against watch face format version #2
+== validator-push-cli 1.1.0-alpha01, watchface-debug.apk, for world.taqwa.app
+   Validation is successful
+   No failing checks detected, generated token: (withheld)
+   10 successful checks detected
+   Successful check: CheckSuccess{name=APK size validation, category=SECURITY}
+   Successful check: CheckSuccess{name=File contents validation, category=SECURITY}
+   Successful check: CheckSuccess{name=AndroidManifest validation, category=SECURITY}
+   Successful check: CheckSuccess{name=Watch face definition files presence, category=WATCH_FACE_FORMAT}
+   Successful check: CheckSuccess{name=Watch Face Format validator run, category=WATCH_FACE_FORMAT}
+   Successful check: CheckSuccess{name=Memory footprint validation, category=MEMORY_FOOTPRINT}
+   Successful check: CheckSuccess{name=Watch Face Format version property, category=ANDROID_MANIFEST}
+   Successful check: CheckSuccess{name=Minimum SDK version, category=ANDROID_MANIFEST}
+   Successful check: CheckSuccess{name=Package name, category=ANDROID_MANIFEST}
+   Successful check: CheckSuccess{name=APK signature validation, category=APK_SIGNATURE}
+== validator-push-cli 1.1.0-alpha01, watchface-release-unsigned.apk (a scratch copy signed with the test key), for world.taqwa.app
+   Validation is successful
+   No failing checks detected, generated token: (withheld)
+   10 successful checks detected
+   Successful check: CheckSuccess{name=APK size validation, category=SECURITY}
+   Successful check: CheckSuccess{name=File contents validation, category=SECURITY}
+   Successful check: CheckSuccess{name=AndroidManifest validation, category=SECURITY}
+   Successful check: CheckSuccess{name=Watch face definition files presence, category=WATCH_FACE_FORMAT}
+   Successful check: CheckSuccess{name=Watch Face Format validator run, category=WATCH_FACE_FORMAT}
+   Successful check: CheckSuccess{name=Memory footprint validation, category=MEMORY_FOOTPRINT}
+   Successful check: CheckSuccess{name=Watch Face Format version property, category=ANDROID_MANIFEST}
+   Successful check: CheckSuccess{name=Minimum SDK version, category=ANDROID_MANIFEST}
+   Successful check: CheckSuccess{name=Package name, category=ANDROID_MANIFEST}
+   Successful check: CheckSuccess{name=APK signature validation, category=APK_SIGNATURE}
+both validators pass

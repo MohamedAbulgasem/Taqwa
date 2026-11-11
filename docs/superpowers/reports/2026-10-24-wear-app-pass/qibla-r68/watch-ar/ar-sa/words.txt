@@ -1,0 +1,15 @@
+== qibla-aligned
+text='أنت باتجاه القبلة'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'
+== qibla-besteffort
+text='البوصلة غير متاحة'
+content-desc='البوصلة غير متاحة، ٢٣° · ٦٬٦٠٠ كم إلى مكة'
+== qibla-low
+text='تداخل مغناطيسي'
+content-desc='تداخل مغناطيسي'
+== qibla-searching
+content-desc='استدر يمينًا حوالي ٤٥ درجة'
+text='٢٣°'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'

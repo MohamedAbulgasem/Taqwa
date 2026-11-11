@@ -1,0 +1,14 @@
+# After git mv alone (before the pointers): store-listing-check exit 1
+app-review: 2026-10-30-notes-1.4.0-40.txt, which en.md points to, is not there
+
+# privacy-check exit 1
+FAIL: 3-4n-notes-file [en] docs/store/app-review/2026-10-30-notes-1.4.0-40.txt: the file is missing
+FAIL: 3-4n-notes-file [en] docs/store/app-review/2026-10-30-notes-1.4.0-40.txt: the file is missing
+FAIL: 3-4n-notes-file [en] docs/store/app-review/2026-10-30-notes-1.4.0-40.txt: the file is missing
+FAIL: 3-4n-notes-file [en] docs/store/app-review/2026-10-30-notes-1.4.0-40.txt: the file is missing
+FAIL: sweep: docs/store/app-review/2026-10-30-notes-1.6.0-42.txt:5: «…culates everything on the device, works offline, has no ads, and collects no data; it sends only to the user'…» is in no row of the report and in none of its lists (items 4 and 5, and the lines about something else)
+FAIL: sweep: docs/store/app-review/2026-10-30-notes-1.6.0-42.txt:13: «…e watch nearby (until then, "Open Taqwa on your phone").» is in no row of the report and in none of its lists (items 4 and 5, and the lines about something else)
+FAIL: sweep: docs/store/app-review/2026-10-30-notes-1.6.0-42.txt:16: «…ions, cities and fonts are bundled. The internet is used for recitation: playing a surah not yet on the phone…» is in no row of the report and in none of its lists (items 4 and 5, and the lines about something else)
+FAIL: sweep: docs/store/app-review/2026-10-30-notes-1.6.0-42.txt:21: «6. Third-party material» is in no row of the report and in none of its lists (items 4 and 5, and the lines about something else)
+FAIL: sweep: docs/store/app-review/2026-10-30-notes-1.6.0-42.txt:25: «- Recitations: Islamic Network, licensed by the reciters for free, non-commercial redistribution at the publi…» is in no row of the report and in none of its lists (items 4 and 5, and the lines about something else)
+privacy-check: 263 rows (263 approved, 0 awaiting), 7 policies, 238 sweep lines: 9 problems
