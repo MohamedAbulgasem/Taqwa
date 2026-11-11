@@ -1,0 +1,70 @@
+== nofeed-tile
+text='Open Taqwa on your phone'
+== nofeed-today
+text='Open Taqwa on your phone'
+== qibla-aligned
+text='Facing qibla'
+text='Makkah · 6,600 km away'
+== qibla-besteffort
+text='Compass unavailable'
+content-desc='Compass unavailable, 23° · 6,600 km to Makkah'
+== qibla-low-calibration
+text='Compass needs calibrating'
+content-desc='Compass needs calibrating'
+== qibla-searching
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='Makkah · 6,600 km away'
+== tasbeeh-0
+content-desc='SubhanAllah'
+== tasbeeh-27
+content-desc='SubhanAllah'
+== tasbeeh-list-end
+content-desc='La ilaha illallah, 100'
+content-desc='SubhanAllahi wa bihamdihi, 100'
+content-desc='سبحان الله وبحمده، سبحان الله العظيم, 100'
+content-desc='Astaghfirullah wa atubu ilayh, 33'
+content-desc='Reset'
+== tasbeeh-list
+text='Tasbeeh'
+content-desc='After prayer, 100'
+content-desc='SubhanAllah, 100'
+content-desc='Alhamdulillah, 100'
+content-desc='Allahu Akbar, 100'
+content-desc='Astaghfirullah, 100'
+== tasbeeh-phrase
+content-desc='سبحان الله وبحمده، سبحان الله العظيم'
+== tile-1458
+content-desc='Asr in 1 hour 11 minutes, at \u20684:10\xa0PM\u2069'
+text='ASR'
+text='in 1 h 11 min'
+content-desc='Fajr, \u20684:33\xa0AM\u2069'
+text='Fajr'
+text='4:33\xa0AM'
+content-desc='Sunrise, \u20686:01\xa0AM\u2069'
+text='Sunrise'
+text='6:01\xa0AM'
+content-desc='Dhuhr, \u206812:33\xa0PM\u2069'
+text='Dhuhr'
+text='12:33\xa0PM'
+content-desc='Asr, \u20684:10\xa0PM\u2069'
+text='Asr'
+text='4:10\xa0PM'
+content-desc='Maghrib, \u20687:04\xa0PM\u2069'
+text='Maghrib'
+text='7:04\xa0PM'
+content-desc='Isha, \u20688:24\xa0PM\u2069'
+text='Isha'
+text='8:24\xa0PM'
+content-desc='সান ফার্নান্দো ডে মোন্তে ক্রিস্টি'
+text='সান ফার্নান্দো ডে মোন্তে ক্রিস্টি'
+== today-1458
+content-desc='Asr in 1 hour 11 minutes, at \u20684:10\xa0PM\u2069'
+== today-list-end
+content-desc='Fajr, \u20684:33\xa0AM\u2069'
+content-desc='Sunrise, \u20686:01\xa0AM\u2069'
+content-desc='Dhuhr, \u206812:33\xa0PM\u2069'
+content-desc='Asr, \u20684:10\xa0PM\u2069'
+content-desc='Maghrib, \u20687:04\xa0PM\u2069'
+content-desc='Isha, \u20688:24\xa0PM\u2069'
+text='সান ফার্নান্দো ডে মোন্তে ক্রিস্টি'

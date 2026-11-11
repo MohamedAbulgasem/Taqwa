@@ -68,6 +68,13 @@ object PrayerNaming {
     }
 
     /**
+     * The same heading as a pattern, with `%1$s` where the name goes: `%1$s in`, `متبقٍّ على %1$s`.
+     * It is the watch feed's `nextIn`, which the watch fills with the name it shows.
+     */
+    fun nextInPattern(languageTag: String): String =
+        COUNTDOWN.getValue(UiLanguage.of(languageTag)).replace("{prayer}", "%1\$s")
+
+    /**
      * [localizedName] is what the caller has resolved for its own interface (a composable's
      * string resource, or [name] where there is none); it is what pairs with the Arabic.
      */

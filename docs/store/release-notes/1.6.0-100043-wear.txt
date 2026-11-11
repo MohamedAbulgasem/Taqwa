@@ -1,0 +1,21 @@
+<en-GB>
+The Taqwa face in four styles, complications for any face, a Tile, and Today, Tasbeeh and Qibla. Needs Taqwa on your phone, which sends the prayer times.
+</en-GB>
+<ar>
+واجهة تقوى بأربعة أنماط، وإضافات لأي واجهة، ومربّع، وشاشات اليوم والتسبيح والقبلة. يحتاج إلى تقوى على هاتفك، فهو الذي يرسل مواقيت الصلاة.
+</ar>
+<fr-FR>
+Le cadran Taqwa en quatre styles, des complications pour tout cadran, une carte, et Aujourd’hui, Tasbih et Qibla. Nécessite Taqwa sur votre téléphone, qui envoie les horaires de prière.
+</fr-FR>
+<tr-TR>
+Dört stilde Taqwa saat yüzü, her saat yüzüne komplikasyonlar, bir kutucuk; Bugün, Tesbih ve Kıble ekranları. Namaz vakitlerini gönderen Taqwa’nın telefonunuzda olması gerekir.
+</tr-TR>
+<id>
+Tampilan jam Taqwa dalam empat gaya, komplikasi untuk tampilan jam apa pun, kartu, serta layar Hari ini, Tasbih, dan Kiblat. Memerlukan Taqwa di ponsel Anda, yang mengirimkan waktu salat.
+</id>
+<ur>
+چار انداز میں تقویٰ واچ فیس، کسی بھی فیس کے لیے کمپلیکیشنز، ایک ٹائل، اور آج، تسبیح اور قبلہ کی اسکرینیں۔ آپ کے فون پر تقویٰ ہونا ضروری ہے، جو نماز کے اوقات بھیجتا ہے۔
+</ur>
+<bn-BD>
+চারটি স্টাইলে তাকওয়া ওয়াচ ফেস, যেকোনো ফেসের জন্য কমপ্লিকেশন, একটি টাইল, আর “আজ”, তাসবিহ ও কিবলা স্ক্রিন। আপনার ফোনে তাকওয়া থাকা দরকার, যা নামাজের সময় পাঠায়।
+</bn-BD>

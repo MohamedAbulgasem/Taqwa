@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the phone's own words: androidApp's app_name and widget labels -->
+    <string name="app_name">تقویٰ</string>
+    <string name="complication_next_prayer">اگلی نماز</string>
+    <string name="complication_mark">تقویٰ</string>
+    <string name="complication_mark_description">تقویٰ</string>
+    <string name="tile_label">نماز کے اوقات</string>
+    <!-- the watch's own words -->
+    <string name="open_taqwa_on_phone">اپنے فون پر تقویٰ کھولیں</string>
+    <string name="update_taqwa_on_watch">اپنی گھڑی پر تقویٰ اپڈیٹ کریں</string>
+    <string name="complication_day">دن کی نمازیں</string>
+    <string name="complication_day_dial">تقویٰ ڈائل: دن کا ڈائل</string>
+    <string name="complication_dates">تاریخیں</string>
+    <string name="complication_day_title">دن</string>
+    <string name="complication_day_description">آج کے نماز کے اوقات</string>
+    <string name="preview_prayer_label">عصر</string>
+    <string name="preview_prayer_name">عصر</string>
+    <string name="preview_prayer_time">16:10</string>
+    <string name="preview_countdown">1 گھنٹے 12 منٹ میں</string>
+    <string name="preview_day_times">فجر 4:33، طلوعِ آفتاب 6:01، ظہر 12:33، عصر 16:10، مغرب 19:04، عشاء 20:24</string>
+    <string name="preview_hijri">6 جمادی الاول 1448</string>
+    <string name="preview_hijri_day_month">6 جمادی الاول</string>
+    <string name="preview_gregorian">اتوار 18 اکتوبر</string>
+    <string name="preview_weekday">اتوار</string>
+    <string name="preview_day_number">18</string>
+    <string name="tile_description">آج کی نمازیں اور اگلی نماز کی الٹی گنتی</string>
+
+    <string name="face_add">تقویٰ واچ فیس شامل کریں</string>
+    <string name="face_about">اگلی نماز اور اس کی الٹی گنتی آپ کے واچ فیس پر۔</string>
+    <string name="face_active">تقویٰ آپ کا واچ فیس ہے۔</string>
+    <string name="face_choose_it">اپنے واچ فیس کو دبا کر رکھیں، پھر تقویٰ منتخب کریں۔</string>
+    <string name="face_failed">واچ فیس شامل نہیں ہو سکا۔ بعد میں دوبارہ کوشش کریں۔</string>
+</resources>

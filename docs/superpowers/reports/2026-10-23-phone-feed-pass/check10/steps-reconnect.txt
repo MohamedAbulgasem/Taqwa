@@ -1,0 +1,13 @@
+13:25:18 reconnect with nothing changed: the forwards removed did not drop the node before, so the watch is taken down by serial and brought back with wear-pair.sh
+OK: killing emulator, bye bye
+OK
+13:25:28 h nodes : node c76e057a "Taqwa_Wear_OS_6" nearby=false taqwa_watch=true
+Starting Taqwa_Wear_OS_6 as emulator-5558 (log: /var/folders/m9/c01w6f_573lg47hlr90bvw9w0000gn/T//Taqwa_Wear_OS_6.log)
+Taqwa_Wear_OS_6 booted: API level 36
+Taqwa_Phone_Wear is already running as emulator-5562
+Taqwa_Phone_Wear booted: API level 36
+5601
+5601
+Forwarded tcp:5601 to emulator-5562 and reversed emulator-5558's tcp:5601 to it; asking the harness for its nodes for up to 120 s
+The watch is back: node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=true
+delivery: 677789a581af4ba0/19/23aee84e77b1f1f2

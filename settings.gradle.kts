@@ -3,6 +3,9 @@ rootProject.name = "Taqwa"
 include(":androidApp")
 include(":shared")
 include(":widgetcore")
+include(":watchcore")
+include(":wearApp")
+include(":watchface")
 
 pluginManagement {
     repositories {

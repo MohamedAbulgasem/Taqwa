@@ -1,0 +1,8 @@
+Starting Taqwa_Wear_OS_6 as emulator-5558 (log: /var/folders/m9/c01w6f_573lg47hlr90bvw9w0000gn/T//Taqwa_Wear_OS_6.log)
+Taqwa_Wear_OS_6 booted: API level 36
+Taqwa_Phone_Wear is already running as emulator-5562
+Taqwa_Phone_Wear booted: API level 36
+5601
+5601
+Forwarded tcp:5601 to emulator-5562 and reversed emulator-5558's tcp:5601 to it; asking the harness for its nodes for up to 120 s
+The watch is back: node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=true

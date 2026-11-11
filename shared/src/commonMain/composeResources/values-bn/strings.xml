@@ -15,7 +15,7 @@
     <string name="onboarding_welcome_body">নামাজের সময়, কিবলা ও কুরআন। চিরকাল বিনামূল্যে। বিজ্ঞাপন নেই, অ্যাকাউন্ট নেই, ইন্টারনেট ছাড়াই চলে।</string>
     <string name="onboarding_welcome_cta">শুরু করুন</string>
     <string name="onboarding_location_title">আপনি কোথায় আছেন?</string>
-    <string name="onboarding_location_body">নামাজের সময় আপনার অবস্থানের উপর নির্ভর করে। সব হিসাব আপনার ডিভাইসেই হয়, আর আপনার অবস্থান কখনো ফোন ছেড়ে যায় না।</string>
+    <string name="onboarding_location_body">নামাজের সময় আপনার অবস্থানের উপর নির্ভর করে। সব হিসাব আপনার ডিভাইসেই হয়। আপনার অবস্থান শুধু আপনার নিজের ডিভাইসগুলোই দেখতে পারে।</string>
     <string name="onboarding_continue">চালিয়ে যান</string>
     <string name="onboarding_notifications_title">নামাজের নোটিফিকেশন</string>
     <string name="onboarding_notifications_body">প্রতিটি নামাজের জন্য একটি নোটিফিকেশন। প্রতিটি নামাজের শব্দ আলাদা করে বেছে নিতে পারেন, আর যখন খুশি বদলাতেও পারেন।</string>
@@ -117,6 +117,22 @@
     <string name="settings_appearance">চেহারা</string>
     <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">ভাষা</string>
+    <!-- Settings › App, after Language (plan 4 Task 10): the iPhone’s "Add to Apple Watch", shown
+         while a watch is paired and the Taqwa face is bundled, and the line under it when the
+         face was not added. "Apple Watch" and "Watch" (Apple’s app) are Apple’s names, never
+         translated. -->
+    <string name="settings_add_to_apple_watch">Apple Watch-এ যোগ করুন</string>
+    <string name="settings_add_to_apple_watch_failed">ওয়াচ ফেস যোগ করা যায়নি। Watch অ্যাপ থেকে আবার চেষ্টা করুন।</string>
+    <!-- Settings › Watch, between App and About (plan 5 Task 6): on Android, "Install on your
+         watch" (its value the watch’s name, as the system gives it) opens Taqwa’s Play page on a
+         watch without Taqwa, and "Add the Taqwa face" (the watch’s own face_add) opens the watch’s
+         face screen; a tap says "Continue on your watch" or "Couldn’t reach your watch" as the
+         row’s value. On the iPhone the section holds "Add to Apple Watch" alone. -->
+    <string name="settings_group_watch">ঘড়ি</string>
+    <string name="settings_watch_install">আপনার ঘড়িতে ইনস্টল করুন</string>
+    <string name="settings_watch_face">তাকওয়া ওয়াচ ফেস যোগ করুন</string>
+    <string name="settings_watch_continue">আপনার ঘড়িতে চালিয়ে যান</string>
+    <string name="settings_watch_unreachable">আপনার ঘড়িতে পৌঁছানো যায়নি</string>
     <string name="settings_about">তাকওয়া সম্পর্কে</string>
     <string name="settings_attribution">কৃতজ্ঞতা ও লাইসেন্স</string>
     <string name="settings_rate">তাকওয়াকে রেটিং দিন</string>
@@ -125,15 +141,16 @@
     <string name="settings_not_set">নির্ধারিত নয়</string>
     <string name="settings_notifications_off">বন্ধ</string>
     <string name="settings_notifications_on_count">%1$sটি চালু</string>
-    <string name="settings_version_value">1.5.1</string>
+    <string name="settings_version_value">1.6.0</string>
 
     <!-- About screen. The product name is written তাকওয়া here, as on the icon. -->
     <string name="about_tagline">বিনামূল্যে, সবার জন্য, চিরকালের জন্য।</string>
     <string name="about_privacy_label">গোপনীয়তা</string>
-    <string name="about_stays_title">আপনার ফোনেই থাকে</string>
-    <string name="about_stays_body">অবস্থান, সেটিংস, বুকমার্ক ও গণনা কখনো ফোন ছেড়ে যায় না।</string>
-    <string name="about_online_title">শুধু আপনি চাইলেই অনলাইন</string>
-    <string name="about_online_body">ইন্টারনেট একটিমাত্র কাজে লাগে: আপনি যে তিলাওয়াতগুলো ডাউনলোড করতে চান, GitHub-এ তাকওয়ার উন্মুক্ত রিপোজিটরি থেকে সেগুলো আনা।</string>
+    <string name="about_stays_title">আপনার ডিভাইসেই থাকে</string>
+    <string name="about_stays_body">আপনার অবস্থান, সেটিংস, বুকমার্ক ও গণনা শুধু আপনার নিজের ডিভাইসগুলোই দেখতে পারে।</string>
+    <string name="about_online_title">শুধু আপনার বেছে নেওয়া কাজেই অনলাইন</string>
+    <string name="about_online_body_android">ইন্টারনেট লাগে আপনি যে তিলাওয়াতগুলো ডাউনলোড করতে চান সেগুলোর জন্য, GitHub-এ তাকওয়ার উন্মুক্ত রিপোজিটরি থেকে। তাকওয়া আপনার ঘড়িতে যোগ করলে এর তথ্য Google ইন্টারনেটের মাধ্যমে বহন করতে পারে, এনক্রিপ্ট করা অবস্থায়, যাতে শুধু আপনার ফোন ও ঘড়িই তা পড়তে পারে।</string>
+    <string name="about_online_body_ios">ইন্টারনেট লাগে আপনি যে তিলাওয়াতগুলো ডাউনলোড করতে চান সেগুলোর জন্য, GitHub-এ তাকওয়ার উন্মুক্ত রিপোজিটরি থেকে। তাকওয়া আপনার ঘড়িতে যোগ করলে এর তথ্য Apple ইন্টারনেটের মাধ্যমে বহন করতে পারে, এনক্রিপ্ট করা অবস্থায়, যাতে শুধু আপনার ফোন ও ঘড়িই তা পড়তে পারে।</string>
     <string name="about_nothing_title">অ্যাকাউন্ট নেই, বিজ্ঞাপন নেই, অ্যানালিটিক্স নেই</string>
     <string name="about_nothing_body">সাইন ইন করার কিছু নেই, বিক্রি করার মতোও কিছু নেই।</string>
     <string name="about_privacy_policy">গোপনীয়তা নীতি</string>
@@ -220,7 +237,7 @@
     <string name="location_country">দেশ</string>
     <string name="location_timezone">সময় অঞ্চল</string>
     <string name="location_choose_city_instead">বরং একটি শহর বেছে নিন</string>
-    <string name="location_privacy_note">স্থানাঙ্ক আপনার ডিভাইসেই জমা থাকে এবং শুধু সময় হিসাব করতে ব্যবহৃত হয়। কোথাও কিছু পাঠানো হয় না।</string>
+    <string name="location_privacy_note">স্থানাঙ্ক আপনার ডিভাইসেই জমা থাকে এবং শুধু সময় হিসাব করতে ব্যবহৃত হয়। আপনার অবস্থান শুধু আপনার নিজের ডিভাইসগুলোই দেখতে পারে।</string>
     <string name="location_denied_note">অবস্থানের অনুমতি এখন বন্ধ আছে। ডিভাইসের সেটিংস থেকে অনুমতি দিতে পারেন, অথবা বরং একটি শহর বেছে নিতে পারেন।</string>
 
     <!-- City search -->

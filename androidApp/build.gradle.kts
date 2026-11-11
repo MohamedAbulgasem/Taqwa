@@ -22,8 +22,17 @@ dependencies {
 // (git-ignored; keystore.properties.example shows the shape) names it. When the file is absent
 // the release build is left unsigned, as before, so any machine can still build and a debug key
 // can sign a device copy by hand. scripts/release.sh builds the store artefacts.
+// -Ptaqwa.unsignedRelease=true leaves the release unsigned whatever the file says, without reading it:
+// every release-type build but scripts/release.sh's passes it, and :wearApp reads it the same way
+// (plan 5 Task 3, scripts/test-unsigned-release.sh). Any value but true or false stops the build, so
+// a misspelt one never signs.
+val unsignedRelease: Boolean = when (val value = providers.gradleProperty("taqwa.unsignedRelease").orNull) {
+    null, "false" -> false
+    "true" -> true
+    else -> error("taqwa.unsignedRelease is true or false, not '$value'")
+}
 val keystoreProperties: Properties? = rootProject.file("keystore.properties")
-    .takeIf { it.isFile }
+    .takeIf { !unsignedRelease && it.isFile }
     ?.let { file -> Properties().also { props -> file.inputStream().use { props.load(it) } } }
 
 android {
@@ -59,8 +68,8 @@ android {
         applicationId = "world.taqwa.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 42
-        versionName = "1.5.1"
+        versionCode = 45
+        versionName = "1.6.0"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21

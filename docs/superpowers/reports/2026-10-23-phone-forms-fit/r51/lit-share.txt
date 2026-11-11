@@ -1,0 +1,29 @@
+litshare.py on emulator-5558's always-on frames, 25 Oct 2026 (tools/watchface/lit.py undither: twice the emulator's lit
+parity at the levels its dimming leaves, the measure since plan 1's Task 13; raw is the dithered frame). Google's limit is 15%.
+old: the base face found installed (ff28cd5a's), new: the face as committed, shot in one session on the samples at 14:58
+and 10:10; new greg-*: Arch with the Saudi sample's Gregorian line rewritten to each case; before: the first run's
+shots of two of the cases at 14 units (the v2 face before Ruling 51, the same emulator, 25 Oct about 03:10).
+
+old          arch-ar-ly-12h-1458-aod.png          raw  5.10%  face  10.26%
+old          arch-ar-sa-1458-aod.png              raw  4.95%  face   9.96%
+old          arch-en-1458-aod.png                 raw  5.85%  face  11.76%
+old          moon-ar-ly-12h-1458-aod.png          raw  5.11%  face  10.27%
+old          moon-ar-sa-1010-aod.png              raw  5.86%  face  11.80%
+old          ring-ar-sa-1458-aod.png              raw  5.72%  face  11.53%
+old          sun-ar-ly-12h-1458-aod.png           raw  5.85%  face  11.80%
+new          arch-ar-ly-12h-1458-aod.png          raw  4.98%  face  10.02%
+new          arch-ar-sa-1458-aod.png              raw  4.84%  face   9.74%
+new          arch-en-1458-aod.png                 raw  5.85%  face  11.76%
+new          greg-sample-aod.png                  raw  4.84%  face   9.74%
+new          greg-sat-aug-1-aod.png               raw  5.05%  face  10.18%
+new          greg-thu-aug-10-aod.png              raw  5.03%  face  10.14%
+new          greg-thu-nov-30-aod.png              raw  5.02%  face  10.11%
+new          greg-thu-oct-10-aod.png              raw  5.07%  face  10.21%
+new          greg-tue-oct-10-aod.png              raw  4.97%  face  10.01%
+new          moon-ar-ly-12h-1458-aod.png          raw  5.11%  face  10.27%
+new          moon-ar-sa-1010-aod.png              raw  5.86%  face  11.80%
+new          ring-ar-sa-1458-aod.png              raw  5.72%  face  11.53%
+new          sun-ar-ly-12h-1458-aod.png           raw  5.85%  face  11.80%
+before       greg-thu-aug-10-aod.png              raw  5.18%  face  10.42%
+before       greg-tue-oct-10-aod.png              raw  5.35%  face  10.79%
+highest as the face draws it: 11.80% (old/sun-ar-ly-12h-1458-aod.png), under 15%: True

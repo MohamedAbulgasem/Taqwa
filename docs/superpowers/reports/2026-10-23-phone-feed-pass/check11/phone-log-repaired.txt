@@ -1,0 +1,4 @@
+10-31 13:28:55.803 I/TaqwaWatchHarness( 7924): nodes: node c76e057a "Taqwa_Wear_OS_6" nearby=false taqwa_watch=true
+10-31 13:28:58.273 I/System.out( 7924): TaqwaWatch WATCH_APPEARED UNCHANGED 36ms
+10-31 13:28:58.293 I/System.out( 7924): TaqwaWatch WATCH_ASKED UNCHANGED 19ms
+10-31 13:29:00.854 I/TaqwaWatchHarness( 7924): nodes: node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=true

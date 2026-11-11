@@ -1,0 +1,189 @@
+Task 11, Ruling 37: the Moon's right-to-left curves on emulator-5558 (Taqwa_Wear_OS_6).
+A render is the band of the curve in a screenshot; two renders are alike when every pixel is.
+
+== before: the 103f6aea face, slots empty, one bind of each form (see rtl-hijri-before-after.png)
+17 of the 49 forms lost a glyph in that one bind (seen in the sheet): 02, 04, 05, 08, 09, 10, 11, 12, 13
+(جمادى الآخرة: the meem or the jeem's body), 18 and 19 (ربيع: the rāʾ), 20 (جمادى الأولى), 23 (رمضان: the
+rāʾ), 26 (ذو الحجّة: the wāw), 32 (ذوالقعدہ), 38 (٢٠ جمادى الآخرة), 42 (۹ صفر: the ṣād). The two that shape
+into no more glyphs than characters, 16 (محرّم) and 41 (محرم), never lost one.
+
+== after, both slots empty (the 71-unit curve): round 1 in a fresh sandbox, rounds 2-5 each after the
+   font sandbox was force-stopped (and before round 4 the face runtime), one bind a form a round
+round 1: font sandbox pid 26922, face runtime 26849, done 00:06:29 (6 shots a bind)
+round 2: font sandbox restarted; the Moon drawn after a bind again in 216 s (back=1); pids 11464 / 11449
+round 2 done 00:27:22
+round 3: font sandbox restarted; the Moon drawn after a bind again in 213 s (back=1); pids 19098 / 19081
+round 3 done 00:36:13
+round 4: font sandbox and face runtime restarted; the Moon drawn after a bind again in 4 s (back=1); pids 25493 / 25423
+round 4 done 00:41:34
+round 5: font sandbox restarted; the Moon drawn after a bind again in 223 s (back=1); pids 2081 / 2063
+round 5 done 00:50:33
+01 ar-ly12  1 جمادى الآخرة         shots  30  distinct 1  1e9ec9ebea:30
+02 ar-ly12  2 جمادى الآخرة         shots  30  distinct 1  a67dbc8944:30
+03 ar-ly12  3 جمادى الآخرة         shots  30  distinct 1  c799f19396:30
+04 ar-ly12  4 جمادى الآخرة         shots  30  distinct 1  2379ace0b0:30
+05 ar-ly12  5 جمادى الآخرة         shots  30  distinct 1  959782e895:30
+06 ar-ly12  6 جمادى الآخرة         shots  30  distinct 1  c02b64b230:30
+07 ar-ly12  7 جمادى الآخرة         shots  30  distinct 1  895b290e4b:30
+08 ar-ly12  8 جمادى الآخرة         shots  30  distinct 1  e741a77a98:30
+09 ar-ly12  9 جمادى الآخرة         shots  30  distinct 1  3976dfbada:30
+10 ar-ly12  10 جمادى الآخرة        shots  30  distinct 1  c4d9a6d8bd:30
+11 ar-ly12  11 جمادى الآخرة        shots  30  distinct 1  74a728a432:30
+12 ar-ly12  19 جمادى الآخرة        shots  30  distinct 1  d4094e193b:30
+13 ar-ly12  20 جمادى الآخرة        shots  30  distinct 1  02acfe75ca:30
+14 ar-ly12  21 جمادى الآخرة        shots  30  distinct 1  9496fd697b:30
+15 ar-ly12  30 جمادى الآخرة        shots  30  distinct 1  dc799f53e0:30
+16 ar-ly12  9 محرّم                shots  30  distinct 1  1b752ff240:30
+17 ar-ly12  9 صفر                  shots  30  distinct 1  7270dfcb4f:30
+18 ar-ly12  9 ربيع الأوّل          shots  30  distinct 1  f7cf186a89:30
+19 ar-ly12  9 ربيع الآخر           shots  30  distinct 1  bfc09cdd1d:30
+20 ar-ly12  9 جمادى الأولى         shots  30  distinct 1  1108acb909:30
+21 ar-ly12  9 رجب                  shots  30  distinct 1  684aac234c:30
+22 ar-ly12  9 شعبان                shots  30  distinct 1  515cfcd33c:30
+23 ar-ly12  9 رمضان                shots  30  distinct 1  7ee0e783b6:30
+24 ar-ly12  9 شوّال                shots  30  distinct 1  08a5dcc3fd:30
+25 ar-ly12  9 ذو القعدة            shots  30  distinct 1  4cb3c3a2b0:30
+26 ar-ly12  9 ذو الحجّة            shots  30  distinct 1  4d0773e6a2:30
+27 ar-ly12  1 جمادى الأولى         shots  30  distinct 1  2fe039b38e:30
+28 ar-ly12  19 ربيع الآخر          shots  30  distinct 1  0d85aa2153:30
+29 ar-ly12  29 ذو القعدة           shots  30  distinct 1  ec2eb4efe0:30
+30 ar-ly12  9 جمادی الثانی         shots  30  distinct 1  9e232a6362:30
+31 ar-ly12  9 جمادی الاول          shots  30  distinct 1  5c3bdc173d:30
+32 ar-ly12  9 ذوالقعدہ             shots  30  distinct 1  14cfd33b85:30
+33 ar-ly12  29 ربیع الثانی         shots  30  distinct 1  0cdfa2bc3a:30
+34 ar-ly12  1 جمادی الثانی         shots  30  distinct 1  9910b6c161:30
+35 ar-sa    ٩ جمادى الآخرة         shots  30  distinct 1  24b64ef2ac:30
+36 ar-sa    ١ جمادى الآخرة         shots  30  distinct 1  d875a2002e:30
+37 ar-sa    ٣٠ جمادى الآخرة        shots  30  distinct 1  fe36301a73:30
+38 ar-sa    ٢٠ جمادى الآخرة        shots  30  distinct 1  d715b52716:30
+39 ar-sa    ٩ رمضان                shots  30  distinct 1  f9bbd66149:30
+40 ar-ly12  6 جمادى الأولى         shots  30  distinct 1  08efa47b41:30
+41 ar-sa    ۹ محرم                 shots  30  distinct 1  521c2c9a47:30
+42 ar-sa    ۹ صفر                  shots  30  distinct 1  2607e6d6bb:30
+43 ar-sa    ۹ ربیع الاول           shots  30  distinct 1  a083c425a3:30
+44 ar-sa    ۲۹ ربیع الثانی         shots  30  distinct 1  a2e77f11d0:30
+45 ar-sa    ۹ جمادی الاول          shots  30  distinct 1  72c12ce3a6:30
+46 ar-sa    ۳۰ جمادی الثانی        shots  30  distinct 1  ff56337c1e:30
+47 ar-sa    ۹ رجب                  shots  30  distinct 1  47f3fda2e7:30
+48 ar-sa    ۹ شوال                 shots  30  distinct 1  0e79664249:30
+49 ar-sa    ۹ ذوالحجہ              shots  30  distinct 1  bdd24569bc:30
+forms 49, shots 1470, forms with more than one render: 0
+
+== after, the battery and the steps filled (the 58.8-unit curve): four rounds, restarts as above
+round 1 done 00:58:13
+round 2: font sandbox restarted; the Moon drawn after a bind again in 209 s (back=1); pids 17353 / 17327
+round 2 done 01:07:30
+round 3: font sandbox restarted; the Moon drawn after a bind again in 210 s (back=1); pids 25324 / 25295
+round 3 done 01:16:48
+round 4: font sandbox and face runtime restarted; the Moon drawn after a bind again in 4 s (back=1); pids 32436 / 32364
+round 4 done 01:22:40
+01 ar-ly12  1 جمادى الآخرة         shots  32  distinct 1  9178793886:32
+02 ar-ly12  2 جمادى الآخرة         shots  32  distinct 1  aea33891dd:32
+03 ar-ly12  3 جمادى الآخرة         shots  32  distinct 1  8ec76203f6:32
+04 ar-ly12  4 جمادى الآخرة         shots  32  distinct 1  54e4deaeca:32
+05 ar-ly12  5 جمادى الآخرة         shots  32  distinct 1  6a2377e47e:32
+06 ar-ly12  6 جمادى الآخرة         shots  32  distinct 1  f5c2860c89:32
+07 ar-ly12  7 جمادى الآخرة         shots  32  distinct 1  e44ebbc3fd:32
+08 ar-ly12  8 جمادى الآخرة         shots  32  distinct 1  1f34976140:32
+09 ar-ly12  9 جمادى الآخرة         shots  32  distinct 1  14dccce4b0:32
+10 ar-ly12  10 جمادى الآخرة        shots  32  distinct 1  ff8f4a2378:32
+11 ar-ly12  11 جمادى الآخرة        shots  32  distinct 1  46613616d5:32
+12 ar-ly12  19 جمادى الآخرة        shots  32  distinct 1  42129d8a96:32
+13 ar-ly12  20 جمادى الآخرة        shots  32  distinct 1  05b9ee5566:32
+14 ar-ly12  21 جمادى الآخرة        shots  32  distinct 1  2031aff217:32
+15 ar-ly12  30 جمادى الآخرة        shots  32  distinct 1  24d6a1ae80:32
+16 ar-ly12  9 محرّم                shots  32  distinct 1  c0f28351d7:32
+17 ar-ly12  9 صفر                  shots  32  distinct 1  16d1bfdcb4:32
+18 ar-ly12  9 ربيع الأوّل          shots  32  distinct 1  922f5fe04d:32
+19 ar-ly12  9 ربيع الآخر           shots  32  distinct 1  216007a600:32
+20 ar-ly12  9 جمادى الأولى         shots  32  distinct 1  1b38f0be10:32
+21 ar-ly12  9 رجب                  shots  32  distinct 1  f894dd18f8:32
+22 ar-ly12  9 شعبان                shots  32  distinct 1  b8741d88eb:32
+23 ar-ly12  9 رمضان                shots  32  distinct 1  033f282b92:32
+24 ar-ly12  9 شوّال                shots  32  distinct 1  b573e3ef9c:32
+25 ar-ly12  9 ذو القعدة            shots  32  distinct 1  fde8b20b42:32
+26 ar-ly12  9 ذو الحجّة            shots  32  distinct 1  f462515b6e:32
+27 ar-ly12  1 جمادى الأولى         shots  32  distinct 1  493bfe3992:32
+28 ar-ly12  19 ربيع الآخر          shots  32  distinct 1  62254ba6f3:32
+29 ar-ly12  29 ذو القعدة           shots  32  distinct 1  e1ea8b13f7:32
+30 ar-ly12  9 جمادی الثانی         shots  32  distinct 1  8c39ab6f55:32
+31 ar-ly12  9 جمادی الاول          shots  32  distinct 1  59e5d141b2:32
+32 ar-ly12  9 ذوالقعدہ             shots  32  distinct 1  9015864ac6:32
+33 ar-ly12  29 ربیع الثانی         shots  32  distinct 1  f1838cfcde:32
+34 ar-ly12  1 جمادی الثانی         shots  32  distinct 1  5762e30e9f:32
+35 ar-sa    ٩ جمادى الآخرة         shots  32  distinct 1  f4dbe99907:32
+36 ar-sa    ١ جمادى الآخرة         shots  32  distinct 1  35ad261a6e:32
+37 ar-sa    ٣٠ جمادى الآخرة        shots  32  distinct 1  97a5635544:32
+38 ar-sa    ٢٠ جمادى الآخرة        shots  32  distinct 1  6f6e96e5bf:32
+39 ar-sa    ٩ رمضان                shots  32  distinct 1  be0c4451dd:32
+40 ar-ly12  6 جمادى الأولى         shots  32  distinct 1  a9cc30e599:32
+41 ar-sa    ۹ محرم                 shots  32  distinct 1  1232787098:32
+42 ar-sa    ۹ صفر                  shots  32  distinct 1  fce6ad4ee4:32
+43 ar-sa    ۹ ربیع الاول           shots  32  distinct 1  25a41e7e1f:32
+44 ar-sa    ۲۹ ربیع الثانی         shots  32  distinct 1  0055909d9b:32
+45 ar-sa    ۹ جمادی الاول          shots  32  distinct 1  ed71a2d227:32
+46 ar-sa    ۳۰ جمادی الثانی        shots  32  distinct 1  e6c2433a6b:32
+47 ar-sa    ۹ رجب                  shots  32  distinct 1  b3c129fdad:32
+48 ar-sa    ۹ شوال                 shots  32  distinct 1  8635dc0bb6:32
+49 ar-sa    ۹ ذوالحجہ              shots  32  distinct 1  b02c1c2020:32
+forms 49, shots 1568, forms with more than one render: 0
+
+== the prayer's name and the countdown over the top at 20:23:2x, Libya and Saudi Arabia: before (the countdown and name unpadded), after
+01 ar-ly12  6 جمادى الأولى         shots  12  distinct 6  edc9672e34:2 df491773e5:2 bfbb99ff68:2 b0a0bd8e82:2 a846f2ce4a:2 19dfb4ac20:2
+02 ar-sa    6 جمادى الأولى         shots  12  distinct 5  c8d8fa08f2:4 d94f911363:2 bf33eedde1:2 afc8133519:2 32ab3740bc:2
+forms 2, shots 24, forms with more than one render: 2
+01 ar-ly12  6 جمادى الأولى         shots  12  distinct 1  f56003b2af:12
+02 ar-sa    6 جمادى الأولى         shots  12  distinct 1  af3c986e72:12
+forms 2, shots 24, forms with more than one render: 0
+
+== the prayer's name and the countdown over the top at 17:30:2x, Libya and Saudi Arabia: before (the countdown and name unpadded), after
+01 ar-ly12  6 جمادى الأولى         shots  12  distinct 2  1481fcf26b:10 87a57a6163:2
+02 ar-sa    6 جمادى الأولى         shots  12  distinct 2  bdfe5e8c3d:10 34b3173140:2
+forms 2, shots 24, forms with more than one render: 2
+01 ar-ly12  6 جمادى الأولى         shots  12  distinct 1  aba68cb188:12
+02 ar-sa    6 جمادى الأولى         shots  12  distinct 1  0a203034b9:12
+forms 2, shots 24, forms with more than one render: 0
+
+== the prayer's name and the countdown over the top at 22:30:2x, Libya and Saudi Arabia: before (the countdown and name unpadded), after
+01 ar-ly12  6 جمادى الأولى         shots  12  distinct 3  8ca32b1d6d:8 e2830a73e1:2 26b0d159e5:2
+02 ar-sa    6 جمادى الأولى         shots  12  distinct 2  70c1bc2503:8 616ee3c10f:4
+forms 2, shots 24, forms with more than one render: 2
+01 ar-ly12  6 جمادى الأولى         shots  12  distinct 1  b5b932b31e:12
+02 ar-sa    6 جمادى الأولى         shots  12  distinct 1  15df3d70ba:12
+forms 2, shots 24, forms with more than one render: 0
+
+== ten days and a midnight, the natural Libya twelve-hour sample, the battery and the steps filled (rtl-days-midnight.png)
+day +0: 3 shots, 1 render of the date (a9cc30e599)
+day +1: 3 shots, 1 render of the date (3a8c25c3f4)
+day +2: 3 shots, 1 render of the date (4d018a1149)
+day +3: 3 shots, 1 render of the date (c67b13bf75)
+day +4: 3 shots, 1 render of the date (6a8cbd28a0)
+day +5: 3 shots, 1 render of the date (eb0ca49266)
+day +6: 3 shots, 1 render of the date (1bb255ba75)
+day +7: 3 shots, 1 render of the date (f0d3579bdd)
+day +8: 3 shots, 1 render of the date (ee972d6b88)
+day +9: 3 shots, 1 render of the date (87080bf36e)
+day +23: 3 shots, 1 render of the date (599d5efe97)
+day +24: 3 shots, 1 render of the date (0e5437eacd)
+day +25: 3 shots, 1 render of the date (8af7648025)
+day +26: 3 shots, 1 render of the date (ea23c259e6)
+midnight: 23:59:41 on Mon 19 Oct (7 جمادى الأولى) to 00:01:0x on Tue 20 Oct (8 جمادى الأولى), the face left alone; both drawn whole
+
+== review round 1's fix: the left-to-right curves in Bengali (ltr-bengali-before-after.png)
+Rounds 2 on each in a new font sandbox and face runtime (both force-stopped first), round 1 in
+the processes it found; one render a bind as before; sandbox / runtime pids per round.
+- a scratch face whose two curved slots show a literal Bengali watch's day and date, সোম ২০ (6
+  characters, 7 glyphs in Noto Sans Bengali UI), 10:10, two shots a bind:
+  64f27a6f: 5 rounds of 6 binds (60 shots), 3 renders: whole at 26 binds, সোম ২ (the last figure
+    lost, the e-kar thrown) at 3 (rounds 2, 4 and 5), whole but a pixel apart at 1 (round 4).
+    pids 12815 / 12744, 15372 / 15302, 16220 / 16151, 17105 / 17032, 18048 / 17967
+  the fix (the value ends with PAD): 10 rounds of 6 binds (120 shots), 1 render, whole, the same
+    pixels as 64f27a6f's whole one. pids 18048 / 17967, 19638 / 19566, 20527 / 20454, 21386 / 21313, 22259 / 22188, 23101 / 23030, 23959 / 23887, 24808 / 24737, 25695 / 25626, 26563 / 26489
+- the Bengali Dhuhr, যোহর (4 characters, 5 glyphs) beside ১২:৩৩ at 08:30, bengali.sh's feed, two
+  shots a bind:
+  64f27a6f: 5 rounds of 6 binds (60 shots), 1 render, whole. pids 6043 / 5986, 10283 / 10213, 11140 / 11068, 11979 / 11911, 12815 / 12744
+  the fix (the name ends with PAD): 5 rounds of 6 binds (60 shots), 1 render, whole, the same
+    pixels as 64f27a6f's. pids 28647 / 28577, 30462 / 30393, 31293 / 31223, 32135 / 32062, 1059 / 816
+- an Arabic watch's الاثنين ٢٠ and a Latin Mon 20 in the curved slots, 2 rounds of 3 binds each,
+  64f27a6f and the fix: one render each; the Latin one the same pixels, the Arabic one a sub-pixel
+  shift of its letters (the joiners after it), whole in both.

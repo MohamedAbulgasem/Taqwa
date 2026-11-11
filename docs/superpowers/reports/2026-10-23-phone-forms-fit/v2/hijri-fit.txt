@@ -1,0 +1,9 @@
+Arch's Hijri steps (tools/face-centre.py ARCH_HIJRI_STEPS):
+  up to 15 chars  27.00 px  box x 105..345, y 98..138  baselines 128.26
+  up to 19 chars  24.00 px  box x 105..345, y 99..139  baselines 128.12
+  longer          22.50 px  box x 105..345, y 99..140  baselines 128.05
+3600 dates drawn; the least room to the lit stroke in each step:
+  27.00 px: 8.3 px, ১০ রবিউল আউয়াল (NotoSansBengaliUI-VF.ttf, 227.0 px wide of 240)
+  24.00 px: 7.1 px, ১০ জমাদিউল আউয়াল (NotoSansBengaliUI-VF.ttf, 232.6 px wide of 240)
+  22.50 px: 8.8 px, 30 Jumada al-Akhirah (manrope_semibold.ttf, 229.5 px wide of 240)
+every date fits: drawn whole, and 7 px or more from the lit stroke

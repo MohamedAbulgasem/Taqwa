@@ -1,0 +1,12 @@
+place: {"city": "London", "qiblaBearing": 118.0, "qiblaKm": "4,800", "declination": 1.0, "southern": false}
+numbers in place with a fractional part: []
+51.5     anywhere in feed.json: False
+51,5     anywhere in feed.json: False
+-0.12    anywhere in feed.json: False
+-0,12    anywhere in feed.json: False
+0.1278   anywhere in feed.json: False
+51.507   anywhere in feed.json: False
+0.128    anywhere in feed.json: False
+5150     anywhere in feed.json: False
+1278     anywhere in feed.json: False
+bytes 21034

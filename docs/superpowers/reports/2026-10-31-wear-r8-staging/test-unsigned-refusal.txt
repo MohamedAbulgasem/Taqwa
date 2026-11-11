@@ -1,0 +1,1 @@
+/Users/mohamedabulgasem/Desktop/Workspace/apps/Taqwa/.claude/worktrees/watch-wear/keystore.properties is there, which may be the upload key's: this test never touches it, so it does not run

@@ -1,0 +1,4 @@
+10-31 13:05:56.704 I/System.out( 7303): TaqwaWatch RESCHEDULED UNCHANGED 41ms
+10-31 13:05:56.704 I/TaqwaWatchHarness( 7303): reschedule: plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+10-31 13:05:59.877 I/System.out( 7303): TaqwaWatch RESCHEDULED UNCHANGED 21ms
+10-31 13:05:59.877 I/TaqwaWatchHarness( 7303): reschedule: plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true

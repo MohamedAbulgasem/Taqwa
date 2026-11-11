@@ -101,6 +101,10 @@ data class TasbeehUiState(
  * `advanceTimeBy(300)` is the clock without a clock parameter to thread through every call. Its
  * default is the view model's own scope rather than the screen's, because the screen's is
  * cancelled as it leaves composition — which is exactly when [flush] has work to do.
+ *
+ * [onPhrasesChanged] is told once a phrase of the reader's own has been added, edited or deleted,
+ * after the chip row shows it: the watch carries those phrases (plan 2 Task 4). It only asks, and
+ * anything it throws is dropped.
  */
 class TasbeehViewModel(
     private val store: TasbeehStore,
@@ -110,6 +114,7 @@ class TasbeehViewModel(
     private val scope: CoroutineScope = CoroutineScope(
         SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> },
     ),
+    private val onPhrasesChanged: () -> Unit = {},
 ) {
     private val _state = MutableStateFlow(TasbeehUiState())
     val state: StateFlow<TasbeehUiState> = _state.asStateFlow()
@@ -227,6 +232,7 @@ class TasbeehViewModel(
             val custom = store.customPresets.first()
             _state.update { it.copy(preset = added, state = restored, custom = custom) }
             holdIfComplete(added, restored)
+            phrasesChanged()
         }
     }
 
@@ -260,6 +266,7 @@ class TasbeehViewModel(
             } else {
                 _state.update { it.copy(custom = custom) }
             }
+            phrasesChanged()
         }
     }
 
@@ -286,6 +293,7 @@ class TasbeehViewModel(
             } else {
                 _state.update { it.copy(custom = custom) }
             }
+            phrasesChanged()
         }
     }
 
@@ -354,6 +362,15 @@ class TasbeehViewModel(
         scope.launch { store.save(state) }
     }
 
+    /** Tells the watch side, after the chip row already shows the change; never at its cost. */
+    private fun phrasesChanged() {
+        try {
+            onPhrasesChanged()
+        } catch (_: Exception) {
+            // The phrase is saved and shown; a watch that missed it is told at the next ask.
+        }
+    }
+
     private fun scheduleWrite() {
         debounceJob?.cancel()
         debounceJob = scope.launch {
@@ -370,8 +387,8 @@ class TasbeehViewModel(
          * How long a completed set holds its closed ring before rolling over to 0 of the next
          * round. Long enough for the set haptic and the full ring to register as "done", short
          * enough that a reader going straight on does not wait on it — a tap in the hold opens
-         * the next round at 1 immediately.
+         * the next round at 1 immediately. The engine's, so the watches hold for the same time.
          */
-        const val SET_COMPLETE_HOLD_MS = 1_000L
+        const val SET_COMPLETE_HOLD_MS = TasbeehEngine.SET_COMPLETE_HOLD_MS
     }
 }

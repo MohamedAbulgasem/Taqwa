@@ -1,0 +1,49 @@
+emulator-5558 as this fix round found it and as it left it, the wear-5558 lock held between (04:48-05:15 SAST), recorded by
+../r51/state.sh (the empty persist.sys.locale written as '(empty)'); put back with ../restore.sh and the found files:
+
+found Sun Oct 25 04:48:51 SAST 2026
+auto_time: 1
+auto_time_zone: 1
+tz: Africa/Johannesburg
+font_scale: 1.0
+a11y services: null
+a11y enabled: 0
+locales: null / (empty)
+time_12_24: null
+battery:
+  AC powered: false
+  USB powered: false
+  status: 2
+  level: 100
+  Capacity level: -1
+package:world.taqwa.app.watchfacepush.taqwa
+package:world.taqwa.app
+
+after Sun Oct 25 05:14:55 SAST 2026
+auto_time: 1
+auto_time_zone: 1
+tz: Africa/Johannesburg
+font_scale: 1.0
+a11y services: null
+a11y enabled: 0
+locales: null / (empty)
+time_12_24: null
+battery:
+  AC powered: false
+  USB powered: false
+  status: 2
+  level: 100
+  Capacity level: -1
+package:world.taqwa.app.watchfacepush.taqwa
+package:world.taqwa.app
+
+APKs and files/feed.json (SHA-256), found = after, and = the close's (../r51/device-state.txt):
+40a5cadfc1d9d8f50c869e111201927bcad497342cdad0bf804c53fa838875aa  found/world.taqwa.app-base.apk
+7ae6b630bb790dd32ee476504b94129dbe933a042aed12dc477a56c3713be8cd  found/world.taqwa.app.watchfacepush.taqwa-base.apk
+40a5cadfc1d9d8f50c869e111201927bcad497342cdad0bf804c53fa838875aa  after/world.taqwa.app-base.apk
+7ae6b630bb790dd32ee476504b94129dbe933a042aed12dc477a56c3713be8cd  after/world.taqwa.app.watchfacepush.taqwa-base.apk
+0aa487715c80058c619ba2c8c2cd7909ac85e229993e637126be1e18f9acbf99  found/feed.json
+0aa487715c80058c619ba2c8c2cd7909ac85e229993e637126be1e18f9acbf99  after/feed.json
+
+Installed for the pass, then replaced by the found face: the debug face built from 452b12f6's tree (only docs changed since), 784f0c87685b4a945dfd117194915e9c84ed8072e27756f97f38ea15bcab85df.
+The face after the restore, awake: Arch, Amber, slots empty, English, the stored sample (MON 19 OCT 5:14, DHUHR 12:33).

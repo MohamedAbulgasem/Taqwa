@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- A watch face: it is offered to watches and to nothing else. -->
+    <uses-feature android:name="android.hardware.type.watch" />
+
+    <!-- A Watch Face Format face is resources and no code, and says so: hasCode has to be false.
+         The face asks for no permission. Its complication slots are fixed, and the system gives a
+         Watch Face Format face the data of the sources they name without a prompt, as the spike on
+         the Wear OS 6 emulator found (docs/superpowers/reports/2026-10-19-wear-spike.md, Evidence 5). -->
+    <application
+        android:label="@string/watch_face_name"
+        android:hasCode="false">
+
+        <!-- The watch app is needed for the data: the face is installed by it (Watch Face Push),
+             and runs on its own as far as the system is concerned. -->
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="true" />
+
+        <!-- The format version the face is written in: 2 is the first that has WeightedStroke, which
+             the Sun style draws the day with. -->
+        <property
+            android:name="com.google.wear.watchface.format.version"
+            android:value="2" />
+    </application>
+</manifest>

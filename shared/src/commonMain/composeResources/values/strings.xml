@@ -19,7 +19,7 @@
     <string name="onboarding_welcome_body">Prayer times, qibla and the Quran. Free forever. No ads, no account, works offline.</string>
     <string name="onboarding_welcome_cta">Get started</string>
     <string name="onboarding_location_title">Where are you?</string>
-    <string name="onboarding_location_body">Prayer times depend on where you are. Everything is calculated on your device. Your location never leaves your phone.</string>
+    <string name="onboarding_location_body">Prayer times depend on where you are. Everything is calculated on your device. Only your own devices can see your location.</string>
     <string name="onboarding_continue">Continue</string>
     <string name="onboarding_notifications_title">Prayer notifications</string>
     <string name="onboarding_notifications_body">A notification for each prayer. You pick the sound for every prayer separately, and can change it whenever you like.</string>
@@ -139,6 +139,22 @@
     <string name="settings_appearance">Appearance</string>
     <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">Language</string>
+    <!-- Settings › App, after Language (plan 4 Task 10): the iPhone’s "Add to Apple Watch", shown
+         while a watch is paired and the Taqwa face is bundled, and the line under it when the
+         face was not added. "Apple Watch" and "Watch" (Apple’s app) are Apple’s names, never
+         translated. -->
+    <string name="settings_add_to_apple_watch">Add to Apple Watch</string>
+    <string name="settings_add_to_apple_watch_failed">The face could not be added. Try again from the Watch app.</string>
+    <!-- Settings › Watch, between App and About (plan 5 Task 6): on Android, "Install on your
+         watch" (its value the watch’s name, as the system gives it) opens Taqwa’s Play page on a
+         watch without Taqwa, and "Add the Taqwa face" (the watch’s own face_add) opens the watch’s
+         face screen; a tap says "Continue on your watch" or "Couldn’t reach your watch" as the
+         row’s value. On the iPhone the section holds "Add to Apple Watch" alone. -->
+    <string name="settings_group_watch">WATCH</string>
+    <string name="settings_watch_install">Install on your watch</string>
+    <string name="settings_watch_face">Add the Taqwa face</string>
+    <string name="settings_watch_continue">Continue on your watch</string>
+    <string name="settings_watch_unreachable">Couldn’t reach your watch</string>
     <string name="settings_about">About Taqwa</string>
     <string name="settings_attribution">Attribution &amp; licences</string>
     <string name="settings_rate">Rate Taqwa</string>
@@ -147,16 +163,19 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">1.5.1</string>
+    <string name="settings_version_value">1.6.0</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          both locales, as on the icon. -->
     <string name="about_tagline">Free, for everyone, for good.</string>
     <string name="about_privacy_label">PRIVACY</string>
-    <string name="about_stays_title">Stays on your phone</string>
-    <string name="about_stays_body">Location, settings, bookmarks and counts never leave it.</string>
-    <string name="about_online_title">Online only when you ask</string>
-    <string name="about_online_body">The internet is used for one thing: recitations you choose to download, from Taqwa’s public repository on GitHub.</string>
+    <string name="about_stays_title">Stays on your devices</string>
+    <string name="about_stays_body">Only your own devices can see your location, settings, bookmarks and counts.</string>
+    <string name="about_online_title">Online only for what you choose</string>
+    <!-- One per platform: the iPhone names Apple alone and Android Google alone (App Store Review
+         Guideline 2.3.10, Ruling 63); aboutOnlineBody(isIos) picks it. -->
+    <string name="about_online_body_android">The internet is used for recitations you choose to download, from Taqwa’s public repository on GitHub. If you add Taqwa to your watch, Google may carry its data over the internet, encrypted so only your phone and watch can read it.</string>
+    <string name="about_online_body_ios">The internet is used for recitations you choose to download, from Taqwa’s public repository on GitHub. If you add Taqwa to your watch, Apple may carry its data over the internet, encrypted so only your phone and watch can read it.</string>
     <string name="about_nothing_title">No account, no ads, no analytics</string>
     <string name="about_nothing_body">Nothing to sign into, nothing to sell.</string>
     <string name="about_privacy_policy">Privacy policy</string>
@@ -255,7 +274,7 @@
     <string name="location_country">Country</string>
     <string name="location_timezone">Time zone</string>
     <string name="location_choose_city_instead">Choose a city instead</string>
-    <string name="location_privacy_note">Coordinates are stored on your device and used only to calculate times. Nothing is sent anywhere.</string>
+    <string name="location_privacy_note">Coordinates are stored on your device and used only to calculate times. Only your own devices can see your location.</string>
     <string name="location_denied_note">Location access is currently denied. You can grant it in your device settings, or choose a city instead.</string>
 
     <!-- City search -->

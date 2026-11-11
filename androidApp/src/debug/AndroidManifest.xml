@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Debug-only additions: the cleartext exception for the local test server, and the two broadcast
-  receivers a device round drives recitation with. Neither is in the release manifest, and nothing
-  in a main source set references either.
+  Debug-only additions: the cleartext exception for the local test server, the two broadcast
+  receivers a device round drives recitation with, and the watch link's harness (plan 2 Task 7).
+  None is in the release manifest, and nothing in a main source set references any of them.
 
   `src/androidDebug`, not `src/debug`: `androidApp/build.gradle.kts` points AGP's build-type
   manifest overlay here, at the KMP layout's own debug source set, so a receiver declared in
@@ -18,6 +18,13 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="world.taqwa.app.debug.RECITATION" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="world.taqwa.app.debug.WatchHarnessReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="world.taqwa.app.debug.WATCH" />
             </intent-filter>
         </receiver>
     </application>

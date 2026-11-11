@@ -1,0 +1,231 @@
+== ar-sa-aligned-t023
+text='أنت باتجاه القبلة'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'
+== ar-sa-searching-t340
+content-desc='Turn right about ٤٥ degrees'
+text='٢٣°'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'
+== ar-sa-tilted-t045
+text='أبقِ معصمك مستويًا'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'
+== ar-sa-tilted-t060
+text='أبقِ معصمك مستويًا'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'
+== ar-sa-tilted-t135
+text='أبقِ معصمك مستويًا'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'
+== ar-sa-tilted-t225
+text='أبقِ معصمك مستويًا'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'
+== ar-sa-tilted-t315
+text='أبقِ معصمك مستويًا'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'
+== ar-sa-tilted-t345
+text='أبقِ معصمك مستويًا'
+text='٦٬٦٠٠ كم'
+content-desc='مكة · على بُعد ٦٬٦٠٠ كم'
+== bn-aligned-t023
+text='কিবলামুখী'
+text='৬,৬০০ km'
+content-desc='মক্কা · ৬,৬০০ কিমি দূরে'
+== bn-searching-t340
+content-desc='Turn right about ৪৫ degrees'
+text='২৩°'
+text='৬,৬০০ km'
+content-desc='মক্কা · ৬,৬০০ কিমি দূরে'
+== bn-tilted-t045
+text='কব্জি সমান করে রাখুন'
+text='৬,৬০০ km'
+content-desc='মক্কা · ৬,৬০০ কিমি দূরে'
+== bn-tilted-t060
+text='কব্জি সমান করে রাখুন'
+text='৬,৬০০ km'
+content-desc='মক্কা · ৬,৬০০ কিমি দূরে'
+== bn-tilted-t135
+text='কব্জি সমান করে রাখুন'
+text='৬,৬০০ km'
+content-desc='মক্কা · ৬,৬০০ কিমি দূরে'
+== bn-tilted-t225
+text='কব্জি সমান করে রাখুন'
+text='৬,৬০০ km'
+content-desc='মক্কা · ৬,৬০০ কিমি দূরে'
+== bn-tilted-t315
+text='কব্জি সমান করে রাখুন'
+text='৬,৬০০ km'
+content-desc='মক্কা · ৬,৬০০ কিমি দূরে'
+== bn-tilted-t345
+text='কব্জি সমান করে রাখুন'
+text='৬,৬০০ km'
+content-desc='মক্কা · ৬,৬০০ কিমি দূরে'
+== en-aligned-t023
+text='Facing qibla'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'
+== en-searching-t340
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'
+== en-tilted-t045
+text='Hold your wrist level'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'
+== en-tilted-t060
+text='Hold your wrist level'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'
+== en-tilted-t135
+text='Hold your wrist level'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'
+== en-tilted-t225
+text='Hold your wrist level'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'
+== en-tilted-t315
+text='Hold your wrist level'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'
+== en-tilted-t345
+text='Hold your wrist level'
+text='6,600 km'
+content-desc='Makkah · 6,600 km away'
+== fr-aligned-t023
+text='Face à la qibla'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-searching-t340
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t045
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t060
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t135
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t225
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t315
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t345
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== id-aligned-t023
+text='Menghadap kiblat'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-searching-t340
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t045
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t060
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t135
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t225
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t315
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t345
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== tr-aligned-t023
+text='Kıbleye dönüksünüz'
+text='6.600 km'
+content-desc='Mekke · 6.600 km uzakta'
+== tr-searching-t340
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='6.600 km'
+content-desc='Mekke · 6.600 km uzakta'
+== tr-tilted-t045
+text='Bileğinizi düz tutun'
+text='6.600 km'
+content-desc='Mekke · 6.600 km uzakta'
+== tr-tilted-t060
+text='Bileğinizi düz tutun'
+text='6.600 km'
+content-desc='Mekke · 6.600 km uzakta'
+== tr-tilted-t135
+text='Bileğinizi düz tutun'
+text='6.600 km'
+content-desc='Mekke · 6.600 km uzakta'
+== tr-tilted-t225
+text='Bileğinizi düz tutun'
+text='6.600 km'
+content-desc='Mekke · 6.600 km uzakta'
+== tr-tilted-t315
+text='Bileğinizi düz tutun'
+text='6.600 km'
+content-desc='Mekke · 6.600 km uzakta'
+== tr-tilted-t345
+text='Bileğinizi düz tutun'
+text='6.600 km'
+content-desc='Mekke · 6.600 km uzakta'
+== ur-aligned-t023
+text='آپ قبلہ رخ ہیں'
+text='6,600 km'
+content-desc='مکہ مکرمہ · 6,600 کلومیٹر دور'
+== ur-searching-t340
+content-desc='Turn right about 45 degrees'
+text='23°'
+text='6,600 km'
+content-desc='مکہ مکرمہ · 6,600 کلومیٹر دور'
+== ur-tilted-t045
+text='اپنی کلائی سیدھی رکھیں'
+text='6,600 km'
+content-desc='مکہ مکرمہ · 6,600 کلومیٹر دور'
+== ur-tilted-t060
+text='اپنی کلائی سیدھی رکھیں'
+text='6,600 km'
+content-desc='مکہ مکرمہ · 6,600 کلومیٹر دور'
+== ur-tilted-t135
+text='اپنی کلائی سیدھی رکھیں'
+text='6,600 km'
+content-desc='مکہ مکرمہ · 6,600 کلومیٹر دور'
+== ur-tilted-t225
+text='اپنی کلائی سیدھی رکھیں'
+text='6,600 km'
+content-desc='مکہ مکرمہ · 6,600 کلومیٹر دور'
+== ur-tilted-t315
+text='اپنی کلائی سیدھی رکھیں'
+text='6,600 km'
+content-desc='مکہ مکرمہ · 6,600 کلومیٹر دور'
+== ur-tilted-t345
+text='اپنی کلائی سیدھی رکھیں'
+text='6,600 km'
+content-desc='مکہ مکرمہ · 6,600 کلومیٹر دور'

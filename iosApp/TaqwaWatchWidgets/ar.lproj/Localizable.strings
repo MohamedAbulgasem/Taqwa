@@ -1,0 +1,11 @@
+/* The next-prayer widget as the watch's widget gallery names it: the phone's own words, its widget label (widget_small_label), as the Galaxy watch says it (M8 point A4). */
+"next_prayer_widget_name" = "الصلاة القادمة";
+
+/* The next-prayer widget's description in the watch's widget gallery. */
+"next_prayer_widget_description" = "الصلاة القادمة ووقتها والعد التنازلي.";
+
+/* Shown until the phone has sent a feed, in the watch's language (spec 1.3). */
+"open_taqwa_on_phone" = "افتح تقوى على هاتفك";
+
+/* Shown once a feed in a newer format than this build reads has been seen (plan 3's call 5). */
+"update_taqwa_on_watch" = "حدّث تقوى على ساعتك";

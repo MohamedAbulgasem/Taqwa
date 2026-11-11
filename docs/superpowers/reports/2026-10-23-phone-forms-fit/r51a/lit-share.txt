@@ -1,0 +1,16 @@
+litshare.py (r51/litshare.py: tools/watchface/lit.py undither, the measure since plan 1's Task 13) on this session's always-on
+frames; Google's limit is 15%. base: ff28cd5a's face; new: the face as committed.
+
+base         arch-ar-sa-1458-aod.png              raw  4.95%  face   9.96%
+base         arch-en-1458-aod.png                 raw  5.85%  face  11.76%
+base         pass-arch-ar-ly-12h-1458-aod.png     raw  5.10%  face  10.26%
+new          arch-ar-sa-1458-aod.png              raw  4.95%  face   9.96%
+new          arch-en-1458-aod.png                 raw  5.85%  face  11.76%
+new          greg-sample-aod.png                  raw  4.95%  face   9.96%
+new          greg-sat-aug-1-aod.png               raw  4.93%  face   9.92%
+new          greg-thu-aug-10-aod.png              raw  5.03%  face  10.14%
+new          greg-thu-nov-30-aod.png              raw  5.02%  face  10.11%
+new          greg-thu-oct-10-aod.png              raw  5.07%  face  10.21%
+new          greg-tue-oct-10-aod.png              raw  4.97%  face  10.01%
+new          pass-arch-ar-ly-12h-1458-aod.png     raw  5.10%  face  10.26%
+highest as the face draws it: 11.76% (new/arch-en-1458-aod.png), under 15%: True

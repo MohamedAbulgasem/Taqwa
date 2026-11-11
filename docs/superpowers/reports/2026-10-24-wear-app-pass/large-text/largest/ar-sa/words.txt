@@ -1,0 +1,70 @@
+== nofeed-tile
+text='Open Taqwa on your phone'
+== nofeed-today
+text='Open Taqwa on your phone'
+== qibla-aligned
+text='أنت باتجاه القبلة'
+text='مكة · على بُعد ٦٬٦٠٠ كم'
+== qibla-besteffort
+text='البوصلة غير متاحة'
+content-desc='البوصلة غير متاحة، ٢٣° · ٦٬٦٠٠ كم إلى مكة'
+== qibla-low-calibration
+text='البوصلة تحتاج إلى معايرة'
+content-desc='البوصلة تحتاج إلى معايرة'
+== qibla-searching
+content-desc='استدر يمينًا حوالي ٤٥ درجة'
+text='٢٣°'
+text='مكة · على بُعد ٦٬٦٠٠ كم'
+== tasbeeh-0
+content-desc='سبحان الله'
+== tasbeeh-27
+content-desc='سبحان الله'
+== tasbeeh-list-end
+content-desc='لا إله إلا الله, ١٠٠'
+content-desc='سبحان الله وبحمده, ١٠٠'
+content-desc='سبحان الله وبحمده، سبحان الله العظيم, ١٠٠'
+content-desc='Astaghfirullah wa atubu ilayh, ٣٣'
+content-desc='إعادة العدّ'
+== tasbeeh-list
+text='التسبيح'
+content-desc='بعد الصلاة, ١٠٠'
+content-desc='سبحان الله, ١٠٠'
+content-desc='الحمد لله, ١٠٠'
+content-desc='الله أكبر, ١٠٠'
+content-desc='أستغفر الله, ١٠٠'
+== tasbeeh-phrase
+content-desc='سبحان الله وبحمده، سبحان الله العظيم'
+== tile-1458
+content-desc='العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠'
+text='بعد ١ س ١١ د'
+text='العصر'
+content-desc='الفجر, ٤:٣٣'
+text='٤:٣٣'
+text='الفجر'
+content-desc='الشروق, ٦:٠١'
+text='٦:٠١'
+text='الشروق'
+content-desc='الظهر, ١٢:٣٣'
+text='١٢:٣٣'
+text='الظهر'
+content-desc='العصر, ١٦:١٠'
+text='١٦:١٠'
+text='العصر'
+content-desc='المغرب, ١٩:٠٤'
+text='١٩:٠٤'
+text='المغرب'
+content-desc='العشاء, ٢٠:٢٤'
+text='٢٠:٢٤'
+text='العشاء'
+content-desc='সান ফার্নান্দো ডে মোন্তে ক্রিস্টি'
+text='সান ফার্নান্দো ডে মোন্তে ক্রিস্টি'
+== today-1458
+content-desc='العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠'
+== today-list-end
+content-desc='الفجر, ٤:٣٣'
+content-desc='الشروق, ٦:٠١'
+content-desc='الظهر, ١٢:٣٣'
+content-desc='العصر, ١٦:١٠'
+content-desc='المغرب, ١٩:٠٤'
+content-desc='العشاء, ٢٠:٢٤'
+text='সান ফার্নান্দো ডে মোন্তে ক্রিস্টি'

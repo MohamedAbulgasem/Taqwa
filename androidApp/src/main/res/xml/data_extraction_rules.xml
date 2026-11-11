@@ -2,8 +2,8 @@
 <!--
   Android 12+ consults these rather than allowBackup, and they say the same thing: nothing of
   Taqwa's is copied to Google's backup or to a new phone. The reason is in the manifest, beside
-  allowBackup: the settings file holds the reader's location, and "your location never leaves your
-  phone" has to include the backup.
+  allowBackup: the settings file holds the reader's location, and "Only your own devices can see
+  your location" has to include the backup.
 -->
 <data-extraction-rules>
     <cloud-backup>

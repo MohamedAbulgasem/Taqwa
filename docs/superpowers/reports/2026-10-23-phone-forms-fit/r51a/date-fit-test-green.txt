@@ -1,0 +1,25 @@
+test_a_function_or_source_it_does_not_know_fails (__main__.FaceExpressions.test_a_function_or_source_it_does_not_know_fails) ... ok
+test_a_string_is_never_compared_with_a_number (__main__.FaceExpressions.test_a_string_is_never_compared_with_a_number) ... ok
+test_a_subtext_outside_the_text_fails (__main__.FaceExpressions.test_a_subtext_outside_the_text_fails) ... ok
+test_an_empty_text_is_read (__main__.FaceExpressions.test_an_empty_text_is_read) ... ok
+test_numbers_and_logic (__main__.FaceExpressions.test_numbers_and_logic) ... ok
+test_the_length_and_the_last_five_characters (__main__.FaceExpressions.test_the_length_and_the_last_five_characters) ... ok
+test_a_face_drawing_a_step_at_another_size_fails (__main__.TheFace.test_a_face_drawing_a_step_at_another_size_fails) ... ok
+test_a_face_that_spells_august_otherwise_fails (__main__.TheFace.test_a_face_that_spells_august_otherwise_fails) ... ok
+test_a_face_without_the_months_test_fails (__main__.TheFace.test_a_face_without_the_months_test_fails) ... ok
+test_a_form_outside_the_basic_multilingual_plane_fails (__main__.TheFace.test_a_form_outside_the_basic_multilingual_plane_fails) ... ok
+test_every_form_shows_the_one_group_its_step_names (__main__.TheFace.test_every_form_shows_the_one_group_its_step_names) ... ok
+test_the_face_draws_the_tables_groups (__main__.TheFace.test_the_face_draws_the_tables_groups) ... ok
+test_the_sample_is_drawn_in_the_base_faces_own_box (__main__.TheFace.test_the_sample_is_drawn_in_the_base_faces_own_box) ... ok
+test_august_as_the_phone_writes_it_is_13_units_at_every_length (__main__.TheRule.test_august_as_the_phone_writes_it_is_13_units_at_every_length) ... ok
+test_eighteen_characters_not_in_august_are_14_units (__main__.TheRule.test_eighteen_characters_not_in_august_are_14_units) ... ok
+test_every_other_august_the_phones_write_is_14_units (__main__.TheRule.test_every_other_august_the_phones_write_is_14_units) ... ok
+test_nineteen_characters_or_more_are_11_25_units (__main__.TheRule.test_nineteen_characters_or_more_are_11_25_units) ... ok
+test_the_last_step_takes_every_form (__main__.TheRule.test_the_last_step_takes_every_form) ... ok
+test_the_phones_that_write_august_so_are_the_four (__main__.TheRule.test_the_phones_that_write_august_so_are_the_four) ... ok
+test_the_sample_keeps_the_base_faces_14_units (__main__.TheRule.test_the_sample_keeps_the_base_faces_14_units) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.124s
+
+OK

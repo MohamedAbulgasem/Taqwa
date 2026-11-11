@@ -1,0 +1,32 @@
+TalkBack on emulator-5558 (AVD Taqwa_Wear_OS_6, Wear OS 6, TalkBack 16.0.0.744548319 wear), 24 Oct 2026,
+before Task 12's face change (watch-companion 89ab3ce0, then the WIP steps of this task). Each line of a
+walk is one "next item" swipe (tools/watchface/talkback.sh walk), and what TalkBack said, from its log
+(Diagnosis mode on); "|" separates the times it said it within the 3.5 s after the swipe.
+
+1. The face as plan 1 closed it (Moon, slots empty, 05:13 on the watch; Arch read the same items):
+   1: SUN 18|SUN 18|SUN 18|SUN 18
+   2: DHUHR 12:33|DHUHR 12:33|DHUHR 12:33|DHUHR 12:33
+   3: 5:13 AM|5:13 AM|5:13 AM|5:13 AM
+   Three items, each said three or four times in 3.5 s. The "DHUHR 12:33" item was every full-face slot
+   at once (slots 7, 0, 1, 2 and 6 had the same box): the words were slot 6's, the last declared.
+
+2. Untouched, focus on the clock (Moon, 05:34), ten seconds of TalkBack's log: the system UI rebuilt
+   its items twice a second-pair and TalkBack spoke the focused item again each time:
+   05:34:11 SPEAK 5:34 AM   05:34:11 SPEAK 5:34 AM   05:34:13 SPEAK 5:34 AM   05:34:13 SPEAK 5:34 AM
+   05:34:15 SPEAK 5:34 AM   05:34:15 SPEAK 5:34 AM   05:34:17 SPEAK 5:34 AM   ... (10 in 10 s)
+   before-talkback-one-swipe.log is TalkBack's own log around one swipe at 05:33:42: the focused
+   node's id changes every second (23690022, 23690983, 23694827) and TalkBack re-focuses it with
+   RESTORED_LAST_FOCUS after each TYPE_WINDOW_CONTENT_CHANGED.
+
+3. With the ring made static (a throwaway build, not kept): nothing said in ten seconds untouched, and
+   no window content changes. The per-second label refresh is the ring's dynamic value.
+
+4. Dynamic descriptions: a throwaway long text whose description was "SPIKE <time>, " and the
+   countdown, as a dynamic value: "SPIKE 12:33, in 7 h 15 min" at 05:17 and "SPIKE 12:33, in 7 h 14 min"
+   a minute later, with no new request. The reader is given the newly worked-out words each minute.
+
+5. What a description cannot do (throwaway builds, distinct boxes):
+   - an empty description: TalkBack said slot 7's title and text, "0123456789PM L2LAM", and slot 6's,
+     "in 6 h 53 min DHUHR";
+   - a single space: TalkBack said "Space".
+   - a 0 by 0 box (slot 1): no item at all.

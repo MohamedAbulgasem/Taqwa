@@ -1,0 +1,3 @@
+13:29:18 h forms : wrote files/phone-forms-device.json (17123 bytes)
+device file sha1 b65c1459, committed phone-forms-api36.json sha1 b65c1459, tools/watchface/phone-forms.json sha1 b65c1459
+byte-identical to tools/watchface/phone-forms.json

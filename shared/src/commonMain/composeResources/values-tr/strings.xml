@@ -17,7 +17,7 @@
     <string name="onboarding_welcome_body">Namaz vakitleri, kıble ve Kur’an. Sonsuza dek ücretsiz. Reklam yok, hesap yok, çevrimdışı çalışır.</string>
     <string name="onboarding_welcome_cta">Başlayalım</string>
     <string name="onboarding_location_title">Neredesiniz?</string>
-    <string name="onboarding_location_body">Namaz vakitleri konumunuza bağlıdır. Her şey cihazınızda hesaplanır. Konumunuz telefonunuzdan hiç çıkmaz.</string>
+    <string name="onboarding_location_body">Namaz vakitleri konumunuza bağlıdır. Her şey cihazınızda hesaplanır. Konumunuzu yalnızca kendi cihazlarınız görebilir.</string>
     <string name="onboarding_continue">Devam</string>
     <string name="onboarding_notifications_title">Namaz bildirimleri</string>
     <string name="onboarding_notifications_body">Her namaz için bir bildirim. Sesi her vakit için ayrı seçersiniz, dilediğiniz zaman da değiştirebilirsiniz.</string>
@@ -122,6 +122,22 @@
     <string name="settings_appearance">Görünüm</string>
     <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">Dil</string>
+    <!-- Settings › App, after Language (plan 4 Task 10): the iPhone’s "Add to Apple Watch", shown
+         while a watch is paired and the Taqwa face is bundled, and the line under it when the
+         face was not added. "Apple Watch" and "Watch" (Apple’s app) are Apple’s names, never
+         translated. -->
+    <string name="settings_add_to_apple_watch">Apple Watch’a ekle</string>
+    <string name="settings_add_to_apple_watch_failed">Saat kadranı eklenemedi. Apple Watch uygulamasından yeniden deneyin.</string>
+    <!-- Settings › Watch, between App and About (plan 5 Task 6): on Android, "Install on your
+         watch" (its value the watch’s name, as the system gives it) opens Taqwa’s Play page on a
+         watch without Taqwa, and "Add the Taqwa face" (the watch’s own face_add) opens the watch’s
+         face screen; a tap says "Continue on your watch" or "Couldn’t reach your watch" as the
+         row’s value. On the iPhone the section holds "Add to Apple Watch" alone. -->
+    <string name="settings_group_watch">SAAT</string>
+    <string name="settings_watch_install">Saate yükle</string>
+    <string name="settings_watch_face">Taqwa saat yüzünü ekle</string>
+    <string name="settings_watch_continue">Saatinizden devam edin</string>
+    <string name="settings_watch_unreachable">Saatinize ulaşılamadı</string>
     <string name="settings_about">Taqwa hakkında</string>
     <string name="settings_attribution">Kaynaklar ve lisanslar</string>
     <string name="settings_rate">Taqwa’yı değerlendir</string>
@@ -130,15 +146,16 @@
     <string name="settings_not_set">Belirlenmedi</string>
     <string name="settings_notifications_off">Kapalı</string>
     <string name="settings_notifications_on_count">%1$s açık</string>
-    <string name="settings_version_value">1.5.1</string>
+    <string name="settings_version_value">1.6.0</string>
 
     <!-- “Taqwa hakkında” ekranı. Ürün adı, simgede olduğu gibi Latin harfleriyle kalır. -->
     <string name="about_tagline">Ücretsiz, herkes için, kalıcı olarak.</string>
     <string name="about_privacy_label">GİZLİLİK</string>
-    <string name="about_stays_title">Telefonunuzda kalır</string>
-    <string name="about_stays_body">Konum, ayarlar, yer imleri ve sayaçlar telefonunuzdan çıkmaz.</string>
-    <string name="about_online_title">Yalnızca siz isteyince çevrimiçi</string>
-    <string name="about_online_body">İnternet tek bir şey için kullanılır: Taqwa’nın GitHub’daki herkese açık deposundan indirmeyi seçtiğiniz tilavetler.</string>
+    <string name="about_stays_title">Cihazlarınızda kalır</string>
+    <string name="about_stays_body">Konumunuzu, ayarlarınızı, yer imlerinizi ve sayaçlarınızı yalnızca kendi cihazlarınız görebilir.</string>
+    <string name="about_online_title">Yalnızca seçtikleriniz için çevrimiçi</string>
+    <string name="about_online_body_android">İnternet, Taqwa’nın GitHub’daki herkese açık deposundan indirmeyi seçtiğiniz tilavetler için kullanılır. Taqwa’yı saatinize eklerseniz Google onun verilerini internet üzerinden taşıyabilir; veriler şifrelidir, yalnızca telefonunuz ve saatiniz okuyabilir.</string>
+    <string name="about_online_body_ios">İnternet, Taqwa’nın GitHub’daki herkese açık deposundan indirmeyi seçtiğiniz tilavetler için kullanılır. Taqwa’yı saatinize eklerseniz Apple onun verilerini internet üzerinden taşıyabilir; veriler şifrelidir, yalnızca telefonunuz ve saatiniz okuyabilir.</string>
     <string name="about_nothing_title">Hesap yok, reklam yok, analiz yok</string>
     <string name="about_nothing_body">Giriş yapılacak bir şey yok, satılacak bir şey yok.</string>
     <string name="about_privacy_policy">Gizlilik politikası</string>
@@ -233,7 +250,7 @@
     <string name="location_country">Ülke</string>
     <string name="location_timezone">Saat dilimi</string>
     <string name="location_choose_city_instead">Bunun yerine şehir seç</string>
-    <string name="location_privacy_note">Koordinatlar cihazınızda saklanır ve yalnızca vakitleri hesaplamak için kullanılır. Hiçbir yere hiçbir şey gönderilmez.</string>
+    <string name="location_privacy_note">Koordinatlar cihazınızda saklanır ve yalnızca vakitleri hesaplamak için kullanılır. Konumunuzu yalnızca kendi cihazlarınız görebilir.</string>
     <string name="location_denied_note">Konum erişimi şu anda reddedilmiş durumda. Cihaz ayarlarınızdan izin verebilir ya da bunun yerine bir şehir seçebilirsiniz.</string>
 
     <!-- Şehir arama -->

@@ -1,0 +1,5 @@
+13:14:39 uninstall: Success
+13:14:48 h nodes : node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=false
+13:14:48 h reschedule : plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+13:14:58 install -r: Success
+13:16:19 nothing started the watch app within a minute (no TaqwaWearFeed line, no files/feed.json): am start WearMainActivity

@@ -1,0 +1,6 @@
+# The same window, the watch's TaqwaWearFeed lines (logcat -s TaqwaWearFeed System.out), as the reviewer saved them. The watch's clock runs a few hundred ms from the phone's.
+10-31 14:24:25.793 I/System.out( 4576): TaqwaWearFeed NUDGE armed in 86400s found=false stopped=false
+10-31 14:24:27.747 I/System.out( 4576): TaqwaWearFeed ASK STARTED sent
+10-31 14:24:28.049 I/System.out( 4576): TaqwaWearFeed ASK OPENED skipped
+10-31 14:25:28.376 I/System.out( 4576): TaqwaWearFeed ACCEPTED 12/dcd0420ecdc97f21
+10-31 14:25:28.379 I/System.out( 4576): TaqwaWearFeed ACK 12/dcd0420ecdc97f21 sent

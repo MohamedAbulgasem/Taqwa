@@ -1,0 +1,28 @@
+<en-GB>
+What's new in 1.6.0:
+• Taqwa on your watch: a watch face, complications and a Tile, tasbeeh and Qibla, on Wear OS watches such as Galaxy Watch
+</en-GB>
+<ar>
+الجديد في الإصدار 1.6.0:
+• تقوى على ساعتك: واجهة ساعة، وإضافات، ومربّع، والتسبيح والقبلة، على ساعات Wear OS مثل Galaxy Watch
+</ar>
+<fr-FR>
+Nouveautés de la 1.6.0 :
+• Taqwa sur votre montre : un cadran, des complications et une carte, le tasbih et la qibla, sur les montres Wear OS comme la Galaxy Watch
+</fr-FR>
+<tr-TR>
+1.6.0 sürümündeki yenilikler:
+• Taqwa saatinizde: saat yüzü, komplikasyonlar ve kutucuk, tesbih ve Kıble; Galaxy Watch gibi Wear OS saatlerde
+</tr-TR>
+<id>
+Yang baru di versi 1.6.0:
+• Taqwa di jam tangan Anda: tampilan jam, komplikasi dan kartu, tasbih dan kiblat, di jam tangan Wear OS seperti Galaxy Watch
+</id>
+<ur>
+1.6.0 میں نیا کیا ہے:
+• آپ کی گھڑی پر تقویٰ: واچ فیس، کمپلیکیشنز اور ٹائل، تسبیح اور قبلہ، Galaxy Watch جیسی Wear OS گھڑیوں پر
+</ur>
+<bn-BD>
+1.6.0 সংস্করণে যা নতুন:
+• আপনার ঘড়িতে তাকওয়া: ওয়াচ ফেস, কমপ্লিকেশন ও টাইল, তাসবিহ ও কিবলা, Galaxy Watch-এর মতো Wear OS ঘড়িতে
+</bn-BD>

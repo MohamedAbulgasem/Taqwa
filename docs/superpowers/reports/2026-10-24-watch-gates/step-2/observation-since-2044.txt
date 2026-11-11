@@ -1,0 +1,34 @@
+# observation.log (adb -s emulator-5558 logcat -v time -s TaqwaComplications TaqwaWearFeed): every line stamped 6 Nov 20:44 SAST or later.
+# These are lines 317 to 328 of its 328. The 316 before them are the buffer's, stamped 20:40:31 and earlier. The capture ran from 20:44:26 until the Lead ended it at 08:54.
+11-07 02:41:49.326 D/TaqwaComplications(24930): next prayer, RANGED_VALUE: 12 steps, last until 2026-11-08T17:57:00Z
+11-07 02:41:49.352 D/TaqwaComplications(24930): dates, LONG_TEXT: 3 steps, last until 2026-11-08T17:57:00Z
+11-07 02:41:49.353 D/TaqwaComplications(24930): day dial: 12 steps, last until 2026-11-08T17:57:00Z
+11-07 02:41:49.355 D/TaqwaComplications(24930): next prayer, LONG_TEXT: 12 steps, last until 2026-11-08T17:57:00Z
+11-07 02:41:49.376 D/TaqwaComplications(24930): dates, SHORT_TEXT: 3 steps, last until 2026-11-08T17:57:00Z
+11-07 02:41:49.381 D/TaqwaComplications(24930): day: 12 steps, last until 2026-11-08T17:57:00Z
+11-07 08:45:32.279 D/TaqwaComplications(24930): next prayer, RANGED_VALUE: 13 steps, last until 2026-11-09T05:26:00Z
+11-07 08:45:32.286 D/TaqwaComplications(24930): day: 13 steps, last until 2026-11-09T05:26:00Z
+11-07 08:45:32.287 D/TaqwaComplications(24930): dates, LONG_TEXT: 4 steps, last until 2026-11-09T05:26:00Z
+11-07 08:45:32.288 D/TaqwaComplications(24930): day dial: 13 steps, last until 2026-11-09T05:26:00Z
+11-07 08:45:32.289 D/TaqwaComplications(24930): dates, SHORT_TEXT: 4 steps, last until 2026-11-09T05:26:00Z
+11-07 08:45:32.291 D/TaqwaComplications(24930): next prayer, LONG_TEXT: 13 steps, last until 2026-11-09T05:26:00Z
+
+# observation-sysout.log (-s System.out TaqwaFace), the same span: 0 lines. Its last of 169 lines is stamped 11-06 20:40:31.198.
+
+# adb -s emulator-5558 logcat -b crash -d, read 7 Nov 08:59: the buffer's only process, the emulator's own sensors HAL. Taqwa's process is not in it.
+--------- beginning of crash
+11-06 23:41:01.015  3852  3852 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 3852 (android.hardwar), pid 3852 (android.hardwar)
+11-06 23:41:01.041 25858 25858 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-06 23:41:01.041 25858 25858 F DEBUG   : Build fingerprint: 'google/sdk_gwear_arm64/emu64a:16/BP2A.250605.006.E4/13659021:user/release-keys'
+11-06 23:41:01.041 25858 25858 F DEBUG   : Revision: '0'
+11-06 23:41:01.041 25858 25858 F DEBUG   : ABI: 'arm64'
+11-06 23:41:01.041 25858 25858 F DEBUG   : Timestamp: 2026-11-06 23:41:01.027192105+0200
+11-06 23:41:01.041 25858 25858 F DEBUG   : Process uptime: 0s
+11-06 23:41:01.041 25858 25858 F DEBUG   : Cmdline: /vendor/bin/hw/android.hardware.sensors-service.multihal
+11-06 23:41:01.041 25858 25858 F DEBUG   : pid: 3852, tid: 3852, name: android.hardwar  >>> /vendor/bin/hw/android.hardware.sensors-service.multihal <
+11-06 23:41:01.041 25858 25858 F DEBUG   : uid: 1000
+11-06 23:41:01.041 25858 25858 F DEBUG   : tagged_addr_ctrl: 0000000000000001 (PR_TAGGED_ADDR_ENABLE)
+11-06 23:41:01.041 25858 25858 F DEBUG   : pac_enabled_keys: 000000000000000f (PR_PAC_APIAKEY, PR_PAC_APIBKEY, PR_PAC_APDAKEY, PR_PAC_APDBKEY)
+11-06 23:41:01.041 25858 25858 F DEBUG   : signal 6 (SIGABRT), code -1 (SI_QUEUE), fault addr --------
+11-06 23:41:01.041 25858 25858 F DEBUG   : Abort message: 'activationOnChangeSensorEvent:231: unexpected sensor type: 26'
+11-06 23:41:01.041 25858 25858 F DEBUG   :     x0  0000000000000000  x1  0000000000000f0c  x2  0000000000000006  x3  0000007fe18e6c00

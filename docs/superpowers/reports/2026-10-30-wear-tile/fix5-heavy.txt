@@ -1,0 +1,18 @@
+Review fix round 5, emulator-5558 (Wear OS 6, renderer schema 1.500), debug bb47e298 of the fix.
+
+The sample at 14:58 (as committed):
+  10-18 14:58:00.806 D TaqwaTile: Tile: 32 entries, 18 counting down, 150571 bytes, schema 1.500
+  14:58:13 shot: 0 px different from en-1458.png
+  process killed 14:58:20; pidof empty to 14:59:05: "in 1 h 11 min" -> "in 1 h 10 min",
+  said "Asr in 1 hour 10 minutes, at 16:10"
+
+The sample with a 1,200-byte city (400 Bengali letters, DEBUG_FEED --es city), whose whole plan
+is 264,903 B on the JVM (ROUGH measure), at 14:58:
+  10-18 14:58:00.922 D TaqwaTile: Tile: 25 entries, 10 counting down, 195320 bytes, schema 1.500
+  (JVM: whole 32 entries, sent 25 entries, 10 moving, 194,984 B; the moving part ends at 15:46:00,
+  the entry from there to 16:10 says the start's time; fresh 1,645 s)
+  no TransactionTooLargeException, no "Dynamic type expression limit reached"
+  14:58:06 "ASR" "in 1 h 11 min", said "Asr in 1 hour 11 minutes, at 16:10"  (fix5-heavy-1458.png)
+  process killed; clock set to 15:46:20 (no new Tile request: the log holds the 14:58 line alone);
+  15:46:30, pidof empty: "ASR" "16:10", said "Asr, 16:10"  (fix5-heavy-154630.png)
+  the renderer's next change: RTC 16:10:00, window +17m44s999ms (ProtoTilesTimelineMgr)

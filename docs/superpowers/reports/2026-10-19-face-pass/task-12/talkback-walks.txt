@@ -1,0 +1,256 @@
+TalkBack 16 on emulator-5558 with the face as committed at 07e511be, slot 0 declared before slot 2
+again (Ruling 42, which withdrew Ruling 40; the installed APK's sha1 304cde43 is the build's, and
+without its comments the face is 0298756d's byte for byte), heard at Task 12's close, 24 Oct 2026
+(tools/watchface/talkback.sh: "idle 10" then "walk"). Before each walk the clock was set to 14:57:50
+on the mock day and the sample feed stored for 14:58, so its words are the mock Sunday's:
+6 Jumada al-Ula 1448, Sunday 18 October, Asr at 16:10.
+Each walk line is one "next item" swipe and what TalkBack said after it, but for its "Double-tap to
+activate"; an empty line is the end of the list, after which TalkBack starts again at the first item,
+the time. A walk starts after whichever item TalkBack was on, so the lists start at different places.
+TalkBack's own voice was English, the watch's language, and it says the time in the watch's own
+format ("2:58 PM").
+
+The order is the time, the prayer with its countdown, the dates, then the wearer's slots, once each
+(Ruling 42: on a prayer face the prayer comes first). Fix round 3's walks on fef65dc7, with Ruling
+40's dates first, said the same words in that order; they are in git at a75edce9. Review round 2's
+walks on 95559883 (the same face as this one, but for comments) are in git at 0298756d, and the first
+build's (6c074bc7, which said the screen's words, "in 5 h 20 min" and "SUN 18 OCT", and had no Sun
+walk) at that commit.
+
+The samples: en (English on 24 hours), en12 (English on 12 hours), ar-ly12 (Libya: Western digits, 12
+hours), ar-sa (Saudi Arabia: Arabic-Indic digits). The wearer's slots: empty, or the battery (slot 4)
+and the steps (slot 5); the step count rises between walks because the emulator's step sensor counts.
+
+The emulator hung once, at about 14:20 during the walk of the Sun with the battery and the steps
+(adb's shell and console silent): it was stopped by its serial (adb -s emulator-5558 emu kill,
+14:23:52) and booted again (tools/watchface/emulator.sh), and the walks went on from the wearer's
+slots filled, the Sun again. The walks with the slots empty are from before the hang, the rest from
+after it.
+
+Explore by touch is in touch.txt.
+
+== arch, slots empty, en, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: Asr in 1 hour 11 minutes, at 16:10
+2: 6 Jumada al-Ula 1448, Sunday 18 October
+3: 
+4: 2:58 PM
+5: Asr in 1 hour 11 minutes, at 16:10
+6: 6 Jumada al-Ula 1448, Sunday 18 October
+7: 
+== arch, slots empty, ar-ly12, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 2:58 PM
+2: العصر بعد 1 ساعة و11 دقيقة، الساعة 4:10
+3: 6 جمادى الأولى 1448، الأحد 18 أكتوبر
+4: 
+5: 2:58 PM
+6: العصر بعد 1 ساعة و11 دقيقة، الساعة 4:10
+7: 6 جمادى الأولى 1448، الأحد 18 أكتوبر
+== arch, slots empty, ar-sa, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 
+2: 2:58 PM
+3: العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+4: ٦ جمادى الأولى ١٤٤٨، الأحد ١٨ أكتوبر
+5: 
+6: 2:58 PM
+7: العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+== arch, slots empty, en12, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 6 Jumada al-Ula 1448, Sunday 18 October
+2: 
+3: 2:58 PM
+4: Asr in 1 hour 11 minutes, at 4:10
+5: 6 Jumada al-Ula 1448, Sunday 18 October
+6: 
+7: 2:58 PM
+
+== ring, slots empty, en, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: Asr in 1 hour 11 minutes, at 16:10
+2: 6 Jumada al-Ula 1448, Sunday 18 October
+3: 
+4: 2:58 PM
+5: Asr in 1 hour 11 minutes, at 16:10
+6: 6 Jumada al-Ula 1448, Sunday 18 October
+7: 
+== ring, slots empty, ar-ly12, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 2:58 PM
+2: العصر بعد 1 ساعة و11 دقيقة، الساعة 4:10
+3: 6 جمادى الأولى 1448، الأحد 18 أكتوبر
+4: 
+5: 2:58 PM
+6: العصر بعد 1 ساعة و11 دقيقة، الساعة 4:10
+7: 6 جمادى الأولى 1448، الأحد 18 أكتوبر
+== ring, slots empty, ar-sa, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 
+2: 2:58 PM
+3: العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+4: ٦ جمادى الأولى ١٤٤٨، الأحد ١٨ أكتوبر
+5: 
+6: 2:58 PM
+7: العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+
+== sun, slots empty, en, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: Asr in 1 hour 11 minutes, at 16:10
+2: 6 Jumada al-Ula 1448, Sunday 18 October
+3: 
+4: 2:58 PM
+5: Asr in 1 hour 11 minutes, at 16:10
+6: 6 Jumada al-Ula 1448, Sunday 18 October
+7: 
+== sun, slots empty, ar-ly12, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 2:58 PM
+2: العصر بعد 1 ساعة و11 دقيقة، الساعة 4:10
+3: 6 جمادى الأولى 1448، الأحد 18 أكتوبر
+4: 
+5: 2:58 PM
+6: العصر بعد 1 ساعة و11 دقيقة، الساعة 4:10
+7: 6 جمادى الأولى 1448، الأحد 18 أكتوبر
+== sun, slots empty, ar-sa, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 
+2: 2:58 PM
+3: العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+4: ٦ جمادى الأولى ١٤٤٨، الأحد ١٨ أكتوبر
+5: 
+6: 2:58 PM
+7: العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+
+== moon, slots empty, en, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: Asr in 1 hour 11 minutes, at 16:10
+2: 6 Jumada al-Ula 1448, Sunday 18 October
+3: 
+4: 2:58 PM
+5: Asr in 1 hour 11 minutes, at 16:10
+6: 6 Jumada al-Ula 1448, Sunday 18 October
+7: 
+== moon, slots empty, ar-ly12, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 2:58 PM
+2: العصر بعد 1 ساعة و11 دقيقة، الساعة 4:10
+3: 6 جمادى الأولى 1448، الأحد 18 أكتوبر
+4: 
+5: 2:58 PM
+6: العصر بعد 1 ساعة و11 دقيقة، الساعة 4:10
+7: 6 جمادى الأولى 1448، الأحد 18 أكتوبر
+== moon, slots empty, ar-sa, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 
+2: 2:58 PM
+3: العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+4: ٦ جمادى الأولى ١٤٤٨، الأحد ١٨ أكتوبر
+5: 
+6: 2:58 PM
+7: العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+
+== sun, battery and steps, en, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: Asr in 1 hour 11 minutes, at 16:10
+2: 6 Jumada al-Ula 1448, Sunday 18 October
+3: Battery: 82
+4: Step count 0 Steps
+5: 
+6: 2:58 PM
+7: Asr in 1 hour 11 minutes, at 16:10
+8: 6 Jumada al-Ula 1448, Sunday 18 October
+
+== arch, battery and steps, en, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: Asr in 1 hour 11 minutes, at 16:10
+2: 6 Jumada al-Ula 1448, Sunday 18 October
+3: Battery: 82
+4: Step count 158 Steps
+5: 
+6: 2:58 PM
+7: Asr in 1 hour 11 minutes, at 16:10
+8: 6 Jumada al-Ula 1448, Sunday 18 October
+
+== ring, battery and steps, en, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: Asr in 1 hour 11 minutes, at 16:10
+2: 6 Jumada al-Ula 1448, Sunday 18 October
+3: Battery: 82
+4: Step count 318 Steps
+5: 
+6: 2:58 PM
+7: Asr in 1 hour 11 minutes, at 16:10
+8: 6 Jumada al-Ula 1448, Sunday 18 October
+
+== moon, battery and steps, en, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: Asr in 1 hour 11 minutes, at 16:10
+2: 6 Jumada al-Ula 1448, Sunday 18 October
+3: Battery: 82
+4: Step count 508 Steps
+5: 
+6: 2:58 PM
+7: Asr in 1 hour 11 minutes, at 16:10
+8: 6 Jumada al-Ula 1448, Sunday 18 October
+== moon, battery and steps, ar-ly12, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: Battery: 82
+2: Step count 628 Steps
+3: 
+4: 2:58 PM
+5: العصر بعد 1 ساعة و11 دقيقة، الساعة 4:10
+6: 6 جمادى الأولى 1448، الأحد 18 أكتوبر
+7: Battery: 82
+8: Step count 628 Steps
+== moon, battery and steps, ar-sa, watch at 14:57:54
+spoken in 10 s untouched: 0
+1: 
+2: 2:58 PM
+3: العصر بعد ١ ساعة و١١ دقيقة، الساعة ١٦:١٠
+4: ٦ جمادى الأولى ١٤٤٨، الأحد ١٨ أكتوبر
+5: Battery: 82
+6: Step count 758 Steps
+7: 
+8: 2:58 PM
+
+== The line moves on its own: the English sample stored once, then, with no new request, the
+   clock set to each moment and a walk of five swipes there (the Moon, battery and steps).
+== the clock set to 15:30:05 on Sunday 18 October (the watch said Sun 18 Oct 15:30:08)
+   (seven swipes, on Arch with the slots empty, after the run: the run's walk of five here started
+   after the prayer and ended before it came round, so it is walked again)
+1: 6 Jumada al-Ula 1448, Sunday 18 October
+2: 
+3: 3:30 PM
+4: Asr in 39 minutes, at 16:10
+5: 6 Jumada al-Ula 1448, Sunday 18 October
+6: 
+7: 3:30 PM
+== the clock set to 16:09:20 on Sunday 18 October (the watch said Sun 18 Oct 16:09:23)
+1: Asr in under a minute, at 16:10
+2: 6 Jumada al-Ula 1448, Sunday 18 October
+3: Battery: 82
+4: Step count 958 Steps
+5: 
+== the clock set to 16:10:30 on Sunday 18 October (the watch said Sun 18 Oct 16:10:33)
+1: 4:10 PM
+2: Maghrib in 2 hours 53 minutes, at 19:04
+3: 6 Jumada al-Ula 1448, Sunday 18 October
+4: Battery: 82
+5: Step count 998 Steps
+== the clock set to 00:00:30 on Monday 19 October (the watch said Mon 19 Oct 00:00:33)
+1: Fajr in 4 hours 32 minutes, at 4:33
+2: 7 Jumada al-Ula 1448, Monday 19 October
+3: Battery: 82
+4: Step count 0 Steps
+5: 
+
+== The empty form: four days on with no new request, past the end of the sources' timelines,
+   slots 0 and 2 each say "No data".
+== the clock set to 14:58:00 on Thursday 22 October, four days on (the watch said Thu 22 Oct 14:58:03)
+1: Battery: 82
+2: Step count 0 Steps
+3: 
+4: 2:58 PM
+5: No data
+6: No data

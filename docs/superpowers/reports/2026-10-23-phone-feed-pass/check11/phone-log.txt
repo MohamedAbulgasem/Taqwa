@@ -1,0 +1,6 @@
+10-31 13:26:44.864 I/TaqwaWatchHarness( 7924): nodes: node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=true
+10-31 13:26:45.024 I/System.out( 7924): TaqwaWatch RESCHEDULED UNCHANGED 26ms
+10-31 13:26:45.024 I/TaqwaWatchHarness( 7924): reschedule: plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+10-31 13:26:53.629 I/TaqwaWatchHarness( 7924): nodes: node c76e057a "Taqwa_Wear_OS_6" nearby=false taqwa_watch=true
+10-31 13:26:53.765 I/System.out( 7924): TaqwaWatch RESCHEDULED NO_WATCH 1ms
+10-31 13:26:53.766 I/TaqwaWatchHarness( 7924): reschedule: plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true

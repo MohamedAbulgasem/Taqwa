@@ -1,0 +1,84 @@
+Ruling 40's reorder (slot 2 declared before slot 0) and the drawn face, fix round 3 of Task 12's review,
+emulator-5558, 24 Oct 2026, and Ruling 42's revert of it at Task 12's close (section 3). Nothing drawn
+changed either way.
+
+1. The same session, before and after: the pass's shots where slots 0 and 2 both draw (pass.sh's own
+   lines, 13 shots awake and always-on), shot with 0298756d's face (the installed APK, sha1 2b6ea57b),
+   then with fef65dc7's (sha1 bfab50d9, the build), compared by passdiff.py (the Moon's seconds hand, the
+   step count and the moon picture set aside). What is left is at most 6 px a shot, 1 level in 255;
+   on Arch, Ring and Sun every one of them lies on the face's round edge (227 px from the centre).
+
+pass-arch-ar-ly-12h-1458-aod.png         differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-arch-ar-ly-12h-1458-awake.png       differ      4  moon   0  left     4  worst   1  over 2 levels     0  
+pass-arch-en-1240-aod.png                differ      4  moon   0  left     4  worst   1  over 2 levels     0  
+pass-arch-en-1240-awake.png              differ      4  moon   0  left     4  worst   1  over 2 levels     0  
+pass-arch-en-1458-aod.png                differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-arch-en-1458-awake.png              differ      4  moon   0  left     4  worst   1  over 2 levels     0  
+pass-arch-en-1855-aod.png                differ      4  moon   0  left     4  worst   1  over 2 levels     0  
+pass-arch-en-1855-awake.png              differ      4  moon   0  left     4  worst   1  over 2 levels     0  
+pass-arch-slots-1458-aod.png             differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-arch-slots-1458-awake.png           differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+pass-moon-ar-ly-12h-1458-aod.png         differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-moon-ar-ly-12h-1458-awake.png       differ   1068  moon   0  left     2  worst   1  over 2 levels     0  
+pass-moon-ar-ly-12h-slots-1458-aod.png   differ    300  moon   0  left     0  worst   0  over 2 levels     0  
+pass-moon-ar-ly-12h-slots-1458-awake.png differ    779  moon   0  left     2  worst   1  over 2 levels     0  
+pass-moon-en-1458-aod.png                differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-moon-en-1458-awake.png              differ    876  moon   0  left     2  worst   1  over 2 levels     0  
+pass-moon-slots-1458-aod.png             differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-moon-slots-1458-awake.png           differ   1087  moon   0  left     2  worst   1  over 2 levels     0  
+pass-ring-ar-sa-1458-aod.png             differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-ring-ar-sa-1458-awake.png           differ      4  moon   0  left     4  worst   1  over 2 levels     0  
+pass-ring-en-1458-aod.png                differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-ring-en-1458-awake.png              differ      6  moon   0  left     6  worst   1  over 2 levels     0  
+pass-sun-ar-ly-12h-1458-aod.png          differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-sun-ar-ly-12h-1458-awake.png        differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+pass-sun-en-1458-aod.png                 differ      0  moon   0  left     0  worst   0  over 2 levels     0  
+pass-sun-en-1458-awake.png               differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+left in all: 48
+
+2. The full pass (tools/watchface/pass.sh, 45 shots) on fef65dc7 after the reorder:
+   - against the committed shots (docs/superpowers/reports/2026-10-19-face-pass/): 33,077 px left in
+     all, worst 3 levels, the same totals as review round 3's pass of 0298756d (pass-vs-committed.txt
+     is Task 12's first build's, 33,584);
+   - against review round 3's pass of 0298756d on the same emulator that morning: 51 px left in all 45
+     shots, worst 1 level.
+
+3. Ruling 42 withdrew the reorder (Task 12's close, 24 Oct): slot 2's block went back after slot 1's,
+   unchanged (07e511be), and without its comments the face is 0298756d's again, byte for byte
+   (sha1 of the comment-stripped XML e95345c2 for both, 2e053d40 for fef65dc7's). The same subset of 13
+   shots, shot on 07e511be's face (the installed APK's sha1 304cde43 is the build's) after the
+   emulator was booted again that afternoon, against section 1's shots of 0298756d that morning:
+   at most 7 px a shot, 1 level in 255, every one of them on the face's round edge (227 px from the
+   centre), 95 px left in all; against section 1's shots of fef65dc7, 71 px left in all. Against
+   the committed shots the subset is within 3 levels, as every pass of Task 12 has been.
+   Test first: SourceManifestTest's read order went back to 0, 2, 4, 5 before the move, and failed
+   on the reordered face ("expected:<[0, 2, 4, 5]> but was:<[2, 0, 4, 5]>"); it passed once slot 2's
+   block was back.
+
+   pass-arch-ar-ly-12h-1458-aod.png         differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-arch-ar-ly-12h-1458-awake.png       differ      5  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-arch-en-1240-aod.png                differ      3  moon   0  left     3  worst   1  over 2 levels     0  
+   pass-arch-en-1240-awake.png              differ      5  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-arch-en-1458-aod.png                differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-arch-en-1458-awake.png              differ      5  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-arch-en-1855-aod.png                differ      3  moon   0  left     3  worst   1  over 2 levels     0  
+   pass-arch-en-1855-awake.png              differ      5  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-arch-slots-1458-aod.png             differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-arch-slots-1458-awake.png           differ      5  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-moon-ar-ly-12h-1458-aod.png         differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-moon-ar-ly-12h-1458-awake.png       differ   1067  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-moon-ar-ly-12h-slots-1458-aod.png   differ    302  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-moon-ar-ly-12h-slots-1458-awake.png differ    827  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-moon-en-1458-aod.png                differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-moon-en-1458-awake.png              differ    841  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-moon-slots-1458-aod.png             differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-moon-slots-1458-awake.png           differ    776  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-ring-ar-sa-1458-aod.png             differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-ring-ar-sa-1458-awake.png           differ      5  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-ring-en-1458-aod.png                differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-ring-en-1458-awake.png              differ      7  moon   0  left     7  worst   1  over 2 levels     0  
+   pass-sun-ar-ly-12h-1458-aod.png          differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-sun-ar-ly-12h-1458-awake.png        differ      5  moon   0  left     5  worst   1  over 2 levels     0  
+   pass-sun-en-1458-aod.png                 differ      2  moon   0  left     2  worst   1  over 2 levels     0  
+   pass-sun-en-1458-awake.png               differ      5  moon   0  left     5  worst   1  over 2 levels     0  
+   left in all: 95

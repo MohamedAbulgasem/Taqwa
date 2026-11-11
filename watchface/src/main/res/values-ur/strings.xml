@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the phone's own words: androidApp's app_name and widget_small_label -->
+    <string name="watch_face_name">تقویٰ</string>
+    <string name="slot_next_prayer">اگلی نماز</string>
+    <!-- the watch's own words -->
+    <string name="style">انداز</string>
+    <string name="style_arch">محراب</string>
+    <string name="style_ring">حلقہ</string>
+    <string name="style_sun">سورج</string>
+    <string name="style_moon">چاند</string>
+    <string name="accent">رنگ</string>
+    <string name="accent_amber">کہربائی</string>
+    <string name="accent_pearl">موتی</string>
+    <string name="accent_sage">ہلکا سبز</string>
+    <string name="accent_night">رات</string>
+    <string name="slot_day">دن کی نمازیں</string>
+    <string name="slot_dates">تاریخیں</string>
+    <string name="slot_dates_short">تاریخ اور چاند</string>
+    <string name="slot_countdown">اگلی نماز تک باقی وقت</string>
+    <string name="slot_day_dial">نماز کے دن کا ڈائل</string>
+    <string name="slot_left">بائیں کمپلیکیشن</string>
+    <string name="slot_right">دائیں کمپلیکیشن</string>
+</resources>

@@ -1,0 +1,152 @@
+11:20:20.597 phone[49612] TaqwaWatch activate() asked
+11:20:20.605 phone[49612] TaqwaWatch activated=true state=2 error=none, calling watchActivated()
+11:20:20.611 phone[49612] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:20:20.611 phone[49612] TaqwaWatch handshake have=none, calling refreshRequested(have:reply:)
+11:20:20.612 phone[49612] TaqwaWatch key new
+11:20:20.978 phone[49612] TaqwaWatch key kept
+11:20:20.980 phone[49612] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:20:20.981 phone[49612] TaqwaWatch send queued: bytes=21034 delivery=1/6efab8e0696fdd95
+11:20:20.983 phone[49612] TaqwaWatch key kept
+11:20:20.984 phone[49612] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:20:21.015 phone[49612] TaqwaWatch key kept
+11:20:21.017 phone[49612] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:20:21.017 phone[49612] TaqwaWatch send queued: bytes=21034 delivery=3/6efab8e0696fdd95
+11:20:21.018 phone[49612] TaqwaWatch handshake answered queued=true
+11:20:26.212 phone[49612] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:20:26.256 phone[49612] TaqwaWatch key kept
+11:21:58.425 phone[49612] TaqwaWatch handshake have=3/6efab8e0696fdd95, calling refreshRequested(have:reply:)
+11:21:58.429 phone[49612] TaqwaWatch key kept
+11:21:58.429 phone[49612] TaqwaWatch key kept
+11:21:58.430 phone[49612] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:21:58.471 phone[49612] TaqwaWatch key kept
+11:21:58.472 phone[49612] TaqwaWatch handshake answered queued=true
+11:24:59.106 phone[52576] TaqwaWatch activate() asked
+11:24:59.154 phone[52576] TaqwaWatch activated=true state=2 error=none, calling watchActivated()
+11:24:59.197 phone[52576] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:24:59.674 phone[52576] TaqwaWatch key kept
+11:24:59.676 phone[52576] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:24:59.677 phone[52576] TaqwaWatch send queued: bytes=21037 delivery=4/22fe6eecbe87a32f
+11:24:59.678 phone[52576] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:24:59.705 phone[52576] TaqwaWatch key kept
+11:25:02.415 phone[52576] TaqwaWatch handshake have=4/22fe6eecbe87a32f, calling refreshRequested(have:reply:)
+11:25:02.425 phone[52576] TaqwaWatch key kept
+11:25:02.425 phone[52576] TaqwaWatch key kept
+11:25:02.426 phone[52576] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:25:02.461 phone[52576] TaqwaWatch key kept
+11:25:02.461 phone[52576] TaqwaWatch handshake answered queued=true
+11:26:13.663 phone[53300] TaqwaWatch activate() asked
+11:26:13.666 phone[53300] TaqwaWatch activated=true state=2 error=none, calling watchActivated()
+11:26:13.668 phone[53300] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:26:13.668 phone[53300] TaqwaWatch handshake have=4/22fe6eecbe87a32f, calling refreshRequested(have:reply:)
+11:26:13.669 phone[53300] TaqwaWatch key kept
+11:26:13.985 phone[53300] TaqwaWatch key kept
+11:26:13.986 phone[53300] TaqwaWatch key kept
+11:26:13.986 phone[53300] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:26:14.012 phone[53300] TaqwaWatch key kept
+11:26:14.012 phone[53300] TaqwaWatch handshake answered queued=true
+11:26:49.628 phone[53787] TaqwaWatch activate() asked
+11:26:49.631 phone[53787] TaqwaWatch activated=true state=2 error=none, calling watchActivated()
+11:26:49.634 phone[53787] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:26:49.804 phone[53787] TaqwaWatch probe context from=60000 to=300000 step=4096 reachable=true
+11:26:49.804 phone[53787] TaqwaWatch probe context 60000 accepted
+11:26:49.806 phone[53787] TaqwaWatch probe context 300000 accepted
+11:26:49.806 phone[53787] TaqwaWatch probe context 300000 none
+11:26:49.806 phone[53787] TaqwaWatch probe restore
+11:26:49.944 phone[53787] TaqwaWatch key kept
+11:26:49.944 phone[53787] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:26:49.972 phone[53787] TaqwaWatch key kept
+11:26:49.974 phone[53787] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:26:50.001 phone[53787] TaqwaWatch key kept
+11:26:50.002 phone[53787] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:26:50.003 phone[53787] TaqwaWatch send queued: bytes=21037 delivery=6/22fe6eecbe87a32f
+11:27:21.498 phone[53787] TaqwaWatch probe userInfo from=60000 to=300000 step=4096 reachable=true
+11:27:21.499 phone[53787] TaqwaWatch probe userInfo 60000 sent
+11:27:21.524 phone[53787] TaqwaWatch probe userInfo 60000 accepted
+11:27:21.524 phone[53787] TaqwaWatch probe userInfo 300000 sent
+11:27:22.287 phone[53787] TaqwaWatch probe userInfo 300000 accepted
+11:27:22.287 phone[53787] TaqwaWatch probe userInfo 300000 none
+11:27:22.287 phone[53787] TaqwaWatch probe userInfo cancelled 0 outstanding
+11:27:22.287 phone[53787] TaqwaWatch probe restore
+11:27:22.290 phone[53787] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:27:22.323 phone[53787] TaqwaWatch key kept
+11:27:22.324 phone[53787] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:27:22.325 phone[53787] TaqwaWatch send queued: bytes=21037 delivery=8/22fe6eecbe87a32f
+11:29:02.738 phone[53787] TaqwaWatch watch state changed: paired=true installed=false, calling watchStateChanged()
+11:29:02.742 phone[53787] TaqwaWatch isReady()=false activated=true paired=true installed=false
+11:30:24.064 phone[56054] TaqwaWatch activate() asked
+11:30:24.070 phone[56054] TaqwaWatch activated=true state=2 error=none, calling watchActivated()
+11:30:24.079 phone[56054] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:30:24.329 phone[56054] TaqwaWatch probe context from=60000 to=300000 step=4096 fill=random reachable=true
+11:30:24.332 phone[56054] TaqwaWatch probe context 60000 accepted
+11:30:24.352 phone[56054] TaqwaWatch probe context 300000 refused
+11:30:24.359 phone[56054] TaqwaWatch probe context 180000 accepted
+11:30:24.369 phone[56054] TaqwaWatch probe context 240000 accepted
+11:30:24.378 phone[56054] TaqwaWatch probe context 270000 refused
+11:30:24.387 phone[56054] TaqwaWatch probe context 255000 accepted
+11:30:24.396 phone[56054] TaqwaWatch probe context 262500 refused
+11:30:24.405 phone[56054] TaqwaWatch probe context 258750 accepted
+11:30:24.407 phone[56054] TaqwaWatch probe context random 258750 262500
+11:30:24.407 phone[56054] TaqwaWatch probe restore
+11:30:24.472 phone[56054] TaqwaWatch key kept
+11:30:24.474 phone[56054] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:30:24.475 phone[56054] TaqwaWatch send queued: bytes=21037 delivery=10/22fe6eecbe87a32f
+11:30:24.477 phone[56054] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:30:24.514 phone[56054] TaqwaWatch key kept
+11:30:24.516 phone[56054] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:30:24.559 phone[56054] TaqwaWatch key kept
+11:30:24.562 phone[56054] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:30:24.563 phone[56054] TaqwaWatch send queued: bytes=21037 delivery=12/22fe6eecbe87a32f
+11:31:06.649 phone[56054] TaqwaWatch probe userInfo from=60000 to=300000 step=4096 fill=random reachable=true
+11:31:06.651 phone[56054] TaqwaWatch probe userInfo 60000 sent
+11:31:06.669 phone[56054] TaqwaWatch probe userInfo 60000 accepted
+11:31:06.680 phone[56054] TaqwaWatch probe userInfo 300000 sent
+11:31:06.680 phone[56054] TaqwaWatch probe userInfo 300000 refused
+11:31:06.687 phone[56054] TaqwaWatch probe userInfo 180000 sent
+11:31:06.687 phone[56054] TaqwaWatch probe userInfo 180000 refused
+11:31:06.692 phone[56054] TaqwaWatch probe userInfo 120000 sent
+11:31:06.693 phone[56054] TaqwaWatch probe userInfo 120000 refused
+11:31:06.697 phone[56054] TaqwaWatch probe userInfo 90000 sent
+11:31:06.698 phone[56054] TaqwaWatch probe userInfo 90000 refused
+11:31:06.701 phone[56054] TaqwaWatch probe userInfo 75000 sent
+11:31:06.701 phone[56054] TaqwaWatch probe userInfo 75000 refused
+11:31:06.704 phone[56054] TaqwaWatch probe userInfo 67500 sent
+11:31:06.704 phone[56054] TaqwaWatch probe userInfo 67500 refused
+11:31:06.706 phone[56054] TaqwaWatch probe userInfo 63750 sent
+11:31:07.287 phone[56054] TaqwaWatch probe userInfo 63750 accepted
+11:31:07.287 phone[56054] TaqwaWatch probe userInfo random 63750 67500
+11:31:07.287 phone[56054] TaqwaWatch probe userInfo cancelled 0 outstanding
+11:31:07.288 phone[56054] TaqwaWatch probe restore
+11:31:07.290 phone[56054] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:31:07.318 phone[56054] TaqwaWatch key kept
+11:31:07.320 phone[56054] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:31:07.321 phone[56054] TaqwaWatch send queued: bytes=21037 delivery=14/22fe6eecbe87a32f
+11:31:30.318 phone[56054] TaqwaWatch probe userInfo from=63750 to=67500 step=8 fill=random reachable=true
+11:31:30.321 phone[56054] TaqwaWatch probe userInfo 63750 sent
+11:31:30.332 phone[56054] TaqwaWatch probe userInfo 63750 accepted
+11:31:30.335 phone[56054] TaqwaWatch probe userInfo 67500 sent
+11:31:30.336 phone[56054] TaqwaWatch probe userInfo 67500 refused
+11:31:30.338 phone[56054] TaqwaWatch probe userInfo 65625 sent
+11:31:30.339 phone[56054] TaqwaWatch probe userInfo 65625 refused
+11:31:30.341 phone[56054] TaqwaWatch probe userInfo 64687 sent
+11:31:31.283 phone[56054] TaqwaWatch probe userInfo 64687 accepted
+11:31:31.286 phone[56054] TaqwaWatch probe userInfo 65156 sent
+11:31:32.294 phone[56054] TaqwaWatch probe userInfo 65156 accepted
+11:31:32.299 phone[56054] TaqwaWatch probe userInfo 65390 sent
+11:31:33.293 phone[56054] TaqwaWatch probe userInfo 65390 accepted
+11:31:33.298 phone[56054] TaqwaWatch probe userInfo 65507 sent
+11:31:34.288 phone[56054] TaqwaWatch probe userInfo 65507 accepted
+11:31:34.292 phone[56054] TaqwaWatch probe userInfo 65566 sent
+11:31:34.292 phone[56054] TaqwaWatch probe userInfo 65566 refused
+11:31:34.295 phone[56054] TaqwaWatch probe userInfo 65536 sent
+11:31:34.295 phone[56054] TaqwaWatch probe userInfo 65536 refused
+11:31:34.298 phone[56054] TaqwaWatch probe userInfo 65521 sent
+11:31:35.293 phone[56054] TaqwaWatch probe userInfo 65521 accepted
+11:31:35.298 phone[56054] TaqwaWatch probe userInfo 65528 sent
+11:31:35.298 phone[56054] TaqwaWatch probe userInfo 65528 refused
+11:31:35.298 phone[56054] TaqwaWatch probe userInfo random 65521 65528
+11:31:35.299 phone[56054] TaqwaWatch probe userInfo cancelled 0 outstanding
+11:31:35.299 phone[56054] TaqwaWatch probe restore
+11:31:35.301 phone[56054] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:31:35.335 phone[56054] TaqwaWatch key kept
+11:31:35.336 phone[56054] TaqwaWatch isReady()=true activated=true paired=true installed=true
+11:31:35.337 phone[56054] TaqwaWatch send queued: bytes=21037 delivery=16/22fe6eecbe87a32f

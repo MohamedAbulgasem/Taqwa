@@ -1,0 +1,6 @@
+M1 c6202bee's inverted vector exit=1 theSplashIsTheLauncherIconAt48dp: org.junit.ComparisonFailure: the launcher icon wrapped at a size, not a drawing of its own
+M2 IconBackground + icon background exit=1 theLauncherStartsOnTheSplashTheme: org.junit.ComparisonFailure: the round icon's theme expected:&lt;Theme.SplashScreen[]&gt; 
+M3 splash 90 dp exit=1 theSplashIsTheLauncherIconAt48dp: org.junit.ComparisonFailure: expected:&lt;[48]dp&gt; but was:&lt;[90]dp&gt;
+M4 foreground only exit=1 theSplashIsTheLauncherIconAt48dp: org.junit.ComparisonFailure: the launcher icon expected:&lt;@[mipmap/ic_launcher]&gt; but 
+M5 dark disc on both exit=1 theLauncherIconIsThePhones: org.junit.ComparisonFailure: the white disc expected:&lt;#[FFFFF]F&gt; but was:&lt;#[16160
+M6 postSplash theme exit=1 theLauncherStartsOnTheSplashTheme: org.junit.ComparisonFailure: once the splash is gone, the activity is in the theme it had 

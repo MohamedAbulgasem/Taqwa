@@ -1,0 +1,5 @@
+10-31 13:16:19.758 I/System.out( 5230): TaqwaWearFeed NUDGE armed in 86400s found=false stopped=false
+10-31 13:16:19.969 I/System.out( 5230): TaqwaWearFeed ASK STARTED sent
+10-31 13:16:20.032 I/System.out( 5230): TaqwaWearFeed ASK OPENED skipped
+10-31 13:16:20.679 I/System.out( 5230): TaqwaWearFeed ACCEPTED 13/23aee84e77b1f1f2
+10-31 13:16:20.699 I/System.out( 5230): TaqwaWearFeed ACK 13/23aee84e77b1f1f2 sent

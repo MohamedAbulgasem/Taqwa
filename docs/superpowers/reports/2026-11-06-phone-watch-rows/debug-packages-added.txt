@@ -1,0 +1,5 @@
+androidx.wear
+androidx.wear.core
+androidx.wear.remote
+androidx.wear.remote.interactions
+androidx.wear.utils

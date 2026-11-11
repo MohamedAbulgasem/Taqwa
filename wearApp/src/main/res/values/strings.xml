@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What the watch system shows from the app's own resources, in the watch's language and often
+     before any feed exists, so none of it can come from the feed (spec 1.3): the app's name, the
+     complications' and the Tile's picker names and previews, and the two lines a watch shows before
+     it holds a feed. Everything the app's screens and the Tile write once a feed is held is the
+     feed's, in the phone's language.
+
+     They ship in the phone's seven languages, in the folders the phone's own resources use
+     (values-ar, -fr, -tr, -in, -ur, -bn: Android spells Indonesian "in"). A phrase the phone
+     already has is the phone's own text there; every other one had its native review (plan 5 Task
+     11: Mohamed read the Arabic at M8), and none is marked a draft. SystemStringsTest holds all
+     seven to this file. -->
+<resources>
+    <string name="app_name">Taqwa</string>
+    <!-- What the watch shows on every page and the Tile until the phone has sent a feed (spec 2.6). -->
+    <string name="open_taqwa_on_phone">Open Taqwa on your phone</string>
+    <!-- Shown in its place when the phone has sent a feed in a newer format than this build reads,
+         so that the wearer is not sent to a phone that has already sent it. -->
+    <string name="update_taqwa_on_watch">Update Taqwa on your watch</string>
+
+    <!-- The complication sources, as the system's pickers name them (spec 2.3). -->
+    <string name="complication_next_prayer">Next prayer</string>
+    <string name="complication_day">Prayer day</string>
+    <!-- The Taqwa face's own day dial: hidden from the pickers, so no one is shown this name. -->
+    <string name="complication_day_dial">Taqwa face: day dial</string>
+    <string name="complication_dates">Dates</string>
+    <string name="complication_mark">Taqwa</string>
+    <!-- The weighted day's title, which the library asks for beside the weights and other faces may
+         show, and what a screen reader says for the day and the mark. For the day dial it says the
+         date's times, in the phone's words (ComplicationFields.dialSpoken). -->
+    <string name="complication_day_title">Day</string>
+    <string name="complication_day_description">Prayer times today</string>
+    <string name="complication_mark_description">Taqwa</string>
+    <!-- What the pickers preview: one sample, whatever the feed holds, because a preview is static
+         (the library refuses a moving one). Cape Town on Sunday 18 October 2026, at 14:58. -->
+    <string name="preview_prayer_label">ASR</string>
+    <!-- The prayer's name as a screen reader says it, in its own case and not in the face's capitals. -->
+    <string name="preview_prayer_name">Asr</string>
+    <string name="preview_prayer_time">16:10</string>
+    <string name="preview_countdown">in 1 h 12 min</string>
+    <string name="preview_day_times">Fajr 4:33, Sunrise 6:01, Dhuhr 12:33, Asr 16:10, Maghrib 19:04, Isha 20:24</string>
+    <string name="preview_hijri">6 Jumada al-Ula 1448</string>
+    <string name="preview_hijri_day_month">6 Jumada al-Ula</string>
+    <string name="preview_gregorian">SUN 18 OCT</string>
+    <string name="preview_weekday">SUN</string>
+    <string name="preview_day_number">18</string>
+
+    <!-- The Tile, as the Tiles picker names and describes it (spec 2.4; plan 3 Task 8 draws it). -->
+    <string name="tile_label">Prayer times</string>
+    <string name="tile_description">Today’s prayers and the next one counted down</string>
+
+    <!-- The face screen and Today's face chip (plan 5 Task 5), before any feed: with a feed they are
+         the feed's, in the phone's language (WatchUi.face), and these are the same five phrases. -->
+    <string name="face_add">Add the Taqwa face</string>
+    <string name="face_about">The next prayer and its countdown on your watch face.</string>
+    <string name="face_active">Taqwa is your watch face.</string>
+    <string name="face_choose_it">Touch and hold your watch face, then choose Taqwa.</string>
+    <string name="face_failed">Couldn’t add the face. Try again later.</string>
+</resources>

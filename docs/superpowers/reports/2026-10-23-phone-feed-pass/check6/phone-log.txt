@@ -1,0 +1,2 @@
+10-31 13:13:28.281 I/System.out( 7924): TaqwaWatch WATCH_ASKED SENT 52ms
+10-31 13:13:28.309 I/System.out( 7924): TaqwaWatch ACK 8/23aee84e77b1f1f2

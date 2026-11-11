@@ -1,0 +1,2 @@
+10-31 13:04:14.113 I/System.out( 3363): TaqwaWearFeed ACCEPTED 2/6efab8e0696fdd95
+10-31 13:04:14.258 I/System.out( 3363): TaqwaWearFeed ACK 2/6efab8e0696fdd95 sent

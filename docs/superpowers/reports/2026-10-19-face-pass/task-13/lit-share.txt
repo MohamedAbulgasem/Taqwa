@@ -1,0 +1,239 @@
+task-13/litshare.py on the pass at Task 13's closing fix (emulator-5558, 24 Oct 2026, the face as rebuilt under
+Ruling 46: the moon window's near-black fill, #070908, black always-on, its hairline kept; the Moon's always-on
+frames as committed, and Arch, Ring and Sun's from the committed pass, which the closing fix's pass matched within
+3 levels), on ec8f1bd4's pass (git archive: the face before Ruling 46), on d40776a7's pass (git archive, the
+outline hands) and on ref.py's drawings of the same moments (Ruling 41's hands and Ruling 46's window, ref.py aod
+sec=0; with the slots, face=moon-d comps v4=82 v5=0):
+    python3 -I litshare.py <the pass> <d40776a7's pass> <the drawings> <ec8f1bd4's pass>
+A pixel is lit when any channel of the face's colour is over 8; Google's always-on limit is 15%. The columns:
+  raw      the emulator's dithered frame, at its own levels;
+  face     the frame as the face draws it, lit.py undither: the emulator dithers always-on as a strict
+           checkerboard (every pixel it draws on one parity) and draws it at 0.85 of the face's colours,
+           so twice its pixels lit at 8 or more, where a face's 9 lands. This is the measure since fix
+           round 2 (review round 2); on the drawings dimmed and dithered the same way it gives their own
+           share within 0.02 point (litworst.py section 4);
+  drawing  the drawing's own share;
+  round 1  the figure first written here, each black pixel filled from its neighbours and counted over 8:
+           about a point high on edges;
+then the mean light over the screen (undithered: twice the frame's mean, at the emulator's levels), the
+brightest lit level (99th percentile), the same frame's share before Ruling 46 (ec8f1bd4's, its window fill
+lit: 2.3 points more on each), and before Task 13 (d40776a7's, the outline hands).
+These are the pass's moments, 14:58 and 10:10, when the Moon's chapter arc is short; they are not its
+worst. Its worst moments, and Arch, Ring and Sun's, are in the second half of this file.
+
+Moon always-on, Ruling 41's hands at A_HANDS 209, Ruling 46's moon window (limit 15% lit):
+frame                                  raw    face   drawing  round 1  mean light brightest   before Ruling 46 (ec8f1bd4): face   before (d40776a7, outline hands): raw / face
+pass-moon-en-1458                    4.90%   9.86%     9.51%   10.53%        6.35     170.6                              12.18%   4.80% / 11.86%
+pass-moon-en-1010                    5.82%  11.72%    11.28%   12.48%        7.29     170.6                              14.04%   not in d40776a7's pass
+pass-moon-ar-ly-12h-1458             5.11%  10.27%     9.94%   10.91%        6.50     170.6                              12.59%   5.03% / 12.32%
+pass-moon-ar-ly-12h-1010             5.97%  12.03%    11.68%   12.73%        7.37     170.6                              14.34%   not in d40776a7's pass
+pass-moon-slots-1458                 5.15%  10.35%    10.00%   11.06%        6.75     170.6                              12.70%   5.07% / 12.43%
+pass-moon-slots-1010                 6.06%  12.21%    11.77%   13.01%        7.68     170.6                              14.49%   5.99% / 14.28%
+pass-moon-ar-ly-12h-slots-1458       5.40%  10.85%    10.43%   11.54%        6.95     170.6                              13.13%   5.33% / 12.93%
+pass-moon-ar-ly-12h-slots-1010       6.24%  12.55%    12.17%   13.30%        7.78     170.6                              14.82%   not in d40776a7's pass
+highest: 12.55% (under 15%: True)
+
+The other styles' always-on frames (the committed pass), for the mood:
+pass-arch-en-1458                    5.85%  11.76%            12.62%       11.67     168.7
+pass-arch-en-1240                    5.43%  10.93%            11.78%       10.15     168.7
+pass-arch-en-1855                    6.30%  12.65%            13.58%       12.87     168.7
+pass-arch-slots-1458                 6.25%  12.57%            13.50%       12.29     168.7
+pass-ring-en-1458                    6.71%  13.49%            14.50%       13.34     168.7
+pass-ring-ar-sa-1458                 5.72%  11.53%            12.40%       10.85     168.7
+pass-sun-en-1458                     6.41%  12.90%            13.93%       12.40     168.7
+pass-arch-ar-ly-12h-1458             5.10%  10.26%            11.01%        9.64     168.7
+pass-ring-ar-ly-12h-1458             6.15%  12.39%            13.28%       11.87     168.7
+pass-sun-ar-ly-12h-1458              5.85%  11.81%            12.72%       10.93     168.7
+
+
+== Fix rounds 1 to 3 and the closing fix (24 Oct 2026): the worst moments ==
+task-13/litworst.py worst rebuilt=worst-r46 sweep=5. task-13/worst/ holds emulator-5558's frames of the face
+before Ruling 46 (the face of 4608eb65, the worktree's debug build; battery 100; the emulator's own step count,
+1,620 to 2,700 in fix round 1's frames, and 890, 960 and 1,030 in review round 3's three, of 97779b42's debug
+face, the same face). task-13/worst-r46/ holds the same thirteen Moon cases taken again on the face as rebuilt
+(the closing fix's debug face, 3047782d; battery 100; the emulator's own 630 to 1,160 steps). Fix round 2 changed
+the emulator's measure (section 3, as in the first half) and added sections 4 and 5; fix round 3 added review
+round 3's frames and the date window's fill; the closing fix drew sections 1, 2 and 4 with Ruling 46's window
+(ref.py's default), added the rebuilt frames to section 3 and set before and after side by side in section 5.
+Ruling 49 (25 Oct) ran it again with the sweep's guard (litworst.py's sweep(): every share that stands alone,
+more than 0.05 point above both its neighbours or below both, and the day's highest are drawn again on their own,
+nothing else drawing, before a row is written). One row changed: en 12h, slots wide, 29 Jumada al-Akhirah, whose
+12.93% at 23:05 was one glitchy parallel render (23:05 draws 12.38% on its own); its highest is 12.87% at 04:45, as
+the same row drawn one render at a time gives. Every other figure below is the same as before.
+The Moon lights the most just after Fajr (04:33) and just after Isha (20:24), when its chapter arc is about
+eight hours long (minute-sweep.txt, the drawing before Ruling 46 minute by minute: 04:38-04:43 and 20:50-21:08
+within 0.1 point of the peak). Before Ruling 46 it was over 15% there with both slots filled, by the drawing
+(15.0-15.2%) and by the emulator's frame as the face draws it (15.0-15.5%), with ordinary slot values too: review
+round 3's frames, a full battery and 890, 960 and 1,030 steps, were 15.41%, 15.45% and 15.42%. 2.0-2.3 points of
+that were the moon window's near-black fill, which had no always-on Variant and is lit by the measure (its 9 is
+over 8; the emulator draws it 6, 8, 7).
+Ruling 46 (the Lead, 24 Oct) made that fill black always-on, its hairline and the moon kept, and the closing fix
+built it. As rebuilt the Moon is under 15% at every moment: its highest in the drawing is 13.02% (04:40 and
+04:45, Libyan Arabic, 100% and 12,345 steps, 28 Jumada al-Ula), over the whole day too, and no minute of any
+form reaches 14.5%; on the emulator 12.91-13.32% with both slots filled and 12.62-12.64% with them empty, each
+case 2.1-2.3 points under the same case before, as fix round 3's pixel lever had it (section 5). Counting every
+pixel that is not black instead of over 8, the rebuilt Moon's worst frames are 13.7-14.7% (15.96-16.76% before).
+The date window's fill, #0B0D0C (the emulator's 9, 11, 10), is lit the same way and keeps its fill: the ruling
+left it, since the moon window alone gives the margin (black too, about 2 points more: section 5's last
+column). lever-sheet.png (leversheet.py, ref.py window=filled) is the sheet the call was made on.
+Untouched by Task 13: Ring with its slots filled is over 15% (15.3% in the drawing, 15.6-16.1% on the emulator)
+and Sun at the limit (14.2% and 15.0%); Ring with its slots empty (14.5% and 14.8%) and Arch (13.4% and 13.5%)
+are under. Counting every pixel that is not black, their worst frames are 16.2-17.4% (Ring), 16.3% (Sun) and
+14.9% (Arch). What gives where Ring or Sun is over is a call of its own.
+
+1. The drawing as built (ref.py aod sec=0, face=moon-d: Ruling 41's hands and, since the closing fix,
+   Ruling 46's moon window, its fill black), lit share; the limit is 15%:
+form                                             04:40   20:55   10:10   14:58
+ar 12h, slots, the pass's values                12.71%  12.57%  12.17%  10.43%
+ar 12h, slots 100 and 12,345                    12.90%  12.76%  12.36%  10.62%
+ar 12h, slots wide, 29 جمادى الآخرة             12.99%  12.85%  12.45%  10.71%
+ar 12h, slots wide, 28 جمادى الأولى             13.02%  12.88%  12.47%  10.73%
+  the same, outline hands                       12.59%  12.41%  12.01%  10.39%
+ar 12h, slots empty, 29 جمادى الآخرة            12.27%  12.08%  11.68%   9.94%
+ar-SA, slots wide, ٢٩ جمادى الآخرة              12.56%  12.46%  11.97%  10.21%
+en 24h, slots, the pass's values                12.30%  11.99%  11.77%  10.00%
+en 24h, slots wide, 29 Jumada al-Akhirah        12.87%  12.57%  12.34%  10.58%
+  the same, outline hands                       12.44%  12.11%  11.87%  10.16%
+en 24h, slots empty, 29 Jumada al-Akhirah       11.86%  11.50%  11.28%   9.51%
+en 12h, slots wide, 29 Jumada al-Akhirah        12.87%  12.57%  12.34%  10.50%
+the Moon's highest as built (Rulings 41 and 46): 13.02% (under 15%: True)
+
+Arch, Ring and Sun at their own worst moments (the day sweep's highest):
+Ring en 24h, slots empty                       18:50  14.49%
+Ring en 24h, slots wide, 29 Jumada al-Akhirah  18:50  15.34%
+Ring ar 12h, slots wide, 29 جمادى الآخرة       10:55  14.33%
+Sun en 24h, slots empty                        18:00  13.37%
+Sun en 24h, slots wide, 29 Jumada al-Akhirah   18:00  14.21%
+Arch en 24h, slots empty                       18:55  12.33%
+Arch en 24h, slots wide, 29 Jumada al-Akhirah  18:55  13.35%
+
+2. The drawing as built over the mock day every 5 minutes (a share that stands alone, and the
+   day's highest, drawn again on its own before the row is written):
+form                                                    highest   >= 14.5%   >= 15%
+ar 12h, slots, the pass's values                 12.72% at 04:45          0        0
+ar 12h, slots 100 and 12,345                     12.90% at 04:45          0        0
+ar 12h, slots wide, 29 جمادى الآخرة              13.00% at 04:45          0        0
+ar 12h, slots wide, 28 جمادى الأولى              13.02% at 04:45          0        0
+  the same, outline hands                        12.60% at 04:45          0        0
+ar 12h, slots empty, 29 جمادى الآخرة             12.27% at 04:40          0        0
+ar-SA, slots wide, ٢٩ جمادى الآخرة               12.56% at 04:40          0        0
+en 24h, slots, the pass's values                 12.30% at 04:45          0        0
+en 24h, slots wide, 29 Jumada al-Akhirah         12.87% at 04:45          0        0
+  the same, outline hands                        12.45% at 04:35          0        0
+en 24h, slots empty, 29 Jumada al-Akhirah        11.86% at 04:40          0        0
+en 12h, slots wide, 29 Jumada al-Akhirah         12.87% at 04:45          0        0
+Ring en 24h, slots empty                         14.49% at 18:50          0        0
+Ring en 24h, slots wide, 29 Jumada al-Akhirah    15.34% at 18:50         24        7
+Ring ar 12h, slots wide, 29 جمادى الآخرة         14.33% at 10:55          0        0
+Sun en 24h, slots empty                          13.37% at 18:00          0        0
+Sun en 24h, slots wide, 29 Jumada al-Akhirah     14.21% at 18:00          0        0
+Arch en 24h, slots empty                         12.33% at 18:55          0        0
+Arch en 24h, slots wide, 29 Jumada al-Akhirah    13.35% at 18:55          0        0
+
+3. emulator-5558, the face before Ruling 46 (the face of 4608eb65; review round 3's three frames are
+   of 97779b42, the same face; Ring, Sun and Arch are as built): the lit share raw (the dithered
+   frame at the emulator's levels), as the face draws it (lit.py undither: twice the lit parity, lit
+   at 8 or more after the emulator's 0.85; the measure), and fix round 1's max-fill; the undithered
+   frame's mean light (0-255):
+frame                                         raw    face  round 1  light
+moon-ar-ly-12h-slots-0440-aod.png           6.62%  15.34%   14.07%   9.09   ar-ly12, slots (100, its steps), 6 جمادى الأولى
+moon-ar-ly-12h-slots-2055-aod.png           6.54%  15.36%   13.96%   8.88   ar-ly12, slots (100, its steps), 6 جمادى الأولى
+moon-ar-ly-12h-slots-long-0440-aod.png      6.64%  15.38%   14.13%   9.10   ar-ly12, slots, 29 جمادى الآخرة
+moon-ar-ly-12h-slots-long-2055-aod.png      6.58%  15.43%   14.05%   8.91   ar-ly12, slots, 29 جمادى الآخرة
+moon-ar-ly-12h-slots-most-0440-aod.png      6.68%  15.46%   14.19%   9.16   ar-ly12, slots, 28 جمادى الأولى
+moon-ar-ly-12h-long-0440-aod.png            6.33%  14.94%   13.46%   8.59   ar-ly12, slots empty, 29 جمادى الآخرة
+moon-ar-sa-slots-long-0440-aod.png          6.55%  15.19%   13.93%   8.90   ar-sa, slots, ٢٩ جمادى الآخرة
+moon-en-slots-0440-aod.png                  6.43%  14.97%   13.76%   8.98   en 24h, slots (100, its steps), 6 Jumada al-Ula
+moon-en-slots-long-0440-aod.png             6.64%  15.39%   14.22%   9.23   en 24h, slots, 29 Jumada al-Akhirah
+moon-en-slots-long-2055-aod.png             6.47%  15.24%   13.91%   8.90   en 24h, slots, 29 Jumada al-Akhirah
+moon-en-long-0440-aod.png                   6.32%  14.92%   13.53%   8.69   en 24h, slots empty, 29 Jumada al-Akhirah
+moon-en12-slots-long-0440-aod.png           6.64%  15.40%   14.23%   9.22   en 12h, slots, 29 Jumada al-Akhirah
+moon-ar-ly-12h-slots-most-890-0440-aod.png  6.65%  15.41%   14.14%   9.12   ar-ly12, slots (100, 890 steps), 28 جمادى الأولى (review round 3)
+moon-ar-ly-12h-slots-most-960-2055-aod.png  6.58%  15.45%   14.05%   8.92   ar-ly12, slots (100, 960 steps), 28 جمادى الأولى (review round 3)
+moon-en-slots-long-1030-0440-aod.png        6.65%  15.42%   14.25%   9.23   en 24h, slots (100, 1,030 steps), 29 Jumada al-Akhirah (review round 3)
+ring-en-1850-aod.png                        7.39%  14.84%   15.92%  14.95   Ring en 24h, slots empty, 6 Jumada al-Ula
+ring-en-slots-1850-aod.png                  7.74%  15.56%   16.67%  15.47   Ring en 24h, slots (100, its steps), 6 Jumada al-Ula
+ring-en-slots-long-1850-aod.png             7.99%  16.06%   17.22%  15.76   Ring en 24h, slots, 29 Jumada al-Akhirah
+sun-en-slots-long-1800-aod.png              7.45%  15.01%   16.18%  14.09   Sun en 24h, slots, 29 Jumada al-Akhirah
+arch-en-slots-long-1855-aod.png             6.73%  13.52%   14.52%  13.51   Arch en 24h, slots, 29 Jumada al-Akhirah
+moon's highest as the face draws it (before Ruling 46): 15.46% (under 15%: False)
+ring's highest as the face draws it: 16.06% (under 15%: False)
+sun's highest as the face draws it: 15.01% (under 15%: False)
+arch's highest as the face draws it: 13.52% (under 15%: True)
+
+   The same Moon cases on the face as rebuilt under Ruling 46 (the closing fix: the moon window's fill
+   black always-on), in worst-r46; the frame before it of each case beside it:
+frame                                         raw    face  light      before (face)
+moon-ar-ly-12h-slots-0440-aod.png           6.56%  13.17%   8.87             15.34%   ar-ly12, slots (100, 630 steps), 6 جمادى الأولى
+moon-ar-ly-12h-slots-2055-aod.png           6.48%  13.03%   8.66             15.36%   ar-ly12, slots (100, 650 steps), 6 جمادى الأولى
+moon-ar-ly-12h-slots-long-0440-aod.png      6.58%  13.21%   8.88             15.38%   ar-ly12, slots (100, 740 steps), 29 جمادى الآخرة
+moon-ar-ly-12h-slots-long-2055-aod.png      6.51%  13.08%   8.69             15.43%   ar-ly12, slots (100, 790 steps), 29 جمادى الآخرة
+moon-ar-ly-12h-slots-most-0440-aod.png      6.62%  13.29%   8.94    15.46% / 15.41%   ar-ly12, slots (100, 840 steps), 28 جمادى الأولى
+moon-ar-ly-12h-slots-most-2055-aod.png      6.55%  13.16%   8.75             15.45%   ar-ly12, slots (100, 890 steps), 28 جمادى الأولى
+moon-ar-ly-12h-long-0440-aod.png            6.29%  12.64%   8.41             14.94%   ar-ly12, slots empty, 29 جمادى الآخرة
+moon-ar-sa-slots-long-0440-aod.png          6.50%  13.05%   8.71             15.19%   ar-sa, slots (100, 940 steps), ٢٩ جمادى الآخرة
+moon-en-slots-0440-aod.png                  6.42%  12.91%   8.84             14.97%   en 24h, slots (100, 1000 steps), 6 Jumada al-Ula
+moon-en-slots-long-0440-aod.png             6.62%  13.32%   9.07    15.39% / 15.42%   en 24h, slots (100, 1050 steps), 29 Jumada al-Akhirah
+moon-en-slots-long-2055-aod.png             6.42%  12.91%   8.68             15.24%   en 24h, slots (100, 1110 steps), 29 Jumada al-Akhirah
+moon-en-long-0440-aod.png                   6.27%  12.62%   8.52             14.92%   en 24h, slots empty, 29 Jumada al-Akhirah
+moon-en12-slots-long-0440-aod.png           6.60%  13.27%   9.04             15.40%   en 12h, slots (100, 1160 steps), 29 Jumada al-Akhirah
+moon's highest as the face draws it, as rebuilt: 13.32% (under 15%: True)
+
+4. The measure checked: drawings drawn as the emulator draws them always-on (0.85 of their
+   colours, rounded, then each parity black in turn), measured as section 3 measures a frame:
+drawing (each parity in turn)                                own    as section 3       round 1's
+ar 12h, slots wide, 28 جمادى الأولى, 20:55                12.88%  12.87 / 12.88%  13.73 / 13.72%
+ar 12h, slots wide, 28 جمادى الأولى, outline hands, 20:55  12.41%  12.41 / 12.41%  13.35 / 13.34%
+en 24h, slots wide, 29 Jumada al-Akhirah, 04:40           12.87%  12.87 / 12.87%  13.79 / 13.76%
+en 24h, slots wide, 29 Jumada al-Akhirah, outline hands, 04:40  12.44%  12.45 / 12.43%  13.43 / 13.40%
+Ring en 24h, slots empty, 18:50                           14.49%  14.50 / 14.49%  15.59 / 15.59%
+Ring en 24h, slots wide, 29 Jumada al-Akhirah, 18:50      15.34%  15.34 / 15.33%  16.52 / 16.53%
+Ring ar 12h, slots wide, 29 جمادى الآخرة, 10:55           14.33%  14.31 / 14.35%  15.42 / 15.46%
+Sun en 24h, slots empty, 18:00                            13.37%  13.36 / 13.38%  14.50 / 14.52%
+Sun en 24h, slots wide, 29 Jumada al-Akhirah, 18:00       14.21%  14.20 / 14.22%  15.42 / 15.45%
+Arch en 24h, slots empty, 18:55                           12.33%  12.34 / 12.32%  13.28 / 13.28%
+Arch en 24h, slots wide, 29 Jumada al-Akhirah, 18:55      13.35%  13.34 / 13.35%  14.39 / 14.41%
+section 3's measure is within 0.02 point of each drawing's own share
+
+5. The two levers of fix round 3: the moon window's fill black always-on, which Ruling 46 chose and
+   the closing fix built, and the date window's fill (WELL) black too, which it left as it is; lit share.
+   The drawing: before Ruling 46 (ref.py window=filled), the same with the fill's own pixels black (what
+   fix round 3 expected), as built (ref.py's default), and as built with WELL's own pixels black:
+                                                               before fill black  as built WELL black
+drawing, ar 12h, slots, the pass's values, 04:40               14.85%     12.75%    12.71%     10.54%
+drawing, ar 12h, slots, the pass's values, 20:55               14.86%     12.61%    12.57%     10.40%
+drawing, ar 12h, slots 100 and 12,345, 04:40                   15.03%     12.94%    12.90%     10.73%
+drawing, ar 12h, slots 100 and 12,345, 20:55                   15.05%     12.80%    12.76%     10.58%
+drawing, ar 12h, slots wide, 29 جمادى الآخرة, 04:40            15.12%     13.03%    12.99%     10.82%
+drawing, ar 12h, slots wide, 29 جمادى الآخرة, 20:55            15.14%     12.89%    12.85%     10.68%
+drawing, ar 12h, slots wide, 28 جمادى الأولى, 04:40            15.15%     13.05%    13.02%     10.85%
+drawing, ar 12h, slots wide, 28 جمادى الأولى, 20:55            15.17%     12.92%    12.88%     10.70%
+drawing, ar 12h, slots empty, 29 جمادى الآخرة, 04:40           14.57%     12.32%    12.27%     10.10%
+drawing, ar 12h, slots empty, 29 جمادى الآخرة, 20:55           14.37%     12.12%    12.08%      9.91%
+drawing, ar-SA, slots wide, ٢٩ جمادى الآخرة, 04:40             14.69%     12.59%    12.56%     10.34%
+drawing, ar-SA, slots wide, ٢٩ جمادى الآخرة, 20:55             14.75%     12.50%    12.46%     10.24%
+drawing, en 24h, slots, the pass's values, 04:40               14.43%     12.33%    12.30%     10.57%
+drawing, en 24h, slots, the pass's values, 20:55               14.28%     12.03%    11.99%     10.27%
+drawing, en 24h, slots wide, 29 Jumada al-Akhirah, 04:40       15.00%     12.90%    12.87%     11.14%
+drawing, en 24h, slots wide, 29 Jumada al-Akhirah, 20:55       14.86%     12.61%    12.57%     10.84%
+drawing, en 24h, slots empty, 29 Jumada al-Akhirah, 04:40      14.15%     11.90%    11.86%     10.13%
+drawing, en 24h, slots empty, 29 Jumada al-Akhirah, 20:55      13.80%     11.54%    11.50%      9.77%
+drawing, en 12h, slots wide, 29 Jumada al-Akhirah, 04:40       15.00%     12.90%    12.87%     11.14%
+drawing, en 12h, slots wide, 29 Jumada al-Akhirah, 20:55       14.86%     12.61%    12.57%     10.84%
+   emulator-5558: the frame before Ruling 46, the same with the fill's own pixels black, the rebuilt
+   face's frame of the same case, and that frame with WELL's own pixels black:
+emulator, moon-ar-ly-12h-slots-0440-aod.png                    15.34%     13.29%   13.17%     11.09%
+emulator, moon-ar-ly-12h-slots-2055-aod.png                    15.36%     13.13%   13.03%     10.95%
+emulator, moon-ar-ly-12h-slots-long-0440-aod.png               15.38%     13.33%   13.21%     11.13%
+emulator, moon-ar-ly-12h-slots-long-2055-aod.png               15.43%     13.20%   13.08%     11.00%
+emulator, moon-ar-ly-12h-slots-most-0440-aod.png               15.46%     13.40%   13.29%     11.21%
+emulator, moon-ar-ly-12h-slots-most-890-0440-aod.png           15.41%     13.36%   13.29%     11.21%
+emulator, moon-ar-ly-12h-slots-most-960-2055-aod.png           15.45%     13.22%   13.16%     11.08%
+emulator, moon-ar-ly-12h-long-0440-aod.png                     14.94%     12.72%   12.64%     10.56%
+emulator, moon-ar-sa-slots-long-0440-aod.png                   15.19%     13.14%   13.05%     10.93%
+emulator, moon-en-slots-0440-aod.png                           14.97%     12.92%   12.91%     11.25%
+emulator, moon-en-slots-long-0440-aod.png                      15.39%     13.34%   13.32%     11.66%
+emulator, moon-en-slots-long-1030-0440-aod.png                 15.42%     13.37%   13.32%     11.66%
+emulator, moon-en-slots-long-2055-aod.png                      15.24%     13.01%   12.91%     11.26%
+emulator, moon-en-long-0440-aod.png                            14.92%     12.70%   12.62%     10.97%
+emulator, moon-en12-slots-long-0440-aod.png                    15.40%     13.35%   13.27%     11.62%

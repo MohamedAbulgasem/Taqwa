@@ -1,0 +1,12 @@
+Set uncaught java.lang.Throwable
+Set deferred uncaught java.lang.Throwable
+Initializing jdb ...
+> Deferring breakpoint world.taqwa.app.wear.TaqwaWearApp.onCreate.
+It will be set after the class is loaded.
+> Ignoring cmd -2147483640/199/1 from the VM
+Set deferred breakpoint world.taqwa.app.wear.TaqwaWearApp.onCreate
+
+Breakpoint hit: "thread=main", world.taqwa.app.wear.TaqwaWearApp.onCreate(), line=54 bci=0
+
+main[1] Removed: breakpoint world.taqwa.app.wear.TaqwaWearApp.onCreate
+main[1] 

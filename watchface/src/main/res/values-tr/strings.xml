@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the phone's own words: androidApp's app_name and widget_small_label -->
+    <string name="watch_face_name">Taqwa</string>
+    <string name="slot_next_prayer">Sonraki vakit</string>
+    <!-- the watch's own words -->
+    <string name="style">Stil</string>
+    <string name="style_arch">Kemer</string>
+    <string name="style_ring">Halka</string>
+    <string name="style_sun">Güneş</string>
+    <string name="style_moon">Ay</string>
+    <string name="accent">Renk</string>
+    <string name="accent_amber">Kehribar</string>
+    <string name="accent_pearl">İnci</string>
+    <string name="accent_sage">Adaçayı</string>
+    <string name="accent_night">Gece</string>
+    <string name="slot_day">Günün vakitleri</string>
+    <string name="slot_dates">Tarihler</string>
+    <string name="slot_dates_short">Tarih ve ay evresi</string>
+    <string name="slot_countdown">Sonraki vakte kalan süre</string>
+    <string name="slot_day_dial">Günün vakitleri kadranı</string>
+    <string name="slot_left">Sol komplikasyon</string>
+    <string name="slot_right">Sağ komplikasyon</string>
+</resources>

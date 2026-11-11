@@ -1,0 +1,20 @@
+<get-noto.sh folder>/NotoSansArabic-<weight>.ttf
+  Light    U+06F4 ۴  cmap uni06F4     locl_URD uni06F4.locl   pnum uni06F4.locl.lf
+  Light    U+06F6 ۶  cmap uni06F6     locl_URD uni0666        pnum uni0666.lf
+  Light    U+06F7 ۷  cmap uni06F7     locl_URD uni06F7.locl   pnum uni06F7.locl.lf
+  SemiBold U+06F4 ۴  cmap uni06F4     locl_URD uni06F4.locl
+  SemiBold U+06F6 ۶  cmap uni06F6     locl_URD uni0666
+  SemiBold U+06F7 ۷  cmap uni06F7     locl_URD uni06F7.locl
+  Bold     U+06F4 ۴  cmap uni06F4     locl_URD uni06F4.locl
+  Bold     U+06F6 ۶  cmap uni06F6     locl_URD uni0666
+  Bold     U+06F7 ۷  cmap uni06F7     locl_URD uni06F7.locl
+watchface/src/main/res/font/noto_sans_arabic_subset_<weight>.ttf
+  Light    U+06F4 ۴  cmap uni06F4     locl_URD None           pnum None
+  Light    U+06F6 ۶  cmap uni06F6     locl_URD None           pnum None
+  Light    U+06F7 ۷  cmap uni06F7     locl_URD None           pnum None
+  SemiBold U+06F4 ۴  cmap uni06F4     locl_URD glyph00143
+  SemiBold U+06F6 ۶  cmap uni06F6     locl_URD uni0666
+  SemiBold U+06F7 ۷  cmap uni06F7     locl_URD glyph00144
+  Bold     U+06F4 ۴  cmap uni06F4     locl_URD glyph00143
+  Bold     U+06F6 ۶  cmap uni06F6     locl_URD uni0666
+  Bold     U+06F7 ۷  cmap uni06F7     locl_URD glyph00144

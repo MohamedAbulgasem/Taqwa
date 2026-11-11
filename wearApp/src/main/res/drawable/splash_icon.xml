@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The launch screen's icon (Theme.Taqwa.Starting): the launcher icon itself, the phone's white disc
+     with the dark arch and its amber lamp, at 48 dp on the black of the screen. Google's Wear app
+     quality item WO-V15 asks for a 48 dp icon on black that matches the launcher icon, and its
+     branded launch guide for "a 48x48dp circular icon"; this is the form Google's Wear splash page
+     gives for a round icon, the launcher's mipmap in a layer-list at that size. The watch masks the
+     adaptive icon round here as in its app list, so the splash cannot drift from the launcher.
+     WearManifestTest holds it to the manifest's android:icon, and the icon's colours. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="48dp"
+        android:height="48dp"
+        android:drawable="@mipmap/ic_launcher"
+        android:gravity="center" />
+</layer-list>

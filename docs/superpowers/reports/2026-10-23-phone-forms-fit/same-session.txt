@@ -1,0 +1,23 @@
+The base face (ff28cd5a's, the APK found installed on emulator-5558) and the v2 face (Urdu's ۴ ۶ ۷ in Urdu forms, the
+fonts under new names), installed in turn in one session, 25 Oct 2026 02:47-03:06 SAST (ab.sh: the base face's round,
+then the v2 face's), each moment shot the same way; abdiff.py, base against v2, every pixel. The Moon's awake frames
+differ only in the seconds hand (x 220-240, at twelve, the shot at :00). The two urdu-digits shots are the Saudi sample
+with every Arabic-Indic digit written extended (feedtext.sh urdu), where only Urdu's ۴ ۶ ۷ may differ
+(urdu-digits-old-new.png).
+
+arch-ar-ly-12h-1458-aod.png               0 px differ
+arch-ar-ly-12h-1458-awake.png             0 px differ
+arch-ar-sa-1458-aod.png                   0 px differ
+arch-ar-sa-1458-awake.png                 0 px differ
+arch-en-1458-aod.png                      0 px differ
+arch-en-1458-awake.png                    0 px differ
+arch-urdu-digits-1447-awake.png        9965 px differ, worst 242 levels, box (104, 108, 350, 344)
+moon-ar-ly-12h-1458-aod.png               0 px differ
+moon-ar-ly-12h-1458-awake.png          1234 px differ, worst 132 levels, box (220, 32, 240, 264)
+moon-ar-sa-1010-aod.png                   0 px differ
+moon-ar-sa-1010-awake.png              1218 px differ, worst 132 levels, box (220, 32, 239, 264)
+ring-ar-sa-1458-aod.png                   0 px differ
+ring-ar-sa-1458-awake.png                 1 px differ, worst   1 levels, box (428, 331, 428, 331)
+ring-urdu-digits-1447-awake.png       11237 px differ, worst 243 levels, box (95, 102, 359, 344)
+sun-ar-ly-12h-1458-aod.png                0 px differ
+sun-ar-ly-12h-1458-awake.png              0 px differ

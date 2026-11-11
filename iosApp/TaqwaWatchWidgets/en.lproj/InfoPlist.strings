@@ -1,0 +1,2 @@
+/* The app's name under the widgets in the watch's lists, in the watch's language: the iPhone's own (iosApp/iosApp/en.lproj/InfoPlist.strings). */
+"CFBundleDisplayName" = "Taqwa";

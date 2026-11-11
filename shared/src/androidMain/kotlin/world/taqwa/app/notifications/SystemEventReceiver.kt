@@ -12,6 +12,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import world.taqwa.app.di.appContainer
+import world.taqwa.app.watchfeed.settleTheWatch
 import world.taqwa.app.widget.WidgetMirrorRefresher
 import world.taqwa.app.widget.androidAyahWidgetUpdateHook
 import world.taqwa.app.widget.androidWidgetUpdateHook
@@ -38,31 +39,32 @@ class SystemEventReceiver : BroadcastReceiver() {
             // early leaves the store consistent; the next foreground reschedule will catch up.
             try {
                 withTimeout(WORK_BUDGET_MILLIS) {
-                    // Reuse the process-wide container rather than rebuilding a repository,
-                    // refresher and coordinator here: DataStore permits one instance per file
-                    // (createDataStore() already guarantees that), and one coordinator means one
-                    // plan. appContext is set in TaqwaApplication.onCreate, which always runs
-                    // before any receiver, so forcing the lazy container here is safe.
-                    //
-                    // Wrapped like every sibling below it: a stored timezone the device's tzdb no
-                    // longer knows, or a DataStore read that fails, must not become a crash during
-                    // BOOT_COMPLETED — the next foreground reschedule will catch up.
-                    runCatching { appContainer.notificationCoordinator.reschedule(trigger) }
-                    // The same events stale the widget: a reboot may land days after the mirror
-                    // was written, and a clock or zone change moves every instant in it. Rewrite
-                    // it from the stored location and redraw; neither may fail the reschedule.
-                    runCatching {
-                        WidgetMirrorRefresher.refresh(appContainer.settingsRepository, appContainer.prayerTimesEngine)
-                    }
-                    runCatching { androidWidgetUpdateHook?.invoke() }
-                    // The ayah rotates on the local *date* (spec §5), so a clock or timezone
-                    // change can move today's ayah outright; a reboot can land a day later. It is
-                    // not on the prayer widgets' five-minute chain, so these events are among the
-                    // few things that redraw it between midnights. The hook also re-arms the
-                    // widget's own midnight alarm (`TaqwaWidgets.updateAyah`), which is what makes
-                    // TIMEZONE_CHANGED complete: the redraw alone would have left tomorrow's alarm
-                    // pointing at the *old* zone's midnight.
-                    runCatching { androidAyahWidgetUpdateHook?.invoke() }
+                    afterSystemEvent(
+                        // Reuse the process-wide container rather than rebuilding a repository,
+                        // refresher and coordinator here: DataStore permits one instance per file
+                        // (createDataStore() already guarantees that), and one coordinator means
+                        // one plan. appContext is set in TaqwaApplication.onCreate, which always
+                        // runs before any receiver, so forcing the lazy container here is safe.
+                        reschedule = { appContainer.notificationCoordinator.reschedule(trigger) },
+                        // The same events stale the widget: a reboot may land days after the
+                        // mirror was written, and a clock or zone change moves every instant in
+                        // it. Rewrite it from the stored location and redraw.
+                        refreshMirror = {
+                            WidgetMirrorRefresher.refresh(appContainer.settingsRepository, appContainer.prayerTimesEngine)
+                        },
+                        redrawWidgets = { androidWidgetUpdateHook?.invoke() },
+                        // The ayah rotates on the local *date* (spec §5), so a clock or timezone
+                        // change can move today's ayah outright; a reboot can land a day later.
+                        // It is not on the prayer widgets' five-minute chain, so these events are
+                        // among the few things that redraw it between midnights. The hook also
+                        // re-arms the widget's own midnight alarm (`TaqwaWidgets.updateAyah`),
+                        // which is what makes TIMEZONE_CHANGED complete: the redraw alone would
+                        // have left tomorrow's alarm pointing at the *old* zone's midnight.
+                        redrawAyah = { androidAyahWidgetUpdateHook?.invoke() },
+                        // The reschedule asked the watch (plan 2 Task 4); the process may stop
+                        // once this returns, so the ask is given its turn here, last and bounded.
+                        settleWatch = { settleTheWatch { appContainer.watchFeedSync } },
+                    )
                 }
             } catch (_: TimeoutCancellationException) {
                 // Nothing useful to do from a broadcast receiver but stop cleanly.
@@ -99,4 +101,28 @@ internal fun rescheduleTriggerFor(action: String?): RescheduleTrigger? = when (a
     Intent.ACTION_TIMEZONE_CHANGED -> RescheduleTrigger.TIMEZONE_CHANGED
     AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> RescheduleTrigger.SETTINGS_CHANGED
     else -> null
+}
+
+/**
+ * The receiver's body inside its budget, its steps passed in, as `topUp`'s are, so that their
+ * order and their independence can be tested without a `Context` or the app's container.
+ *
+ * Each step runs in its own `runCatching`, in this order: a stored timezone the device's tzdb no
+ * longer knows, or a DataStore read that fails, must not become a crash during `BOOT_COMPLETED`,
+ * and no step may cost another its turn (the next foreground reschedule will catch up). The
+ * watch is settled last, after every widget step: the reschedule only asked it, so a watch link
+ * that hangs costs the reminders and the widgets nothing.
+ */
+internal suspend fun afterSystemEvent(
+    reschedule: suspend () -> Unit,
+    refreshMirror: suspend () -> Unit,
+    redrawWidgets: suspend () -> Unit,
+    redrawAyah: suspend () -> Unit,
+    settleWatch: suspend () -> Unit,
+) {
+    runCatching { reschedule() }
+    runCatching { refreshMirror() }
+    runCatching { redrawWidgets() }
+    runCatching { redrawAyah() }
+    runCatching { settleWatch() }
 }

@@ -20,8 +20,11 @@ internal class AndroidPlatformFormat(
     private val clockFormat: ClockFormat = ClockFormat.TWENTY_FOUR_HOUR,
 ) : PlatformFormat {
 
-    // NumberFormat is not thread-safe, but every call here is on the UI thread and one instance
-    // avoids re-resolving the locale's numbering system on every tick of the countdown.
+    // NumberFormat is not thread-safe, so no instance of this class is shared across threads. The
+    // app's screens call theirs on the UI thread alone, and one instance avoids re-resolving the
+    // locale's numbering system on every tick of the countdown. The watch feed builds a fresh
+    // createPlatformFormat() for each ask (feedFor, plan 2 Task 4) and calls it, clockFigures
+    // included, only on the one worker that serves that ask.
     private val plainFormat = NumberFormat.getIntegerInstance(locale).apply { isGroupingUsed = false }
     private val twoDigitFormat = NumberFormat.getIntegerInstance(locale).apply {
         minimumIntegerDigits = 2
@@ -87,6 +90,41 @@ internal class AndroidPlatformFormat(
             return EnglishPlatformFormat.languageName(code)
         }
         return name
+    }
+
+    // The watch feed's words (plan 2, Task 1). clockTime above and longDate stay the app's own, in
+    // this format's locale; these are in the words locale, which follows the interface language.
+
+    override fun clockFigures(hour: Int, minute: Int): String {
+        val h = if (clockFormat == ClockFormat.TWELVE_HOUR) twelveHourParts(hour).first else hour
+        return "${plainFormat.format(h)}:${twoDigitFormat.format(minute)}"
+    }
+
+    override fun dayPeriods(language: UiLanguage): Pair<String, String> {
+        val markers = DateFormatSymbols.getInstance(wordsLocale(language)).amPmStrings
+        return markers[0] to markers[1]
+    }
+
+    override fun shortWeekday(date: LocalDate, language: UiLanguage): String = words("EEE", date, language)
+
+    override fun shortMonth(date: LocalDate, language: UiLanguage): String = words("MMM", date, language)
+
+    override fun longWeekday(date: LocalDate, language: UiLanguage): String = words("EEEE", date, language)
+
+    override fun longMonth(date: LocalDate, language: UiLanguage): String = words("MMMM", date, language)
+
+    private fun wordsLocale(language: UiLanguage): Locale =
+        Locale.forLanguageTag(wordsLocaleTag(languageTag(), language))
+
+    // The format forms of CLDR's Gregorian names (`MMM`, not the stand-alone `LLL`), the forms
+    // longDate's own pattern uses. A pattern of letters alone holds no digit, and the DecimalStyle
+    // is there all the same, as for longDate, should a pattern ever hold one.
+    private fun words(pattern: String, date: LocalDate, language: UiLanguage): String {
+        val wordsLocale = wordsLocale(language)
+        return DateTimeFormatter.ofPattern(pattern, wordsLocale)
+            .withChronology(IsoChronology.INSTANCE)
+            .withDecimalStyle(DecimalStyle.of(wordsLocale))
+            .format(date.toJavaLocalDate())
     }
 }
 

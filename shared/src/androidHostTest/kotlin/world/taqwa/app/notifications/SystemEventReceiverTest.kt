@@ -1,20 +1,36 @@
 package world.taqwa.app.notifications
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.currentTime
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
+import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.watchfeed.FakeWatchFeedMemory
+import world.taqwa.app.watchfeed.FakeWatchLink
+import world.taqwa.app.watchfeed.WatchFeedSync
+import world.taqwa.app.watchfeed.WatchSyncReason
+import world.taqwa.app.watchfeed.settleTheWatch
+import world.taqwa.app.watchfeed.syncFeed
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 /**
- * The action-to-trigger mapping, and nothing else: the receiver's body needs a `Context` and a
- * live container, but the mapping is the part that silently breaks the adhan when it is wrong —
- * an action missing here is an event the app ignores.
+ * The action-to-trigger mapping, and the receiver's body with its steps faked ([afterSystemEvent]):
+ * the receiver itself needs a `Context` and a live container, but the mapping is the part that
+ * silently breaks the adhan when it is wrong — an action missing here is an event the app ignores.
  *
  * The literal strings are deliberate. They are what the manifest's `<intent-filter>` carries, and
  * asserting against `Intent.ACTION_*` would only prove the file agrees with itself; this way a
  * filter and a `when` that drift apart show up here. `Intent.ACTION_TIME_CHANGED` really is
  * `"android.intent.action.TIME_SET"`.
  *
- * Lives in `androidHostTest` because the mapping is an Android concern; only the pure function is
+ * Lives in `androidHostTest` because the mapping is an Android concern; only plain functions are
  * touched, so no Android class is ever loaded.
  */
 class SystemEventReceiverTest {
@@ -63,5 +79,44 @@ class SystemEventReceiverTest {
         assertNull(rescheduleTriggerFor("android.intent.action.PACKAGE_REPLACED"))
         assertNull(rescheduleTriggerFor("world.taqwa.app.PRAYER_ALARM"))
         assertNull(rescheduleTriggerFor(null))
+    }
+
+    /**
+     * The receiver's body ([afterSystemEvent]) with its steps faked, on virtual time: a watch link
+     * that hangs costs the reminders and the widgets nothing. The reschedule only asks the watch,
+     * every widget step runs at once, and the watch is settled last, at the end of the ask's own
+     * 5-second budget, well inside the receiver's 8 seconds. Only plain Kotlin is touched, so no
+     * Android class is loaded.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun theWidgetsAreRedrawnWhileTheWatchLinkHangs() = runTest {
+        val london = GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB")
+        val events = mutableListOf<Pair<String, Long>>()
+        val sync = WatchFeedSync(
+            feedFor = { delay(3.seconds); syncFeed() },
+            link = FakeWatchLink(confirmsDelivery = true).apply { gate = CompletableDeferred() },
+            memory = FakeWatchFeedMemory(),
+            scope = backgroundScope,
+            work = StandardTestDispatcher(testScheduler),
+        )
+        var settled: Pair<Boolean, Long>? = null
+
+        withTimeout(8_000) {
+            afterSystemEvent(
+                reschedule = {
+                    events += "armed" to currentTime
+                    sync.request(WatchSyncReason.RESCHEDULED, london)
+                },
+                refreshMirror = { events += "mirror" to currentTime },
+                redrawWidgets = { events += "widgets" to currentTime },
+                redrawAyah = { events += "ayah" to currentTime },
+                settleWatch = { settled = settleTheWatch { sync } to currentTime },
+            )
+        }
+
+        assertEquals(listOf("armed" to 0L, "mirror" to 0L, "widgets" to 0L, "ayah" to 0L), events)
+        assertEquals(true to 5_000L, settled, "settled once the ask's budget ended")
+        assertTrue(currentTime < 8_000, "returned at $currentTime ms")
     }
 }

@@ -1,0 +1,7 @@
+10-31 13:23:53.856 I/System.out( 1763): TaqwaWearFeed NUDGE armed in 85946s found=false stopped=false
+10-31 13:23:54.002 I/System.out( 1763): TaqwaWearFeed ASK STARTED skipped
+10-31 13:23:59.046 I/System.out( 1763): TaqwaWearFeed ASK PHONE_NEARBY sent
+10-31 13:23:59.202 I/System.out( 1763): TaqwaWearFeed ACCEPTED 18/23aee84e77b1f1f2
+10-31 13:23:59.339 I/System.out( 1763): TaqwaWearFeed ACK 18/23aee84e77b1f1f2 sent
+10-31 13:23:59.465 I/System.out( 1763): TaqwaWearFeed ACCEPTED 19/23aee84e77b1f1f2
+10-31 13:23:59.479 I/System.out( 1763): TaqwaWearFeed ACK 19/23aee84e77b1f1f2 sent

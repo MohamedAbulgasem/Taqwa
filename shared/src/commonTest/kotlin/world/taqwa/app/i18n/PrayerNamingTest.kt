@@ -40,4 +40,18 @@ class PrayerNamingTest {
     fun theLanguageTagCheckIsCaseInsensitive() {
         assertEquals(PrayerNaming.arabicName(Prayer.MAGHRIB), PrayerNaming.display(Prayer.MAGHRIB, "AR", "Maghrib"))
     }
+
+    @Test
+    fun nextInPatternKeepsThePlaceForTheName() {
+        assertEquals("%1\$s in", PrayerNaming.nextInPattern("en"))
+        assertEquals("متبقٍّ على %1\$s", PrayerNaming.nextInPattern("ar"))
+        // The label the widgets render, with the name put in the pattern's place.
+        for (tag in listOf("en", "ar", "fr", "tr", "id", "ur", "bn")) {
+            assertEquals(
+                PrayerNaming.countdownLabel(Prayer.ASR, tag),
+                PrayerNaming.nextInPattern(tag).replace("%1\$s", PrayerNaming.name(Prayer.ASR, tag)),
+                tag,
+            )
+        }
+    }
 }

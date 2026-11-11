@@ -1,0 +1,20 @@
+# Step 3: the pairing, as found after SIGN (Mohamed, 31 Oct ~12:50), and the harness's nodes
+time: Sat Oct 31 12:56:27 SAST 2026
+build: 36 BE2A.250530.026.D1
+taqwa:
+pixel watch app: versionName=5.1.0.1005629187
+gms: versionName=26.42.31 (260400-1005867181)
+packages: 249
+accounts: 1
+auto_time=1 auto_time_zone=1 tz=Africa/Johannesburg
+font_scale=1.0
+locale: persist.sys.locale= system_locales=null
+talkback: services=null enabled=0
+airplane=0 wifi=1
+forward: emulator-5562 tcp:64922 tcp:5601
+reverse (watch): host-15 tcp:5601 tcp:64922
+
+watch: app: versionCode=100038 minSdk=30 targetSdk=36 app sha1: 2b2d77c9 face: versionCode=38 minSdk=33 targetSdk=36 sha1=d4f50b1d files: . .. feed.json nudge.anchor profileInstalled feed sha1: 0b3f92ef writtenAt=1792821600 en
+
+installed 13:03:15-13:03:17: wearApp-debug.apk 832eaa68 on emulator-5558, androidApp-debug.apk e4c68dbc on emulator-5562 (adb -s ... install -r)
+13:04:03 h nodes : node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=true

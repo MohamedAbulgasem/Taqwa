@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The phone's Wear Data Layer capability (plan 2 Task 5): Taqwa's watch app shakes hands only with
+  nearby nodes that declare taqwa_phone (WatchLinkContract.PHONE_CAPABILITY). Read by Play services
+  alone, never by the app's code, so it is kept from resource shrinking. Not a word anyone sees.
+  PhoneWatchListenerServiceTest (in :shared) holds it to the contract's constant (Ruling 54 item 2).
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@array/android_wear_capabilities">
+    <string-array name="android_wear_capabilities" translatable="false">
+        <item>taqwa_phone</item>
+    </string-array>
+</resources>

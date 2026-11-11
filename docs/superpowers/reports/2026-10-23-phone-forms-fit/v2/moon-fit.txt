@@ -1,0 +1,71 @@
+calibration (emulator-5558's angles, the model's, degrees):
+  count     in 2 h 2 min             emulator  61.09  model  61.71
+  count     in 4 h 2 min             emulator  61.09  model  61.87
+  count     in 1 h 39 min            emulator  66.88  model  66.93
+  count     in 1 h 33 min            emulator  66.25  model  66.40
+  count     in 53 min                emulator  48.35  model  49.06
+  count     بعد 2 س 2 د              emulator  63.67  model  63.73
+  count     بعد 4 س 2 د              emulator  63.67  model  63.73
+  count     بعد 1 س 39 د             emulator  70.43  model  70.52
+  count     بعد 1 س 33 د             emulator  70.43  model  70.52
+  count     بعد 53 د                 emulator  41.99  model  42.11
+  count     بعد ٢ س ٢ د              emulator  63.67  model  63.73
+  count     بعد ٤ س ٢ د              emulator  63.67  model  63.73
+  count     بعد ١ س ٣٩ د             emulator  70.43  model  70.52
+  count     بعد ١ س ٣٣ د             emulator  70.43  model  70.52
+  count     بعد ٥٣ د                 emulator  41.99  model  42.11
+  prayer    FAJR 4:33                emulator  58.10  model  59.19
+  prayer    DHUHR 12:33              emulator  76.54  model  76.81
+  prayer    ASR 16:10                emulator  58.09  model  58.43
+  prayer    MAGHRIB 19:04            emulator  91.09  model  91.17
+  prayer    ISHA 20:24               emulator  65.93  model  66.56
+  prayer    الفجر 4:33               emulator  52.61  model  53.95
+  prayer    الظهر 12:33              emulator  59.61  model  60.82
+  prayer    العصر 4:10               emulator  56.38  model  57.39
+  prayer    المغرب 7:04              emulator  64.47  model  65.20
+  prayer    العشاء 8:24              emulator  61.93  model  61.98
+  prayer    الفجر ٤:٣٣               emulator  50.40  model  52.65
+  prayer    الظهر ١٢:٣٣              emulator  56.65  model  60.89
+  prayer    العصر ١٦:١٠              emulator  59.23  model  63.26
+  prayer    المغرب ١٩:٠٤             emulator  66.54  model  70.11
+  prayer    العشاء ٢٠:٢٤             emulator  64.62  model  67.00
+  hijri     6 Jumada al-Ula          emulator  66.76  model  66.99
+  hijri     29 Jumada al-Akhirah     emulator  90.02  model  90.35
+  hijri     30 Joumada al-Akhira     emulator  90.27  model  90.35
+  hijri     30 Cemaziyelevvel        emulator  77.63  model  78.60
+  hijri     ৩০ জমাদিউল আউয়াল        emulator  83.75  model  83.82
+  hijri     2 Rajab                  emulator  30.65  model  30.73
+  hijri     ٣٠ جمادى الأولى          emulator  69.18  model  70.91
+  hijri     29 جمادى الآخرة          emulator  69.88  model  70.00
+  hijri     30 جمادی الثانی          emulator  69.24  model  70.00
+  hijri     6 جمادى الأولى           emulator  65.02  model  65.06
+  hijri     ١٢ جمادى الثانية         emulator  70.79  model  71.52
+  hijri     ١٠ ذو الحجّة             emulator  49.24  model  51.50
+  hijri_d   6 Jumada al-Ula          emulator  80.90  model  81.79
+  hijri_d   29 Jumada al-Akhirah     emulator 110.10  model 110.31
+  hijri_d   30 Joumada al-Akhira     emulator 110.20  model 110.31
+  hijri_d   30 Cemaziyelevvel        emulator  94.30  model  95.98
+  hijri_d   ৩০ জমাদিউল আউয়াল        emulator 102.80  model 102.93
+  hijri_d   2 Rajab                  emulator  37.30  model  37.54
+  hijri_d   ٣٠ جمادى الأولى          emulator  84.30  model  86.61
+  hijri_d   29 جمادى الآخرة          emulator  85.40  model  85.50
+  hijri_d   30 جمادی الثانی          emulator  84.60  model  85.50
+  hijri_d   6 جمادى الأولى           emulator  79.30  model  79.46
+  hijri_d   ١٢ جمادى الثانية         emulator  86.60  model  87.36
+  hijri_d   ١٠ ذو الحجّة             emulator  60.30  model  62.91
+the Hijri date with the slots empty: 3600 forms; the widest 20 Jumada al-Akhirah (ENGLISH) takes 90.4 deg of the 104-degree path, 18.9 px to spare at each end
+the Hijri date with a slot filled: 3600 forms; the widest 20 Jumada al-Akhirah (ENGLISH) takes 110.4 deg of the 120-degree path, 11.1 px to spare at each end
+  its deepest descender (۹ ربیع الثانی), if it stood at six, -0.0 px above the slots' boxes
+the countdown, from tools/watchface/phone-forms.json (ar-AE, ar-DZ, ar-EG, ar-IQ, ar-JO, ar-LB, ar-LY, ar-MA, ar-SA, ar-SY, ar-TN, bn-BD, bn-IN, en, en-GB, en-US, en-ZA, fa-IR, fr-CA, fr-DZ, fr-FR, fr-MA, he-IL, hi-IN, id-ID, mr-IN, tr-TR, ur-IN, ur-PK, zh-CN): 258000 forms; the widest এক মিনিটের কম সময়ে (bn-BD) takes 112.3 deg of the 124-degree path, 12.0 px to spare at each end
+the prayer line: 120 forms (each name beside its clock's widest time); the nearest JOUMOUʿA 20:00 (FRENCH), -52.3..54.0 deg, 64.8 px from the date window
+the curved runs' glyphs: 63264 forms; the most past the characters, against the joiners each run's PAD has:
+  countdown   left to right  0 (৯৯ ঘ ৯ মি পরে), against 0
+  countdown   right to left  8 (بعد أقل من دقيقة), against 12
+  hijri       left to right  0 (৯ সফর), against 0
+  hijri_day   right to left  0 (۹), against 0
+  hijri_month right to left  4 (ربیع الثانی), against 12
+  label       left to right  1 (যোহর), against 12
+  label       right to left  2 (مغرب), against 12
+  time        left to right  0 (৯:৫৯), against 0
+  time        right to left  0 (۹:۵۹), against 0
+every form fits, 3 px or more to spare

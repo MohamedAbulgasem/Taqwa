@@ -215,10 +215,16 @@ class HafsMarkPlacementDbTest {
     // A screen drawing Quran text in the Hafs face has to hand it through forDrawing: a new file, or
     // a call dropped from a file that has others, fails here. It counts calls, so a new call in a
     // listed file means looking at it and raising its number. Files that only ever draw a surah's
-    // name or a reciter's initial carry no superscript alef, sukun or tanwin to convert.
+    // name or a reciter's initial carry no superscript alef, sukun or tanwin to convert. The watch's
+    // sources are walked too, though no watch shows an ayah today: one that ever does is caught here.
     @Test fun everyPlaceDrawingAyahsInTheHafsFaceUsesTheDrawnSpelling() {
         val namesOnly = setOf("MushafFont.kt", "ReaderHeader.kt", "RecitationUi.kt", "PlayerBar.kt", "DownloadSheet.kt")
-        val roots = listOf("src/commonMain/kotlin", "../androidApp/src/main/kotlin", "../iosApp/TaqwaWidget", "../iosApp/iosApp")
+        val roots = listOf(
+            "src/commonMain/kotlin", "src/androidMain/kotlin", "src/iosMain/kotlin",
+            "../androidApp/src/main/kotlin", "../iosApp/TaqwaWidget", "../iosApp/iosApp",
+            "../wearApp/src/main", "../watchcore/src/commonMain",
+            "../iosApp/TaqwaWatch", "../iosApp/TaqwaWatchWidgets", "../iosApp/WatchShared", "../iosApp/WatchCore/Sources",
+        )
         val hafs = listOf("mushafFamily()", "FONT_HAFS", "TaqwaHafs.font")
         val calls = roots.flatMap { root -> resource(root).walkTopDown().toList() }
             .filter { it.extension == "kt" || it.extension == "swift" }

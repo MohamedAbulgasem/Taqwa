@@ -1,0 +1,5 @@
+10-31 16:28:10.895 20691 20737 I System.out: TaqwaWatch WATCH_ASKED SENT 2745ms
+10-31 16:28:10.946 20691 20746 I System.out: TaqwaWatch ACK 2/6efab8e0696fdd95
+10-31 16:28:10.992 20691 20737 I System.out: TaqwaWatch RESCHEDULED SENT 96ms
+10-31 16:28:10.994 20691 20735 I TaqwaWatchHarness: place: stored London id=2643743 zone=Europe/London at <the harness's coordinates, left out>; plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T14:47:00Z; settled=true
+10-31 16:28:11.079 20691 20746 I System.out: TaqwaWatch ACK 3/6efab8e0696fdd95

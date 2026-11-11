@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import world.taqwa.app.about.AboutLinks
 import world.taqwa.app.crash.ReportMail
@@ -74,7 +75,8 @@ import world.taqwa.app.resources.about_licence
 import world.taqwa.app.resources.about_licence_value
 import world.taqwa.app.resources.about_nothing_body
 import world.taqwa.app.resources.about_nothing_title
-import world.taqwa.app.resources.about_online_body
+import world.taqwa.app.resources.about_online_body_android
+import world.taqwa.app.resources.about_online_body_ios
 import world.taqwa.app.resources.about_online_title
 import world.taqwa.app.resources.about_privacy_policy
 import world.taqwa.app.resources.about_report_problem
@@ -95,6 +97,14 @@ import world.taqwa.app.resources.settings_share_message
 import world.taqwa.app.resources.settings_version_value
 import world.taqwa.app.share.shareText
 import world.taqwa.app.widget.isIosPlatform
+
+/**
+ * The "Online only for what you choose" row's text on this platform: the iPhone's names Apple
+ * alone, Android's Google alone, as the company that may carry the watch's data (App Store Review
+ * Guideline 2.3.10, Ruling 63).
+ */
+fun aboutOnlineBody(isIos: Boolean): StringResource =
+    if (isIos) Res.string.about_online_body_ios else Res.string.about_online_body_android
 
 /**
  * Settings › About Taqwa (privacy spec §6; settings redesign spec, approved 30 Oct 2026): the app's
@@ -355,10 +365,9 @@ private fun Promises() {
         mark = { drawPhone(it) },
     )
     CardDivider()
-    // TODO(watch-companion merge): aboutOnlineBody(isIosPlatform)
     PromiseRow(
         stringResource(Res.string.about_online_title),
-        stringResource(Res.string.about_online_body),
+        stringResource(aboutOnlineBody(isIosPlatform)),
         mark = { drawCloudDown(it) },
     )
     CardDivider()

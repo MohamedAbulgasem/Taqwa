@@ -1,0 +1,1 @@
+after DEBUG_FEED: delivery=[cat: files/feed.json.delivery: No such file or directory] days=31 first=2026-10-17 last=2026-11-16 city='Cape Town' place={"qiblaBearing": 23.0, "qiblaKm": "6,600", "declination": -27.0, "southern": true} lang=en rtl=False zero='0' 12h=False version=1 tasbeeh=2 writtenAt=1790920800

@@ -695,6 +695,143 @@ def check_site(data: timetables.Timetables) -> int:
             problem("404.html: not marked noindex")
     for message in check_get_pages():
         problem(message)
+    for message in check_watch_answer():
+        problem(message)
+    for message in check_smart_stack():
+        problem(message)
+    for message in check_chosen_words():
+        problem(message)
+    return problems
+
+
+# The support page's watch answer (#watch) names the watch's own buttons and lines as the watch
+# shows them, in the watch app's own resources: "Add the Taqwa face" (face_add) and "Open Taqwa on
+# your phone" (open_taqwa_on_phone). Plan 5 Task 11's native review found four languages quoting a
+# face label the watch does not show. Arabic was reported here until Mohamed's reading (M8), and
+# since he answered on 6 November 2026 (point A2: the answer quotes the button word for word,
+# «أضِف واجهة تقوى») no language waits.
+WATCH_ANSWER_LABELS = ("face_add", "open_taqwa_on_phone")
+WATCH_ANSWER_AT_M8 = set()
+
+
+# The home page's watch card names Apple's Smart Stack as Apple's own Apple Watch User Guide does
+# in that language (support.apple.com, guide/watch/apdecf142fb9, read on 6 November 2026): French
+# "défilement intelligent", Turkish "Akıllı Gruplama", and the English name in Indonesian, whose
+# guide keeps it, and in Urdu and Bengali, whose guides are in English. Plan 5 Task 11's review
+# round 1 found three translator's names Apple does not use. Apple's Arabic is "الحزمة المكدسة
+# الذكية", which the card takes since Mohamed's reading (M8 point A6, 6 November 2026), so no
+# language waits. tools/store-listing-check.py holds the same names for the App Store's own text.
+SMART_STACK = {"en": "Smart Stack", "ar": "الحزمة المكدسة الذكية", "fr": "défilement intelligent",
+               "tr": "Akıllı Gruplama", "id": "Smart Stack", "ur": "Smart Stack", "bn": "Smart Stack"}
+SMART_STACK_AT_M8 = set()
+
+# The words Mohamed chose for a language at M8 (6 November 2026), on the home page's watch card and
+# in the support page's watch answer: each pair is a word that goes and the one he chose. Arabic
+# says إضافات for complications (point A3), never مضاعفات. tools/store-listing-check.py holds the
+# same words in the store copy and the release notes.
+CHOSEN_WORDS = {"ar": [("مضاعف", "إضافات")]}
+
+
+def folded(text: str, lang: str) -> str:
+    """text in one case for comparing, as lang writes its capitals: Turkish capitals dotless ı as I
+    and dotted i as İ, which casefold alone reads as i and i with a combining dot."""
+    if lang == "tr":
+        text = text.replace("I", "ı").replace("İ", "i")
+    return text.casefold()
+
+
+def check_smart_stack() -> list:
+    """Each language's watch card on its home page (the card that names Apple Watch) names the
+    Smart Stack as Apple's own guide in that language does, in any case: Apple's own headings
+    capitalise it ("Défilement intelligent"), and its prose does not."""
+    problems = []
+    for lang in LANGUAGE_ORDER:
+        path = os.path.join(SITE, "pages", lang, "home.html")
+        if not os.path.exists(path):
+            problems.append(f"{lang}/home.html: no home page")
+            continue
+        with open(path, encoding="utf-8") as f:
+            page = f.read()
+        card = next((c for c in re.findall(r"<article\b.*?</article>", page, re.S) if "Apple Watch" in c), None)
+        if card is None:
+            problems.append(f"{lang}/home.html: no watch card (an article that names Apple Watch)")
+            continue
+        if folded(SMART_STACK[lang], lang) not in folded(card, lang):
+            message = f"{lang}/home.html: the watch card does not name the Smart Stack as Apple does, '{SMART_STACK[lang]}'"
+            if lang in SMART_STACK_AT_M8:
+                print(f"note (M8): {message}", file=sys.stderr)
+            else:
+                problems.append(message)
+    return problems
+
+
+def watch_texts(lang: str) -> list:
+    """(where, text) of lang's watch card on its home page and its support page's watch answer."""
+    texts = []
+    path = os.path.join(SITE, "pages", lang, "home.html")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            page = f.read()
+        card = next((c for c in re.findall(r"<article\b.*?</article>", page, re.S) if "Apple Watch" in c), None)
+        if card is not None:
+            texts.append((f"{lang}/home.html: the watch card", card))
+    path = os.path.join(SITE, "pages", lang, "support.html")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            page = f.read()
+        start = page.find('<h2 id="watch">')
+        if start >= 0:
+            end = page.find("<h2", start + 1)
+            texts.append((f"{lang}/support.html: the watch answer", page[start:end if end > 0 else len(page)]))
+    return texts
+
+
+def check_chosen_words() -> list:
+    """No word Mohamed's choice at M8 replaced is left on a language's watch card or watch answer.
+    A missing page, card or answer is check_smart_stack's and check_watch_answer's to report."""
+    problems = []
+    for lang, words in CHOSEN_WORDS.items():
+        for where, text in watch_texts(lang):
+            for wrong, chosen in words:
+                if folded(wrong, lang) in folded(text, lang):
+                    problems.append(f"{where} says '{wrong}', where Mohamed chose '{chosen}' (M8)")
+    return problems
+
+
+def wear_string(lang: str, key: str) -> str:
+    folder = "values" if lang == "en" else "values-" + ("in" if lang == "id" else lang)
+    path = os.path.join(ROOT, "wearApp", "src", "main", "res", folder, "strings.xml")
+    with open(path, encoding="utf-8") as f:
+        found = re.search(r'<string name="%s">(.*?)</string>' % key, f.read())
+    return found.group(1) if found else ""
+
+
+def check_watch_answer() -> list:
+    """Each language's support answer #watch holds the watch's own face_add and open lines."""
+    problems = []
+    for lang in LANGUAGE_ORDER:
+        path = os.path.join(SITE, "pages", lang, "support.html")
+        if not os.path.exists(path):
+            problems.append(f"{lang}/support.html: no support page")
+            continue
+        with open(path, encoding="utf-8") as f:
+            page = f.read()
+        start = page.find('<h2 id="watch">')
+        if start < 0:
+            problems.append(f"{lang}/support.html: no watch answer (h2 id=watch)")
+            continue
+        end = page.find("<h2", start + 1)
+        answer = page[start:end if end > 0 else len(page)]
+        for key in WATCH_ANSWER_LABELS:
+            label = wear_string(lang, key)
+            if not label:
+                problems.append(f"{lang}: the watch app's resources have no {key} for the watch answer to name")
+            elif label not in answer:
+                message = f"{lang}/support.html: the watch answer does not name the watch's {key}, '{label}'"
+                if lang in WATCH_ANSWER_AT_M8:
+                    print(f"note (M8): {message}", file=sys.stderr)
+                else:
+                    problems.append(message)
     return problems
 
 

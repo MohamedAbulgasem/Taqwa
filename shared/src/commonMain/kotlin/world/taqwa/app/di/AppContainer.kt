@@ -13,6 +13,8 @@ import world.taqwa.app.feature.recitation.asPort
 import world.taqwa.app.feature.recitation.asRecitationPort
 import world.taqwa.app.feature.recitation.readAloudPort
 import world.taqwa.app.city.CityRepository
+import world.taqwa.app.domain.GeoLocation
+import world.taqwa.app.i18n.createPlatformFormat
 import world.taqwa.app.location.LocationRefresher
 import world.taqwa.app.location.LocationRepository
 import world.taqwa.app.location.createLocationProvider
@@ -39,6 +41,22 @@ import world.taqwa.app.settings.DataStoreAdhkarStore
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.settings.TasbeehStore
 import world.taqwa.app.settings.createDataStore
+import world.taqwa.app.watch.WatchFeed
+import world.taqwa.app.watchfeed.DataStoreWatchFeedMemory
+import world.taqwa.app.watchfeed.WATCH_LOG_TAG
+import world.taqwa.app.watchfeed.WatchFeedBuilder
+import world.taqwa.app.watchfeed.WatchFeedInputs
+import world.taqwa.app.watchfeed.WatchFeedMemory
+import world.taqwa.app.watchfeed.WatchFeedSync
+import world.taqwa.app.watchfeed.WatchLink
+import world.taqwa.app.watchfeed.WatchSyncReason
+import world.taqwa.app.watchfeed.askStepsLine
+import world.taqwa.app.watchfeed.createWatchLink
+import world.taqwa.app.watchfeed.stepsLogged
+import world.taqwa.app.watchfeed.watchCityName
+import world.taqwa.app.watchfeed.watchScreenWords
+import world.taqwa.app.watchfeed.watchSpoken
+import world.taqwa.app.watchfeed.watchUiLanguage
 import world.taqwa.app.widget.createWidgetPinRequester
 import world.taqwa.app.widget.createWidgetPlacementSource
 import kotlin.coroutines.cancellation.CancellationException
@@ -156,6 +174,81 @@ class AppContainer {
     val widgetPlacementSource = createWidgetPlacementSource()
     val locationRefresher = LocationRefresher(locationRepository, cityRepository, settingsRepository)
 
+    // ── The watch feed (plan 2 Task 4). Declared before the coordinator, which asks it. ──
+    /**
+     * The watch side's own process scope: the sync's one worker lives here, on the default
+     * dispatcher and never the caller's. The handler for the same reason as the recitation
+     * controller's: a supervisor alone does not stop an uncaught throw reaching the process.
+     */
+    internal val watchFeedScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> },
+    )
+
+    /**
+     * The phone's one record of its watch (Ruling 50): this install's origin, its delivery numbers
+     * and what the watch has echoed, in the settings store.
+     */
+    internal val watchFeedMemory: WatchFeedMemory = DataStoreWatchFeedMemory(dataStore)
+
+    /**
+     * The platform's link to the user's own watch: WatchConnectivity on the iPhone (plan 2 Task 8);
+     * on Android the Wear Data Layer's messages, to watches directly connected at the send (Task 5).
+     */
+    internal val watchLink: WatchLink = createWatchLink()
+
+    /**
+     * The feed for one ask, built on the sync's worker inside its budget: the location planned (or
+     * the stored one), the clock and the prayer settings, then the interface language, the screen
+     * reader's words and the words of the watch's screens read one after the other, so that all
+     * three come from one resource environment. The format is a fresh `createPlatformFormat` for each ask, as the coordinator
+     * builds its own: an Android format's `NumberFormat` is not shared across threads
+     * (`PlatformFormat.android.kt`). Null with no location: nothing goes.
+     */
+    internal val watchFeedFor: suspend (GeoLocation?) -> WatchFeed? = feed@{ planned ->
+        val location = planned ?: settingsRepository.location.first() ?: return@feed null
+        val clockFormat = settingsRepository.clockFormat.first()
+        val prayerSettings = settingsRepository.prayerSettings.first()
+        val language = watchUiLanguage()
+        val spoken = watchSpoken()
+        val screens = watchScreenWords(language)
+        val format = createPlatformFormat(clockFormat)
+        WatchFeedBuilder.build(
+            WatchFeedInputs(
+                location = location,
+                city = watchCityName(location, format, cityRepository),
+                language = language,
+                spoken = spoken,
+                screens = screens,
+                prayerSettings = prayerSettings,
+                format = format,
+                clockFormat = clockFormat,
+                phrases = tasbeehStore.customPresets.first(),
+                now = Clock.System.now(),
+                timesFor = { date -> prayerTimesEngine.timesFor(location, date, prayerSettings) },
+            ),
+        )
+    }
+
+    /**
+     * Asked after every reschedule, every phrase change and every return of the watch. Its one
+     * line per ask is a plain `println`, as `:shared` has no logger of its own (Ruling 48): on
+     * Android it reaches logcat as `System.out`, which plan 2 Task 7's pass reads. It names the
+     * reason, the result and the milliseconds, never the place or the person. A debug build, or a
+     * signed one after `adb shell setprop log.tag.TaqwaWatch DEBUG` (`stepsLogged`, read at each
+     * ask), adds a second line, the time of each of the ask's steps (Ruling 70 item 1), so a slow
+     * step can be named on P5.13's candidate too: `askStepsLine`, which names no place, person or
+     * delivery either.
+     */
+    internal val watchFeedSync = WatchFeedSync(
+        feedFor = watchFeedFor,
+        link = watchLink,
+        memory = watchFeedMemory,
+        scope = watchFeedScope,
+        report = { reason, result, millis -> println("$WATCH_LOG_TAG $reason $result ${millis}ms") },
+        timed = { if (stepsLogged()) println(askStepsLine(it)) },
+    )
+    // ── end watch feed ──────────────────────────────────────────────────────────────
+
     /** The one platform scheduler: the coordinator arms whole plans with it, and a finished set of
      * adhkar withdraws its own reminder through it (adhkar spec §5) without a reschedule. */
     val notificationScheduler = createNotificationScheduler()
@@ -171,6 +264,8 @@ class AppContainer {
         doneAdhkar = {
             AdhkarSet.entries.mapNotNull { set -> adhkarStore.done(set).first()?.let { adhkarNotificationId(set, it) } }.toSet()
         },
+        // Only asks: the sync builds and sends on its own worker, never inside the lock.
+        afterPlan = { watchFeedSync.request(WatchSyncReason.RESCHEDULED, it) },
     )
 }
 

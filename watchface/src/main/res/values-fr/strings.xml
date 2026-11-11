@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the phone's own words: androidApp's app_name and widget_small_label -->
+    <string name="watch_face_name">Taqwa</string>
+    <string name="slot_next_prayer">Prochaine prière</string>
+    <!-- the watch's own words -->
+    <string name="style">Style</string>
+    <string name="style_arch">Arche</string>
+    <string name="style_ring">Anneau</string>
+    <string name="style_sun">Soleil</string>
+    <string name="style_moon">Lune</string>
+    <string name="accent">Couleur</string>
+    <string name="accent_amber">Ambre</string>
+    <string name="accent_pearl">Perle</string>
+    <string name="accent_sage">Sauge</string>
+    <string name="accent_night">Nuit</string>
+    <string name="slot_day">Prières du jour</string>
+    <string name="slot_dates">Dates</string>
+    <string name="slot_dates_short">Date et lune</string>
+    <string name="slot_countdown">Temps avant la prochaine prière</string>
+    <string name="slot_day_dial">Cadran de la journée de prière</string>
+    <string name="slot_left">Complication de gauche</string>
+    <string name="slot_right">Complication de droite</string>
+</resources>

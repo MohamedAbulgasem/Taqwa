@@ -1,0 +1,91 @@
+# P5.12 Step 4, the Tile's refresh, 7 Nov 2026, emulator-5558, staging 62e88a0a (no setprop needed: it predates Ruling 72's log gate).
+# Capture: adb -s emulator-5558 logcat -v threadtime -T 1, 106,668 lines, kept in the session scratchpad (p512s4/tile-all.log). These are its Tile lines.
+# A line's stamp is the watch's clock, moved as the table in the report says. Taqwa's process was PID 24930 until the debug install at 09:34:57.
+
+11-07 09:00:20.557 17988 18179 I SysUI   : [CommonTilesDataController]Visible tile added with id: 36
+11-07 09:00:20.559 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+11-07 09:00:20.587 17988 17988 W ProtoTilesTileRendererImpl: inflateIfNeededAndAttach called but no valid tile data has been set world.taqwa.app/.wear
+11-07 09:00:20.593 24930 24930 I TaqwaComplications: asked again (tile)
+11-07 09:00:20.641 24930 24930 D TaqwaTile: Tile: 32 entries, 18 counting down, 151975 bytes, schema 1.600
+11-07 09:54:16.337 17988 18018 I SysUI   : [CommonTilesDataController]Visible tile removed with id: 36
+11-07 09:54:16.386 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+12-05 19:00:00.055 17988 19710 I SysUI   : [CommonTilesDataController]Visible tile added with id: 37
+12-05 19:00:00.056 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+12-05 19:00:00.077 17988 17988 W ProtoTilesTileRendererImpl: inflateIfNeededAndAttach called but no valid tile data has been set world.taqwa.app/.wear
+12-05 19:00:00.082 24930 24930 I TaqwaComplications: asked again (tile)
+12-05 19:00:00.102 24930 24930 D TaqwaTile: Tile: 9 entries, 8 counting down, 41134 bytes, schema 1.600
+12-05 19:00:16.673 17988 18018 I SysUI   : [CommonTilesDataController]Visible tile removed with id: 37
+12-05 19:00:16.674 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+12-05 19:21:00.051 17988 17998 I SysUI   : [CommonTilesDataController]Visible tile added with id: 38
+# SysUI's "Visible" there means the carousel's list, not the screen: the face stayed in front (not-visible-face.png).
+12-05 19:21:00.051 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+12-05 19:21:00.081 17988 17988 W ProtoTilesTileRendererImpl: inflateIfNeededAndAttach called but no valid tile data has been set world.taqwa.app/.wear
+12-05 19:21:00.088 24930 24930 D TaqwaTile: Tile: 5 entries, 4 counting down, 19760 bytes, schema 1.600
+12-05 19:33:00.169 24930 24930 D TaqwaTile: Tile: 1 entries, 0 counting down, 319 bytes, schema 1.600
+12-05 19:33:29.411 17988 19711 I SysUI   : [CommonTilesDataController]Visible tile removed with id: 38
+12-05 19:33:29.418 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+12-05 19:28:00.125 17988 19710 I SysUI   : [CommonTilesDataController]Visible tile added with id: 39
+12-05 19:28:00.126 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+12-05 19:28:00.156 17988 17988 W ProtoTilesTileRendererImpl: inflateIfNeededAndAttach called but no valid tile data has been set world.taqwa.app/.wear
+12-05 19:28:00.165 24930 24930 D TaqwaTile: Tile: 4 entries, 3 counting down, 14205 bytes, schema 1.600
+12-05 19:33:00.219 24930 24930 D TaqwaTile: Tile: 1 entries, 0 counting down, 319 bytes, schema 1.600
+12-05 19:33:16.508 17988 17997 I SysUI   : [CommonTilesDataController]Visible tile removed with id: 39
+12-05 19:33:16.557 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+12-05 19:28:00.061 17988 19710 I SysUI   : [CommonTilesDataController]Visible tile added with id: 40
+12-05 19:28:00.062 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+12-05 19:28:00.079 24930 24930 D TaqwaTile: Tile: 4 entries, 3 counting down, 14205 bytes, schema 1.600
+12-05 19:28:00.091 17988 17988 W ProtoTilesTileRendererImpl: inflateIfNeededAndAttach called but no valid tile data has been set world.taqwa.app/.wear
+12-05 19:33:59.813 24930 24930 D TaqwaTile: Tile: 1 entries, 0 counting down, 319 bytes, schema 1.600
+12-05 19:34:57.645 17988 18017 I SysUI   : [CommonTilesDataController]Visible tile removed with id: 40
+12-05 19:34:57.646 17988 17988 I SysUI   : [TileUiLoader]Loading all tiles at once. firstLoad? true
+11-07 09:36:22.827 28901 29072 I TaqwaComplications: asked again (feed)
+11-07 09:36:22.939 28901 29072 I TaqwaComplications: asked again (feed)
+11-07 09:36:22.950 28901 29072 I TaqwaComplications: asked again (feed)
+11-07 09:36:22.969 28901 29072 I TaqwaComplications: asked again (feed)
+11-07 09:36:23.116 28901 29072 I TaqwaComplications: asked again (feed)
+
+# dumpsys alarm, 20 s after the first request (the clock unmoved): the one pending alarm of the Tile, the renderer's next entry, not a +45 min timer.
+    RTC #3: Alarm{c227a1d type 1 origWhen 1794034860000 whenElapsed 122033072 com.google.android.wearable.sysui}
+      tag=*alarm*:ProtoTilesPlTileContentEmitter.world.taqwa.app/.wear.tile.TodayTileService
+      type=RTC origWhen=2026-11-07 09:01:00.000 window=+29s514ms repeatInterval=0 count=0 flags=0x0
+      policyWhenElapsed: requester=+31s388ms app_standby=-7s963ms device_idle=-- battery_saver=-7s963ms
+      whenElapsed=+31s388ms maxWhenElapsed=+1m0s902ms
+# The pending list holds no alarm of any package at +40 to +50 min, and dumpsys jobscheduler no job with an earliest time there:
+# The one line in that span with a requested time near it is Android's own *job.delay* alarm, not SysUI's:
+whenElapsed=+36m48s425ms maxWhenElapsed=+1h15m37s28ms
+
+# After the Tile came off: the fresh feed on the paired emulators (phone, then watch).
+11-07 09:36:22.937  4282  4396 I System.out: TaqwaWatch RESCHEDULED SENT 1251ms
+11-07 09:36:23.050  4282  4393 I System.out: TaqwaWatch RESCHEDULED SENT 112ms
+11-07 09:36:23.067  4282  4342 I System.out: TaqwaWatch RESCHEDULED SENT 17ms
+11-07 09:36:23.092  4282  4396 I System.out: TaqwaWatch WATCH_APPEARED SENT 24ms
+11-07 09:36:23.222  4282  4347 I System.out: TaqwaWatch WATCH_ASKED SENT 37ms
+11-07 09:36:23.223  4282  4436 I System.out: TaqwaWatch ACK 8/60e7dff197bb2606
+11-07 09:36:23.225  4282  4436 I System.out: TaqwaWatch ACK 9/60e7dff197bb2606
+11-07 09:36:23.336  4282  4436 I System.out: TaqwaWatch ACK 10/60e7dff197bb2606
+11-07 09:36:23.409  4282  4436 I System.out: TaqwaWatch ACK 11/60e7dff197bb2606
+11-07 09:36:23.415  4282  4436 I System.out: TaqwaWatch ACK 12/60e7dff197bb2606
+11-07 09:36:22.821 28901 29072 I System.out: TaqwaWearFeed ASK PHONE_NEARBY sent
+11-07 09:36:22.827 28901 29072 I TaqwaComplications: asked again (feed)
+11-07 09:36:22.833 28901 29072 I System.out: TaqwaWearFeed ACCEPTED 8/60e7dff197bb2606
+11-07 09:36:22.834 28901 29072 I System.out: TaqwaWearFeed ACK 8/60e7dff197bb2606 sent
+11-07 09:36:22.939 28901 29072 I TaqwaComplications: asked again (feed)
+11-07 09:36:22.942 28901 29072 I System.out: TaqwaWearFeed ACCEPTED 9/60e7dff197bb2606
+11-07 09:36:22.943 28901 29072 I System.out: TaqwaWearFeed ACK 9/60e7dff197bb2606 sent
+11-07 09:36:22.950 28901 29072 I TaqwaComplications: asked again (feed)
+11-07 09:36:22.953 28901 29072 I System.out: TaqwaWearFeed ACCEPTED 10/60e7dff197bb2606
+11-07 09:36:22.956 28901 29072 I System.out: TaqwaWearFeed ACK 10/60e7dff197bb2606 sent
+11-07 09:36:22.969 28901 29072 I TaqwaComplications: asked again (feed)
+11-07 09:36:22.972 28901 29072 I System.out: TaqwaWearFeed ACCEPTED 11/60e7dff197bb2606
+11-07 09:36:22.973 28901 29072 I System.out: TaqwaWearFeed ACK 11/60e7dff197bb2606 sent
+11-07 09:36:23.116 28901 29072 I TaqwaComplications: asked again (feed)
+11-07 09:36:23.118 28901 29072 I System.out: TaqwaWearFeed ACCEPTED 12/60e7dff197bb2606
+11-07 09:36:23.122 28901 29072 I System.out: TaqwaWearFeed ACK 12/60e7dff197bb2606 sent
+
+# The face on the same code: from the capture, the first lines naming it.
+11-07 09:34:58.054 28736 28788 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa true
+11-07 09:34:58.065 28736 28785 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa true
+11-07 09:34:58.275 17988 17988 I SysUI   : [WFP2FavManager]WF Changed to AndroidXSysUiWatchFace {component=SysUiWatchFaceId[world.taqwa.app.watchfacepush.taqwa,null], favId=45, instanceId=wfId-45}
+11-07 09:35:47.576 28901 28933 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa true
+11-07 09:35:47.592 28901 28933 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa true
+11-07 09:35:47.908 17988 17988 I SysUI   : [WFP2FavManager]WF Changed to AndroidXSysUiWatchFace {component=SysUiWatchFaceId[world.taqwa.app.watchfacepush.taqwa,null], favId=45, instanceId=wfId-45}

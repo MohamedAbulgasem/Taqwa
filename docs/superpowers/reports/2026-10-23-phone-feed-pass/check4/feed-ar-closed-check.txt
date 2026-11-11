@@ -1,0 +1,9 @@
+ui.language ar-SA rtl True digitZero '٠' twelveHour True am/pm ص م
+ui.spoken == sample ui.spoken (sample-feed-capetown-ar-sa.json): True
+ui.screens == sample ui.screens: True
+ui.screens: {"today": "اليوم", "tasbeeh": "التسبيح", "qibla": "القبلة", "appName": "تقوى", "openOnPhone": "افتح تقوى على هاتفك", "updateOnWatch": "حدِّث تقوى على ساعتك", "rowCurrent": "الصلاة الحالية", "rowPassed": "انقضت", "rowNext": "الصلاة التالية", "round": "الجولة %1$s", "of": "من %1$s", "bezelHint": "أدِر الإطار أو اضغط", "crownHint": "أدِر التاج أو اضغط", "reset": "إعادة العدّ", "resetConfirm": "إعادة العدّ لهذا الذكر؟", "presets": {"after_prayer": "بعد الصلاة", "subhanallah": "سبحان الله", "alhamdulillah": "الحمد لله", "allahu_akbar": "الله أكبر", "astaghfirullah": "أستغفر الله", "la_ilaha_illalla
+countdown: {"hoursMinutes": "بعد %1$s س %2$s د", "hours": "بعد %1$s س", "minutes": "بعد %1$s د", "underAMinute": "بعد أقل من دقيقة"} nextIn: متبقٍّ على %1$s
+place: {"city": "لندن", "qiblaBearing": 118.0, "qiblaKm": "٤٬٨٠٠", "declination": 1.0, "southern": false} qiblaKm code points: U+0664 U+066C U+0668 U+0660 U+0660
+2026-10-30 | الجمعة ٣٠ الجمعة ٣٠ أكتوبر | الجمعة ٣٠ أكتوبر | ١٨ جمادى الأولى ١٤٤٨ | ١٨ جمادى الأولى | ٢:٤٩ ٢:٤٩ م | العصر
+2026-10-31 | السبت ٣١ السبت ٣١ أكتوبر | السبت ٣١ أكتوبر | ١٩ جمادى الأولى ١٤٤٨ | ١٩ جمادى الأولى | ٢:٤٧ ٢:٤٧ م | العصر
+2026-11-01 | الأحد ١ الأحد ١ نوفمبر | الأحد ١ نوفمبر | ٢٠ جمادى الأولى ١٤٤٨ | ٢٠ جمادى الأولى | ٢:٤٥ ٢:٤٥ م | العصر

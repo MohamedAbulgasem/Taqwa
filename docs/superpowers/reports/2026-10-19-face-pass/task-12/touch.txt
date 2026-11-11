@@ -1,0 +1,102 @@
+Explore by touch on the Taqwa face (Task 12), heard on emulator-5558, 24 Oct 2026
+
+What was heard: no item of the face answers a touch on this emulator, before Task 12 or after it,
+in either order of slots 0 and 2 (Ruling 40's reorder in fix round 3, and the order again after
+Ruling 42), and no item of Google's own accessible face either. So the face is read by swiping
+(talkback-walks.txt), and by Ruling 42 it keeps plan 1's order, 7, 0, 1, 2, 3, 6, 4, 5: the time,
+the prayer with its countdown, the dates, then the wearer's slots. What a touch finds on a watch is
+heard in plan 5's device pass on his Galaxy Watch, with TalkBack and with Samsung's screen reader.
+
+How it was heard
+- TalkBack 16 on, its Diagnosis mode logging what it says. One finger down through the emulator's
+  own touch screen (the console's "event mouse"), moved 1 px, held 0.8 s and lifted, then what
+  TalkBack said and its log of the hover.
+- Review round 2, face 95559883 (the installed APK is the build), the clock at 14:58 on the mock day:
+  - Arch, the wearer's slots empty, at 10 points: the centre (227,240), the prayer line (227,332),
+    the countdown (227,365), the dates (227,120 and 227,150), both edges (452,227 and 30,227),
+    100,300, three o'clock (453,227) and six o'clock (227,452). Nothing was spoken at any of them.
+  - The Moon with the battery and the steps, at 6 points, the wearer's own slots among them
+    (165,400 and 285,400), the centre (227,227), twelve (227,80), 227,345 and 340,227. Nothing
+    was spoken.
+  - Every touch's HOVER_ENTER went to views of the system UI (com.google.android.wearable.sysui)
+    laid above the face: a ViewGroup holding the timer tile's text ("05, 10, 15, 20, 30, New, ...")
+    and an unnamed View. TalkBack's log has touchedFocusableNode=null for each.
+  - The face before Task 12 (89ab3ce0's XML in a test-key copy of the APK, the same sources):
+    touches at 227,240, 227,332, 227,120, 100,300 and 300,227 found no new item either (the same
+    hover targets). TalkBack only kept saying the clock it was on, "3:03 PM", about once a second,
+    the repeat Task 12 fixed (before.txt).
+  - Control: on TalkBack's own "Allow phone access?" window the same injected touch spoke "Allow
+    phone access?", with touchedFocusableNode set. So the touch reaches TalkBack, and the face's
+    items are what it does not reach.
+- Fix round 2, the same build, Arch with the slots empty: a walk of four swipes said the prayer,
+  the dates, the end of the list and the time, and touches at 227,240, 227,332, 227,120 and 100,300
+  said nothing.
+- Review round 3, face 0298756d (the same face as 95559883 but for comments): nothing at Arch's
+  227,240, 227,332, 227,140 and 100,300 with the slots empty, nor on the Moon after a fresh boot at
+  227,227, 227,80 and 165,400; and nothing on Google's own stock face
+  (com.google.android.wearable.watchface.rwf/.accessible.AccessibleWatchFaceService) at 227,140
+  and 227,340. Every HOVER_ENTER went to the system UI's ViewGroup with the timer tile's text,
+  touchedFocusableNode=null.
+- Fix round 3, face fef65dc7 (slot 2 declared before slot 0, Ruling 40, since withdrawn; the
+  installed APK is the build), the clock at 14:58 on the mock day:
+  - Arch with the slots empty: a walk of four swipes said the dates, the prayer, the end of the
+    list and the time; touches at 227,240, 227,332, 227,365, 227,120, 227,150, 100,300 and 300,227
+    said nothing.
+  - The Moon with the battery and the steps: a walk of five said the dates, the prayer, "Battery:
+    82", "Step count 10 Steps" and the end; touches at 227,227, 227,80, 227,345, 340,227, 165,400
+    and 285,400 said nothing.
+- Task 12's close under Ruling 42, face 07e511be (slot 0 declared before slot 2 again; the
+  installed APK's sha1 304cde43 is the build's), the clock at 14:58 on the mock day:
+  - Arch with the slots empty, with each of the four samples (en, ar-ly12, ar-sa, en12): every
+    walk of seven swipes said the prayer before the dates (talkback-walks.txt), and touches at
+    227,240, 227,332, 227,120 and 100,300 said nothing, with any of the four.
+  - The Moon with the battery and the steps, in English, Libya's Arabic and Saudi Arabia's (after
+    the emulator hung and was booted again, talkback-walks.txt): every walk said the prayer, the
+    dates, "Battery: 82" and the steps, in that order, and touches at 227,227, 227,80, 165,400
+    and 285,400 said nothing, with any of the three.
+
+The order of the face's items in the system UI
+- uiautomator's tree (Arch, slots empty) has the three items as children of one ViewGroup, in the
+  order the dates (index 4, [0,0][453,454]), the prayer (index 5, [0,0][454,453]), then the clock
+  (index 6, [113,113][340,340], Arch's middle quarter; once [0,0][450,450] in review round 2). That
+  is the reverse of the order an earlier reading of the system UI's code gave (below), so that
+  reading was wrong about the order as well as about the touch.
+- The tree was the same after Ruling 40's reorder (fix round 3, fef65dc7): Arch with the slots
+  empty, the dates (index 4), the prayer (5), the clock (6); the Moon with the battery and the
+  steps, the same three, then "Battery: 82" (7, [111,371][236,440]) and the steps (8,
+  [236,371][343,440]). So the order the slots are declared in sets the order TalkBack swipes
+  through, and not the order of the system's views: on this emulator the reorder changed the
+  swipe order and nothing else.
+- And the same again at Task 12's close (07e511be, slot 0 declared before slot 2 again), Arch with
+  the slots empty at 14:57 on the mock day: the dates (index 4, [0,0][453,454]), the prayer (5,
+  [0,0][454,453]), the clock (6, [113,113][340,340]), while TalkBack swiped the prayer before the
+  dates. Neither order of slots 0 and 2 changes the system's views here.
+
+What the code reading said, and why it does not hold here
+- Review round 1 read the system UI's dex (hhl, hhd, PositionLayout) and concluded that its hover
+  dispatch gives a touch to the topmost item under the finger, so that slot 2's dates would answer
+  almost anywhere and a touch would have found the prayer before Task 12. Neither was heard: the
+  hover never reaches those items, because the system UI's views over the face take it first, and
+  the items lie in the other order.
+- Ruling 40 (the Lead, 24 Oct, option (b)) declared slot 2 before slot 0 (7, 2, 0, 1, 3, 6, 4, 5),
+  so that the prayer's box would be the later of the two that lie across the face, for a touch;
+  the swipe order became the time, the dates, the prayer. It was built in fix round 3 (fef65dc7),
+  and nothing drawn changed (reorder-pass.txt).
+- Ruling 42 (the Lead, 24 Oct) withdrew it, for option (a): a touch cannot be judged on this
+  emulator, where no box or order of the face's own changes what a touch finds, and the swipe
+  order is what a TalkBack user gets for certain; on a prayer face the prayer comes first. Slot
+  2's block went back after slot 1's, unchanged (07e511be): without its comments the face is
+  0298756d's again, byte for byte, so it draws as review round 3's pass of 0298756d did.
+
+For plan 5's device pass
+- A watch's system UI is its maker's (Samsung's on his Galaxy Watch 8 Classic), so a touch is
+  checked there, with TalkBack and with Samsung's screen reader.
+- If a touch does reach the face's items there, it is heard which of the prayer and the dates
+  answers where their boxes overlap. If it is the dates, declaring slot 2 before slot 0 (Ruling
+  40's option (b)) may be reopened with that evidence (Ruling 42): one reorder of slot 2's block,
+  SourceManifestTest's read order and the docs. The limits are these. A ComplicationSlot is a child
+  of the Scene only (formats 2 to 5) and has one bounding shape, so its box is the same in all four
+  styles, and slots 0 and 2 still draw across the face from inside their boxes (the ring, the arch,
+  the Sun's lit arc, the Moon's curves, the date lines and the Moon's curved Hijri date). And no
+  two boxes may be the same inside the face (spec 3.6). Which item a touch finds where boxes
+  overlap is to be heard there, not read from code.

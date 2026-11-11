@@ -1,0 +1,19 @@
+# Every permission the phone's merged release manifest asks for, and nothing else: the one list
+# scripts/release.sh holds the store build to (plan 5 Task 7), so a library that brings a permission
+# fails the release until it is listed here. The watch gives the phone none (plan 5's Global
+# Constraints). One permission a line: <name> <origin> # <reason>. <origin> is `manifest` (declared
+# in src/main/AndroidManifest.xml) or `library:<group:artifact>` (added by the manifest merge; the
+# first library that adds it, as androidApp/build/outputs/logs/manifest-merger-release-report.txt
+# names it). A permission joins this file in the same commit as the line that brings it.
+android.permission.ACCESS_COARSE_LOCATION manifest # the city for the prayer times and the Qibla, from the phone's location when the user asks; coarse is enough, and a city from the list needs none
+android.permission.SCHEDULE_EXACT_ALARM manifest # the prayer notifications at their minute; user-revocable, with an inexact fallback when refused
+android.permission.POST_NOTIFICATIONS manifest # the prayer and adhan notifications, and a download's progress
+android.permission.RECEIVE_BOOT_COMPLETED manifest # the prayer alarms armed again after a restart (WorkManager asks for it too)
+android.permission.VIBRATE manifest # the Qibla's tick when aligned
+android.permission.INTERNET manifest # the recitation downloads and the daily manifest refresh, from the public Taqwa-data repository
+android.permission.FOREGROUND_SERVICE manifest # a long download and a recitation keep going with the app in the background (WorkManager asks for it too)
+android.permission.FOREGROUND_SERVICE_DATA_SYNC manifest # WorkManager's foreground download, its type from API 34
+android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK manifest # the recitation's MediaSessionService, its type from API 34
+android.permission.ACCESS_NETWORK_STATE library:androidx.media3:media3-exoplayer # ExoPlayer's own (media3-common's too): whether the network is up, for a recitation that streams or downloads
+android.permission.WAKE_LOCK library:androidx.media3:media3-exoplayer # ExoPlayer's own (WorkManager's too): the phone kept awake while a recitation plays or a download runs
+world.taqwa.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION library:androidx.core:core # androidx.core's own, so that a receiver it registers at run time cannot be reached by another app

@@ -1,0 +1,250 @@
+# Ruling 72 items 1, 2 and 7 (Wear): the lines the report cites
+# Full captures stay in the session scratchpad (r72w/). Times are the watch's own clock.
+
+## Builds (debug Wear app, 1.5.0 (100041), installed with adb -s <serial> install -r)
+watch-wear-fix 56dde660 (the 5-minute pairs): 17fc006c60f32199…
+watch-wear-fix 80677818 (the final read-back; its tree is 8e10a072's): 31ccf61f8b6bd5d0…
+base 6f8e2cb7 (git archive, the before pair):   f9e7444fca2f6628…
+Between 56dde660 and 80677818 the app changed only in two API checks moved back to Build.VERSION.SDK_INT (lint); the read-back below is the same.
+
+## 1. Wear OS 3 (emulator-5568, API 30), NextPrayer RANGED_VALUE on Shapes
+### the clock (tools/watchface/clock.sh of this branch) and the sample stored at 19:02:30
+== run 3: clock.sh (at 56dde660, which recorded clockwork_auto_time alone; 41668bfe records "<clockwork_auto_time> <auto_time>")
+Sun Oct 18 19:02:30 SAST 2026
+clockwork_auto_time 2, auto_time 0, record 0
+sample stored at Sun Oct 18 19:02:30 SAST 2026
+### BEFORE: base 6f8e2cb7, the ring's description read back (setprop log.tag.ComplicationData DEBUG for the dump, then unset)
+base/05-start-1904-face.txt: Isha in 1 hour 20 minutes, at 20:24
+base/06-later-1909-face.txt: Isha in 1 hour 19 minutes, at 20:24
+(the 19:09:11 entry was asked for again at 19:04:23 by the daily nudge, so its frozen words are those of 19:04:23:)
+10-18 19:04:23.728 I/TaqwaComplications(14203): asked again (daily)
+10-18 19:04:23.736 I/System.out(14203): TaqwaWearFeed ASK DAILY no phone
+10-18 19:04:23.738 I/TaqwaFace(14203): TaqwaFace installed - none
+10-18 19:04:23.743 I/TaqwaFace(14203): TaqwaFace capability unchanged 4007
+10-18 19:04:23.744 D/TaqwaComplications(14203): next prayer, RANGED_VALUE: 13 steps, last until 2026-10-20T17:04:00Z
+### AFTER: this branch, the same moments
+api30/05-start-1904-face.txt: Isha 20:24
+api30/06-later-1909-face.txt: Isha 20:24
+### AFTER, the read-back whole
+04c-before-1902.png at 19:02:41
+  read back at 19:02:41:
+    value=389.5
+    title=ComplicationText{mSurroundingText=MAGHRIB
+    text=ComplicationText{mSurroundingText=19:04
+    contentDescription=ComplicationText{mSurroundingText=Maghrib 19:04
+    validTimeRange=TimeRange(startDateTimeMillis=-1000000000-01-01T00:00:00Z, endDateTimeMillis=+1000000000-12-31T23:59:59.999999999Z)
+    system: rangedValue=isEnabled=true, rangedValue=389.5, rangedValueMin=217.0, rangedValueMax=391.0
+05-start-1904.png at 19:04:11
+  read back at 19:04:11:
+    value=391.0
+    title=ComplicationText{mSurroundingText=ISHA
+    text=ComplicationText{mSurroundingText=20:24
+    contentDescription=ComplicationText{mSurroundingText=Isha 20:24
+    validTimeRange=TimeRange(startDateTimeMillis=-1000000000-01-01T00:00:00Z, endDateTimeMillis=+1000000000-12-31T23:59:59.999999999Z)
+    system: rangedValue=isEnabled=true, rangedValue=391.0, rangedValueMin=391.0, rangedValueMax=471.0
+06-later-1909.png at 19:09:11
+  read back at 19:09:11:
+    value=391.0
+    title=ComplicationText{mSurroundingText=ISHA
+    text=ComplicationText{mSurroundingText=20:24
+    contentDescription=ComplicationText{mSurroundingText=Isha 20:24
+    validTimeRange=TimeRange(startDateTimeMillis=-1000000000-01-01T00:00:00Z, endDateTimeMillis=+1000000000-12-31T23:59:59.999999999Z)
+    system: rangedValue=isEnabled=true, rangedValue=391.0, rangedValueMin=391.0, rangedValueMax=471.0
+log.tag.ComplicationData=
+### BEFORE, the timeline entry by entry (19:09:11)
+BEFORE (base 6f8e2cb7's debug build), the same timeline at 19:09:11:
+  18 Oct 20:24 to 19 Oct 00:00: title 'FAJR', text '4:33', description 'Fajr in 8 hours 9 minutes, at 4:33', value 471.0 of 471.0..960.0
+  19 Oct 00:00 to 19 Oct 04:33: title 'FAJR', text '4:33', description 'Fajr in 4 hours 33 minutes, at 4:33', value -753.0 of -969.0..-480.0
+  19 Oct 04:33 to 19 Oct 12:33: title 'DHUHR', text '12:33', description 'Dhuhr in 8 hours, at 12:33', value -480.0 of -480.0..0.0
+  19 Oct 12:33 to 19 Oct 16:10: title 'ASR', text '16:10', description 'Asr in 3 hours 37 minutes, at 16:10', value 0.0 of 0.0..217.0
+  19 Oct 16:10 to 19 Oct 19:04: title 'MAGHRIB', text '19:04', description 'Maghrib in 2 hours 54 minutes, at 19:04', value 217.0 of 217.0..391.0
+  19 Oct 19:04 to 19 Oct 20:24: title 'ISHA', text '20:24', description 'Isha in 1 hour 20 minutes, at 20:24', value 391.0 of 391.0..471.0
+  19 Oct 20:24 to 20 Oct 00:00: title 'FAJR', text '4:33', description 'Fajr in 8 hours 9 minutes, at 4:33', value 471.0 of 471.0..960.0
+  20 Oct 00:00 to 20 Oct 04:33: title 'FAJR', text '4:33', description 'Fajr in 4 hours 33 minutes, at 4:33', value -753.0 of -969.0..-480.0
+  20 Oct 04:33 to 20 Oct 12:33: title 'DHUHR', text '12:33', description 'Dhuhr in 8 hours, at 12:33', value -480.0 of -480.0..0.0
+  20 Oct 12:33 to 20 Oct 16:10: title 'ASR', text '16:10', description 'Asr in 3 hours 37 minutes, at 16:10', value 0.0 of 0.0..217.0
+  20 Oct 16:10 to 20 Oct 19:04: title 'MAGHRIB', text '19:04', description 'Maghrib in 2 hours 54 minutes, at 19:04', value 217.0 of 217.0..391.0
+  20 Oct 19:04 to 19 Nov 19:04: type 10 (no data)
+### AFTER, the timeline entry by entry (19:09:11)
+The ring timeline the Wear OS 3 face holds at 19:09:11 (emulator-5568, the debug build of watch-wear-fix), entry by entry:
+  18 Oct 19:04 to 18 Oct 20:24: title 'ISHA', text '20:24', description 'Isha 20:24', value 391.0 of 391.0..471.0
+  18 Oct 20:24 to 19 Oct 00:00: title 'FAJR', text '4:33', description 'Fajr 4:33', value 471.0 of 471.0..960.0
+  19 Oct 00:00 to 19 Oct 04:33: title 'FAJR', text '4:33', description 'Fajr 4:33', value -753.0 of -969.0..-480.0
+  19 Oct 04:33 to 19 Oct 12:33: title 'DHUHR', text '12:33', description 'Dhuhr 12:33', value -480.0 of -480.0..0.0
+  19 Oct 12:33 to 19 Oct 16:10: title 'ASR', text '16:10', description 'Asr 16:10', value 0.0 of 0.0..217.0
+  19 Oct 16:10 to 19 Oct 19:04: title 'MAGHRIB', text '19:04', description 'Maghrib 19:04', value 217.0 of 217.0..391.0
+  19 Oct 19:04 to 19 Oct 20:24: title 'ISHA', text '20:24', description 'Isha 20:24', value 391.0 of 391.0..471.0
+  19 Oct 20:24 to 20 Oct 00:00: title 'FAJR', text '4:33', description 'Fajr 4:33', value 471.0 of 471.0..960.0
+  20 Oct 00:00 to 20 Oct 04:33: title 'FAJR', text '4:33', description 'Fajr 4:33', value -753.0 of -969.0..-480.0
+  20 Oct 04:33 to 20 Oct 12:33: title 'DHUHR', text '12:33', description 'Dhuhr 12:33', value -480.0 of -480.0..0.0
+  20 Oct 12:33 to 20 Oct 16:10: title 'ASR', text '16:10', description 'Asr 16:10', value 0.0 of 0.0..217.0
+  20 Oct 16:10 to 19 Nov 16:10: type 10 (no data)
+### the head's build (80677818), 19:04:11
+05-start-1904.png at 19:04:11
+  read back at 19:04:11:
+    value=391.0
+    title=ComplicationText{mSurroundingText=ISHA
+    text=ComplicationText{mSurroundingText=20:24
+    contentDescription=ComplicationText{mSurroundingText=Isha 20:24
+    validTimeRange=TimeRange(startDateTimeMillis=-1000000000-01-01T00:00:00Z, endDateTimeMillis=+1000000000-12-31T23:59:59.999999999Z)
+    system: rangedValue=isEnabled=true, rangedValue=391.0, rangedValueMin=391.0, rangedValueMax=471.0
+
+## 2. The sources' log gate on Wear OS 3 (this branch's debug build, logcat -s TaqwaComplications)
+== 1. tag as found (unset): log.tag.TaqwaComplications=""
+--------- beginning of main
+--------- beginning of system
+11-06 21:12:59.409 I/TaqwaComplications( 2943): asked again (feed)
+== 2. setprop log.tag.TaqwaComplications DEBUG
+--------- beginning of system
+--------- beginning of main
+--------- beginning of kernel
+11-06 21:13:09.535 I/TaqwaComplications( 2943): asked again (feed)
+11-06 21:13:09.537 D/TaqwaComplications( 2943): next prayer, RANGED_VALUE: 13 steps, last until 2026-11-08T18:24:00Z
+== 3. setprop log.tag.TaqwaComplications INFO
+--------- beginning of system
+--------- beginning of kernel
+--------- beginning of main
+11-06 21:13:19.623 I/TaqwaComplications( 2943): asked again (feed)
+== put back as found
+log.tag.TaqwaComplications=""
+### the face was given data at each of the three stores (its own history)
+RangedValueComplicationData @ 2026-11-06T21:12:59.432
+RangedValueComplicationData @ 2026-11-06T21:13:09.541
+RangedValueComplicationData @ 2026-11-06T21:13:19.629
+
+## 3. A line below its tag's level is dropped as it is written (the log command, through liblog as Log.d is)
+== liblog: a line below its tag level is dropped as it is written (the log command, same liblog as Log.d)
+--------- beginning of system
+--------- beginning of main
+11-06 21:13:41.171 D/TaqwaLogProbe( 3092): written at DEBUG
+11-06 21:13:41.203 D/TaqwaLogProbe( 3097): written with the tag unset
+log.tag.TaqwaLogProbe=""
+
+## 4. Wear OS 4 (emulator-5566, API 33): unchanged
+### first run: the clock set with auto_time 0 alone (clock.sh before the Wear OS 4 fix) was moved by the watch's own sync
+10-18 19:03:05.108 D/TimeSyncManager( 1169): startPhoneTimeUpdate: syncing via phone companion
+10-18 19:03:05.113 I/TimeSyncManager( 1169): rescheduling failed time sync for 120000 ms from now
+10-18 19:05:08.949 D/TimeSyncManager( 1169): onNetworkActive: trigerring network time sync
+10-18 19:05:08.949 I/TimeSyncManager( 1169): performNetworkTimeSync:
+10-18 19:05:08.954 D/NitzTimeUpdateService(  834): NITZ: Setting time of day to Fri Nov 06 21:48:04 GMT+02:00 2026 NITZ receive delay(ms): 194875 gained(ms): 1651375921 from 26/11/06:19:44:50+8:0:Africa!Johannesburg
+11-06 21:48:04.894 I/UsageStatsDatabase(  468): Time changed by +19d2h42m55s920ms. files deleted: 0 files moved: 4
+### second run, clock.sh with clockwork_auto_time 2
+Sun Oct 18 19:02:30 SAST 2026
+auto_time 0, clockwork_auto_time 2, record 0 0
+sample stored at Sun Oct 18 19:02:30 SAST 2026
+api33/04c-before-1902-face.txt: Maghrib in 1 minute, at 19:04
+api33/05-start-1904-face.txt: Isha in 1 hour 19 minutes, at 20:24
+api33/06-later-1909-face.txt: Isha in 1 hour 14 minutes, at 20:24
+04c-before-1902.png at 19:02:40
+    value=389.6667
+    system: rangedValue=isEnabled=true, rangedValue=389.6667, rangedValueMin=217.0, rangedValueMax=391.0colors=null, interpolated=null
+05-start-1904.png at 19:04:11
+    value=391.18332
+    system: rangedValue=isEnabled=true, rangedValue=391.18332, rangedValueMin=391.0, rangedValueMax=471.0colors=null, interpolated=null
+06-later-1909.png at 19:09:11
+    value=396.18332
+    system: rangedValue=isEnabled=true, rangedValue=396.18332, rangedValueMin=391.0, rangedValueMax=471.0colors=null, interpolated=null
+### no 'last until' line with the tag unset (Wear OS 4 too)
+10-18 19:02:30.186 I/TaqwaComplications( 2890): asked again (feed)
+10-18 19:02:30.232 I/TaqwaComplications( 2890): asked again (tile)
+11-06 21:56:35.122 I/TaqwaComplications( 2890): asked again (feed)
+11-06 21:56:35.166 I/TaqwaComplications( 2890): asked again (tile)
+
+## 5. Put back
+### emulator-5568 as found at the first boot (Step 1's put-back of clockwork_auto_time apparently lost at its kill)
+global auto_time = 0
+global clockwork_auto_time = 2
+global auto_time_zone = 0
+### emulator-5568 at its last stop
+state Fri Nov  6 22:05:27 SAST 2026
+global auto_time = 0
+global clockwork_auto_time = 0
+global auto_time_zone = 0
+font_scale = 1.0
+a11y services =
+a11y enabled = 0
+locale =
+tz = Africa/Johannesburg
+log.tag.TaqwaComplications = ''
+log.tag.TaqwaWearQibla = ''
+log.tag.TaqwaLogProbe = ''
+log.tag.ComplicationData = ''
+date = Fri Nov  6 22:05:27 SAST 2026
+    versionCode=100041 minSdk=30 targetSdk=36
+    versionName=1.5.0
+    lastUpdateTime=2026-11-06 22:03:19
+mDefaultWallpaperComponent=null
+  mWallpaperComponent=ComponentInfo{com.google.android.wearable.watchface.rwf/com.google.android.wearable.watchface.shapes.ShapesWatchFaceService}
+### emulator-5566 as found, and at its stop
+global auto_time = 0
+global clockwork_auto_time = 0
+global auto_time_zone = 0
+Fri Nov  6 21:56:35 SAST 2026
+sample stored for Fri Nov  6 21:56:35 SAST 2026
+state Fri Nov  6 21:56:40 SAST 2026
+global auto_time = 0
+global clockwork_auto_time = 0
+global auto_time_zone = 0
+font_scale = 1
+a11y services = null
+a11y enabled = 0
+locale =
+tz = Africa/Johannesburg
+log.tag.TaqwaComplications = ''
+log.tag.TaqwaWearQibla = ''
+log.tag.TaqwaLogProbe = ''
+log.tag.ComplicationData = ''
+date = Fri Nov  6 21:56:40 SAST 2026
+    versionCode=100041 minSdk=30 targetSdk=36
+    versionName=1.5.0
+    lastUpdateTime=2026-11-06 21:45:22
+
+## 6. Ruling 74, review round 1: the back-to-unset line (the real adb 1.0.41 client on a local stand-in server, no device; the plan's own commands, the serial replaced; bash gave the same)
+### the plan at 9844ba78
+== plan line 960, host shell zsh
+  $ adb -s standin-watch shell setprop log.tag.TaqwaComplications DEBUG
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications DEBUG'    exit=0 out=[] tag now=[DEBUG]
+  $ adb -s standin-watch shell setprop log.tag.TaqwaComplications ""
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications '    exit=1 out=[usage: setprop NAME VALUE] tag now=[DEBUG]
+  tag at the line's end: [DEBUG]
+== plan line 977, host shell zsh
+  $ adb -s standin-watch shell setprop log.tag.TaqwaComplications DEBUG
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications DEBUG'    exit=0 out=[] tag now=[DEBUG]
+  $ adb -s standin-watch shell getprop log.tag.TaqwaComplications
+    sent: 'shell,v2,raw:getprop log.tag.TaqwaComplications'    exit=0 out=[DEBUG] tag now=[DEBUG]
+  $ adb -s standin-watch shell setprop log.tag.TaqwaComplications ""
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications '    exit=1 out=[usage: setprop NAME VALUE] tag now=[DEBUG]
+  tag at the line's end: [DEBUG]
+== plan line 1052, host shell zsh
+  $ adb -s standin-watch shell setprop log.tag.TaqwaComplications DEBUG
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications DEBUG'    exit=0 out=[] tag now=[DEBUG]
+  $ adb -s standin-watch shell getprop log.tag.TaqwaComplications
+    sent: 'shell,v2,raw:getprop log.tag.TaqwaComplications'    exit=0 out=[DEBUG] tag now=[DEBUG]
+  $ adb -s standin-watch shell setprop log.tag.TaqwaComplications ""
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications '    exit=1 out=[usage: setprop NAME VALUE] tag now=[DEBUG]
+  tag at the line's end: [DEBUG]
+### the plan after the fix
+== plan line 960, host shell zsh
+  $ adb -s standin-watch shell setprop log.tag.TaqwaComplications DEBUG
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications DEBUG'    exit=0 out=[] tag now=[DEBUG]
+  $ adb -s standin-watch shell 'setprop log.tag.TaqwaComplications ""'
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications ""'    exit=0 out=[] tag now=[]
+  $ adb -s standin-watch shell getprop log.tag.TaqwaComplications
+    sent: 'shell,v2,raw:getprop log.tag.TaqwaComplications'    exit=0 out=[] tag now=[]
+  tag at the line's end: []
+== plan line 977, host shell zsh
+  $ adb -s standin-watch shell setprop log.tag.TaqwaComplications DEBUG
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications DEBUG'    exit=0 out=[] tag now=[DEBUG]
+  $ adb -s standin-watch shell getprop log.tag.TaqwaComplications
+    sent: 'shell,v2,raw:getprop log.tag.TaqwaComplications'    exit=0 out=[DEBUG] tag now=[DEBUG]
+  $ adb -s standin-watch shell 'setprop log.tag.TaqwaComplications ""'
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications ""'    exit=0 out=[] tag now=[]
+  tag at the line's end: []
+== plan line 1052, host shell zsh
+  $ adb -s standin-watch shell setprop log.tag.TaqwaComplications DEBUG
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications DEBUG'    exit=0 out=[] tag now=[DEBUG]
+  $ adb -s standin-watch shell getprop log.tag.TaqwaComplications
+    sent: 'shell,v2,raw:getprop log.tag.TaqwaComplications'    exit=0 out=[DEBUG] tag now=[DEBUG]
+  $ adb -s standin-watch shell 'setprop log.tag.TaqwaComplications ""'
+    sent: 'shell,v2,raw:setprop log.tag.TaqwaComplications ""'    exit=0 out=[] tag now=[]
+  tag at the line's end: []

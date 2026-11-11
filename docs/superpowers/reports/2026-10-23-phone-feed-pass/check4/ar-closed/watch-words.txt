@@ -1,0 +1,3 @@
+today: content-desc='الظهر بعد ٤١ دقيقة، الساعة \u2068١١:٤٩\xa0ص\u2069'
+tasbeeh: content-desc='سبحان الله'
+qibla: text='أبقِ معصمك مستويًا'|text='٤٬٨٠٠ كم'|content-desc='مكة · على بُعد ٤٬٨٠٠ كم'

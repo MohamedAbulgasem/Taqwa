@@ -1,0 +1,24 @@
+arch 16:47 Hijri day | semibold 28.125 u | ۶: Urdu 0.979, Persian 0.678 -> Urdu
+arch 16:47 clock | light 126.0 u | ۴: Urdu 0.993, Persian 0.697 -> Urdu; ۶: Urdu 0.989, Persian 0.344 -> Urdu; ۷: Urdu 0.981, Persian 0.527 -> Urdu
+arch 16:47 Maghrib's time | semibold 30.375 u | ۶: Urdu 0.984, Persian 0.523 -> Urdu
+arch 15:23 Hijri day | semibold 28.125 u | ۶: Urdu 0.979, Persian 0.678 -> Urdu
+arch 15:23 Asr's time | semibold 30.375 u | ۶: Urdu 0.975, Persian 0.568 -> Urdu
+arch 15:23 countdown | semibold 28.125 u | ۴: Urdu 0.959, Persian 0.670 -> Urdu; ۷: Urdu 0.959, Persian 0.531 -> Urdu
+ring 16:47 Hijri day | semibold 28.125 u | ۶: Urdu 0.976, Persian 0.680 -> Urdu
+ring 16:47 clock | light 135.0 u | ۴: Urdu 0.993, Persian 0.702 -> Urdu; ۶: Urdu 0.987, Persian 0.341 -> Urdu; ۷: Urdu 0.985, Persian 0.524 -> Urdu
+ring 16:47 Maghrib's time | semibold 30.375 u | ۶: Urdu 0.984, Persian 0.522 -> Urdu
+ring 15:23 Hijri day | semibold 28.125 u | ۶: Urdu 0.976, Persian 0.680 -> Urdu
+ring 15:23 Asr's time | semibold 30.375 u | ۶: Urdu 0.975, Persian 0.568 -> Urdu
+ring 15:23 countdown | semibold 28.125 u | ۴: Urdu 0.959, Persian 0.669 -> Urdu; ۷: Urdu 0.959, Persian 0.530 -> Urdu
+sun 16:47 Hijri day | semibold 28.125 u | ۶: Urdu 0.978, Persian 0.678 -> Urdu
+sun 16:47 clock | light 135.0 u | ۴: Urdu 0.993, Persian 0.702 -> Urdu; ۶: Urdu 0.987, Persian 0.340 -> Urdu; ۷: Urdu 0.984, Persian 0.525 -> Urdu
+sun 16:47 Maghrib's time | semibold 30.375 u | ۶: Urdu 0.984, Persian 0.522 -> Urdu
+sun 15:23 Hijri day | semibold 28.125 u | ۶: Urdu 0.978, Persian 0.679 -> Urdu
+sun 15:23 Asr's time | semibold 30.375 u | ۶: Urdu 0.975, Persian 0.568 -> Urdu
+sun 15:23 countdown | semibold 28.125 u | ۴: Urdu 0.959, Persian 0.669 -> Urdu; ۷: Urdu 0.959, Persian 0.530 -> Urdu
+moon 16:47 Hijri day (curved) | semibold 27.0 u | ۶: Urdu 0.968, Persian 0.696 -> Urdu
+moon 16:47 Maghrib's time (curved) | bold 29.25 u | ۶: Urdu 0.964, Persian 0.653 -> Urdu
+moon 15:23 Hijri day (curved) | semibold 27.0 u | ۶: Urdu 0.968, Persian 0.696 -> Urdu
+moon 15:23 Asr's time (curved) | bold 29.25 u | ۶: Urdu 0.961, Persian 0.601 -> Urdu
+moon 15:23 countdown (curved) | semibold 27.0 u | ۴: Urdu 0.963, Persian 0.713 -> Urdu; ۷: Urdu 0.984, Persian 0.623 -> Urdu
+sheet-watch-en.png

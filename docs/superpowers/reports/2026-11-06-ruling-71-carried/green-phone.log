@@ -1,0 +1,13 @@
+2026-11-06 19:37:03.958 Df Taqwa[23762:3e5296] (Foundation) TaqwaHarness launch url taqwa://watch/probe?via=context
+2026-11-06 19:37:03.958 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context from=60000 to=300000 step=4096 fill=random reachable=true
+2026-11-06 19:37:03.960 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context 60000 accepted
+2026-11-06 19:37:03.976 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context 300000 refused
+2026-11-06 19:37:03.983 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context 180000 accepted
+2026-11-06 19:37:03.992 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context 240000 accepted
+2026-11-06 19:37:04.001 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context 270000 refused
+2026-11-06 19:37:04.010 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context 255000 accepted
+2026-11-06 19:37:04.019 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context 262500 refused
+2026-11-06 19:37:04.027 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context 258750 accepted
+2026-11-06 19:37:04.027 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe context random 258750 262500
+2026-11-06 19:37:04.027 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch probe restore
+2026-11-06 19:37:04.063 Df Taqwa[23762:3e52c3] (Foundation) TaqwaWatch send queued: bytes=21335 delivery=5/8dfbe547cf8f60c4

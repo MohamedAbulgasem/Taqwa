@@ -44,7 +44,7 @@
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
 
     <!-- allowBackup is off on purpose: the settings file holds the reader's coordinates (or
-         chosen city), and "your location never leaves your phone" has to include Google's
+         chosen city), and "Only your own devices can see your location" has to include Google's
          backup. Backup rules cannot split the file — bookmarks and tasbeeh counts live in the
          same DataStore — so the whole app opts out, and settings are redone on a new phone.
          dataExtractionRules repeats the opt-out in the form Android 12+ reads; below 12,
@@ -181,6 +181,31 @@
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
             tools:node="merge" />
+        <!-- The user's own watch (plan 2 Task 5): its handshake and its acknowledgement over the
+             Wear Data Layer, and taqwa_watch changing as a watch comes back nearby. Exported
+             because Google Play services binds to it, and only Play services can: the library
+             checks its caller. It takes an echo (a random install number, a counter and a
+             fingerprint) and nothing else, and needs no permission. The class lives in :shared.
+             Each filter names one literal path (android:path), so Play services wakes it for the
+             watch's two messages alone; PhoneWatchListenerServiceTest holds the paths and the
+             capability to WatchLinkContract's (Ruling 54 item 2). -->
+        <service
+            android:name="world.taqwa.app.watchfeed.PhoneWatchListenerService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data android:scheme="wear" android:host="*" android:path="/taqwa/refresh" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data android:scheme="wear" android:host="*" android:path="/taqwa/ack" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
+                <data android:scheme="wear" android:host="*" android:path="/taqwa_watch" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

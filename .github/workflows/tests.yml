@@ -1,8 +1,9 @@
 name: Tests
 
-# The app's own checks on every push and pull request: the shared and widget suites (the domain
-# logic, run as Android unit tests on the JVM), a debug build of the Android app, and the
-# translation check. The iOS suites need a Mac and still run through scripts/test.sh.
+# The app's own checks on every push and pull request: one version in every build file, the shared,
+# widget and watch suites (the domain logic, run as Android unit tests on the JVM) and the Wear OS
+# app's unit tests, debug builds of the Android app and the Wear OS app, the Taqwa face's release
+# build, and the translation check. The iOS suites need a Mac and still run through scripts/test.sh.
 on:
   push:
   pull_request:
@@ -23,6 +24,15 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: One version for the phone, the Galaxy watch app, the face and the iOS apps
+        # scripts/version-files.sh lists every file that carries the version: the Wear app is the
+        # phone's code + 100000, the face and every iOS plist the phone's code, all under one
+        # name. A hand edit to one of them, or an iOS plist with a version that bump-version.sh
+        # does not write, fails here before anything is built; the second script tries
+        # bump-version.sh itself on a scratch copy.
+        run: |
+          bash scripts/check-versions.sh
+          bash scripts/test-bump-version.sh
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: temurin
@@ -32,10 +42,10 @@ jobs:
         # compileSdk 37 is newer than the runner's image may carry. The package is named
         # android-37.0, not android-37 (docs/BUILD-LOG.md).
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" > /dev/null
-      - name: Shared and widget tests
-        run: ./gradlew --no-daemon :shared:testAndroidHostTest :widgetcore:testAndroidHostTest
-      - name: Android app builds
-        run: ./gradlew --no-daemon :androidApp:assembleDebug
+      - name: Shared, widget, watch and Wear OS app tests
+        run: ./gradlew --no-daemon :shared:testAndroidHostTest :widgetcore:testAndroidHostTest :watchcore:testAndroidHostTest :wearApp:testDebugUnitTest
+      - name: Android and Wear OS apps build
+        run: ./gradlew --no-daemon :androidApp:assembleDebug :wearApp:assembleDebug
       - name: The APK carries the shared module's sounds and bundled files
         # They reach the app from `shared` (res/raw, and Compose resources as assets), and a build
         # that drops them still succeeds: the adhan goes silent, or the Quran and cities are gone.
@@ -45,6 +55,23 @@ jobs:
                    files/quran.db files/cities.csv files/city-names-ar.csv; do
             grep -q "$f" apk-contents.txt || { echo "::error::$f is missing from the APK"; exit 1; }
           done
+      - name: The Taqwa face builds as a release, with no code, as its generators write it
+        # The face (:watchface) is resources alone: Watch Face Push refuses an APK with a
+        # classes.dex, and a build that grows one still succeeds. Its release build is unsigned (the
+        # owner signs it), so it needs no key here, and like every release-type build but
+        # scripts/release.sh's it passes -Ptaqwa.unsignedRelease=true, which leaves the face as it
+        # is; the debug build needs the throwaway test key and is built on the Mac. Each generated
+        # block of watchface.xml must be what its tool writes, and the face must pass Google's
+        # wff-validator at its declared format version.
+        run: |
+          ./gradlew --no-daemon :watchface:assembleRelease -Ptaqwa.unsignedRelease=true
+          apk=$(ls watchface/build/outputs/apk/release/*.apk)
+          unzip -l "$apk" > face-contents.txt
+          if grep -q 'classes.*\.dex' face-contents.txt; then echo "::error::$apk holds code (a classes.dex)"; exit 1; fi
+          # res/raw/watchface.xml is stored as it is, under a shortened name
+          unzip -p "$apk" | grep -a -q '<WatchFace width="450"' || { echo "::error::$apk has no watchface.xml"; exit 1; }
+          for tool in arch sun moon centre; do python3 "tools/face-$tool.py" --check; done
+          tools/watchface/validate.sh --schema-only
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: failure()
         with:

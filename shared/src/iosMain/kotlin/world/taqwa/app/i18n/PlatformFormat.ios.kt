@@ -115,6 +115,57 @@ internal class IosPlatformFormat(
         val h = plainFormatter.stringFromNumber(NSNumber(int = hour12)) ?: hour12.toString()
         return TwelveHourClock.render(h, m, if (pm) amPm.second else amPm.first, markerFirst)
     }
+
+    // The watch feed's words (plan 2, Task 1). clockTime above and longDate stay the app's own, in
+    // this format's locales; these are in the words locale, which follows the interface language.
+
+    override fun clockFigures(hour: Int, minute: Int): String {
+        val h = if (clockFormat == ClockFormat.TWELVE_HOUR) twelveHourParts(hour).first else hour
+        val hourText = plainFormatter.stringFromNumber(NSNumber(int = h)) ?: h.toString()
+        val minuteText = twoDigitFormatter.stringFromNumber(NSNumber(int = minute)) ?: minute.toString().padStart(2, '0')
+        return "$hourText:$minuteText"
+    }
+
+    override fun dayPeriods(language: UiLanguage): Pair<String, String> = NSDateFormatter().run {
+        setLocale(wordsLocale(language))
+        AMSymbol to PMSymbol
+    }
+
+    override fun shortWeekday(date: LocalDate, language: UiLanguage): String =
+        words("EEE", date, language) ?: super.shortWeekday(date, language)
+
+    override fun shortMonth(date: LocalDate, language: UiLanguage): String =
+        words("MMM", date, language) ?: super.shortMonth(date, language)
+
+    override fun longWeekday(date: LocalDate, language: UiLanguage): String =
+        words("EEEE", date, language) ?: super.longWeekday(date, language)
+
+    override fun longMonth(date: LocalDate, language: UiLanguage): String =
+        words("MMMM", date, language) ?: super.longMonth(date, language)
+
+    private fun wordsLocale(language: UiLanguage): NSLocale =
+        NSLocale(localeIdentifier = wordsLocaleTag(tag, language))
+
+    // The Gregorian calendar on both the components and the formatter, as longDate has it, and the
+    // format forms (`MMM`, not the stand-alone `LLL`). The date is taken at noon, so a zone whose
+    // clocks change at midnight cannot move it to the day before.
+    private fun words(pattern: String, date: LocalDate, language: UiLanguage): String? {
+        val calendar = gregorian ?: return null
+        val components = NSDateComponents().apply {
+            setYear(date.year.toLong())
+            setMonth(date.month.number.toLong())
+            setDay(date.day.toLong())
+            setHour(12)
+        }
+        val nsDate = calendar.dateFromComponents(components) ?: return null
+        val formatter = NSDateFormatter().apply {
+            setLocale(wordsLocale(language))
+            setCalendar(calendar)
+            setTimeZone(calendar.timeZone)
+            setDateFormat(pattern)
+        }
+        return formatter.stringFromDate(nsDate)
+    }
 }
 
 actual fun createPlatformFormat(clockFormat: ClockFormat): PlatformFormat = IosPlatformFormat(clockFormat)

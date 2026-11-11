@@ -1,0 +1,4 @@
+13:17:07 hold-next-ack set
+13:17:07 h clock --es format 24: clock TWENTY_FOUR_HOUR; plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T13:55:00Z; settled=true
+13:17:11 h clock --es format 12: clock TWELVE_HOUR; plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T13:55:00Z; settled=true
+13:17:54 h reschedule : plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T13:55:00Z; settled=true

@@ -1,0 +1,10 @@
+ok - with -Ptaqwa.unsignedRelease=true both release builds pass beside the decoy
+ok - androidApp/build/outputs/apk/release/androidApp-release-unsigned.apk is the build's unsigned output
+ok - apksigner finds no signature on androidApp/build/outputs/apk/release/androidApp-release-unsigned.apk (ERROR: Missing META-INF/MANIFEST.MF)
+ok - wearApp/build/outputs/apk/release/wearApp-release-unsigned.apk is the build's unsigned output
+ok - apksigner finds no signature on wearApp/build/outputs/apk/release/wearApp-release-unsigned.apk (ERROR: Missing META-INF/MANIFEST.MF)
+ok - without the property the build fails on the decoy's store file, /nonexistent/decoy.jks
+ok - :androidApp would have signed with the decoy (validateSigningRelease failed on it)
+ok - :wearApp would have signed with the decoy (validateSigningRelease failed on it)
+test-unsigned-release: PASS
+bash scripts/test-unsigned-release.sh  1.31s user 0.21s system 2% cpu 57.896 total

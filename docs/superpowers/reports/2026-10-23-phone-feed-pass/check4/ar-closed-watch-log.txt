@@ -1,0 +1,2 @@
+10-31 13:06:30.844 I/System.out( 3363): TaqwaWearFeed ACCEPTED 4/bca974c6176a7730
+10-31 13:06:30.857 I/System.out( 3363): TaqwaWearFeed ACK 4/bca974c6176a7730 sent

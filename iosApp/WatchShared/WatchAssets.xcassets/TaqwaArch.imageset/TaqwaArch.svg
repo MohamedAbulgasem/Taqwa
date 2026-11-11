@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Written by tools/watch-art.py from androidApp/src/main/res/drawable/ic_launcher_monochrome.xml: edit that, then run the tool. -->
+  <path d="M 340.4 721.04 L 340.4 518.24 C 340.4 402.8 409.04 321.68 512 281.12 C 614.96 321.68 683.6 402.8 683.6 518.24 L 683.6 721.04" fill="none" stroke="#000000" stroke-width="68.64" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 512 382.52 a 35.88 35.88 0 1 0 0.078 0 z" fill="#000000"/>
+</svg>

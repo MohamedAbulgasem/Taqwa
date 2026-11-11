@@ -1,0 +1,91 @@
+10-18 14:58:00.573 28316 28316 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 141.00, a digit's ink 0.766 em
+10-18 14:58:00.580 28316 28316 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 14:58:00.888 28316 28316 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 14:58:00.893 28316 28316 D TaqwaWearQibla: caption 'Hold your wrist level' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 14:58:00.970 28316 28316 D TaqwaWearQibla: caption 'Hold your wrist level' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 14:58:15.485 28316 28316 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 141.00, a digit's ink 0.766 em
+10-18 14:58:15.486 28316 28316 D TaqwaWearQibla: caption 'Facing qibla' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 14:58:17.286 28316 28316 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 14:58:17.288 28316 28316 D TaqwaWearQibla: caption 'Hold your wrist level' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 14:59:30.269 28316 28316 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 141.00, a digit's ink 0.766 em
+10-18 14:59:30.270 28316 28316 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 14:59:47.335 28316 28316 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 141.00, a digit's ink 0.766 em
+10-18 14:59:47.336 28316 28316 D TaqwaWearQibla: caption 'Facing qibla' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 14:59:58.764 28626 28626 D TaqwaWearQibla: detail '6 600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.51 as drawn (7.51 at the judged size), ticks 23.66, caption y 141.00, a digit's ink 0.766 em
+10-18 14:59:58.772 28626 28626 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 14:59:59.067 28626 28626 D TaqwaWearQibla: detail '6 600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.51 as drawn (7.51 at the judged size), ticks 23.66, caption y 126.07, a digit's ink 0.766 em
+10-18 14:59:59.072 28626 28626 D TaqwaWearQibla: caption 'Gardez le poignet à plat' at font size 1.0: size 14.00 in a box of 14.00 on 2 lines, baselines 126.07 to 141.04, the half anchor 141.00
+10-18 14:59:59.168 28626 28626 D TaqwaWearQibla: caption 'Gardez le poignet à plat' at font size 1.0: size 14.00 in a box of 14.00 on 2 lines, baselines 126.07 to 141.04, the half anchor 141.00
+10-18 15:00:13.722 28626 28626 D TaqwaWearQibla: detail '6 600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.51 as drawn (7.51 at the judged size), ticks 23.66, caption y 141.00, a digit's ink 0.766 em
+10-18 15:00:13.723 28626 28626 D TaqwaWearQibla: caption 'Face à la qibla' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:00:15.505 28626 28626 D TaqwaWearQibla: detail '6 600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.51 as drawn (7.51 at the judged size), ticks 23.66, caption y 126.07, a digit's ink 0.766 em
+10-18 15:00:15.507 28626 28626 D TaqwaWearQibla: caption 'Gardez le poignet à plat' at font size 1.0: size 14.00 in a box of 14.00 on 2 lines, baselines 126.07 to 141.04, the half anchor 141.00
+10-18 15:01:28.519 28626 28626 D TaqwaWearQibla: detail '6 600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.51 as drawn (7.51 at the judged size), ticks 23.66, caption y 141.00, a digit's ink 0.766 em
+10-18 15:01:28.520 28626 28626 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:01:45.553 28626 28626 D TaqwaWearQibla: detail '6 600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.51 as drawn (7.51 at the judged size), ticks 23.66, caption y 141.00, a digit's ink 0.766 em
+10-18 15:01:45.554 28626 28626 D TaqwaWearQibla: caption 'Face à la qibla' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:01:56.867 28936 28936 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.27 as drawn (7.27 at the judged size), ticks 23.58, caption y 141.00, a digit's ink 0.766 em
+10-18 15:01:56.875 28936 28936 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:01:57.199 28936 28936 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.27 as drawn (7.27 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 15:01:57.205 28936 28936 D TaqwaWearQibla: caption 'Bileğinizi düz tutun' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:01:57.286 28936 28936 D TaqwaWearQibla: caption 'Bileğinizi düz tutun' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:02:11.809 28936 28936 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.27 as drawn (7.27 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 15:02:11.811 28936 28936 D TaqwaWearQibla: caption 'Kıbleye dönüksünüz' at font size 1.0: size 13.00 in a box of 13.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:02:13.593 28936 28936 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.27 as drawn (7.27 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 15:02:13.596 28936 28936 D TaqwaWearQibla: caption 'Bileğinizi düz tutun' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:03:26.552 28936 28936 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.27 as drawn (7.27 at the judged size), ticks 23.58, caption y 141.00, a digit's ink 0.766 em
+10-18 15:03:26.553 28936 28936 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:03:43.601 28936 28936 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.27 as drawn (7.27 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 15:03:43.602 28936 28936 D TaqwaWearQibla: caption 'Kıbleye dönüksünüz' at font size 1.0: size 13.00 in a box of 13.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:03:54.942 29238 29238 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 141.00, a digit's ink 0.766 em
+10-18 15:03:54.954 29238 29238 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:03:55.287 29238 29238 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 15:03:55.294 29238 29238 D TaqwaWearQibla: caption 'Pegang jam mendatar' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:03:55.369 29238 29238 D TaqwaWearQibla: caption 'Pegang jam mendatar' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:04:09.885 29238 29238 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 15:04:09.886 29238 29238 D TaqwaWearQibla: caption 'Menghadap kiblat' at font size 1.0: size 13.00 in a box of 13.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:04:11.670 29238 29238 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 15:04:11.672 29238 29238 D TaqwaWearQibla: caption 'Pegang jam mendatar' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:05:24.435 29238 29238 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 141.00, a digit's ink 0.766 em
+10-18 15:05:24.435 29238 29238 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:05:41.485 29238 29238 D TaqwaWearQibla: detail '6.600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.42 as drawn (7.42 at the judged size), ticks 23.58, caption y 125.00, a digit's ink 0.766 em
+10-18 15:05:41.486 29238 29238 D TaqwaWearQibla: caption 'Menghadap kiblat' at font size 1.0: size 13.00 in a box of 13.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:05:52.881 29540 29540 D TaqwaWearQibla: detail '٦٬٦٠٠ كم' at font size 1.0: size 10.0, y 155.00, least letter gap 7.41 as drawn (7.41 at the judged size), ticks 22.73, caption y 141.00, a digit's ink 0.766 em
+10-18 15:05:52.890 29540 29540 D TaqwaWearQibla: caption '٢٣°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:05:53.235 29540 29540 D TaqwaWearQibla: detail '٦٬٦٠٠ كم' at font size 1.0: size 10.0, y 155.00, least letter gap 7.41 as drawn (7.41 at the judged size), ticks 22.73, caption y 141.00, a digit's ink 0.766 em
+10-18 15:05:53.238 29540 29540 D TaqwaWearQibla: caption 'أبقِ معصمك مستويًا' at font size 1.0: size 12.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:05:53.302 29540 29540 D TaqwaWearQibla: caption 'أبقِ معصمك مستويًا' at font size 1.0: size 12.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:06:07.803 29540 29540 D TaqwaWearQibla: detail '٦٬٦٠٠ كم' at font size 1.0: size 10.0, y 155.00, least letter gap 7.41 as drawn (7.41 at the judged size), ticks 22.73, caption y 141.00, a digit's ink 0.766 em
+10-18 15:06:07.803 29540 29540 D TaqwaWearQibla: caption 'أنت باتجاه القبلة' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:06:09.602 29540 29540 D TaqwaWearQibla: detail '٦٬٦٠٠ كم' at font size 1.0: size 10.0, y 155.00, least letter gap 7.41 as drawn (7.41 at the judged size), ticks 22.73, caption y 141.00, a digit's ink 0.766 em
+10-18 15:06:09.604 29540 29540 D TaqwaWearQibla: caption 'أبقِ معصمك مستويًا' at font size 1.0: size 12.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:07:22.604 29540 29540 D TaqwaWearQibla: detail '٦٬٦٠٠ كم' at font size 1.0: size 10.0, y 155.00, least letter gap 7.41 as drawn (7.41 at the judged size), ticks 22.73, caption y 141.00, a digit's ink 0.766 em
+10-18 15:07:22.605 29540 29540 D TaqwaWearQibla: caption '٢٣°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:07:39.703 29540 29540 D TaqwaWearQibla: detail '٦٬٦٠٠ كم' at font size 1.0: size 10.0, y 155.00, least letter gap 7.41 as drawn (7.41 at the judged size), ticks 22.73, caption y 141.00, a digit's ink 0.766 em
+10-18 15:07:39.705 29540 29540 D TaqwaWearQibla: caption 'أنت باتجاه القبلة' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:07:51.197 29848 29848 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.77 as drawn (7.77 at the judged size), ticks 23.54, caption y 141.00, a digit's ink 0.766 em
+10-18 15:07:51.206 29848 29848 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:07:51.570 29848 29848 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.77 as drawn (7.77 at the judged size), ticks 23.54, caption y 125.00, a digit's ink 0.766 em
+10-18 15:07:51.574 29848 29848 D TaqwaWearQibla: caption 'اپنی کلائی سیدھی رکھیں' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:07:51.653 29848 29848 D TaqwaWearQibla: caption 'اپنی کلائی سیدھی رکھیں' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:08:06.139 29848 29848 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.77 as drawn (7.77 at the judged size), ticks 23.54, caption y 141.00, a digit's ink 0.766 em
+10-18 15:08:06.140 29848 29848 D TaqwaWearQibla: caption 'آپ قبلہ رخ ہیں' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:08:07.920 29848 29848 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.77 as drawn (7.77 at the judged size), ticks 23.54, caption y 125.00, a digit's ink 0.766 em
+10-18 15:08:07.922 29848 29848 D TaqwaWearQibla: caption 'اپنی کلائی سیدھی رکھیں' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:09:21.169 29848 29848 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.77 as drawn (7.77 at the judged size), ticks 23.54, caption y 141.00, a digit's ink 0.766 em
+10-18 15:09:21.170 29848 29848 D TaqwaWearQibla: caption '23°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:09:38.252 29848 29848 D TaqwaWearQibla: detail '6,600 km' at font size 1.0: size 10.0, y 155.00, least letter gap 7.77 as drawn (7.77 at the judged size), ticks 23.54, caption y 141.00, a digit's ink 0.766 em
+10-18 15:09:38.253 29848 29848 D TaqwaWearQibla: caption 'آپ قبلہ رخ ہیں' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:09:49.684 30147 30147 D TaqwaWearQibla: detail '৬,৬০০ km' at font size 1.0: size 10.0, y 155.00, least letter gap 5.41 as drawn (5.41 at the judged size), ticks 23.89, caption y 141.00, a digit's ink 0.766 em
+10-18 15:09:49.692 30147 30147 D TaqwaWearQibla: caption '২৩°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:09:49.981 30147 30147 D TaqwaWearQibla: detail '৬,৬০০ km' at font size 1.0: size 10.0, y 155.00, least letter gap 5.41 as drawn (5.41 at the judged size), ticks 23.89, caption y 125.00, a digit's ink 0.766 em
+10-18 15:09:49.990 30147 30147 D TaqwaWearQibla: caption 'কব্জি সমান করে রাখুন' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:09:50.085 30147 30147 D TaqwaWearQibla: caption 'কব্জি সমান করে রাখুন' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:10:04.638 30147 30147 D TaqwaWearQibla: detail '৬,৬০০ km' at font size 1.0: size 10.0, y 155.00, least letter gap 5.41 as drawn (5.41 at the judged size), ticks 23.89, caption y 141.00, a digit's ink 0.766 em
+10-18 15:10:04.639 30147 30147 D TaqwaWearQibla: caption 'কিবলামুখী' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:10:06.421 30147 30147 D TaqwaWearQibla: detail '৬,৬০০ km' at font size 1.0: size 10.0, y 155.00, least letter gap 5.41 as drawn (5.41 at the judged size), ticks 23.89, caption y 125.00, a digit's ink 0.766 em
+10-18 15:10:06.423 30147 30147 D TaqwaWearQibla: caption 'কব্জি সমান করে রাখুন' at font size 1.0: size 15.00 in a box of 15.00 on 2 lines, baselines 125.00 to 141.30, the half anchor 141.00
+10-18 15:11:19.488 30147 30147 D TaqwaWearQibla: detail '৬,৬০০ km' at font size 1.0: size 10.0, y 155.00, least letter gap 5.41 as drawn (5.41 at the judged size), ticks 23.89, caption y 141.00, a digit's ink 0.766 em
+10-18 15:11:19.490 30147 30147 D TaqwaWearQibla: caption '২৩°' at font size 1.0: size 15.00 in a box of 15.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00
+10-18 15:11:36.535 30147 30147 D TaqwaWearQibla: detail '৬,৬০০ km' at font size 1.0: size 10.0, y 155.00, least letter gap 5.41 as drawn (5.41 at the judged size), ticks 23.89, caption y 141.00, a digit's ink 0.766 em
+10-18 15:11:36.535 30147 30147 D TaqwaWearQibla: caption 'কিবলামুখী' at font size 1.0: size 13.00 in a box of 13.00 on 1 lines, baselines 141.00 to 141.00, the half anchor 141.00

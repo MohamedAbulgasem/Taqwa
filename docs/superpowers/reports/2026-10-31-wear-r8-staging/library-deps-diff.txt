@@ -1,0 +1,16 @@
+7,8c7,8
+< androidx.appcompat:appcompat-resources:1.1.0
+< androidx.appcompat:appcompat:1.1.0
+---
+> androidx.appcompat:appcompat-resources:1.7.0
+> androidx.appcompat:appcompat:1.7.0
+53a54
+> androidx.core:core-splashscreen:1.2.0
+61a63
+> androidx.emoji2:emoji2-views-helper:1.4.0
+63c65
+< androidx.fragment:fragment:1.1.0
+---
+> androidx.fragment:fragment:1.5.4
+96a99
+> androidx.resourceinspection:resourceinspection-annotation:1.0.1

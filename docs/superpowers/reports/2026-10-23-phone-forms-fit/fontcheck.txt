@@ -1,0 +1,16 @@
+Light    U+06F4: new uni06F4     = upstream pnum(locl_URD(uni06F4)): same outline and advance (the old file's uni06F4: different)
+Light    U+06F6: new uni0666     = upstream pnum(locl_URD(uni06F6)): same outline and advance (the old file's uni06F6: different)
+Light    U+06F7: new uni06F7     = upstream pnum(locl_URD(uni06F7)): same outline and advance (the old file's uni06F7: different)
+Light    the other 503 code points: 0 with another outline or advance than the old file's
+Light    tables whose bytes differ from the old file's (head's checkSumAdjustment aside): cmap (719 glyphs, 719 before)
+SemiBold U+06F4: new uni06F4     = upstream locl_URD(uni06F4): same outline and advance (the old file's uni06F4: different)
+SemiBold U+06F6: new uni0666     = upstream locl_URD(uni06F6): same outline and advance (the old file's uni06F6: different)
+SemiBold U+06F7: new uni06F7     = upstream locl_URD(uni06F7): same outline and advance (the old file's uni06F7: different)
+SemiBold the other 503 code points: 0 with another outline or advance than the old file's
+SemiBold tables whose bytes differ from the old file's (head's checkSumAdjustment aside): cmap (719 glyphs, 719 before)
+Bold     U+06F4: new uni06F4     = upstream locl_URD(uni06F4): same outline and advance (the old file's uni06F4: different)
+Bold     U+06F6: new uni0666     = upstream locl_URD(uni06F6): same outline and advance (the old file's uni06F6: different)
+Bold     U+06F7: new uni06F7     = upstream locl_URD(uni06F7): same outline and advance (the old file's uni06F7: different)
+Bold     the other 503 code points: 0 with another outline or advance than the old file's
+Bold     tables whose bytes differ from the old file's (head's checkSumAdjustment aside): cmap (719 glyphs, 719 before)
+PASS

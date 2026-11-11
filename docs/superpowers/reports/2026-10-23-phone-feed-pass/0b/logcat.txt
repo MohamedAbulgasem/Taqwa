@@ -1,0 +1,7 @@
+10-31 13:27:59.739 I/TaqwaWatchHarness( 2548): nodes: no Wear API
+10-31 13:28:00.235 I/System.out( 2548): TaqwaWatch RESCHEDULED NO_WATCH 0ms
+10-31 13:28:00.236 I/TaqwaWatchHarness( 2548): place: stored London id=2643743 zone=Europe/London at 51.507,-0.128; plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+10-31 13:28:00.345 I/System.out( 2548): TaqwaWatch RESCHEDULED NO_WATCH 0ms
+10-31 13:28:00.345 I/TaqwaWatchHarness( 2548): reschedule: plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+10-31 13:28:00.391 I/TaqwaWatchHarness( 2548): nodes: no Wear API
+10-31 13:28:00.443 I/TaqwaWatchHarness( 2548): language: en

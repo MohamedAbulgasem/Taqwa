@@ -15,7 +15,7 @@
     <string name="onboarding_welcome_body">مواقيت الصلاة والقبلة والقرآن. مجانًا إلى الأبد. بلا إعلانات ولا حساب، ويعمل دون اتصال.</string>
     <string name="onboarding_welcome_cta">ابدأ</string>
     <string name="onboarding_location_title">أين أنت؟</string>
-    <string name="onboarding_location_body">تعتمد المواقيت على موقعك. كل الحساب يجري على جهازك، وموقعك لا يغادر هاتفك.</string>
+    <string name="onboarding_location_body">تعتمد المواقيت على موقعك. كل الحساب يجري على جهازك. لا ترى موقعك إلا أجهزتك أنت.</string>
     <string name="onboarding_continue">متابعة</string>
     <string name="onboarding_notifications_title">إشعارات الصلاة</string>
     <string name="onboarding_notifications_body">إشعار لكل صلاة. تختار الصوت لكل صلاة على حدة، ويمكنك تغييره متى شئت.</string>
@@ -125,6 +125,22 @@
     <string name="settings_appearance">المظهر</string>
     <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">اللغة</string>
+    <!-- Settings › App, after Language (plan 4 Task 10): the iPhone’s "Add to Apple Watch", shown
+         while a watch is paired and the Taqwa face is bundled, and the line under it when the
+         face was not added. "Apple Watch" and "Watch" (Apple’s app) are Apple’s names, never
+         translated. -->
+    <string name="settings_add_to_apple_watch">أضِف إلى Apple Watch</string>
+    <string name="settings_add_to_apple_watch_failed">تعذّرت إضافة واجهة الساعة. حاول مجددًا من تطبيق Watch.</string>
+    <!-- Settings › Watch, between App and About (plan 5 Task 6): on Android, "Install on your
+         watch" (its value the watch’s name, as the system gives it) opens Taqwa’s Play page on a
+         watch without Taqwa, and "Add the Taqwa face" (the watch’s own face_add) opens the watch’s
+         face screen; a tap says "Continue on your watch" or "Couldn’t reach your watch" as the
+         row’s value. On the iPhone the section holds "Add to Apple Watch" alone. -->
+    <string name="settings_group_watch">الساعة</string>
+    <string name="settings_watch_install">ثبّت على ساعتك</string>
+    <string name="settings_watch_face">أضِف واجهة تقوى</string>
+    <string name="settings_watch_continue">تابِع على ساعتك</string>
+    <string name="settings_watch_unreachable">تعذّر الوصول إلى ساعتك</string>
     <string name="settings_about">عن تقوى</string>
     <string name="settings_attribution">الإسناد والتراخيص</string>
     <string name="settings_rate">قيّم تقوى</string>
@@ -133,15 +149,16 @@
     <string name="settings_not_set">غير محدد</string>
     <string name="settings_notifications_off">معطّلة</string>
     <string name="settings_notifications_on_count">%1$s مُفعّلة</string>
-    <string name="settings_version_value">1.5.1</string>
+    <string name="settings_version_value">1.6.0</string>
 
     <!-- شاشة «عن تقوى». الاسم «Taqwa» يبقى بالحروف اللاتينية كما على الأيقونة. -->
     <string name="about_tagline">مجاني، للجميع، دائمًا.</string>
     <string name="about_privacy_label">الخصوصية</string>
-    <string name="about_stays_title">يبقى على هاتفك</string>
-    <string name="about_stays_body">الموقع والإعدادات والعلامات والعدّاد لا تغادره.</string>
-    <string name="about_online_title">متصل فقط عندما تطلب</string>
-    <string name="about_online_body">يُستخدم الإنترنت لشيء واحد: التلاوات التي تختار تنزيلها، من مستودع تقوى العام على GitHub.</string>
+    <string name="about_stays_title">يبقى على أجهزتك</string>
+    <string name="about_stays_body">لا ترى موقعك وإعداداتك وعلاماتك وعدّادك إلا أجهزتك أنت.</string>
+    <string name="about_online_title">متصل فقط لما تختاره</string>
+    <string name="about_online_body_android">يُستخدم الإنترنت للتلاوات التي تختار تنزيلها، من مستودع تقوى العام على GitHub. وإن أضفت تقوى إلى ساعتك، فقد تنقل Google بياناتها عبر الإنترنت، مشفّرةً فلا يقرؤها إلا هاتفك وساعتك.</string>
+    <string name="about_online_body_ios">يُستخدم الإنترنت للتلاوات التي تختار تنزيلها، من مستودع تقوى العام على GitHub. وإن أضفت تقوى إلى ساعتك، فقد تنقل Apple بياناتها عبر الإنترنت، مشفّرةً فلا يقرؤها إلا هاتفك وساعتك.</string>
     <string name="about_nothing_title">بلا حساب، بلا إعلانات، بلا تحليلات</string>
     <string name="about_nothing_body">لا شيء لتسجيل الدخول إليه، ولا شيء للبيع.</string>
     <string name="about_privacy_policy">سياسة الخصوصية</string>
@@ -228,7 +245,7 @@
     <string name="location_country">الدولة</string>
     <string name="location_timezone">المنطقة الزمنية</string>
     <string name="location_choose_city_instead">اختر مدينة بدلًا من ذلك</string>
-    <string name="location_privacy_note">تُحفظ الإحداثيات على جهازك وتُستخدم لحساب المواقيت فقط. لا يُرسل شيء إلى أي جهة.</string>
+    <string name="location_privacy_note">تُحفظ الإحداثيات على جهازك وتُستخدم لحساب المواقيت فقط. لا ترى موقعك إلا أجهزتك أنت.</string>
     <string name="location_denied_note">الوصول إلى الموقع مرفوض حاليًا. يمكنك السماح به من إعدادات جهازك، أو اختيار مدينة بدلًا من ذلك.</string>
 
     <!-- City search -->

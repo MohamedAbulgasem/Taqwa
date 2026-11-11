@@ -1,0 +1,49 @@
+What the Watch Face Format and the Wear OS 6 face runtime give a screen reader (plan 1, Task 12).
+
+The format's reference (developer.android.com/reference/wear-os/wff, versions 1 to 5)
+- ComplicationSlot: x, y, width, height, slotId, supportedTypes, pivotX/Y, angle, alpha, scaleX/Y,
+  tintColor, displayName (the editor's name), isCustomizable, blendMode, name. No attribute says what
+  a screen reader reads, nor its order. Children: one bounding area, Complication per type,
+  DefaultProviderPolicy, Variant, and ScreenReader.
+- ScreenReader (Wear OS 4, format 1 on): "Every group- or part-based element supports the
+  ScreenReader element"; stringId (a string resource) and Parameter children (expressions).
+- UserConfigurations take screenReaderText (the editor's spoken names).
+
+The face runtime (com.google.wear.watchface.runtime 334200060, DeclarativeWatchFaceRuntimePrebuilt.apk on
+the emulator; an androidx.wear.watchface WatchFaceService, obfuscated; read with dexdump):
+- updateContentDescriptionLabels (strings "WatchFaceService.updateContentDescriptionLabels"): one label
+  for the clock, index -1, at the main clock element's box (the AnalogClock or DigitalClock elements
+  enabled; with none, the middle quarter of the screen), text a TimeFormatText "HH:mm" or "h:mm a" by
+  the watch's own 24-hour setting; then, for each enabled slot whose bounds type is not background,
+  with a content description, a label at the slot's bounds (its bounding area, normalised), with its
+  tap action, index = the slot's internal id; then the renderer's additional labels; sorted by index.
+- A slot's internal id is 11 and up in the order the slots are declared (dumpsys: "ComplicationSlot
+  11" is slot 7, the first declared, 12 is slot 0, ... 18 is slot 5), and its traversal index is the
+  same number. Bounds type is always 0.
+- A slot's content description (x0.*.d): its description unless it is empty or a placeholder (androidx
+  drops an empty one); otherwise a template of its title and text; a ranged value with neither says
+  "%s of %s"; no data says the placeholder's, or the runtime's own word; empty and not configured say
+  nothing (no label).
+- ScreenReader elements (b2.b.W, a4.g0): the string resource formatted with String.format by the
+  Parameters' values, refreshed 100 ms after a parameter changes; labels for the enabled elements
+  only, at the element's bounds, indices from 19.
+- The list is made again whenever a slot's data changes (lastComplicationUpdate; with a dynamic value
+  that is each time the value changes: the ring's, every second).
+
+The system UI (com.google.android.wearable.sysui, ClockworkSysUiGoogle.apk; AndroidXWatchFaceEngine
+.maybeUpdateA11yLabels and hhl.h / hhl.x):
+- It fetches the labels and makes one android.view.View per label, keyed by (bounds, tap action). A
+  label whose key is already there reuses that View and replaces its accessibility delegate, so the
+  item says the last label's words. Each View is "accessibility traversal after" the View made just
+  before it, so the items are read in the labels' order.
+- When a new list arrives, it keeps its Views only if the list has exactly as many labels as it has
+  Views, every key among them; otherwise it removes every View and makes them again (new ids). With
+  two labels on one key the counts never match, so every refresh rebuilt every item, TalkBack lost
+  its focus, put it back (RESTORED_LAST_FOCUS) and said the item again.
+- The delegate sets the node's content description to the label's text at the moment it is read
+  (TimeDependentText.getTextAt), the first item's followed by a line of the system's own.
+
+TalkBack: injected gestures (adb shell input) reach the face and not TalkBack; a swipe through the
+emulator's own touch screen (the console's "event mouse") is a gesture ("GestureController:
+Recognized gesture id: 4 [Swipe right], action: [NEXT]"). Its log says what it speaks
+("SpeechControllerImpl: Speaking fragment text=...") with its Diagnosis mode on.

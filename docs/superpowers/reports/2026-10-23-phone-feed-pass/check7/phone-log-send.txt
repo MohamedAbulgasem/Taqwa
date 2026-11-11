@@ -1,0 +1,3 @@
+10-31 13:14:21.829 I/System.out( 7924): TaqwaWatch WATCH_CHANGED SENT 101ms
+10-31 13:14:21.830 I/TaqwaWatchHarness( 7924): send: WATCH_CHANGED SENT
+10-31 13:14:21.889 I/System.out( 7924): TaqwaWatch ACK 11/23aee84e77b1f1f2

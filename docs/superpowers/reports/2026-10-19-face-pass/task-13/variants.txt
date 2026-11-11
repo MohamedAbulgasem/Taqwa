@@ -1,0 +1,20 @@
+Ruling 25's audit of watchface.xml at Task 13's closing fix (task-13/variants.py): every Variant by its parent
+element, mode and target; the Moon's five hands; no element with both an alpha Variant and an alpha Transform;
+none in a Font or a Stroke. Exit 0. Task 13 had 142; Ruling 46 adds two PartDraw Variants, the moon window's fill
+at alpha 0 always-on, in the window and in option (d)'s risen one.
+
+Variants: 144
+  Group        AMBIENT alpha x4
+  HourHand     AMBIENT alpha x2
+  MinuteHand   AMBIENT alpha x2
+  PartDraw     AMBIENT alpha x36
+  PartImage    AMBIENT alpha x32
+  PartText     AMBIENT alpha x67
+  SecondHand   AMBIENT alpha x1
+  hand HourHand hand_hour_back alpha=0 always-on=255
+  hand HourHand hand_hour alpha=None always-on=209
+  hand MinuteHand hand_minute_back alpha=0 always-on=255
+  hand MinuteHand hand_minute alpha=None always-on=209
+  hand SecondHand hand_second alpha=None always-on=0
+an alpha Variant and an alpha Transform on one element: 0
+outside the rule (in a Font or a Stroke, or not AMBIENT alpha): 0 []

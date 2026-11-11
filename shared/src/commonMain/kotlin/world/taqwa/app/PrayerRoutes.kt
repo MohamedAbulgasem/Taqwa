@@ -55,6 +55,7 @@ import world.taqwa.app.resources.Res
 import world.taqwa.app.resources.adhkar_evening
 import world.taqwa.app.resources.adhkar_morning
 import world.taqwa.app.settings.SettingsRepository
+import world.taqwa.app.watchfeed.WatchSyncReason
 import kotlin.time.Clock
 
 @Composable
@@ -318,6 +319,8 @@ internal fun TasbeehRoute(
         TasbeehViewModel(
             store = container.tasbeehStore,
             haptics = createHaptics(),
+            // The watch carries the reader's own phrases: an edit only asks it (plan 2 Task 4).
+            onPhrasesChanged = { container.watchFeedSync.request(WatchSyncReason.PHRASES_CHANGED) },
         )
     }
     val tasbeehState by tasbeehVm.state.collectAsState()

@@ -1,0 +1,54 @@
+11:20:18.160 watch[49610] TaqwaWatch activate() asked
+11:20:18.188 watch[49610] TaqwaWatch activated=true state=2 error=none
+11:20:18.188 watch[49610] TaqwaWatch nothing to store via activation
+11:20:18.310 watch[49610] TaqwaWatch drain drained 108 ms
+11:20:18.325 watch[49610] TaqwaWatch handshake activated skipped: the phone is not reachable
+11:20:18.380 watch[49610] TaqwaWatch handshake opened skipped: the phone is not reachable
+11:20:18.381 watch[49610] TaqwaWatch reachable=true
+11:20:18.382 watch[49610] TaqwaWatch handshake reachable have=none
+11:20:35.207 watch[49610] TaqwaWatch accepted 1/6efab8e0696fdd95 31 days via context
+11:20:35.211 watch[49610] TaqwaWatch unchanged 3/6efab8e0696fdd95 31 days via context
+11:20:35.212 watch[49610] TaqwaWatch handshake reachable answered queued=true
+11:21:56.556 watch[50407] TaqwaWatch activate() asked
+11:21:56.561 watch[50407] TaqwaWatch activated=true state=2 error=none
+11:21:56.563 watch[50407] TaqwaWatch stale 3/6efab8e0696fdd95 via activation
+11:21:56.665 watch[50407] TaqwaWatch drain drained 100 ms
+11:21:56.667 watch[50407] TaqwaWatch handshake activated skipped: the phone is not reachable
+11:21:56.721 watch[50407] TaqwaWatch handshake opened skipped
+11:21:56.723 watch[50407] TaqwaWatch reachable=true
+11:21:56.725 watch[50407] TaqwaWatch handshake reachable have=3/6efab8e0696fdd95
+11:21:59.178 watch[50407] TaqwaWatch handshake reachable answered queued=true
+11:25:00.608 watch[52587] TaqwaWatch activate() asked
+11:25:00.613 watch[52587] TaqwaWatch activated=true state=2 error=none
+11:25:00.615 watch[52587] TaqwaWatch stale 3/6efab8e0696fdd95 via activation
+11:25:00.621 watch[52587] TaqwaWatch accepted 4/22fe6eecbe87a32f 31 days via context
+11:25:00.639 watch[52587] TaqwaWatch stale 4/22fe6eecbe87a32f via context
+11:25:00.689 watch[52587] TaqwaWatch reachable=true
+11:25:00.689 watch[52587] TaqwaWatch drain drained 72 ms
+11:25:00.691 watch[52587] TaqwaWatch handshake reachable have=4/22fe6eecbe87a32f
+11:25:00.691 watch[52587] TaqwaWatch handshake activated skipped
+11:25:00.695 watch[52587] TaqwaWatch drain drained 0 ms
+11:25:00.698 watch[52587] TaqwaWatch reachable=false
+11:25:00.711 watch[52587] TaqwaWatch handshake reachable failed: WCErrorDomain 7007
+11:26:11.215 watch[53248] TaqwaWatch activate() asked
+11:26:11.220 watch[53248] TaqwaWatch activated=true state=2 error=none
+11:26:11.221 watch[53248] TaqwaWatch stale 4/22fe6eecbe87a32f via activation
+11:26:11.324 watch[53248] TaqwaWatch drain drained 102 ms
+11:26:11.326 watch[53248] TaqwaWatch handshake activated skipped: the phone is not reachable
+11:26:11.387 watch[53248] TaqwaWatch handshake opened skipped
+11:26:11.389 watch[53248] TaqwaWatch reachable=true
+11:26:11.392 watch[53248] TaqwaWatch handshake reachable have=4/22fe6eecbe87a32f
+11:26:15.321 watch[53248] TaqwaWatch handshake reachable answered queued=true
+11:26:50.197 watch[53248] TaqwaWatch nothing to store via context
+11:26:51.323 watch[53248] TaqwaWatch nothing to store via context
+11:26:51.330 watch[53248] TaqwaWatch unchanged 6/22fe6eecbe87a32f 31 days via context
+11:27:24.329 watch[53248] TaqwaWatch unchanged 8/22fe6eecbe87a32f 31 days via context
+11:30:25.279 watch[53248] TaqwaWatch nothing to store via context
+11:30:28.319 watch[53248] TaqwaWatch nothing to store via context
+11:30:30.319 watch[53248] TaqwaWatch nothing to store via context
+11:30:33.320 watch[53248] TaqwaWatch nothing to store via context
+11:30:36.325 watch[53248] TaqwaWatch nothing to store via context
+11:30:36.333 watch[53248] TaqwaWatch unchanged 10/22fe6eecbe87a32f 31 days via context
+11:30:36.337 watch[53248] TaqwaWatch unchanged 12/22fe6eecbe87a32f 31 days via context
+11:31:09.324 watch[53248] TaqwaWatch unchanged 14/22fe6eecbe87a32f 31 days via context
+11:31:37.333 watch[53248] TaqwaWatch unchanged 16/22fe6eecbe87a32f 31 days via context

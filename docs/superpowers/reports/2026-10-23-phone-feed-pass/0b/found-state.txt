@@ -1,0 +1,6 @@
+time: Sat Oct 31 13:27:58 SAST 2026
+build: 36 BE2A.250530.026.D1 sdk_phone64_arm64
+gms: [] gsf: [] vending: [] wear companion: []
+packages: 181
+tz=Africa/Johannesburg font_scale=1.0
+13:2x: stopped with adb -s emulator-5564 emu kill; AVD Taqwa_Phone_NoPlay deleted with avdmanager delete avd (its 6 GB given back); lock phone-5564 released

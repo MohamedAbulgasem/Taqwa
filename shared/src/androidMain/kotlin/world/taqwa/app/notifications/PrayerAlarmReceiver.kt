@@ -18,6 +18,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.domain.PrayerSound
 import world.taqwa.app.di.appContainer
 import world.taqwa.app.nav.LaunchRequests
+import world.taqwa.app.watchfeed.settleTheWatch
 import world.taqwa.app.widget.WidgetMirrorRefresher
 import world.taqwa.app.widget.androidWidgetUpdateHook
 import kotlin.time.Clock
@@ -146,8 +147,10 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
     }
 
     /**
-     * The two things worth doing while this alarm has the process briefly awake: redraw the
-     * widget, and top the plan up before it runs out.
+     * The three things worth doing while this alarm has the process briefly awake, in this order:
+     * redraw the widget, top the plan up before it runs out (or rebuild it, see [rebuildPlan]),
+     * and then settle the watch, which the top-up only asked, given its turn last and bounded
+     * (plan 2 Task 4), as `afterSystemEvent` and `topUp` give it.
      *
      * `goAsync` rather than [world.taqwa.app.widget.refreshWidgets]: that helper is deliberately
      * fire-and-forget on a process-lifetime scope, which is right for a running app but not here —
@@ -167,6 +170,9 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 withTimeout(WORK_BUDGET_MILLIS) {
                     refreshWidgets()
                     topUpPlan(context, rebuildPlan)
+                    // A top-up asked the watch (plan 2 Task 4), and the process may stop once this
+                    // returns: the ask gets its turn last, bounded, after every widget step.
+                    runCatching { settleTheWatch { appContainer.watchFeedSync } }
                 }
             } catch (_: TimeoutCancellationException) {
                 // The half-hourly update and the next window alarm will both catch up.

@@ -48,6 +48,14 @@ class NotificationCoordinator(
      * spec §5). None for callers with no adhkar store to hand.
      */
     private val doneAdhkar: suspend () -> Set<String> = { emptySet() },
+    /**
+     * Told the location of each plan right after the scheduler armed it, inside the lock, so the
+     * watch is asked in the order the plans were armed (plan 2 Task 4). It must only queue
+     * (`WatchFeedSync.request`), never wait, so the lock is held no longer than before; anything
+     * it throws is dropped. Never called without a location: the watch then keeps its last feed
+     * until it runs out. Nothing for callers with no watch to hand.
+     */
+    private val afterPlan: (location: GeoLocation) -> Unit = {},
 ) {
     private val rescheduling = Mutex()
 
@@ -68,6 +76,11 @@ class NotificationCoordinator(
         // trigger is not branched on: every reason for waking up resolves to the same correct
         // plan for right now. It exists so callers and logs can say why a reschedule happened.
         scheduler.scheduleAll(plan)
+        try {
+            afterPlan(location)
+        } catch (_: Exception) {
+            // The reminders are armed; nothing the watch side does may cost them.
+        }
         plan
     }
 

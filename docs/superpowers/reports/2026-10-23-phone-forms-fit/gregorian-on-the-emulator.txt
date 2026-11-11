@@ -1,0 +1,11 @@
+Arch on emulator-5558 (the v2 face, the Saudi sample at 14:58 with every day's Gregorian line rewritten by feedtext.sh), 25 Oct 2026:
+the least distance in each awake shot from the line's ink (bright grey) to the lit stroke's pixels (amber), face px, beside
+date-fit.py's figure for the same form (its ink to the stroke's edge; -4.3 is its floor, the ink on the stroke's centre line).
+الأحد ١٨ أكتوبر: in the shot 42.4 px between the line's ink and the stroke's pixels; model (ink to the stroke's edge) 41.1 px
+  the model's stroke centre line (y 110-190) to the shot's nearest amber pixel: median 0.4 px, max 0.7 px
+الثلاثاء ١٠ تشرين الأول: in the shot 2.0 px between the line's ink and the stroke's pixels; model (ink to the stroke's edge) -4.3 px
+  the model's stroke centre line (y 110-190) to the shot's nearest amber pixel: median 0.4 px, max 1.5 px
+الخميس ١٠ أغسطس: in the shot 1.0 px between the line's ink and the stroke's pixels; model (ink to the stroke's edge) -1.3 px
+  the model's stroke centre line (y 110-190) to the shot's nearest amber pixel: median 0.4 px, max 0.7 px
+الخميس ٣٠ تشرين الثاني: in the shot 1.0 px between the line's ink and the stroke's pixels; model (ink to the stroke's edge) -4.1 px
+  the model's stroke centre line (y 110-190) to the shot's nearest amber pixel: median 0.4 px, max 3.4 px

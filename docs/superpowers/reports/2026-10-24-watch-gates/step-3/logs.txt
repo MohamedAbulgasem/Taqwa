@@ -1,0 +1,224 @@
+# P5.12 Step 3: the dry-run candidate on emulator-5562 (phone) and emulator-5558 (watch), 6 Nov 2026
+# Logs: adb -s <serial> logcat -v threadtime from 20:20:24 (watch clock), excerpts. Times are SAST.
+
+== 1. The dry run (scripts/release.sh, TAQWA_RELEASE_DRY_RUN=1, the test pin), its last lines
+== 6. The outputs
+    31.4 MB  build/release-dry-run/androidApp-release-DRY-RUN.aab
+             certificate SHA-256 e5d76ef683b35977e7c4127144cabdcb1279afb59349b5f954c5dee77c2a7dc7
+    26.2 MB  build/release-dry-run/androidApp-release-DRY-RUN.apk
+             certificate SHA-256 e5d76ef683b35977e7c4127144cabdcb1279afb59349b5f954c5dee77c2a7dc7
+     5.5 MB  build/release-dry-run/wearApp-release-DRY-RUN.aab
+             certificate SHA-256 e5d76ef683b35977e7c4127144cabdcb1279afb59349b5f954c5dee77c2a7dc7
+     4.8 MB  build/release-dry-run/wearApp-release-DRY-RUN.apk
+             certificate SHA-256 e5d76ef683b35977e7c4127144cabdcb1279afb59349b5f954c5dee77c2a7dc7
+
+  package: name='world.taqwa.app' versionCode='41' versionName='1.5.0'
+  package: name='world.taqwa.app' versionCode='100041' versionName='1.5.0'
+  the face inside: package: name='world.taqwa.app.watchfacepush.taqwa' versionCode='41' versionName='1.5.0', certificate SHA-256 9939135e65000a3915c722d45463569863d191152bd5418c1fab569185743b70
+
+release.sh: DRY RUN PASS: build/release-dry-run/ holds the four outputs, signed with the debug key, for the emulators alone; Play refuses them.
+ok lines: 29, FAIL lines: 0
+32960829 androidApp-release-DRY-RUN.aab
+27427656 androidApp-release-DRY-RUN.apk
+5748333 wearApp-release-DRY-RUN.aab
+5010024 wearApp-release-DRY-RUN.apk
+0e66ebae633812ee624142519bbd0d1ba06429af7bd64a78b8cc85b5941bb4de  androidApp-release-DRY-RUN.aab
+a54ff7347591dcd8b6f7740e2b8896e4c947b09fbee572ae7c60081edeb9f984  androidApp-release-DRY-RUN.apk
+b234e7f9479e50dcc7bcf8e8611e35788e439f6d00467b935e71158bd3b54c94  wearApp-release-DRY-RUN.aab
+1103cf65d81a10d48ab2cde6392b27d40ef55faa399f87497b6326fffea7098f  wearApp-release-DRY-RUN.apk
+face inside the Wear APK (assets/default_watchface.apk): sha256 3c3c254e07d2687443c5dea621965becc87791232020dbd761f497f235633e4c, sha1 5b0586ce
+
+== 2. Installed first (20:18)
+== phone (emulator-5562) Fri Nov  6 20:18:33 SAST 2026
+world.taqwa.app: versionCode=41 minSdk=26 targetSdk=36 versionName=1.5.0 sha1=6cbda5a6
+   firstInstallTime=2026-11-05 23:08:17 lastUpdateTime=2026-11-06 14:53:17 installerPackageName=null pkgFlags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ]
+   signer: e5d76ef683b35977e7c4127144cabdcb1279afb59349b5f954c5dee77c2a7dc7
+world.taqwa.app.watchfacepush.taqwa: not installed
+== watch (emulator-5558) Fri Nov  6 20:18:33 SAST 2026
+world.taqwa.app: versionCode=100041 minSdk=30 targetSdk=36 versionName=1.5.0 sha1=109521c0
+   firstInstallTime=2026-11-06 14:49:22 lastUpdateTime=2026-11-06 18:32:57 installerPackageName=null pkgFlags=[ DEBUGGABLE HAS_CODE ALLOW_CLEAR_USER_DATA ]
+   signer: e5d76ef683b35977e7c4127144cabdcb1279afb59349b5f954c5dee77c2a7dc7
+world.taqwa.app.watchfacepush.taqwa: versionCode=41 minSdk=33 targetSdk=36 versionName=1.5.0 sha1=f13548e6
+   firstInstallTime=2026-11-06 14:49:22 lastUpdateTime=2026-11-06 18:32:57 installerPackageName=com.google.android.wearable.dwf.receiver pkgFlags=[ ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+   signer: 9939135e65000a3915c722d45463569863d191152bd5418c1fab569185743b70
+-- the watch (state.sh)
+time: Fri Nov  6 20:18:34 SAST 2026
+app: versionCode=100041 minSdk=30 targetSdk=36
+app sha1: 109521c0
+face: versionCode=41 minSdk=33 targetSdk=36 sha1=f13548e6
+files: . .. face-activation-spent feed.json feed.json.delivery nudge.anchor profileInstalled refresh.asked
+shared_prefs: 
+feed sha1: cb56754e writtenAt=1793984634 en-US
+nudge.anchor: 1793957551
+auto_time=1 auto_time_zone=0 tz=Africa/Johannesburg
+font_scale=1.0 display_density=Physical density: 320
+talkback: services=null enabled=0
+locale: persist.sys.locale=en-US system_locales=null app-locales=Locales for world.taqwa.app for user 0 are []
+battery: AC powered: false level: 100 Capacity level: -1
+rotation: user_rotation=0 accel_rotation=1
+alarms (taqwa): 1
+tiles: 0
+READ_PHONE_STATE (talkback): android.permission.READ_PHONE_STATE
+deviceidle: ACTIVE
+
+== 3. Uninstalls and installs
+20:20:50 uninstall face on 5558: Success
+20:20:53 uninstall Wear debug on 5558: Success
+20:20:53 uninstall phone debug on 5562: Success
+20:21:07 install phone dry run on 5562: Success
+20:25:26 install Wear dry run on 5558: Success
+20:30:37 item 3 round: uninstall Wear dry run: Success
+face after app uninstall: 
+20:30:48 item 3 round: install Wear dry run: Success
+
+== 4. Phone check 1: Install on your watch (the Wear app uninstalled)
+-- tap 1 at 20:22:47, the companion cached: the phone's REMOTE_INTENT broadcast (dumpsys activity broadcasts)
+BroadcastRecord{b6e7a48 com.google.android.wearable.intent.action.REMOTE_INTENT/u0} to user 0
+enqueueClockTime=2026-11-06 20:22:48.166 dispatchClockTime=2026-11-06 20:23:33.234
+DELIVERED scheduled +45s69ms terminal 0 (-1) #0: BroadcastFilter{fa6a4c0 10216/u0 ReceiverList{132e643 2879 com.google.android.apps.wear.companion:persistent/10216/u0 remote:f56fff2}}
+-- the watch
+11-06 20:23:32.747   572  8859 I ActivityTaskManager: START u0 {act=android.intent.action.VIEW dat=market://details/... flg=0x10000000 xflg=0x4 cmp=com.android.vending/com.google.android.finsky.wearmainactivity.WearMainActivity} with LAUNCH_SINGLE_TA
+11-06 20:23:32.859   572   592 I ActivityTaskManager: Displayed com.android.vending/com.google.android.finsky.wearunauth.WearUnauthenticatedMainActivity for user 0: +117ms
+11-06 20:25:02.735   572 11976 I ActivityTaskManager: START u0 {act=android.intent.action.VIEW dat=market://details/... flg=0x10000000 xflg=0x4 cmp=com.android.vending/com.google.android.finsky.wearmainactivity.WearMainActivity} with LAUNCH_SINGLE_TA
+11-06 20:25:02.804   572   592 I ActivityTaskManager: Displayed com.android.vending/com.google.android.finsky.wearunauth.WearUnauthenticatedMainActivity for user 0: +69ms
+11-06 20:25:09.474   572  1120 I ActivityTaskManager: START u0 {act=android.intent.action.VIEW dat=market://details/... flg=0x10000000 xflg=0x4 cmp=com.android.vending/com.google.android.finsky.wearmainactivity.WearMainActivity} with LAUNCH_SINGLE_TA
+11-06 20:25:09.515   572   592 I ActivityTaskManager: Displayed com.android.vending/com.google.android.finsky.wearunauth.WearUnauthenticatedMainActivity for user 0: +37ms
+
+== 5. The Wear app installed (20:25:26): Watch Face Push installs the bundled face
+11-06 20:25:26.230   572   630 I PackageManager: installation completed for package:world.taqwa.app. Final code path: /data/app/~~y9Ix-wgYvTC7gPT9RJHe0w==/world.taqwa.app-iSPQlC9mqgl0M6AvBkD6Dg==
+11-06 20:25:26.369  7706  7706 I Finsky  : [2] VerifyApps: Install-time verification requested for package world.taqwa.app.watchfacepush.taqwa, PackageManager id = 130, Verifier id = 22bc79b1-1a9f-4a9
+11-06 20:25:26.401   572   630 I PackageManager: installation completed for package:world.taqwa.app.watchfacepush.taqwa. Final code path: /data/app/~~5kiML4oHaCFBAjPhIDObww==/world.taqwa.app.watchface
+11-06 20:25:28.719 23193 23206 I System.out: TaqwaWearFeed NUDGE armed in 86400s found=false stopped=false
+11-06 20:25:28.725 23193 23205 I TaqwaFace: TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 20:25:28.728 23193 23205 I TaqwaFace: TaqwaFace bundled 41 copied
+11-06 20:25:28.729 23193 23206 I System.out: TaqwaWearFeed ASK STARTED sent
+11-06 20:25:28.732 23193 23214 I TaqwaComplications: asked again (feed)
+11-06 20:25:28.734 23193 23210 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa false
+11-06 20:25:28.741 23193 23210 I TaqwaFace: TaqwaFace capability added INSTALLED
+11-06 20:25:28.742 23193 23214 I System.out: TaqwaWearFeed ACCEPTED 1/5cb4f7c2d90cbbe6
+11-06 20:25:28.743 23193 23214 I System.out: TaqwaWearFeed ACK 1/5cb4f7c2d90cbbe6 sent
+11-06 20:25:28.755 23193 23214 I TaqwaComplications: asked again (feed)
+11-06 20:25:28.757 23193 23214 I System.out: TaqwaWearFeed ACCEPTED 3/5cb4f7c2d90cbbe6
+11-06 20:25:28.758 23193 23214 I System.out: TaqwaWearFeed ACK 3/5cb4f7c2d90cbbe6 sent
+11-06 20:27:11.032 23193 23193 I TaqwaComplications: asked again (app start)
+11-06 20:27:11.037 23193 23597 I System.out: TaqwaWearFeed ASK OPENED skipped
+11-06 20:27:11.116 23193 23596 I TaqwaFace: TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 20:27:11.119 23193 23219 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa false
+11-06 20:27:11.120 23193 23219 I TaqwaFace: TaqwaFace capability unchanged 4006
+11-06 20:28:05.304 23193 23218 I TaqwaFace: TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 20:28:05.307 23193 23218 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa false
+11-06 20:28:32.102 23193 23207 I TaqwaFace: TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 20:28:32.106 23193 23596 I TaqwaFace: TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 20:28:32.228 23193 23207 I TaqwaFace: TaqwaFace setActive 948eb69c-6e4a-3198-a1d5-94addb1dcb3d ok
+11-06 20:28:32.253 23193 23207 I TaqwaFace: TaqwaFace capability removed ACTIVE
+11-06 20:29:12.500 23193 23193 I TaqwaComplications: asked again (tile)
+
+== 6. Phone check 2: Add the Taqwa face (tap 20:28:05, the companion awake)
+11-06 20:28:05.267   572  8859 I ActivityTaskManager: START u0 {act=android.intent.action.VIEW cat=[android.intent.category.BROWSABLE] dat=taqwa://face/... flg=0x10000000 xflg=0x4 cmp=world.taqwa.app/.wear.face.FaceActivity} with LAUNCH_MULTIPLE from
+11-06 20:28:05.293   572   592 I ActivityTaskManager: Displayed world.taqwa.app/.wear.face.FaceActivity for user 0: +27ms
+11-06 20:31:18.354   572   592 I ActivityTaskManager: Displayed world.taqwa.app/.wear.face.FaceActivity for user 0: +33ms
+
+== 7. The complications on the active face (after setActive, 20:28:32)
+11-06 20:28:32.251 23193 23193 D TaqwaComplications: day dial: 13 steps, last until 2026-11-08T17:57:00Z
+11-06 20:28:32.254 23193 23193 D TaqwaComplications: next prayer, RANGED_VALUE: 13 steps, last until 2026-11-08T17:57:00Z
+11-06 20:28:32.276 23193 23193 D TaqwaComplications: next prayer, LONG_TEXT: 13 steps, last until 2026-11-08T17:57:00Z
+11-06 20:28:32.293 23193 23193 D TaqwaComplications: day: 13 steps, last until 2026-11-08T17:57:00Z
+11-06 20:28:32.294 23193 23193 D TaqwaComplications: dates, LONG_TEXT: 4 steps, last until 2026-11-08T17:57:00Z
+11-06 20:28:32.295 23193 23193 D TaqwaComplications: dates, SHORT_TEXT: 4 steps, last until 2026-11-08T17:57:00Z
+11-06 20:28:32.283   850   850 I DWF:WearComplicationProvider: [11:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.DayDialSource NoTapAction
+11-06 20:28:32.283   850   850 I DWF:WearComplicationProvider: [11:TEXT] "0123456789PM"
+11-06 20:28:32.283   850   850 I DWF:WearComplicationProvider: [11:TITLE] "L2LAM"
+11-06 20:28:32.289   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:32.289   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:32.289   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:32.307   850   850 I DWF:WearComplicationProvider: [16:LONG_TEXT] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:32.307   850   850 I DWF:WearComplicationProvider: [16:TEXT] "in 10 h 54 min"
+11-06 20:28:32.307   850   850 I DWF:WearComplicationProvider: [16:TITLE] "FAJR"
+11-06 20:28:32.308   850   850 I DWF:WearComplicationProvider: [13:WEIGHTED_ELEMENTS] world.taqwa.app/world.taqwa.app.wear.complication.DaySource NoTapAction
+11-06 20:28:32.308   850   850 I DWF:WearComplicationProvider: [13:TITLE] "Day"
+11-06 20:28:32.308   850   850 I DWF:WearComplicationProvider: [14:LONG_TEXT] world.taqwa.app/world.taqwa.app.wear.complication.DatesSource NoTapAction
+11-06 20:28:32.308   850   850 I DWF:WearComplicationProvider: [14:TEXT] "FRI 6 NOV"
+11-06 20:28:32.308   850   850 I DWF:WearComplicationProvider: [14:TITLE] "25 Jumada al-Ula"
+11-06 20:28:32.309   850   850 I DWF:WearComplicationProvider: [15:SHORT_TEXT] world.taqwa.app/world.taqwa.app.wear.complication.DatesSource NoTapAction
+11-06 20:28:32.309   850   850 I DWF:WearComplicationProvider: [15:TEXT] "6"
+11-06 20:28:32.309   850   850 I DWF:WearComplicationProvider: [15:TITLE] "FRI"
+11-06 20:28:44.900   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:44.900   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:44.900   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:45.003   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:45.003   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:45.003   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:46.004   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:46.004   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:46.004   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:47.007   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:47.007   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:47.007   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:48.003   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:48.003   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:48.003   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:49.004   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:49.004   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:49.004   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:50.004   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:50.004   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:50.004   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:51.005   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:51.005   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:51.005   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:52.004   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:52.005   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:52.005   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:28:53.005   850   850 I DWF:WearComplicationProvider: [12:RANGED_VALUE] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:28:53.005   850   850 I DWF:WearComplicationProvider: [12:TEXT] "5:23"
+11-06 20:28:53.005   850   850 I DWF:WearComplicationProvider: [12:TITLE] "FAJR"
+11-06 20:29:01.009   850   850 I DWF:WearComplicationProvider: [16:LONG_TEXT] world.taqwa.app/world.taqwa.app.wear.complication.NextPrayerSource NoTapAction
+11-06 20:29:01.009   850   850 I DWF:WearComplicationProvider: [16:TEXT] "in 10 h 53 min"
+11-06 20:29:01.009   850   850 I DWF:WearComplicationProvider: [16:TITLE] "FAJR"
+
+== 8. The second install (Task 6 Step 6 check 3, Deny)
+11-06 20:31:02.612 24230 24244 I System.out: TaqwaWearFeed NUDGE armed in 86400s found=false stopped=false
+11-06 20:31:02.620 24230 24230 I TaqwaComplications: asked again (app start)
+11-06 20:31:02.634 24230 24246 I TaqwaFace: TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 20:31:02.638 24230 24246 I TaqwaFace: TaqwaFace bundled 41 copied
+11-06 20:31:02.640 24230 24259 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa false
+11-06 20:31:02.662 24230 24258 I System.out: TaqwaWearFeed ASK STARTED sent
+11-06 20:31:02.662 24230 24244 I System.out: TaqwaWearFeed ASK OPENED sent
+11-06 20:31:02.670 24230 24244 I TaqwaFace: TaqwaFace capability added INSTALLED
+11-06 20:31:02.693 24230 24272 I TaqwaComplications: asked again (feed)
+11-06 20:31:02.696 24230 24272 I System.out: TaqwaWearFeed ACCEPTED 5/5cb4f7c2d90cbbe6
+11-06 20:31:02.697 24230 24272 I System.out: TaqwaWearFeed ACK 5/5cb4f7c2d90cbbe6 sent
+11-06 20:31:02.718 24230 24272 I TaqwaComplications: asked again (feed)
+11-06 20:31:02.720 24230 24272 I System.out: TaqwaWearFeed ACCEPTED 7/5cb4f7c2d90cbbe6
+11-06 20:31:02.721 24230 24272 I System.out: TaqwaWearFeed ACK 7/5cb4f7c2d90cbbe6 sent
+11-06 20:31:02.726 24230 24247 I TaqwaFace: TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 20:31:02.730 24230 24247 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa false
+11-06 20:31:02.732 24230 24256 I TaqwaFace: TaqwaFace capability unchanged 4006
+11-06 20:31:18.359 24230 24258 I TaqwaFace: TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 20:31:18.361 24230 24250 I TaqwaFace: TaqwaFace isActive world.taqwa.app.watchfacepush.taqwa false
+11-06 20:31:33.676 24230 24259 I TaqwaFace: TaqwaFace installed - [948eb69c-6e4a-3198-a1d5-94addb1dcb3d world.taqwa.app.watchfacepush.taqwa 41]
+11-06 20:31:33.686 24230 24259 I TaqwaFace: TaqwaFace capability removed CHOOSE_IT_YOURSELF
+-- the permission after Deny: com.google.wear.permission.SET_PUSHED_WATCH_FACE_AS_ACTIVE: granted=false, flags=[ USER_SET]
+
+== 9. Crash buffers
+watch logcat -b crash lines naming world.taqwa: 0
+phone logcat -b crash lines naming world.taqwa: 0
+
+== 10. Left (20:34)
+== phone (emulator-5562) Fri Nov  6 20:34:19 SAST 2026
+world.taqwa.app: versionCode=41 minSdk=26 targetSdk=36 versionName=1.5.0 sha1=91d0a6f1
+   firstInstallTime=2026-11-06 20:21:07 lastUpdateTime=2026-11-06 20:21:07 installerPackageName=null pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+   signer: e5d76ef683b35977e7c4127144cabdcb1279afb59349b5f954c5dee77c2a7dc7
+world.taqwa.app.watchfacepush.taqwa: not installed
+== watch (emulator-5558) Fri Nov  6 20:34:18 SAST 2026
+world.taqwa.app: versionCode=100041 minSdk=30 targetSdk=36 versionName=1.5.0 sha1=53bc9078
+   firstInstallTime=2026-11-06 20:30:48 lastUpdateTime=2026-11-06 20:30:48 installerPackageName=null pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+   signer: e5d76ef683b35977e7c4127144cabdcb1279afb59349b5f954c5dee77c2a7dc7
+world.taqwa.app.watchfacepush.taqwa: versionCode=41 minSdk=33 targetSdk=36 versionName=1.5.0 sha1=5b0586ce
+   firstInstallTime=2026-11-06 20:30:48 lastUpdateTime=2026-11-06 20:30:48 installerPackageName=com.google.android.wearable.dwf.receiver pkgFlags=[ ALLOW_CLEAR_USER_DATA ALLOW_BACKUP ]
+   signer: 9939135e65000a3915c722d45463569863d191152bd5418c1fab569185743b70
+-- the phone's Wearable node table (dumpsys WearableService, Reachable Nodes)
+      Reachable Nodes:
+                                  name :         id : hops : isNearby :  isWatch
+                       Taqwa_Wear_OS_4 :   5a3042ca :    2 :    false :     true
+                       Taqwa_Wear_OS_6 :   c76e057a :    1 :     true :     true

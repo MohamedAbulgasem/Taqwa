@@ -1,0 +1,80 @@
+package world.taqwa.app.wear.scratch
+
+import java.io.File
+import java.time.Instant
+import java.time.ZoneId
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import org.junit.Test
+import world.taqwa.app.watch.WatchFeedJson
+import world.taqwa.app.watch.WatchRules
+import world.taqwa.app.watch.WatchTime
+import world.taqwa.app.watch.of
+import world.taqwa.app.wear.complication.ComplicationTimelines
+import world.taqwa.app.wear.complication.saysUntil
+import world.taqwa.app.wear.tile.TilePlan
+
+/**
+ * P5.12 Step 4's one-off, never committed as a test: the watch's stored feed (read with the debug
+ * build's run-as, step-2/stored-feed.json) against the observation's shots and lines, and what
+ * TilePlan gives at each timed request. It lives in step-2/ as StoredFeedCheck.kt.txt.
+ */
+class StoredFeedCheck {
+    private val sast = ZoneId.of("Africa/Johannesburg")
+    private val feed = assertNotNull(
+        WatchFeedJson.decode(File("../docs/superpowers/reports/2026-10-24-watch-gates/step-2/stored-feed.json").readText()),
+    )
+
+    private fun at(text: String): Long = Instant.parse(text).epochSecond
+
+    /** The line a face draws at [now]: the next prayer, its time and the countdown, by WatchRules. */
+    private fun faceAt(now: Long): String {
+        val moment = assertNotNull(WatchRules.moment(feed, now))
+        val day = feed.days[moment.next.dayIndex]
+        val time = WatchTime.of(moment.next.prayer)
+        val name = day.names.of(time).uppercase()
+        val clock = WatchRules.clockText(day, time)
+        return "$name $clock, ${WatchRules.countdown(feed, moment.secondsLeft)}"
+    }
+
+    private fun tileAt(now: Long): String {
+        val entries = TilePlan.entries(feed, false, now)
+        val fresh = TilePlan.freshnessMillis(entries, now)
+        return "${entries.size} entries, ${entries.count { it.moves }} counting down, fresh for ${fresh / 1000} s"
+    }
+
+    private fun lastUntil(now: Long): String {
+        val plan = ComplicationTimelines.nextPrayer(feed, now)
+        return "${plan.size} steps, last until ${plan.saysUntil()?.let { Instant.ofEpochSecond(it) }}"
+    }
+
+    @Test
+    fun theFeedAgainstTheShotsAndTheLines() {
+        println("city ${feed.place.city}, days ${feed.days.size}")
+        println("first day midnight ${Instant.ofEpochSecond(feed.days.first().midnight)}, last ${Instant.ofEpochSecond(feed.days.last().midnight)}")
+        for ((label, now) in listOf(
+            "face at 6 Nov 20:45:08 SAST" to at("2026-11-06T18:45:08Z"),
+            "face at 7 Nov 08:53:55 SAST" to at("2026-11-07T06:53:55Z"),
+        )) {
+            println("$label: ${faceAt(now)}")
+        }
+        for ((label, now) in listOf(
+            "request 6 Nov 20:40:31 SAST" to at("2026-11-06T18:40:31Z"),
+            "request 7 Nov 02:41:49 SAST" to at("2026-11-07T00:41:49Z"),
+            "request 7 Nov 08:45:32 SAST" to at("2026-11-07T06:45:32Z"),
+        )) {
+            println("$label: ${lastUntil(now)}")
+        }
+        for ((label, now) in listOf(
+            "tile request 7 Nov 09:00:20 SAST" to at("2026-11-07T07:00:20Z"),
+            "tile request 5 Dec 19:00:00 SAST" to at("2026-12-05T17:00:00Z"),
+            "tile request 5 Dec 19:21:00 SAST" to at("2026-12-05T17:21:00Z"),
+            "tile request 5 Dec 19:28:00 SAST" to at("2026-12-05T17:28:00Z"),
+            "tile request 5 Dec 19:33:00 SAST" to at("2026-12-05T17:33:00Z"),
+        )) {
+            println("$label: ${tileAt(now)}")
+        }
+        assertEquals("DHUHR 11:49, in 4 h 55 min", faceAt(at("2026-11-07T06:53:55Z")))
+        assertEquals("FAJR 5:23, in 10 h 37 min", faceAt(at("2026-11-06T18:45:08Z")))
+    }
+}

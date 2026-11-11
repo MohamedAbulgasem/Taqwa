@@ -1,0 +1,12 @@
+Arch on emulator-5558 (the new face, the Saudi sample at 14:58 with every day's Gregorian line rewritten by feedtext.sh), 25 Oct 2026:
+the least distance in each awake shot from the line's ink (bright grey) to the lit stroke's pixels (amber), face px, beside
+date-fit.py's figure for the same form at its step (its ink to the stroke's edge), and the ink's x extent in the shot.
+الأحد ١٨ أكتوبر (15 chars, step 18, 29.25 px): in the shot 49.0 px between the line's ink and the stroke's pixels; model 47.7 px; the ink x 133.8..312.2
+السبت ١ أغسطس (13 chars, step 13, 31.50 px): in the shot 16.5 px between the line's ink and the stroke's pixels; model 14.2 px; the ink x 98.1..350.9
+الخميس ١٠ أغسطس (15 chars, step 18, 29.25 px): in the shot 9.1 px between the line's ink and the stroke's pixels; model 8.7 px; the ink x 88.2..359.8
+الثلاثاء ١٠ تشرين الأول (23 chars, step longer, 25.31 px): in the shot 24.2 px between the line's ink and the stroke's pixels; model 21.2 px; the ink x 103.1..343.9
+الخميس 10 تشرين الأول (21 chars, step longer, 25.31 px): in the shot 14.9 px between the line's ink and the stroke's pixels; model 11.6 px; the ink x 92.2..355.8
+الخميس ٣٠ تشرين الثاني (22 chars, step longer, 25.31 px): in the shot 12.4 px between the line's ink and the stroke's pixels; model 8.5 px; the ink x 88.2..358.8
+
+The same measure on the base face's sample (14 units), the same session (shotgap.py ... units=14, P2.2 review round 3: the model at the base face's one size):
+الأحد ١٨ أكتوبر (15 chars, step one size, 31.50 px): in the shot 42.4 px between the line's ink and the stroke's pixels; model 41.1 px; the ink x 126.9..319.2

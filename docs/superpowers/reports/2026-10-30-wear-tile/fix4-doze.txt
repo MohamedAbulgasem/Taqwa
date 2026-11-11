@@ -1,0 +1,33 @@
+Review fix round 4, emulator-5558 (Wear OS 6, renderer schema 1.500), debug build 10a87924 of the
+fix (WIP 57120e3d), 31 October 2026 01:42-01:52 SAST, the clock set to the mock day (Sunday 18
+October 2026, Cape Town).
+
+The Tile, asked for at 14:57:40 (the sample stored), first entry 14:57:40-15:01:00, its chain from
+72 to 66 minutes left (TilePlan.shownUntil = 15:03:40).
+
+14:58:24  shot pixel-identical to en-1458.png (compare.py: 0 differing pixels)
+          "ASR" "in 1 h 11 min", said "Asr in 1 hour 11 minutes, at 16:10"; no
+          "Dynamic type expression limit reached" in the log
+14:58:38  run-as world.taqwa.app kill -9; pidof empty through 14:59:06
+14:59:06  "in 1 h 10 min", said "Asr in 1 hour 10 minutes, at 16:10"
+
+dumpsys alarm:
+  *alarm*:ProtoTilesTimelineMgr  type=RTC origWhen=2026-10-18 15:01:00.000 window=+2m29s263ms
+  (the latest the renderer means to change: 15:03:29.3, within shownUntil 15:03:40)
+
+14:59:23  dumpsys deviceidle force-idle: mForceIdle=true, mState=IDLE, mWakefulness=Awake
+          (screen timeout never, the Tile in front)
+
+time      pending change alarm           line                     sentence                              rules
+15:01:10  15:01:00 +2m29s (deferred)     ASR  in 1 h 8 min        Asr in 1 hour 8 minutes, at 16:10     68
+15:03:50  15:01:00 +2m29s (deferred)     ASR  in 1 h 6 min        Asr in 1 hour 6 minutes, at 16:10     66
+15:04:10  15:01:00 +2m29s (deferred)     ASR  16:10               Asr, 16:10                            65
+15:05:10  15:01:00 +2m29s (deferred)     ASR  16:10               Asr, 16:10                            64
+
+From 15:04:01 the entry is past its chain's last link (66): it says the start's time, call 6's form
+(fix4-doze-150410.png), where 6251254a's chain would have said "in 1 h 6 min" until the renderer
+moved on. Dhuhr stays lit, as the rules have it until 16:10.
+
+15:05:26  dumpsys deviceidle unforce: the deferred change came at once (alarm gone 15:05:26)
+15:05:31  the entry 15:01-15:06: "in 1 h 4 min", said "Asr in 1 hour 4 minutes, at 16:10";
+          next change 15:06:00 +24.9s

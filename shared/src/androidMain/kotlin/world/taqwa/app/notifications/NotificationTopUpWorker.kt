@@ -8,6 +8,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import world.taqwa.app.di.appContainer
+import world.taqwa.app.watchfeed.settleTheWatch
 import world.taqwa.app.widget.WidgetMirrorRefresher
 import world.taqwa.app.widget.androidWidgetUpdateHook
 import java.util.concurrent.TimeUnit
@@ -42,6 +43,9 @@ class NotificationTopUpWorker(context: Context, params: WorkerParameters) : Coro
         // process-lifetime scope, and a worker's process may be reclaimed as soon as doWork
         // returns, taking a redraw still in flight with it.
         redraw = { androidWidgetUpdateHook?.invoke() },
+        // The reschedule asked the watch (plan 2 Task 4), and the process may be reclaimed once
+        // doWork returns: the ask gets its turn last, bounded, since topUp has no budget of its own.
+        settleWatch = { settleTheWatch { appContainer.watchFeedSync } },
     )
 
     companion object {
@@ -57,23 +61,27 @@ class NotificationTopUpWorker(context: Context, params: WorkerParameters) : Coro
 }
 
 /**
- * The worker's body, its three steps passed in so their order and their independence can be
- * tested without WorkManager or the app's container.
+ * The worker's body, its steps passed in so their order and their independence can be tested
+ * without WorkManager or the app's container.
  *
  * The plan first, because its reschedule may store a new location (a journey noticed from the
  * phone's last known position, spec §16.5); then the mirror, from whatever location that left;
- * then the redraw, which reads the mirror. Each in its own `runCatching`, because none may cost
- * another its turn: a widget that failed to redraw must never cost the reschedule, nor a failed
- * reschedule the widget. And never a failure: a step that could not run is retried at the next
- * period by definition, and WorkManager's own retry would only add a backoff on top of that.
+ * then the redraw, which reads the mirror; then the watch, which the reschedule only asked, given
+ * its turn last (plan 2 Task 4). Each in its own `runCatching`, because none may cost another its
+ * turn: a widget that failed to redraw must never cost the reschedule, nor a failed reschedule
+ * the widget, nor the watch either of them. And never a failure: a step that could not run is
+ * retried at the next period by definition, and WorkManager's own retry would only add a backoff
+ * on top of that.
  */
 internal suspend fun topUp(
     reschedule: suspend () -> Unit,
     refreshMirror: suspend () -> Unit,
     redraw: suspend () -> Unit,
+    settleWatch: suspend () -> Unit = {},
 ): ListenableWorker.Result {
     runCatching { reschedule() }
     runCatching { refreshMirror() }
     runCatching { redraw() }
+    runCatching { settleWatch() }
     return ListenableWorker.Result.success()
 }

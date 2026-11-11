@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WatchFaceInfo>
+    <!-- What the face picker shows (a picture of the face at 14:58, Amber, as the mockups draw it). -->
+    <Preview value="@drawable/preview" />
+    <!-- The face editor's Customise: the style, the colour and the wearer's own slots. -->
+    <Editable value="true" />
+</WatchFaceInfo>

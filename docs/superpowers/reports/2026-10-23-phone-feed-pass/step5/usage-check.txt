@@ -1,0 +1,7 @@
+# Step 5: ./gradlew :androidApp:minifyReleaseWithR8 (unsigned; no release key read), 31 Oct 13:32 SAST, exit 0
+# usage.txt lists each as a whole class removed (a class line with no member lines under it):
+world.taqwa.app.watchfeed.WatchFeedDebug  (line 58411; next line: world.taqwa.app.watchfeed.WatchFeedFingerprintKt:)
+world.taqwa.app.watchfeed.PhoneForms  (line 58366; next line: world.taqwa.app.watchfeed.PhoneTags$WhenMappings)
+world.taqwa.app.watchfeed.PhoneTags  (line 58368; next line: world.taqwa.app.watchfeed.PlayWatchNodes:)
+world.taqwa.app.watchfeed.DebugNode  (line 58361; next line: world.taqwa.app.watchfeed.NoWatchLink)
+# their inner classes removed too: 12

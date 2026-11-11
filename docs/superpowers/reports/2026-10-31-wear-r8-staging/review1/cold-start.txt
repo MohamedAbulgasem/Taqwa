@@ -1,0 +1,7 @@
+Starting: Intent { cmp=world.taqwa.app/.wear.app.WearMainActivity }
+Status: ok
+LaunchState: COLD
+Activity: world.taqwa.app/.wear.app.WearMainActivity
+TotalTime: 104
+WaitTime: 106
+Complete

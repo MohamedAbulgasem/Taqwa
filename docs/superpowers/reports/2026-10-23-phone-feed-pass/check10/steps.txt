@@ -1,0 +1,15 @@
+13:20:26 forwards: emulator-5562 tcp:64922 tcp:5601 | watch reverse: host-15 tcp:5601 tcp:64922
+13:20:26 link down: adb -s emulator-5562 forward --remove tcp:64922 (Studio's host port; no tcp:5601 forward exists)
+forwards now:
+13:22:25 h nodes : node c76e057a "Taqwa_Wear_OS_6" nearby=true taqwa_watch=true
+13:23:08 the node stayed nearby for 2 min with the forward removed (the established connection outlives the forward): the plan's fallback, adb -s emulator-5558 emu kill
+OK: killing emulator, bye bye
+OK
+emu kill exit 0
+13:23:18 h nodes : no nodes
+List of devices attached
+KB2604110095	device
+emulator-5562	device
+emulator-5572	device
+
+13:23:24 h place --es place 51.5074,-0.1278,Europe/London,London,2643743: stored London id=2643743 zone=Europe/London at 51.507,-0.128; plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true

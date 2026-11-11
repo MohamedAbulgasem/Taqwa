@@ -1,0 +1,6 @@
+13:27:59 h nodes : no Wear API
+13:27:59 h place --es place 51.5074,-0.1278,Europe/London,London,2643743: stored London id=2643743 zone=Europe/London at 51.507,-0.128; plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+13:28:00 h reschedule : plan of 59, first DHUHR-PRAYER-2026-10-31 PRAYER at 2026-10-31T11:49:00Z; settled=true
+13:28:00 h nodes : no Wear API
+13:28:00 h language : en
+world.taqwa.app alarms: 59

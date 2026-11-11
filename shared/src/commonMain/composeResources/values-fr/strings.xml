@@ -17,7 +17,7 @@
     <string name="onboarding_welcome_body">Les horaires de prière, la qibla et le Coran. Gratuit pour toujours. Sans publicité, sans compte, fonctionne hors ligne.</string>
     <string name="onboarding_welcome_cta">Commencer</string>
     <string name="onboarding_location_title">Où êtes-vous ?</string>
-    <string name="onboarding_location_body">Les horaires dépendent de votre position. Tout est calculé sur votre appareil, et votre position ne quitte jamais votre téléphone.</string>
+    <string name="onboarding_location_body">Les horaires dépendent de votre position. Tout est calculé sur votre appareil. Seuls vos propres appareils peuvent voir votre position.</string>
     <string name="onboarding_continue">Continuer</string>
     <string name="onboarding_notifications_title">Notifications de prière</string>
     <string name="onboarding_notifications_body">Une notification pour chaque prière. Vous choisissez le son de chaque prière séparément, et vous pouvez le changer quand vous voulez.</string>
@@ -120,6 +120,22 @@
     <string name="settings_appearance">Apparence</string>
     <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">Langue</string>
+    <!-- Settings › App, after Language (plan 4 Task 10): the iPhone’s "Add to Apple Watch", shown
+         while a watch is paired and the Taqwa face is bundled, and the line under it when the
+         face was not added. "Apple Watch" and "Watch" (Apple’s app) are Apple’s names, never
+         translated. -->
+    <string name="settings_add_to_apple_watch">Ajouter à l’Apple Watch</string>
+    <string name="settings_add_to_apple_watch_failed">Impossible d’ajouter le cadran. Réessayez depuis l’app Apple Watch.</string>
+    <!-- Settings › Watch, between App and About (plan 5 Task 6): on Android, "Install on your
+         watch" (its value the watch’s name, as the system gives it) opens Taqwa’s Play page on a
+         watch without Taqwa, and "Add the Taqwa face" (the watch’s own face_add) opens the watch’s
+         face screen; a tap says "Continue on your watch" or "Couldn’t reach your watch" as the
+         row’s value. On the iPhone the section holds "Add to Apple Watch" alone. -->
+    <string name="settings_group_watch">MONTRE</string>
+    <string name="settings_watch_install">Installer sur votre montre</string>
+    <string name="settings_watch_face">Ajouter le cadran Taqwa</string>
+    <string name="settings_watch_continue">Continuez sur votre montre</string>
+    <string name="settings_watch_unreachable">Impossible de joindre votre montre</string>
     <string name="settings_about">À propos de Taqwa</string>
     <string name="settings_attribution">Attributions et licences</string>
     <string name="settings_rate">Noter Taqwa</string>
@@ -128,16 +144,17 @@
     <string name="settings_not_set">Non définie</string>
     <string name="settings_notifications_off">Désactivées</string>
     <string name="settings_notifications_on_count">%1$s activées</string>
-    <string name="settings_version_value">1.5.1</string>
+    <string name="settings_version_value">1.6.0</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          every locale, as on the icon. -->
     <string name="about_tagline">Gratuit, pour tous, pour toujours.</string>
     <string name="about_privacy_label">CONFIDENTIALITÉ</string>
-    <string name="about_stays_title">Tout reste sur votre téléphone</string>
-    <string name="about_stays_body">Position, paramètres, signets et compteurs ne le quittent jamais.</string>
-    <string name="about_online_title">En ligne seulement quand vous le demandez</string>
-    <string name="about_online_body">Internet ne sert qu’à une chose : les récitations que vous choisissez de télécharger, depuis le dépôt public de Taqwa sur GitHub.</string>
+    <string name="about_stays_title">Tout reste sur vos appareils</string>
+    <string name="about_stays_body">Seuls vos propres appareils peuvent voir votre position, vos paramètres, vos signets et vos compteurs.</string>
+    <string name="about_online_title">En ligne seulement pour ce que vous choisissez</string>
+    <string name="about_online_body_android">Internet sert aux récitations que vous choisissez de télécharger, depuis le dépôt public de Taqwa sur GitHub. Si vous ajoutez Taqwa à votre montre, Google peut acheminer ses données par Internet, chiffrées pour que seuls votre téléphone et votre montre puissent les lire.</string>
+    <string name="about_online_body_ios">Internet sert aux récitations que vous choisissez de télécharger, depuis le dépôt public de Taqwa sur GitHub. Si vous ajoutez Taqwa à votre montre, Apple peut acheminer ses données par Internet, chiffrées pour que seuls votre téléphone et votre montre puissent les lire.</string>
     <string name="about_nothing_title">Sans compte, sans publicité, sans suivi</string>
     <string name="about_nothing_body">Rien où se connecter, rien à vendre.</string>
     <string name="about_privacy_policy">Politique de confidentialité</string>
@@ -232,7 +249,7 @@
     <string name="location_country">Pays</string>
     <string name="location_timezone">Fuseau horaire</string>
     <string name="location_choose_city_instead">Choisir plutôt une ville</string>
-    <string name="location_privacy_note">Les coordonnées sont enregistrées sur votre appareil et servent uniquement à calculer les horaires. Rien n’est envoyé nulle part.</string>
+    <string name="location_privacy_note">Les coordonnées sont enregistrées sur votre appareil et servent uniquement à calculer les horaires. Seuls vos propres appareils peuvent voir votre position.</string>
     <string name="location_denied_note">L’accès à la position est actuellement refusé. Vous pouvez l’autoriser dans les paramètres de votre appareil, ou choisir plutôt une ville.</string>
 
     <!-- City search -->
@@ -594,8 +611,9 @@
     <string name="tab_prayer">Prière</string>
     <string name="tab_quran">Coran</string>
     <string name="tab_settings">Paramètres</string>
-    <!-- Prayer screen's Qibla card: bearing from north, then the great-circle distance. -->
-    <string name="prayer_qibla_detail">%1$s° · %2$s km jusqu’à La Mecque</string>
+    <!-- Prayer screen's Qibla card: bearing from north, then the great-circle distance. The watch's
+         Qibla page draws it too: 'de La Mecque', shorter than 'jusqu’à La Mecque' (Ruling 63). -->
+    <string name="prayer_qibla_detail">%1$s° · %2$s km de La Mecque</string>
     <!-- Quran tab root (slice 2a task 5) -->
     <string name="quran_title">Coran</string>
     <string name="quran_search_hint">Rechercher dans le Coran</string>

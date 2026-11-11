@@ -1,0 +1,2 @@
+10-31 13:17:55.118 I/System.out( 7924): TaqwaWatch RESCHEDULED UNCHANGED 55ms
+10-31 13:17:55.118 I/TaqwaWatchHarness( 7924): reschedule: plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T13:55:00Z; settled=true

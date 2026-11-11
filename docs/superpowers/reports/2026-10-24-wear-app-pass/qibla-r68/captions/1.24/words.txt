@@ -1,0 +1,48 @@
+== fr-tilted-t045
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t060
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t135
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t225
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t315
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== fr-tilted-t345
+text='Gardez le poignet à plat'
+text='6\u202f600 km'
+content-desc='La Mecque · à 6\u202f600 km'
+== id-tilted-t045
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t060
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t135
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t225
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t315
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'
+== id-tilted-t345
+text='Pegang jam mendatar'
+text='6.600 km'
+content-desc='Makkah · 6.600 km dari sini'

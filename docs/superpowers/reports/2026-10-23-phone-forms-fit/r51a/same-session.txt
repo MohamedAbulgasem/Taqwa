@@ -1,0 +1,50 @@
+The face as committed (new) against ff28cd5a's face (base, built from ff28cd5a's tree: Arch's right-to-left Gregorian line at one
+size, 14 units), installed in turn and shot at the same moments on emulator-5558 at the pass's battery (82, as pass.sh sets it):
+the committed pass's four Arch Arabic (Libya) frames and Arch's Saudi and English samples (ab3.sh, 25 Oct 2026 06:57-07:04 SAST).
+abdiff.py base new:
+
+arch-ar-sa-1458-aod.png                   0 px differ
+arch-ar-sa-1458-awake.png                 0 px differ
+arch-en-1458-aod.png                      0 px differ
+arch-en-1458-awake.png                    0 px differ
+pass-arch-ar-ly-12h-1258-awake.png        0 px differ
+pass-arch-ar-ly-12h-1458-aod.png          0 px differ
+pass-arch-ar-ly-12h-1458-awake.png        0 px differ
+pass-arch-ar-ly-12h-2258-awake.png        0 px differ
+
+(Each pair is the same PNG byte for byte.)
+
+The same four frames shot on the face as committed, against the files committed for them at ff28cd5a (Task 10's pass), which
+this commit puts back (abdiff.py, ff28cd5a's files against the new shots):
+
+pass-arch-ar-ly-12h-1258-awake.png      342 px differ, worst   1 levels, box (0, 0, 453, 453)
+pass-arch-ar-ly-12h-1458-aod.png         83 px differ, worst   1 levels, box (0, 0, 453, 453)
+pass-arch-ar-ly-12h-1458-awake.png      354 px differ, worst   1 levels, box (0, 0, 453, 453)
+pass-arch-ar-ly-12h-2258-awake.png      306 px differ, worst   1 levels, box (0, 0, 453, 453)
+
+(1 level over the whole frame is the emulator's noise between sessions; the close's full pass found Arch, Ring and Sun within 3.)
+Against the files committed at 72c7bcb5 (review round 1's shots, the three steps' 13 units), only the Gregorian band differs:
+
+pass-arch-ar-ly-12h-1258-awake.png     3142 px differ, worst 240 levels, box (127, 134, 323, 173)
+pass-arch-ar-ly-12h-1458-aod.png       1519 px differ, worst 123 levels, box (127, 134, 323, 173)
+pass-arch-ar-ly-12h-1458-awake.png     3142 px differ, worst 240 levels, box (127, 134, 323, 173)
+pass-arch-ar-ly-12h-2258-awake.png     3142 px differ, worst 240 levels, box (127, 134, 323, 173)
+
+The six r51 cases on the face as committed against r51/shots/new (Ruling 51's three steps), abdiff.py r51/shots/new r51a/shots/new:
+
+greg-sample-aod.png                    1459 px differ, worst 123 levels, box (127, 134, 323, 173)
+greg-sample-awake.png                  3010 px differ, worst 240 levels, box (127, 134, 323, 173)
+greg-sat-aug-1-aod.png                 1668 px differ, worst 123 levels, box (97, 134, 355, 173)
+greg-sat-aug-1-awake.png               3450 px differ, worst 240 levels, box (97, 134, 355, 173)
+greg-thu-aug-10-aod.png                   0 px differ
+greg-thu-aug-10-awake.png                 0 px differ
+greg-thu-nov-30-aod.png                   0 px differ
+greg-thu-nov-30-awake.png                 0 px differ
+greg-thu-oct-10-aod.png                   0 px differ
+greg-thu-oct-10-awake.png                 0 px differ
+greg-tue-oct-10-aod.png                   0 px differ
+greg-tue-oct-10-awake.png                 0 px differ
+
+Read: the four cases whose size rule A keeps (الخميس ١٠ أغسطس at 13 units, the three long ones at 11.25) are 0 px from Ruling 51's
+shots; the sample (15 characters, now 14 units) and السبت ١ أغسطس (13, now 13 units, August) differ in the line's band alone. The
+sample's shots are 0 px from the base face's (r51/shots/old/arch-ar-sa-1458-*.png) and from the proof face's (proof/shots).

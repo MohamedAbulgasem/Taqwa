@@ -1,0 +1,5 @@
+301a302,305
+> 
+>         <uses-library
+>             android:name="wear-sdk"
+>             android:required="false" />

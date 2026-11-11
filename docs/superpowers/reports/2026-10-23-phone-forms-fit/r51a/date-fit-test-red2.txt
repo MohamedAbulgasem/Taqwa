@@ -1,0 +1,113 @@
+.......FF.FFFFFF...F
+======================================================================
+FAIL: test_a_face_that_spells_august_otherwise_fails (__main__.TheFace.test_a_face_that_spells_august_otherwise_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 160, in test_a_face_that_spells_august_otherwise_fails
+    self.assertEqual(xml.count('"%s"' % AUGUST), 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2
+
+======================================================================
+FAIL: test_a_face_without_the_months_test_fails (__main__.TheFace.test_a_face_without_the_months_test_fails)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 154, in test_a_face_without_the_months_test_fails
+    xml = self.in_group(self.face(), "الخميس ١٠ أغسطس", ' &amp;&amp; %s == "%s"' % (LAST5, AUGUST), "")
+          ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "tools/watchface/date-fit-test.py", line 140, in in_group
+    self.assertEqual(xml[i:j].count(old), 1, old)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 1 :  &amp;&amp; subText([COMPLICATION.TEXT], clamp(textLength([COMPLICATION.TEXT]) - 5, 0, 99), textLength([COMPLICATION.TEXT])) == "أغسطس"
+
+======================================================================
+FAIL: test_every_form_shows_the_one_group_its_step_names (__main__.TheFace.test_every_form_shows_the_one_group_its_step_names)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 147, in test_every_form_shows_the_one_group_its_step_names
+    self.assertEqual(D.face_steps_check(D.written_steps(), steps(), RTL_DATES + [""]), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["watchface.xml draws Arch's right-to-left[225 chars].py"] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+"watchface.xml draws Arch's right-to-left Gregorian steps as [('13', 31.5, 118, 72), ('18', 29.25, 122, 66), ('more', 25.3125, 127, 58)], and ARCH_GREGORIAN_STEPS says [('more', 25.3125, 127, 58), ('18', 29.25, 122, 66), ('13', 31.5, 118, 72)]: run tools/face-centre.py"
+
++ []
+- ["watchface.xml draws Arch's right-to-left Gregorian steps as [('13', 31.5, "
+-  "118, 72), ('18', 29.25, 122, 66), ('more', 25.3125, 127, 58)], and "
+-  "ARCH_GREGORIAN_STEPS says [('more', 25.3125, 127, 58), ('18', 29.25, 122, "
+-  "66), ('13', 31.5, 118, 72)]: run tools/face-centre.py"]
+
+======================================================================
+FAIL: test_the_face_draws_the_tables_groups (__main__.TheFace.test_the_face_draws_the_tables_groups)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 144, in test_the_face_draws_the_tables_groups
+    self.assertEqual([row[:4] for row in D.written_steps()], D.expected_steps(steps()))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [('13', 31.5, 118, 72), ('18', 29.25, 122, 66), ('more', 25.3125, 127, 58)] != [('more', 25.3125, 127, 58), ('18', 29.25, 122, 66), ('13', 31.5, 118, 72)]
+
+First differing element 0:
+('13', 31.5, 118, 72)
+('more', 25.3125, 127, 58)
+
+- [('13', 31.5, 118, 72), ('18', 29.25, 122, 66), ('more', 25.3125, 127, 58)]
++ [('more', 25.3125, 127, 58), ('18', 29.25, 122, 66), ('13', 31.5, 118, 72)]
+
+======================================================================
+FAIL: test_the_sample_is_drawn_in_the_base_faces_own_box (__main__.TheFace.test_the_sample_is_drawn_in_the_base_faces_own_box)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 151, in test_the_sample_is_drawn_in_the_base_faces_own_box
+    self.assertEqual(rest[1:4], (31.5, 118, 72))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Tuples differ: (29.25, 122, 66) != (31.5, 118, 72)
+
+First differing element 0:
+29.25
+31.5
+
+- (29.25, 122, 66)
++ (31.5, 118, 72)
+
+======================================================================
+FAIL: test_august_as_the_phone_writes_it_is_13_units_at_every_length (__main__.TheRule.test_august_as_the_phone_writes_it_is_13_units_at_every_length) (text='السبت ١ أغسطس')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 54, in test_august_as_the_phone_writes_it_is_13_units_at_every_length
+    self.assertEqual(units(text), 13)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 14.0 != 13
+
+======================================================================
+FAIL: test_eighteen_characters_not_in_august_are_14_units (__main__.TheRule.test_eighteen_characters_not_in_august_are_14_units)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 65, in test_eighteen_characters_not_in_august_are_14_units
+    self.assertEqual(units(text), 14)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+AssertionError: 13.0 != 14
+
+======================================================================
+FAIL: test_every_other_august_the_phones_write_is_14_units (__main__.TheRule.test_every_other_august_the_phones_write_is_14_units) (month='اگست')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 73, in test_every_other_august_the_phones_write_is_14_units
+    self.assertEqual(units("الخميس ١٠ " + month), 14)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 13.0 != 14
+
+======================================================================
+FAIL: test_the_sample_keeps_the_base_faces_14_units (__main__.TheRule.test_the_sample_keeps_the_base_faces_14_units)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tools/watchface/date-fit-test.py", line 48, in test_the_sample_keeps_the_base_faces_14_units
+    self.assertEqual(units("الأحد ١٨ أكتوبر"), 14)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 13.0 != 14
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.068s
+
+FAILED (failures=9)

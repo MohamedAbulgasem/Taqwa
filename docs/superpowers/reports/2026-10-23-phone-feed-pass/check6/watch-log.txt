@@ -1,0 +1,3 @@
+10-31 13:13:27.821 I/System.out( 3363): TaqwaWearFeed ASK OPENED sent
+10-31 13:13:27.995 I/System.out( 3363): TaqwaWearFeed ACCEPTED 8/23aee84e77b1f1f2
+10-31 13:13:27.997 I/System.out( 3363): TaqwaWearFeed ACK 8/23aee84e77b1f1f2 sent

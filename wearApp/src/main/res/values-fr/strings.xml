@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the phone's own words: androidApp's app_name and widget labels -->
+    <string name="app_name">Taqwa</string>
+    <string name="complication_next_prayer">Prochaine prière</string>
+    <string name="complication_mark">Taqwa</string>
+    <string name="complication_mark_description">Taqwa</string>
+    <string name="tile_label">Horaires de prière</string>
+    <!-- the watch's own words -->
+    <string name="open_taqwa_on_phone">Ouvrez Taqwa sur votre téléphone</string>
+    <string name="update_taqwa_on_watch">Mettez à jour Taqwa sur votre montre</string>
+    <string name="complication_day">Prières du jour</string>
+    <string name="complication_day_dial">Cadran Taqwa : cadran du jour</string>
+    <string name="complication_dates">Dates</string>
+    <string name="complication_day_title">Jour</string>
+    <string name="complication_day_description">Horaires de prière du jour</string>
+    <string name="preview_prayer_label">ASR</string>
+    <string name="preview_prayer_name">Asr</string>
+    <string name="preview_prayer_time">16:10</string>
+    <string name="preview_countdown">dans 1 h 12 min</string>
+    <string name="preview_day_times">Fajr 4:33, Lever du soleil 6:01, Dhuhr 12:33, Asr 16:10, Maghrib 19:04, Isha 20:24</string>
+    <string name="preview_hijri">6 Joumada al-Oula 1448</string>
+    <string name="preview_hijri_day_month">6 Joumada al-Oula</string>
+    <string name="preview_gregorian">DIM 18 OCT</string>
+    <string name="preview_weekday">DIM</string>
+    <string name="preview_day_number">18</string>
+    <string name="tile_description">Les prières du jour et le compte à rebours de la prochaine</string>
+
+    <string name="face_add">Ajouter le cadran Taqwa</string>
+    <string name="face_about">La prochaine prière et son compte à rebours sur votre cadran.</string>
+    <string name="face_active">Taqwa est votre cadran.</string>
+    <string name="face_choose_it">Appuyez longuement sur votre cadran, puis choisissez Taqwa.</string>
+    <string name="face_failed">Impossible d’ajouter le cadran. Réessayez plus tard.</string>
+</resources>

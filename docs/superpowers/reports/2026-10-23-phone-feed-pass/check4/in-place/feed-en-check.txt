@@ -1,0 +1,9 @@
+ui.language en-US rtl False digitZero '0' twelveHour True am/pm AM PM
+ui.spoken == sample ui.spoken (sample-feed-capetown.json): True
+ui.screens == sample ui.screens: True
+ui.screens: {"today": "Today", "tasbeeh": "Tasbeeh", "qibla": "Qibla", "appName": "Taqwa", "openOnPhone": "Open Taqwa on your phone", "updateOnWatch": "Update Taqwa on your watch", "rowCurrent": "Current prayer", "rowPassed": "Passed", "rowNext": "Next prayer", "round": "ROUND %1$s", "of": "of %1$s", "bezelHint": "Turn the bezel or tap", "crownHint": "Turn the crown or tap", "reset": "Reset", "resetConfirm": "Reset the count for this dhikr?", "presets": {"after_prayer": "After prayer", "subhanallah": "SubhanAllah", "alhamdulillah": "Alhamdulillah", "allahu_akbar": "Allahu Akbar", "astaghfirullah": "Astagh
+countdown: {"hoursMinutes": "in %1$s h %2$s min", "hours": "in %1$s h", "minutes": "in %1$s min", "underAMinute": "in under a minute"} nextIn: %1$s in
+place: {"city": "London", "qiblaBearing": 118.0, "qiblaKm": "4,800", "declination": 1.0, "southern": false} qiblaKm code points: U+0034 U+002C U+0038 U+0030 U+0030
+2026-10-30 | FRI 30 FRI 30 OCT | Friday 30 October | 18 Jumada al-Ula 1448 | 18 Jumada al-Ula | 2:49 2:49 PM | Asr
+2026-10-31 | SAT 31 SAT 31 OCT | Saturday 31 October | 19 Jumada al-Ula 1448 | 19 Jumada al-Ula | 2:47 2:47 PM | Asr
+2026-11-01 | SUN 1 SUN 1 NOV | Sunday 1 November | 20 Jumada al-Ula 1448 | 20 Jumada al-Ula | 2:45 2:45 PM | Asr

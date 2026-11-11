@@ -1,13 +1,27 @@
 package world.taqwa.app.notifications
 
 import androidx.work.ListenableWorker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
+import world.taqwa.app.watchfeed.FakeWatchFeedMemory
+import world.taqwa.app.watchfeed.FakeWatchLink
+import world.taqwa.app.watchfeed.WatchFeedSync
+import world.taqwa.app.watchfeed.WatchSyncReason
+import world.taqwa.app.watchfeed.settleTheWatch
+import world.taqwa.app.watchfeed.syncFeed
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
- * The top-up worker's body ([topUp]) with its three steps faked: the order they run in, and that
- * none of them can cost another its turn or the worker its success.
+ * The top-up worker's body ([topUp]) with its steps faked: the order they run in, and that none
+ * of them can cost another its turn or the worker its success. The watch is settled last, and
+ * never costs the widget or more than its bound (plan 2 Task 4).
  *
  * With notifications off the plan is empty and no prayer alarm ever fires, so this worker is the
  * one thing left in the background to move the widget's two-day horizon. The mirror is rewritten
@@ -59,5 +73,39 @@ class NotificationTopUpWorkerTest {
         assertEquals(success, topUp(reschedule, fails, redraw))
         assertEquals(success, topUp(reschedule, refreshMirror, fails))
         assertEquals(success, topUp(fails, fails, fails))
+    }
+
+    @Test
+    fun theWatchIsSettledLastAndNeverCostsTheWidget() = runTest {
+        topUp(reschedule, refreshMirror, redraw, settleWatch = { steps += "settle" })
+        assertEquals(listOf("reschedule", "mirror", "redraw", "settle"), steps)
+
+        val success = ListenableWorker.Result.success()
+        assertEquals(success, topUp(reschedule, refreshMirror, redraw, settleWatch = { error("the watch broke") }))
+    }
+
+    /**
+     * `topUp` has no budget of its own, so the bound around the watch's settle is the worker's:
+     * even with the sync's worker gone, the top-up costs no more than [WatchFeedSync.CALLER_BOUND].
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun aStoppedWorkerCostsTheTopUpOnlyItsBound() = runTest {
+        val stopped = CoroutineScope(backgroundScope.coroutineContext + Job(backgroundScope.coroutineContext[Job]))
+        val sync = WatchFeedSync(
+            feedFor = { syncFeed() },
+            link = FakeWatchLink(),
+            memory = FakeWatchFeedMemory(),
+            scope = stopped,
+            work = StandardTestDispatcher(testScheduler),
+        )
+        stopped.cancel()
+        sync.request(WatchSyncReason.RESCHEDULED)
+
+        val result = topUp(reschedule, refreshMirror, redraw, settleWatch = { settleTheWatch { sync } })
+
+        assertEquals(ListenableWorker.Result.success(), result)
+        assertEquals(listOf("reschedule", "mirror", "redraw"), steps)
+        assertTrue(currentTime <= WatchFeedSync.CALLER_BOUND.inWholeMilliseconds, "returned at $currentTime ms")
     }
 }

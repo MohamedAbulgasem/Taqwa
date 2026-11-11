@@ -15,7 +15,7 @@
     <string name="onboarding_welcome_body">Waktu salat, kiblat, dan Al-Qur’an. Gratis selamanya. Tanpa iklan, tanpa akun, berfungsi offline.</string>
     <string name="onboarding_welcome_cta">Mulai</string>
     <string name="onboarding_location_title">Di mana Anda berada?</string>
-    <string name="onboarding_location_body">Waktu salat bergantung pada posisi Anda. Semuanya dihitung di perangkat Anda. Lokasi Anda tidak pernah keluar dari ponsel.</string>
+    <string name="onboarding_location_body">Waktu salat bergantung pada posisi Anda. Semuanya dihitung di perangkat Anda. Hanya perangkat Anda sendiri yang dapat melihat lokasi Anda.</string>
     <string name="onboarding_continue">Lanjutkan</string>
     <string name="onboarding_notifications_title">Notifikasi salat</string>
     <string name="onboarding_notifications_body">Notifikasi untuk setiap salat. Anda memilih suaranya untuk tiap salat secara terpisah, dan bisa menggantinya kapan saja.</string>
@@ -115,6 +115,22 @@
     <string name="settings_appearance">Tampilan</string>
     <string name="settings_appearance_value">%1$s · %2$s</string>
     <string name="settings_language">Bahasa</string>
+    <!-- Settings › App, after Language (plan 4 Task 10): the iPhone’s "Add to Apple Watch", shown
+         while a watch is paired and the Taqwa face is bundled, and the line under it when the
+         face was not added. "Apple Watch" and "Watch" (Apple’s app) are Apple’s names, never
+         translated. -->
+    <string name="settings_add_to_apple_watch">Tambahkan ke Apple Watch</string>
+    <string name="settings_add_to_apple_watch_failed">Wajah jam tidak dapat ditambahkan. Coba lagi dari app Apple Watch.</string>
+    <!-- Settings › Watch, between App and About (plan 5 Task 6): on Android, "Install on your
+         watch" (its value the watch’s name, as the system gives it) opens Taqwa’s Play page on a
+         watch without Taqwa, and "Add the Taqwa face" (the watch’s own face_add) opens the watch’s
+         face screen; a tap says "Continue on your watch" or "Couldn’t reach your watch" as the
+         row’s value. On the iPhone the section holds "Add to Apple Watch" alone. -->
+    <string name="settings_group_watch">JAM TANGAN</string>
+    <string name="settings_watch_install">Pasang di jam tangan Anda</string>
+    <string name="settings_watch_face">Tambahkan tampilan jam Taqwa</string>
+    <string name="settings_watch_continue">Lanjutkan di jam tangan Anda</string>
+    <string name="settings_watch_unreachable">Tidak dapat terhubung ke jam tangan Anda</string>
     <string name="settings_about">Tentang Taqwa</string>
     <string name="settings_attribution">Atribusi &amp; lisensi</string>
     <string name="settings_rate">Beri nilai Taqwa</string>
@@ -123,15 +139,16 @@
     <string name="settings_not_set">Belum diatur</string>
     <string name="settings_notifications_off">Nonaktif</string>
     <string name="settings_notifications_on_count">%1$s aktif</string>
-    <string name="settings_version_value">1.5.1</string>
+    <string name="settings_version_value">1.6.0</string>
 
     <!-- Layar «Tentang Taqwa». Nama «Taqwa» tetap dalam huruf Latin, seperti pada ikonnya. -->
     <string name="about_tagline">Gratis, untuk semua, selamanya.</string>
     <string name="about_privacy_label">PRIVASI</string>
-    <string name="about_stays_title">Tetap di ponsel Anda</string>
-    <string name="about_stays_body">Lokasi, pengaturan, penanda, dan hitungan tidak pernah keluar dari ponsel.</string>
-    <string name="about_online_title">Online hanya bila Anda minta</string>
-    <string name="about_online_body">Internet dipakai untuk satu hal saja: tilawah yang Anda pilih untuk diunduh, dari repositori publik Taqwa di GitHub.</string>
+    <string name="about_stays_title">Tetap di perangkat Anda</string>
+    <string name="about_stays_body">Hanya perangkat Anda sendiri yang dapat melihat lokasi, pengaturan, penanda, dan hitungan Anda.</string>
+    <string name="about_online_title">Online hanya untuk yang Anda pilih</string>
+    <string name="about_online_body_android">Internet dipakai untuk tilawah yang Anda pilih untuk diunduh, dari repositori publik Taqwa di GitHub. Jika Anda menambahkan Taqwa ke jam tangan Anda, Google dapat membawa datanya lewat internet, terenkripsi sehingga hanya ponsel dan jam tangan Anda yang dapat membacanya.</string>
+    <string name="about_online_body_ios">Internet dipakai untuk tilawah yang Anda pilih untuk diunduh, dari repositori publik Taqwa di GitHub. Jika Anda menambahkan Taqwa ke jam tangan Anda, Apple dapat membawa datanya lewat internet, terenkripsi sehingga hanya ponsel dan jam tangan Anda yang dapat membacanya.</string>
     <string name="about_nothing_title">Tanpa akun, tanpa iklan, tanpa analitik</string>
     <string name="about_nothing_body">Tidak ada akun untuk masuk, tidak ada data untuk dijual.</string>
     <string name="about_privacy_policy">Kebijakan privasi</string>
@@ -220,7 +237,7 @@
     <string name="location_country">Negara</string>
     <string name="location_timezone">Zona waktu</string>
     <string name="location_choose_city_instead">Pilih kota saja</string>
-    <string name="location_privacy_note">Koordinat disimpan di perangkat Anda dan hanya dipakai untuk menghitung waktu salat. Tidak ada yang dikirim ke mana pun.</string>
+    <string name="location_privacy_note">Koordinat disimpan di perangkat Anda dan hanya dipakai untuk menghitung waktu salat. Hanya perangkat Anda sendiri yang dapat melihat lokasi Anda.</string>
     <string name="location_denied_note">Akses lokasi saat ini ditolak. Anda bisa mengizinkannya di pengaturan perangkat, atau pilih kota saja.</string>
 
     <!-- City search -->

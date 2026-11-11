@@ -1,0 +1,36 @@
+51a52
+>         android:icon="@mipmap/ic_launcher"
+52a54
+>         android:roundIcon="@mipmap/ic_launcher_round"
+69c71,73
+<              whose own tasbeeh counts the first could write over when it came back.
+---
+>              whose own tasbeeh counts the first could write over when it came back. It starts on
+>              the launch screen, the launcher icon's mark on black (Theme.Taqwa.Starting), and is
+>              drawn in the device's own theme after it.
+75c79,80
+<             android:taskAffinity="" >
+---
+>             android:taskAffinity=""
+>             android:theme="@style/Theme.Taqwa.Starting" >
+263,272d267
+< 
+<         <activity
+<             android:name="com.google.android.gms.common.api.GoogleApiActivity"
+<             android:exported="false"
+<             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+< 
+<         <meta-data
+<             android:name="com.google.android.gms.version"
+<             android:value="@integer/google_play_services_version" />
+< 
+291a287,295
+>         <activity
+>             android:name="com.google.android.gms.common.api.GoogleApiActivity"
+>             android:exported="false"
+>             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+> 
+>         <meta-data
+>             android:name="com.google.android.gms.version"
+>             android:value="@integer/google_play_services_version" />
+> 

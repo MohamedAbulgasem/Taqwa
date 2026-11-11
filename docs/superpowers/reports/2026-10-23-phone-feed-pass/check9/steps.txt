@@ -1,0 +1,2 @@
+files: drop-next-feed feed.json feed.json.delivery nudge.anchor profileInstalled refresh.asked
+13:16:37 h place --es place 32.8872,13.1913,Africa/Tripoli,Tripoli,2210247: stored Tripoli id=2210247 zone=Africa/Tripoli at 32.887,13.191; plan of 58, first ASR-PRAYER-2026-10-31 PRAYER at 2026-10-31T13:55:00Z; settled=true

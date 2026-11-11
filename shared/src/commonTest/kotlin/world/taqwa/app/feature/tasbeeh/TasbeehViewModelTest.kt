@@ -3,6 +3,7 @@ package world.taqwa.app.feature.tasbeeh
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -569,5 +570,70 @@ class TasbeehViewModelTest {
         assertEquals(midRound, midRound.rolledOver())
         val fresh = TasbeehUiState(preset, TasbeehState("after_prayer", 0, 1))
         assertEquals(fresh, fresh.rolledOver())
+    }
+
+    /**
+     * The watch carries the reader's own phrases (plan 2 Task 4), so a phrase added, edited or
+     * deleted asks it for a new feed, once each. Counting, switching chips and resetting change no
+     * phrase and ask nothing.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun addingEditingOrRemovingAPhraseTellsTheWatch() = runTest {
+        var told = 0
+        val store = TasbeehStore(dataStore()) { 4_242L }
+        val vm = TasbeehViewModel(store, FakeHaptics(), backgroundScope, onPhrasesChanged = { told++ })
+        runCurrent()
+
+        vm.addCustom("يا لطيف", 40)
+        vm.state.first { it.preset.id == "custom_4242" }
+        runCurrent()
+        assertEquals(1, told)
+
+        repeat(3) { vm.tap() }
+        vm.select("subhanallah")
+        vm.state.first { it.preset.id == "subhanallah" }
+        vm.reset()
+        vm.flush()
+        advanceTimeBy(1_000)
+        runCurrent()
+        assertEquals(1, told, "counting, switching and resetting change no phrase")
+
+        vm.updateCustom("custom_4242", "يا لطيف يا خبير", 33)
+        vm.state.first { it.custom.single().total == 33 }
+        runCurrent()
+        assertEquals(2, told)
+
+        vm.removeCustom("custom_4242")
+        vm.state.first { it.custom.isEmpty() }
+        runCurrent()
+        assertEquals(3, told)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun theWatchIsToldAfterTheChipIsShown() = runTest {
+        val seen = mutableListOf<List<String>>()
+        val store = TasbeehStore(dataStore()) { 4_242L }
+        lateinit var vm: TasbeehViewModel
+        vm = TasbeehViewModel(
+            store,
+            FakeHaptics(),
+            backgroundScope,
+            onPhrasesChanged = { seen += vm.state.value.custom.map { it.parts.first().dhikr.arabic } },
+        )
+        runCurrent()
+
+        vm.addCustom("يا لطيف", 40)
+        vm.state.first { it.custom.isNotEmpty() }
+        runCurrent()
+        vm.updateCustom("custom_4242", "يا لطيف يا خبير", 33)
+        vm.state.first { it.custom.single().total == 33 }
+        runCurrent()
+        vm.removeCustom("custom_4242")
+        vm.state.first { it.custom.isEmpty() }
+        runCurrent()
+
+        assertEquals(listOf(listOf("يا لطيف"), listOf("يا لطيف يا خبير"), emptyList()), seen)
     }
 }
