@@ -387,7 +387,16 @@ support@taqwa.world.
   rounding edge could, BUILD-LOG 10–11 October). A unit with no official days has no "at most" figure.
   About states the range and, after it, "not yet checked after {date}". `release.sh` and
   `ios-release.sh` refuse to build on a stale or red stamp; the Ramadan release also refuses unless every
-  A/B unit's proof covers Ramadan 1448 or the gate has demoted it.
+  A/B unit's proof covers Ramadan 1448 or the gate has demoted it. Covers means the unit's own checked
+  runs of its Fajr, its end of eating and its Maghrib each hold every day of the tabular month and a day
+  each side (7 February to 10 March 2027 for 1448: the eve of the first tarawih and the last fast of a
+  country that begins a day late, as the engine's own Ramadan for every authority but Umm al-Qura is the
+  tabular month within a day), never the stamp's `first`..`last` envelope (ruling R145) nor the unit's days as a whole
+  (ruling R148: the stamp writes each event's runs, `checkedByEvent`, for the entry and each unit; a table
+  without a Suhoor column proves no end of eating, and a proven Fajr does not bound an end counted back from
+  it); the check is `checkStamps -Pramadan=1448`, opted into for that build as
+  `TAQWA_RAMADAN=1448 scripts/release.sh` and the same for `ios-release.sh` (ruling R146), and from eight
+  weeks before the month a plain `checkStamps` says so.
 - **The monitor** (slice 2): a scheduled local job, not public CI, that fetches each entry's newest
   published table (and Tripoli's daily from api.ifta.ly) and runs the gate on it; a failure opens a task,
   and a registry-only release follows within days.

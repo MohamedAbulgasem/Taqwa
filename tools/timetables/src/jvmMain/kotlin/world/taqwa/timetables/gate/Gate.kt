@@ -71,6 +71,11 @@ class Gate(
     private val change: ((TimetableMethod) -> TimetableMethod)? = null,
     /** Registry entries by id; a test may add its own. */
     private val lookup: (String) -> RegistryEntry? = Registry::byId,
+    /**
+     * The user's Hijri offset every day is computed with (`EngineSettings.hijriOffsetDays`); 0, the gate's own,
+     * unless a test asks what ±1 does to the Ramadan rules (HijriOffsetTest).
+     */
+    private val hijriOffsetDays: Int = 0,
 ) {
 
     fun evaluate(manifest: GateManifest): GateResult {
@@ -114,7 +119,7 @@ class Gate(
             if (!promiseOnly) s.places += point
             val cautious = resolution.entryClass == EntryClass.C
             val mostFollowed = resolution.members.minByOrNull { it.shareRank }?.id
-            val days = computed.getOrPut("${entry.id}|${row.unit}|${point.lat},${point.lon}|${row.zone}") { Days(resolution, zone) }
+            val days = computed.getOrPut("${entry.id}|${row.unit}|${point.lat},${point.lon}|${row.zone}") { Days(resolution, zone, hijriOffsetDays) }
             // Days actually in Ramadan (Umm al-Qura's dates), not the day either side authorities are given.
             val ramadan = Registry.ramadanCalendar()
 
@@ -210,11 +215,11 @@ class Gate(
     )
 
     /** One resolution's days, each computed once ([DayPipeline], R34). */
-    private class Days(private val resolution: Resolution, private val zone: TimeZone) {
+    private class Days(private val resolution: Resolution, private val zone: TimeZone, private val hijriOffsetDays: Int) {
         private val unended = HashMap<LocalDate, PrayerDay>()
 
         private fun unended(date: LocalDate): PrayerDay =
-            unended.getOrPut(date) { DayPipeline.unended(resolution, date, zone) }
+            unended.getOrPut(date) { DayPipeline.unended(resolution, date, zone, hijriOffsetDays = hijriOffsetDays) }
 
         fun day(date: LocalDate): PrayerDay = Ends.withNextDay(unended(date), unended(date.plus(1, DateTimeUnit.DAY)))
 
@@ -227,7 +232,7 @@ class Gate(
             val members = resolution.members
             val mostFollowed = members.minBy { it.shareRank }.id
             val sunSets = DayPipeline.realSunset(resolution.point, date, zone) != null
-            return members.zip(DayPipeline.members(resolution, date, zone)).associate { (member, day) ->
+            return members.zip(DayPipeline.members(resolution, date, zone, hijriOffsetDays = hijriOffsetDays)).associate { (member, day) ->
                 member.id to maghribBar(day, member.id == mostFollowed, sunSets)
             }
         }
@@ -301,7 +306,9 @@ class Gate(
          * of the registry, checked against a named unit) with [change] applied to its method, and
          * the table read when the archive is held ([OfficialRoots]). Null, with the reason in
          * [problems], when any of it fails: a table the archive does not hold, or one that yields no
-         * day (a column list that does not fit its lines), is a mistake in the gate file.
+         * day (a column list that does not fit its lines), is a mistake in the gate file, and so is
+         * an end read from a start's column of a table whose minutes were rounded up ([roundedUp],
+         * ruling R149).
          */
         fun setUp(
             row: GateRow,
@@ -345,7 +352,18 @@ class Gate(
             } else {
                 val file = roots.file(row.path)
                 if (!file.isFile) return null.also { problems += "${row.where}: ${row.path} is not held (${file.path})" }
-                val read = OfficialTable.from(format.read(file.readLines(), row.columns.size))
+                val lines = file.readLines()
+                val shared = row.columns.firstOrNull { column -> column.any { it.isStart } && column.any { !it.isStart } }
+                if (shared != null && roundedUp(lines)) {
+                    return null.also {
+                        problems += "${row.where}: ${row.path} says its times were rounded up to the minute, so a column that holds a start " +
+                            "may not also hold an end (${shared.joinToString("+") { it.key }}): the printed minute could stand up to 59 s " +
+                            "after the authority's moment, and a day at +0 would pass while the end is late (ruling R149). Read the end " +
+                            "from a column of its own, floored from the source's seconds or the printed minute less one " +
+                            "(archive/code/moral-auth-world/southasia/di_floor_e.py)"
+                    }
+                }
+                val read = OfficialTable.from(format.read(lines, row.columns.size))
                 if (read.days.isEmpty()) {
                     return null.also {
                         problems += "${row.where}: no day read from ${row.path} (${read.unreadable} unreadable lines for " +
@@ -362,6 +380,28 @@ class Gate(
             val resolved = unit ?: Units.of(entry.id)?.units?.firstOrNull { it.name == resolution.unitName && it.point == resolution.unitPoint }
             return Setup(entry, point, zone, changed, table, resolved, clock)
         }
+
+        /**
+         * The words a table's `#` lines carry where its minutes were rounded up from the source's seconds ([roundedUp]):
+         * "rounded up" as the archive writes it, and the other ways to say it ("rounds them up", "ceil", "to the next
+         * minute"), so a table worded differently is not let through (review of 12 Nov 2026). None of the 1,435 tables
+         * read with a shared column on 12 Nov 2026 carries any of them.
+         */
+        private val ROUNDED_UP = Regex(
+            "\\bround(?:ed|s|ing)?\\s+(?:\\w+\\s+)?up\\b|\\bceil(?:ing|ed)?\\b|\\bto the next (?:whole |full )?minute\\b",
+            RegexOption.IGNORE_CASE,
+        )
+
+        /**
+         * Ruling R149: whether a table's comment lines say its times were rounded up to the minute
+         * (Dawat-e-Islami's months, whose AJAX prints seconds; Dar al-Iftaa's derived starts). Right
+         * for a start, which is then never shown early; wrong as an end's reference, which could stand
+         * up to 59 s after the authority's moment. [setUp] refuses such a table on a row whose column
+         * holds a start and an end together (`F+E`), the shape that hid a late end of under a minute
+         * at Karachi until 18 Oct 2026 (E16, ruling R147).
+         */
+        fun roundedUp(lines: List<String>): Boolean =
+            lines.any { line -> line.trimStart().startsWith("#") && ROUNDED_UP.containsMatchIn(line) }
 
         /**
          * [event]'s late limit on a row (rulings R37, R41): the `LateLimit` [lateLimitFor] finds for it
@@ -466,6 +506,23 @@ class EventStats {
     var worst = 0
     var over = 0
     var absent = 0
+
+    /**
+     * The days a cell of this event was compared on, as epoch days (ruling R148: a Ramadan is proven
+     * event by event, so the stamp writes each event's own runs; a bit a day, since an entry of many
+     * units holds one of these per unit and event).
+     */
+    private val days = java.util.BitSet()
+
+    /** Those days, in order. */
+    val dates: List<LocalDate> get() = days.stream().mapToObj { LocalDate.fromEpochDays(it) }.toList()
+
+    internal fun day(date: LocalDate) {
+        val epochDay = date.toEpochDays()
+        require(epochDay in 0..Int.MAX_VALUE) { "a day before 1970: $date" }
+        days.set(epochDay.toInt())
+    }
+
     /** Cells the day declared not followed (ruling R82): not checked, and the dates they fell on. */
     var declared = 0
     val declaredDates = sortedSetOf<LocalDate>()
@@ -669,6 +726,7 @@ class EntryStats(val entry: RegistryEntry) {
         val promiseOnly = o.row.promiseOnly
         if (!promiseOnly) {
             e.checked++
+            e.day(o.date)
             e.applied["${o.limit.source} ${o.limit.minutes}"] = o.limit
         }
         val seconds = (o.shown - o.official).inWholeSeconds

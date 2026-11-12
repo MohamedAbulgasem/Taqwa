@@ -840,7 +840,7 @@ object ProofStamps {
         placeDays = 2400,
         ramadanDays = 0,
         lastChecked = "2026-09-30",
-        worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
+        worstLateMinutes = mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
         worstLateByUnit = inKarachiUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "dhuhr", "fajr", "isha", "maghrib", "sunrise")),
@@ -850,7 +850,7 @@ object ProofStamps {
     )
 
     private fun inKarachiUnits(): Map<String, Map<String, Int>> = mapOf(
-        "delhi" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 4, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
+        "delhi" to mapOf("asrHanafi" to 1, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 1, "isha" to 1, "maghrib" to 1, "sunrise" to 2),
     )
 
     private fun iqSunni() = ProofStamp(
@@ -1457,7 +1457,7 @@ object ProofStamps {
         placeDays = 637,
         ramadanDays = 0,
         lastChecked = "2027-12-31",
-        worstLateMinutes = mapOf("asrHanafi" to 3, "asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
+        worstLateMinutes = mapOf("asrHanafi" to 3, "asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
         worstLateByUnit = pkKarachiUnits(),
         lateLimits = listOf(
             ProofLateLimit(minutes = 3, reason = null, events = listOf("asrHanafi", "asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
@@ -1466,7 +1466,7 @@ object ProofStamps {
     )
 
     private fun pkKarachiUnits(): Map<String, Map<String, Int>> = mapOf(
-        "karachi" to mapOf("asrHanafi" to 3, "asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 3, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
+        "karachi" to mapOf("asrHanafi" to 3, "asrStandard" to 3, "dhuhr" to 1, "endOfEating" to 2, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
     )
 
     private fun psGazaAwqaf() = ProofStamp(

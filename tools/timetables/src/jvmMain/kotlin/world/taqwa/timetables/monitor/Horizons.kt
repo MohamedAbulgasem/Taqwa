@@ -3,40 +3,12 @@ package world.taqwa.timetables.monitor
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
-import world.taqwa.app.hijri.TabularHijriCalendar
 import world.taqwa.app.prayer.ClockChange
 import world.taqwa.app.prayer.ClockChanges
 import world.taqwa.app.prayer.engine.registry.data.UmmAlQuraDates
-import world.taqwa.timetables.Json
-import java.io.File
-
-/** One entry's stamp as the horizons read it: statistics only (`official/stamps/<entry>.json`). */
-data class StampSummary(
-    val entryId: String,
-    /** The stamp's `class` split on `/`: "A", "B", "C", "D (authority)", "D (none)". */
-    val classes: Set<String>,
-    val first: LocalDate?,
-    val last: LocalDate?,
-    val broken: Int,
-) {
-    val isAOrB: Boolean get() = "A" in classes || "B" in classes
-
-    companion object {
-        /** Every `*.json` stamp in [dir]. */
-        fun load(dir: File): List<StampSummary> =
-            dir.listFiles { f -> f.extension == "json" }?.sortedBy { it.name }?.map { file ->
-                @Suppress("UNCHECKED_CAST")
-                val stamp = Json.parse(file.readText()) as Map<String, Any?>
-                StampSummary(
-                    entryId = stamp["entry"] as? String ?: file.nameWithoutExtension,
-                    classes = (stamp["class"] as? String).orEmpty().split('/').map { it.trim() }.filter { it.isNotEmpty() }.toSet(),
-                    first = (stamp["first"] as? String)?.let(LocalDate::parse),
-                    last = (stamp["last"] as? String)?.let(LocalDate::parse),
-                    broken = (stamp["broken"] as? Long ?: 0L).toInt(),
-                )
-            }.orEmpty()
-    }
-}
+import world.taqwa.timetables.gate.Ramadan
+import world.taqwa.timetables.gate.StampSummary
+import world.taqwa.timetables.gate.lastDay
 
 /**
  * A published calendar the engine leans on for a year at a time: on and after [fromMonth]/[fromDay]
@@ -52,9 +24,14 @@ data class NextYearRule(val entryId: String, val fromMonth: Int, val fromDay: In
  * - each clock change's `until` ([ClockChanges.table]) from eight weeks before it until it passes;
  * - London Unified's next year not held by 1 December, IRN's (Tromsø's 2027 calendar, ruling R82)
  *   by 1 November ([NEXT_YEAR]);
- * - any stamp whose `last` (ProofStamps' `lastChecked`) is older than twelve months;
- * - from eight weeks before each Ramadan (the tabular calendar) to its end, the A/B entries whose
- *   proof does not cover it (spec §5's Ramadan release rule).
+ * - any stamp whose `last` (ProofStamps' `lastChecked`) is older than twelve months, and any unit
+ *   whose own last checked day is, while its entry's is not (ruling R145);
+ * - from eight weeks before each Ramadan (the tabular calendar, [Ramadan]) to its end, the A/B
+ *   entries with a unit whose checked runs of Fajr, the end of eating or Maghrib do not hold every
+ *   day of it (spec §5's Ramadan release rule, `checkStamps -Pramadan=<year>`): the runs, unit by
+ *   unit and event by event, never the entry's envelope `first`..`last`, which hid Muscat's hole of
+ *   ten years (ruling R145), nor the unit's days as a whole, which hid Pretoria's missing end of
+ *   eating (ruling R148).
  */
 object Horizons {
 
@@ -74,7 +51,6 @@ object Horizons {
     )
 
     private const val WEEKS_8 = 56
-    private const val RAMADAN_DAYS = 29
 
     fun check(
         today: LocalDate,
@@ -138,56 +114,57 @@ object Horizons {
         }
 
         val staleBefore = today.plus(-12, DateTimeUnit.MONTH)
+        val fetchNewest = "fetch the authority's newest table (add a fetcher if it has none), add gate rows and re-run the gate; " +
+            "where the authority prints one table a year, list it as a manual source in sources.tsv naming this entry, " +
+            "with next_expected the month it is due: this line then waits for that date."
         for (stamp in stamps) {
             val last = stamp.last ?: continue
             val until = deferred[stamp.entryId]
-            if (last < staleBefore && (until == null || today >= until)) {
+            if (until != null && today < until) continue
+            if (last < staleBefore) {
+                // The whole entry is stale, its units with it: one line.
                 items += Item(
                     Kind.HORIZON,
                     "${stamp.entryId}'s proof is older than twelve months (through $last)",
                     listOf("About states \"not yet checked after $last\" for it."),
-                    "fetch the authority's newest table (add a fetcher if it has none), add gate rows and re-run the gate; " +
-                        "where the authority prints one table a year, list it as a manual source in sources.tsv naming this entry, " +
-                        "with next_expected the month it is due: this line then waits for that date.",
+                    fetchNewest,
                     key = "horizon:stale:${stamp.entryId}",
                 )
+                continue
+            }
+            // Ruling R145: a unit whose own rows stopped a year ago is stale though the entry's envelope is
+            // fresh; About and its city page give a place the end of its unit's own last run (ruling R115).
+            for (unit in stamp.units) {
+                val unitLast = unit.checked.lastDay ?: continue
+                if (unitLast < staleBefore) {
+                    items += Item(
+                        Kind.HORIZON,
+                        "${stamp.entryId}'s unit ${unit.id} (${unit.name}) is older than twelve months (through $unitLast)",
+                        listOf("The entry's proof runs through $last; About and the city page state \"not yet checked after $unitLast\" at this unit's places."),
+                        fetchNewest.replace("the authority's newest table", "the authority's newest table for this unit's point"),
+                        key = "horizon:stale:${stamp.entryId}/${unit.id}",
+                    )
+                }
             }
         }
 
-        val ramadan = nextRamadan(today)
-        val ramadanEnd = ramadan.plus(RAMADAN_DAYS, DateTimeUnit.DAY)
-        if (today >= ramadan.plus(-WEEKS_8, DateTimeUnit.DAY) && today <= ramadanEnd) {
-            val short = stamps.filter { it.isAOrB }.filter { s ->
-                val first = s.first
-                val last = s.last
-                first == null || last == null || first > ramadan || last < ramadanEnd
-            }
+        val ramadan = Ramadan.nextFrom(today)
+        if (ramadan.isNear(today)) {
+            val short = stamps.filter { it.isAOrB }.mapNotNull { s -> s.ramadanGaps(ramadan).takeIf { it.isNotEmpty() }?.let { s to it } }
             if (short.isNotEmpty()) {
                 items += Item(
                     Kind.HORIZON,
-                    "Ramadan begins about $ramadan and ${short.size} A/B entr${if (short.size == 1) "y's proof does" else "ies' proofs do"} not cover it",
-                    short.map { "${it.entryId}: proven ${it.first ?: "?"}..${it.last ?: "?"}" },
-                    "the Ramadan release refuses to build unless every A/B entry's proof covers Ramadan or the gate has demoted it (spec §5): " +
-                        "fetch each authority's table for those dates (most publish the Ramadan imsakiya a few weeks before), add gate rows " +
-                        "(split test) and re-run the gate.",
-                    key = "horizon:ramadan:$ramadan",
+                    "Ramadan ${ramadan.hijriYear} begins about ${ramadan.first} and ${short.size} A/B entr${if (short.size == 1) "y's proof does" else "ies' proofs do"} " +
+                        "not cover it from ${ramadan.guardFirst} through ${ramadan.guardLast} (the month and a day each side)",
+                    short.map { (s, gaps) -> "${s.entryId}: ${s.describe(ramadan, gaps)}" },
+                    "the Ramadan build refuses to build unless every A/B unit's Fajr, end of eating and Maghrib were checked on every day " +
+                        "of Ramadan or the gate has demoted the entry (./gradlew -p tools/timetables checkStamps -Pramadan=${ramadan.hijriYear}, " +
+                        "spec §5): fetch each authority's table for those dates (most publish the Ramadan imsakiya a few weeks before), " +
+                        "add gate rows (split test) and re-run the gate.",
+                    key = "horizon:ramadan:${ramadan.first}",
                 )
             }
         }
         return items
-    }
-
-    /**
-     * The first day of the tabular Ramadan that [today] is in or before: the current one when
-     * [today] falls inside it (within [RAMADAN_DAYS] of its start), else the next.
-     */
-    fun nextRamadan(today: LocalDate): LocalDate {
-        var date = today.plus(-RAMADAN_DAYS, DateTimeUnit.DAY)
-        repeat(400) {
-            val hijri = TabularHijriCalendar.fromGregorian(date)
-            if (hijri.month == 9 && hijri.day == 1) return date
-            date = date.plus(1, DateTimeUnit.DAY)
-        }
-        error("no Ramadan within 400 days of $today")
     }
 }

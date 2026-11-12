@@ -7,6 +7,15 @@
   "first": "2026-09-01",
   "last": "2026-09-30",
   "checked": ["2026-09-01..2026-09-30"],
+  "checkedByEvent": {
+    "fajr": ["2026-09-01..2026-09-30"],
+    "sunrise": ["2026-09-01..2026-09-30"],
+    "dhuhr": ["2026-09-01..2026-09-30"],
+    "asrHanafi": ["2026-09-01..2026-09-30"],
+    "maghrib": ["2026-09-01..2026-09-30"],
+    "isha": ["2026-09-01..2026-09-30"],
+    "endOfEating": ["2026-09-01..2026-09-30"]
+  },
   "placeDays": 2400,
   "heldOutDays": 2370,
   "ramadanDays": 0,
@@ -110,11 +119,11 @@
       "late": {
         "0": 0,
         "1": 0,
-        "2": 0,
-        "3+": 2400
+        "2": 2083,
+        "3+": 317
       },
       "exactShare": 0,
-      "worstLate": 4,
+      "worstLate": 3,
       "lateLimit": 4,
       "lateLimitFrom": "unit delhi",
       "overLimit": 0
@@ -220,11 +229,11 @@
         "late": {
           "0": 0,
           "1": 0,
-          "2": 0,
-          "3+": 2370
+          "2": 2053,
+          "3+": 317
         },
         "exactShare": 0,
-        "worstLate": 4,
+        "worstLate": 3,
         "lateLimit": 4,
         "lateLimitFrom": "unit delhi",
         "overLimit": 0
@@ -245,6 +254,15 @@
       "name": "Delhi",
       "placeDays": 30,
       "checked": ["2026-09-01..2026-09-30"],
+      "checkedByEvent": {
+        "fajr": ["2026-09-01..2026-09-30"],
+        "sunrise": ["2026-09-01..2026-09-30"],
+        "dhuhr": ["2026-09-01..2026-09-30"],
+        "asrHanafi": ["2026-09-01..2026-09-30"],
+        "maghrib": ["2026-09-01..2026-09-30"],
+        "isha": ["2026-09-01..2026-09-30"],
+        "endOfEating": ["2026-09-01..2026-09-30"]
+      },
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -352,11 +370,11 @@
           "late": {
             "0": 0,
             "1": 0,
-            "2": 0,
-            "3+": 2400
+            "2": 2083,
+            "3+": 317
           },
           "exactShare": 0,
-          "worstLate": 4,
+          "worstLate": 3,
           "lateLimit": 4,
           "lateLimitFrom": "unit delhi",
           "overLimit": 0

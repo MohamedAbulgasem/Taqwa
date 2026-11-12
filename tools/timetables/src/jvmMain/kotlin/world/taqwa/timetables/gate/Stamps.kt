@@ -11,7 +11,8 @@ import java.security.MessageDigest
  * A stamp never holds an official time: places, first and last date, the checked dates as runs
  * (for the entry, each unit and, for a cautious entry, each member at each point its rows were
  * read at — ruling R115: a page shows only days some table was checked on — with the days the gate
- * file excuses there and the kind of reason, never its words: ruling R117), place-days, Ramadan
+ * file excuses there and the kind of reason, never its words: ruling R117; and for the entry and
+ * each unit by event too, ruling R148, since a Ramadan is proven event by event), place-days, Ramadan
  * days, early and late-end counts per event, the late histogram, the exact share, the worst late
  * minutes, the cells declared not followed and their dates (ruling R82), a cautious entry's
  * Maghrib cells the far-north guard read otherwise than as printed (ruling R156) and its place-days
@@ -50,6 +51,9 @@ object Stamps {
         "last" to s.last?.toString(),
         // The days any row compared, as runs: the envelope first..last may have holes (ruling R115).
         "checked" to dateRanges(s.dates),
+        // And by event (ruling R148): a Ramadan is proven only where the unit's Fajr, end of eating and
+        // Maghrib were each checked on every day of it, and a table may print some columns and not others.
+        "checkedByEvent" to checkedByEvent(s.events),
         "placeDays" to s.placeDayCount,
         "heldOutDays" to s.testDays,
         // Place-days in Ramadan by Umm al-Qura's own dates.
@@ -104,12 +108,17 @@ object Stamps {
                 "name" to u.name,
                 "placeDays" to u.placeDays.size,
                 "checked" to dateRanges(u.placeDays),
+                "checkedByEvent" to checkedByEvent(u.events),
                 "broken" to u.broken,
                 "lateLimits" to limits(u.events),
                 "events" to events(u.events),
             )
         },
     ).filterValues { it != null }
+
+    /** Each event's own checked days as runs (ruling R148); an event with no cell compared is left out. */
+    private fun checkedByEvent(events: Map<Event, EventStats>): Map<String, List<String>> =
+        events.entries.filter { it.value.checked > 0 }.associate { (event, e) -> event.key to dateRanges(e.dates) }
 
     // An event only promise-only rows read (GateRow.promiseOnly: a table the place may not follow, such as ISNA's West
     // Island Hanafi Asr under Canada's cautious times) has no cell in the proof, so it is left out of the stamp.

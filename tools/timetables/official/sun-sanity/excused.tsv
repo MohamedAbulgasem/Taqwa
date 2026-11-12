@@ -1,0 +1,6 @@
+# The sun-sanity pass's excused groups (SunSanity.kt, Excuse): breaches the engine's own day accounts for, pinned like
+# the open findings so a new one, or one that grows, fails the pass. A Dhuhr before transit is never excused. Same
+# window, run and ceilings as open-findings.tsv (worst_s: the worst seconds rounded up plus one; points: points found).
+entry	check	excuse	worst_s	points	note
+no.cautious	fajr-after-sunrise	declared	94	2	Norway (Automatic): Harstad on 22 Jul 2027 (93 s) and Longyearbyen on 25 Aug 2027 (66 s), 4 place-days: a member's Fajr the day declares it does not show (PrayerDay.notFollowed, ruling R82), the first days the sun sets again after the midnight sun.
+se.cautious	fajr-after-sunrise	declared	4	1	Sweden (Automatic): Boden on 27 Jun 2027, 3 s, 2 place-days: a member's Fajr the day declares it does not show (PrayerDay.notFollowed, ruling R82).

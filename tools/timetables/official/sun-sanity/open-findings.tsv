@@ -1,0 +1,29 @@
+# The sun-sanity pass's open findings (tools/timetables sunSanity; SunSanity.kt): starts the engine shows before the
+# real sun allows, at app cities, unit points or Settings choices at app cities, on 2026-11-12..2027-12-31, which
+# nothing in the day excuses. Each is a fitted margin below zero that keeps the start at its authority's printed
+# minute (the gate holds every one never early and within its limit), so the authority's own minute sits at or before
+# the true transit or sunset there. Listed so the pass fails only on a new one or a listed one that grows; a fix is the
+# owner's call (the never-early standard is the local table's). The note gives the smallest margin raise that clears
+# the pass, found by re-running it with the margin raised one second at a time, and what the gate says after it (whole
+# gate rows of the entry, same archive).
+# Ceilings: worst_s is the worst seconds before the sun found, rounded up to the next whole second, plus one second for
+# the default window's drift from year to year; points is the number of points found. The pass fails when a finding is
+# worse than worst_s or found at more points (a margin that slips, a rule that spreads to new towns): re-measure, and
+# raise a ceiling only with the reason in the note.
+# Run of 12 Nov 2026 on engine/ramadan-guard (46,085 points, 5,258 of them Settings choices); place-days count both Asr
+# schools.
+entry	check	worst_s	points	note
+be.emb	dhuhr-before-transit	23	16	Brussels (EMB, Settings choice only): the unit's point and 15 Belgian cities it is chosen at, up to 22 s before transit, 4,076 place-days. Raise Dhuhr -22 -> 0 s: gate early 0, over 0, worst still 1 min.
+bh.council	maghrib-before-sunset	18	3	Bahrain (Automatic): Dar Kulayb, Madinat Hamad, Jidd Hafs, up to 16 s before sunset, 218 place-days. Raise Maghrib -36 -> -20 s: gate early 0, over 0, worst still 1 min.
+ca.mac	dhuhr-before-transit	24	8	MAC Masjid Toronto (a Settings choice; as a ca.toronto member it is never the latest, and ca.toronto is clean): 8 points (its unit and Toronto cities it is chosen at), up to 23 s, 2,302 place-days. Raise Dhuhr -23 -> 0 s: gate early 0, over 0, worst still 1 min.
+ca.mac	maghrib-before-sunset	23	10	MAC Masjid Toronto: 10 points, up to 22 s, 2,304 place-days. Raise Maghrib -22 -> 0 s: gate early 0, over 0, worst still 1 min.
+eg.esa	dhuhr-before-transit	7	81	Egypt (Automatic, class B units): 81 points, up to 6 s, 6,466 place-days. Raise the national Dhuhr -6 -> 0 s: gate early 0, over 0, worst still 2 min (2-min cells 60 -> 79).
+ie.icci	maghrib-before-sunset	24	23	Dublin ICCI (a Settings choice; ie.cautious, whose member it is, is clean): 23 points (its unit and Irish cities it is chosen at), up to 23 s, 5,430 place-days. Raise Maghrib -23 -> 0 s: gate early 0, over 0, worst still 1 min.
+kg.default	dhuhr-before-transit	63	30	Kyrgyzstan (Automatic): 30 cities, up to 62 s before transit on every day (survey's -62 s, confirmed). Raise Dhuhr -62 -> 0 s: gate (4 Dhuhr cells, one day) early 0, worst 1 min. The refit on muftiyat.kg's 2027 (survey candidate) supersedes this.
+nz.fianz	dhuhr-before-transit	14	16	Auckland (FIANZ unit): 16 points, up to 13 s, 2,662 place-days. Raise Dhuhr -13 -> 0 s: gate early 0, over 0, worst still 1 min.
+nz.fianz	maghrib-before-sunset	2	19	Auckland: 19 points, 1 s, 206 place-days. Raise Maghrib -1 -> 0 s: gate early 0, over 0, worst still 1 min.
+ps.gaza.awqaf	dhuhr-before-transit	9	13	Gaza Awqaf (Gaza's cautious member, and a Settings choice anywhere in Palestine): 13 points, up to 8 s, 1,396 place-days. Raise Dhuhr -8 -> 0 s: gate early 0, over 0, worst still 2 min.
+ps.gaza.cautious	dhuhr-before-transit	9	16	Gaza (Automatic): 16 points, up to 8 s, 1,476 place-days, from its members (ps.gaza.awqaf, ps.iftaa): clears with their two raises.
+ps.iftaa	dhuhr-before-transit	67	68	West Bank (Automatic, and a Settings choice in Gaza): 68 points, up to 65 s (Battir, Bethlehem's unit), 28,954 place-days. The towns read al-Aqsa's table plus the printed whole-minute figure (FixedPointMode.TABLE, ruling R118), so a town west of its figure's point gets a Dhuhr before its own transit. Raise Dhuhr -37 -> +29 s (66 s): gate early 0, over 0, worst 1 -> 2 min (9,471 cells at 2). A smaller fix: hold a TABLE town's Dhuhr to its own transit, as R118 already holds Maghrib to a sunset.
+za.mjc	dhuhr-before-transit	11	1	Cape Town MJC (a Settings choice; za.cape, whose member it is, is clean): its unit's point, up to 10 s, 124 place-days. Raise Dhuhr -10 -> 0 s: gate early 0, over 0, worst still 1 min.
+za.mjc	maghrib-before-sunset	11	1	Cape Town MJC: up to 10 s, 138 place-days. Raise Maghrib -10 -> 0 s: gate early 0, over 0, worst still 1 min.

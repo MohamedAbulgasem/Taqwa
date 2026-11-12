@@ -8,6 +8,7 @@ import world.taqwa.timetables.gate.Gate
 import world.taqwa.timetables.gate.GateError
 import world.taqwa.timetables.gate.GateManifest
 import world.taqwa.timetables.gate.OfficialRoots
+import world.taqwa.timetables.gate.StampSummary
 import world.taqwa.timetables.gate.Stamps
 import world.taqwa.timetables.gate.SurveyFolder
 import world.taqwa.timetables.gate.Surveys

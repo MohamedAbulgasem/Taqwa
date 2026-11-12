@@ -7,6 +7,15 @@
   "first": "2026-09-25",
   "last": "2026-09-25",
   "checked": ["2026-09-25"],
+  "checkedByEvent": {
+    "fajr": ["2026-09-25"],
+    "sunrise": ["2026-09-25"],
+    "dhuhr": ["2026-09-25"],
+    "asrStandard": ["2026-09-25"],
+    "maghrib": ["2026-09-25"],
+    "isha": ["2026-09-25"],
+    "endOfEating": ["2026-09-25"]
+  },
   "placeDays": 10,
   "heldOutDays": 0,
   "ramadanDays": 0,

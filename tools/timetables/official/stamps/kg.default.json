@@ -7,6 +7,15 @@
   "first": "2026-09-26",
   "last": "2026-09-26",
   "checked": ["2026-09-26"],
+  "checkedByEvent": {
+    "fajr": ["2026-09-26"],
+    "sunrise": ["2026-09-26"],
+    "dhuhr": ["2026-09-26"],
+    "asrHanafi": ["2026-09-26"],
+    "maghrib": ["2026-09-26"],
+    "isha": ["2026-09-26"],
+    "endOfEating": ["2026-09-26"]
+  },
   "placeDays": 4,
   "heldOutDays": 3,
   "ramadanDays": 0,
@@ -241,6 +250,15 @@
       "name": "Bishkek",
       "placeDays": 1,
       "checked": ["2026-09-26"],
+      "checkedByEvent": {
+        "fajr": ["2026-09-26"],
+        "sunrise": ["2026-09-26"],
+        "dhuhr": ["2026-09-26"],
+        "asrHanafi": ["2026-09-26"],
+        "maghrib": ["2026-09-26"],
+        "isha": ["2026-09-26"],
+        "endOfEating": ["2026-09-26"]
+      },
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {

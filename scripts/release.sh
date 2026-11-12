@@ -17,9 +17,12 @@ if [ ! -f keystore.properties ]; then
     exit 1
 fi
 
-# Spec §5 / ruling R86: refuse to build on a stale or red prayer-time stamp.
-if ! ./gradlew -q -p tools/timetables checkStamps; then
-    echo "A prayer-time stamp is stale or red (see above). Refresh it first: " \
+# Spec §5 / ruling R86: refuse to build on a stale or red prayer-time stamp. The Ramadan build
+# (ruling R146) runs as TAQWA_RAMADAN=<Hijri year> scripts/release.sh, e.g. 1448: it then also
+# refuses an A/B unit whose Fajr, end of eating and Maghrib were not each checked on every day of
+# that Ramadan (ruling R148), unless the gate has demoted it.
+if ! ./gradlew -q -p tools/timetables checkStamps ${TAQWA_RAMADAN:+-Pramadan="$TAQWA_RAMADAN"}; then
+    echo "A prayer-time stamp is stale or red, or its Ramadan is not proven (see above). Refresh it first: " \
         "./gradlew -p tools/timetables gate, then ./gradlew -p tools/timetables generateProofStamps." >&2
     exit 1
 fi

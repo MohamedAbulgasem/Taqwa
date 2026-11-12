@@ -7,6 +7,15 @@
   "first": "2025-12-04",
   "last": "2025-12-04",
   "checked": ["2025-12-04"],
+  "checkedByEvent": {
+    "fajr": ["2025-12-04"],
+    "sunrise": ["2025-12-04"],
+    "dhuhr": ["2025-12-04"],
+    "asrStandard": ["2025-12-04"],
+    "maghrib": ["2025-12-04"],
+    "isha": ["2025-12-04"],
+    "endOfEating": ["2025-12-04"]
+  },
   "placeDays": 4,
   "heldOutDays": 3,
   "ramadanDays": 0,
@@ -241,6 +250,15 @@
       "name": "Baghdad",
       "placeDays": 1,
       "checked": ["2025-12-04"],
+      "checkedByEvent": {
+        "fajr": ["2025-12-04"],
+        "sunrise": ["2025-12-04"],
+        "dhuhr": ["2025-12-04"],
+        "asrStandard": ["2025-12-04"],
+        "maghrib": ["2025-12-04"],
+        "isha": ["2025-12-04"],
+        "endOfEating": ["2025-12-04"]
+      },
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {

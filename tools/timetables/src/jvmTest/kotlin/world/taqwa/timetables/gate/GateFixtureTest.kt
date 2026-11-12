@@ -161,6 +161,8 @@ class GateFixtureTest {
         assertEquals(listOf("dhuhr"), (stamped["lateLimits"] as Map<String, Map<String, Any>>).getValue("class B: 2 min")["events"])
         // Ruling R115: the unit's checked dates, as runs, so a page can hold every day no table checked.
         assertEquals(listOf("2026-01-01..2026-12-31"), stamped["checked"])
+        // Ruling R148: and by event — the one column this row reads, and no other.
+        assertEquals(mapOf("dhuhr" to listOf("2026-01-01..2026-12-31")), stamped["checkedByEvent"])
     }
 
     @Test
@@ -172,6 +174,68 @@ class GateFixtureTest {
             "open/SG-MUIS/muis-2026-02-a.txt\tsg.muis\t\t\tAsia/Singapore\tF+E S D A M I\tdaily\tstandard\tfit\t",
         )
         assertEquals(listOf("2026-02-14..2026-02-18"), Stamps.stamp(Gate(roots, PINNED).evaluate(holed).entries.getValue("sg.muis"), "core")["checked"])
+    }
+
+    @Test
+    fun `the stamp records each event's checked dates as runs and an unread event has none`() {
+        // Ruling R148: a Ramadan is proven event by event, so the stamp says which days each event was compared on.
+        val all = Stamps.stamp(Gate(roots, PINNED).evaluate(muis).entries.getValue("sg.muis"), "core")["checkedByEvent"]
+        assertEquals(
+            listOf("fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating").associateWith { listOf("2026-02-14..2026-02-23") },
+            all,
+        )
+        // The second file read without its end of eating: that event's runs stop with the first file (Pretoria's shape).
+        val partial = manifest(
+            "open/SG-MUIS/muis-2026-02-a.txt\tsg.muis\t\t\tAsia/Singapore\tF+E S D A M I\tdaily\tstandard\tfit\t",
+            "open/SG-MUIS/muis-2026-02-b.txt\tsg.muis\t\t\tAsia/Singapore\tF S D A M I\tdaily\tstandard\ttest\t",
+        )
+        val stamp = Stamps.stamp(Gate(roots, PINNED).evaluate(partial).entries.getValue("sg.muis"), "core")
+        @Suppress("UNCHECKED_CAST")
+        val byEvent = stamp["checkedByEvent"] as Map<String, List<String>>
+        assertEquals(listOf("2026-02-14..2026-02-23"), byEvent["fajr"])
+        assertEquals(listOf("2026-02-14..2026-02-18"), byEvent["endOfEating"])
+        assertEquals(listOf("2026-02-14..2026-02-23"), stamp["checked"])
+        // Read back: tabular Ramadan 1447 begins on 18 February and its guard on the 17th, so the ten days hold seven guarded
+        // days for Fajr and Maghrib and, with the second file's end of eating unread, two for the end of eating; the summary
+        // counts each event on its own.
+        val summary = StampSummary.of(stamp, "sg.muis")
+        val gap = summary.ramadanGaps(Ramadan.of(1447)).single()
+        assertEquals(listOf(7, 2, 7), Ramadan.EVENTS.map { Ramadan.GUARD_DAYS - gap.uncheckedByEvent.getValue(it).size })
+        assertEquals("2 of 32 days (fajr 7, endOfEating 2, maghrib 7)", gap.describe())
+    }
+
+    @Test
+    fun `a table whose times were rounded up is never read with an end on a start's column`() {
+        // Ruling R149 (E16): Dawat-e-Islami's months say their starts were rounded up from the source's seconds; as the end
+        // of eating's reference the printed Fajr could then stand up to 59 s after the authority's moment.
+        val archive = Files.createTempDirectory("gate-rounded").toFile()
+        try {
+            val lines = root.resolve("open/SG-MUIS/muis-2026-02-a.txt").readLines()
+            archive.resolve("archive").mkdirs()
+            archive.resolve("archive/rounded.txt").writeText(
+                (listOf("# Source seconds rounded up to the minute (starts, never early); sunrise rounded down (an end).") + lines).joinToString("\n"),
+            )
+            val gate = Gate(OfficialRoots(archive, root), PINNED)
+            val error = assertFailsWith<GateError> {
+                gate.evaluate(manifest("archive/rounded.txt\tsg.muis\t\t\tAsia/Singapore\tF+E S D A M I\tdaily\tstandard\ttest\t"))
+            }
+            assertTrue("t.tsv:2: archive/rounded.txt says its times were rounded up to the minute" in error.message!!, error.message)
+            assertTrue("(fajr+endOfEating)" in error.message!! && "ruling R149" in error.message!!, error.message)
+            // Its starts alone, or an end from a column of its own, are read.
+            assertEquals(1, gate.evaluate(manifest("archive/rounded.txt\tsg.muis\t\t\tAsia/Singapore\tF S D A M I\tdaily\tstandard\ttest\t")).checkedRows)
+            assertEquals(1, gate.evaluate(manifest("archive/rounded.txt\tsg.muis\t\t\tAsia/Singapore\tF E D A M I\tdaily\tstandard\ttest\t")).checkedRows)
+            // The words have to be the table's own, in a comment line: a line of times never carries them.
+            assertTrue(!Gate.roundedUp(lines) && Gate.roundedUp(listOf("# ... Rounded UP ...")) && !Gate.roundedUp(listOf("rounded up")))
+            // Other ways to say it are caught too; a minute's mere mention, or "rounded down", is not.
+            for (said in listOf("# seconds ceil'd to the minute", "# each start rounds it up", "# times taken to the next whole minute", "# rounding up the seconds")) {
+                assertTrue(Gate.roundedUp(listOf(said)), said)
+            }
+            for (said in listOf("# sunrise rounded down", "# printed to the minute", "# the next minute's table", "# around Uppsala")) {
+                assertTrue(!Gate.roundedUp(listOf(said)), said)
+            }
+        } finally {
+            archive.deleteRecursively()
+        }
     }
 
     @Test

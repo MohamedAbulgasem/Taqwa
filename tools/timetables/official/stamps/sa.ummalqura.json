@@ -7,6 +7,15 @@
   "first": "2024-01-01",
   "last": "2030-12-31",
   "checked": ["2024-01-01..2030-12-31"],
+  "checkedByEvent": {
+    "fajr": ["2024-01-01..2030-12-31"],
+    "sunrise": ["2024-01-01..2030-12-31"],
+    "dhuhr": ["2024-01-01..2030-12-31"],
+    "asrStandard": ["2024-01-01..2030-12-31"],
+    "maghrib": ["2024-01-01..2030-12-31"],
+    "isha": ["2024-01-01..2030-12-31"],
+    "endOfEating": ["2024-01-01..2030-12-31"]
+  },
   "placeDays": 2493800,
   "heldOutDays": 2487595,
   "ramadanDays": 201850,
@@ -318,6 +327,15 @@
       "name": "Abanat",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -445,6 +463,15 @@
       "name": "Abha",
       "placeDays": 1095,
       "checked": ["2025-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2025-01-01..2027-12-31"],
+        "sunrise": ["2025-01-01..2027-12-31"],
+        "dhuhr": ["2025-01-01..2027-12-31"],
+        "asrStandard": ["2025-01-01..2027-12-31"],
+        "maghrib": ["2025-01-01..2027-12-31"],
+        "isha": ["2025-01-01..2027-12-31"],
+        "endOfEating": ["2025-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -572,6 +599,15 @@
       "name": "Abqaiq",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -699,6 +735,15 @@
       "name": "Abu Arish",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -826,6 +871,15 @@
       "name": "Ad Dilam",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -953,6 +1007,15 @@
       "name": "Ad Diriyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -1080,6 +1143,15 @@
       "name": "Addayer",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -1207,6 +1279,15 @@
       "name": "Adham",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -1334,6 +1415,15 @@
       "name": "Afif",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -1461,6 +1551,15 @@
       "name": "Ahad Al Masarihah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -1588,6 +1687,15 @@
       "name": "Ahad Rafidah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -1715,6 +1823,15 @@
       "name": "Al Aflaj",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -1842,6 +1959,15 @@
       "name": "Al Ahsa",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -1969,6 +2095,15 @@
       "name": "Al Amwah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -2096,6 +2231,15 @@
       "name": "Al Aqiq",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -2223,6 +2367,15 @@
       "name": "Al Ardhiyat",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -2350,6 +2503,15 @@
       "name": "Al Aridhah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -2477,6 +2639,15 @@
       "name": "Al Bada",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -2604,6 +2775,15 @@
       "name": "Al Badayea",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -2731,6 +2911,15 @@
       "name": "Al Bahah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -2858,6 +3047,15 @@
       "name": "Al Bayda",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -2985,6 +3183,15 @@
       "name": "Al Birk",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -3112,6 +3319,15 @@
       "name": "Al Bukayriyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -3239,6 +3455,15 @@
       "name": "Al Busur",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -3366,6 +3591,15 @@
       "name": "Al Duwadimi",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -3493,6 +3727,15 @@
       "name": "Al Edabi",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -3620,6 +3863,15 @@
       "name": "Al Farshah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -3747,6 +3999,15 @@
       "name": "Al Ghat",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -3874,6 +4135,15 @@
       "name": "Al Ghazalah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -4001,6 +4271,15 @@
       "name": "Al Hait",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -4128,6 +4407,15 @@
       "name": "Al Hajrah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -4255,6 +4543,15 @@
       "name": "Al Harajah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -4382,6 +4679,15 @@
       "name": "Al Hariq",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -4509,6 +4815,15 @@
       "name": "Al Hayr",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -4636,6 +4951,15 @@
       "name": "Al Henakiyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -4763,6 +5087,15 @@
       "name": "Al Hofuf",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -4890,6 +5223,15 @@
       "name": "Al 'Is",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -5017,6 +5359,15 @@
       "name": "Al Jubail",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -5144,6 +5495,15 @@
       "name": "Al Jumum",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -5271,6 +5631,15 @@
       "name": "Al Kamil",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -5398,6 +5767,15 @@
       "name": "Al Kharj",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -5525,6 +5903,15 @@
       "name": "Al Kharkhir",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -5652,6 +6039,15 @@
       "name": "Al Khobar",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -5779,6 +6175,15 @@
       "name": "Al Khurma",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -5906,6 +6311,15 @@
       "name": "Al Lith",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -6033,6 +6447,15 @@
       "name": "Al Majmaah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -6160,6 +6583,15 @@
       "name": "Al Makhwah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -6287,6 +6719,15 @@
       "name": "Al Mithnab",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -6414,6 +6855,15 @@
       "name": "Al Mubarraz",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -6541,6 +6991,15 @@
       "name": "Al Muwayh",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -6668,6 +7127,15 @@
       "name": "Al Muzahimiyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -6795,6 +7263,15 @@
       "name": "Al Namas",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -6922,6 +7399,15 @@
       "name": "Al Qatif",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -7049,6 +7535,15 @@
       "name": "Al Qunfudhah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -7176,6 +7671,15 @@
       "name": "Al Qurayyat",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -7303,6 +7807,15 @@
       "name": "Al Quwaiiyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -7430,6 +7943,15 @@
       "name": "Al Quwarah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -7557,6 +8079,15 @@
       "name": "Al Reeth",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -7684,6 +8215,15 @@
       "name": "Al Udayd",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -7811,6 +8351,15 @@
       "name": "Al Ula",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -7938,6 +8487,15 @@
       "name": "Al 'Uwayqiliyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -8065,6 +8623,15 @@
       "name": "Al Uyaynah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -8192,6 +8759,15 @@
       "name": "Al Wajh",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -8319,6 +8895,15 @@
       "name": "Alasyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -8446,6 +9031,15 @@
       "name": "Aldarb",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -8573,6 +9167,15 @@
       "name": "Alharth",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -8700,6 +9303,15 @@
       "name": "Almajaridah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -8827,6 +9439,15 @@
       "name": "Almandaq",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -8954,6 +9575,15 @@
       "name": "Alqura",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -9081,6 +9711,15 @@
       "name": "An Nabhaniyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -9208,6 +9847,15 @@
       "name": "Ar Rass",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -9335,6 +9983,15 @@
       "name": "Ar Rayn",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -9462,6 +10119,15 @@
       "name": "Arar",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -9589,6 +10255,15 @@
       "name": "As Sulaymi",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -9716,6 +10391,15 @@
       "name": "As Sulayyil",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -9843,6 +10527,15 @@
       "name": "Ash Shamli",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -9970,6 +10663,15 @@
       "name": "Ash Shimasiyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -10097,6 +10799,15 @@
       "name": "Ash Shinan",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -10224,6 +10935,15 @@
       "name": "At Tuwal",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -10351,6 +11071,15 @@
       "name": "Az Zulfi",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -10478,6 +11207,15 @@
       "name": "Badr",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -10605,6 +11343,15 @@
       "name": "Badr Al Janoub",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -10732,6 +11479,15 @@
       "name": "Bahrah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -10859,6 +11615,15 @@
       "name": "Baish",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -10986,6 +11751,15 @@
       "name": "Baljurashi",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -11113,6 +11887,15 @@
       "name": "Bani Hasan",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -11240,6 +12023,15 @@
       "name": "Baqaa",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -11367,6 +12159,15 @@
       "name": "Bariq",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -11494,6 +12295,15 @@
       "name": "Belqarn",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -11621,6 +12431,15 @@
       "name": "Bishah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -11748,6 +12567,15 @@
       "name": "Buraydah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -11875,6 +12703,15 @@
       "name": "Damad",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -12002,6 +12839,15 @@
       "name": "Dammam",
       "placeDays": 1095,
       "checked": ["2025-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2025-01-01..2027-12-31"],
+        "sunrise": ["2025-01-01..2027-12-31"],
+        "dhuhr": ["2025-01-01..2027-12-31"],
+        "asrStandard": ["2025-01-01..2027-12-31"],
+        "maghrib": ["2025-01-01..2027-12-31"],
+        "isha": ["2025-01-01..2027-12-31"],
+        "endOfEating": ["2025-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -12129,6 +12975,15 @@
       "name": "Dariyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -12256,6 +13111,15 @@
       "name": "Dhahban",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -12383,6 +13247,15 @@
       "name": "Dhahran",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -12510,6 +13383,15 @@
       "name": "Dhahran Al Janub",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -12637,6 +13519,15 @@
       "name": "Dhurma",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -12764,6 +13655,15 @@
       "name": "Duba",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -12891,6 +13791,15 @@
       "name": "Dumah Al Jandal",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -13018,6 +13927,15 @@
       "name": "Farasan Island",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -13145,6 +14063,15 @@
       "name": "Fayfa",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -13272,6 +14199,15 @@
       "name": "Ghamid Az Zinad",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -13399,6 +14335,15 @@
       "name": "Hafar Al Batin",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -13526,6 +14471,15 @@
       "name": "Hail",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -13653,6 +14607,15 @@
       "name": "Haql",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -13780,6 +14743,15 @@
       "name": "Harub",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -13907,6 +14879,15 @@
       "name": "Hawtat Sudayr",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -14034,6 +15015,15 @@
       "name": "Howtat Bani Tamim",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -14161,6 +15151,15 @@
       "name": "Hubuna",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -14288,6 +15287,15 @@
       "name": "Huraymila",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -14415,6 +15423,15 @@
       "name": "Jalajil",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -14542,6 +15559,15 @@
       "name": "Jazan",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -14669,6 +15695,15 @@
       "name": "Jeddah",
       "placeDays": 1095,
       "checked": ["2025-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2025-01-01..2027-12-31"],
+        "sunrise": ["2025-01-01..2027-12-31"],
+        "dhuhr": ["2025-01-01..2027-12-31"],
+        "asrStandard": ["2025-01-01..2027-12-31"],
+        "maghrib": ["2025-01-01..2027-12-31"],
+        "isha": ["2025-01-01..2027-12-31"],
+        "endOfEating": ["2025-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -14796,6 +15831,15 @@
       "name": "Khafji",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -14923,6 +15967,15 @@
       "name": "Khamis Mushait",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -15050,6 +16103,15 @@
       "name": "Khaybar",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -15177,6 +16239,15 @@
       "name": "Khbash",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -15304,6 +16375,15 @@
       "name": "Khulais",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -15431,6 +16511,15 @@
       "name": "Layla",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -15558,6 +16647,15 @@
       "name": "Medina",
       "placeDays": 1095,
       "checked": ["2025-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2025-01-01..2027-12-31"],
+        "sunrise": ["2025-01-01..2027-12-31"],
+        "dhuhr": ["2025-01-01..2027-12-31"],
+        "asrStandard": ["2025-01-01..2027-12-31"],
+        "maghrib": ["2025-01-01..2027-12-31"],
+        "isha": ["2025-01-01..2027-12-31"],
+        "endOfEating": ["2025-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -15685,6 +16783,15 @@
       "name": "Mahd Al Thahab",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -15812,6 +16919,15 @@
       "name": "Mecca",
       "placeDays": 2557,
       "checked": ["2024-01-01..2030-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2024-01-01..2030-12-31"],
+        "sunrise": ["2024-01-01..2030-12-31"],
+        "dhuhr": ["2024-01-01..2030-12-31"],
+        "asrStandard": ["2024-01-01..2030-12-31"],
+        "maghrib": ["2024-01-01..2030-12-31"],
+        "isha": ["2024-01-01..2030-12-31"],
+        "endOfEating": ["2024-01-01..2030-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -15939,6 +17055,15 @@
       "name": "Malham",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -16066,6 +17191,15 @@
       "name": "Marat",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -16193,6 +17327,15 @@
       "name": "Mawqaq",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -16320,6 +17463,15 @@
       "name": "Maysan",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -16447,6 +17599,15 @@
       "name": "Muhayil",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -16574,6 +17735,15 @@
       "name": "Nairyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -16701,6 +17871,15 @@
       "name": "Najran",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -16828,6 +18007,15 @@
       "name": "Qaryat Al Ulya",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -16955,6 +18143,15 @@
       "name": "Qilwah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -17082,6 +18279,15 @@
       "name": "Rabigh",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -17209,6 +18415,15 @@
       "name": "Rafha",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -17336,6 +18551,15 @@
       "name": "Ranyah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -17463,6 +18687,15 @@
       "name": "Ras Tannurah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -17590,6 +18823,15 @@
       "name": "Ras Tanura",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -17717,6 +18959,15 @@
       "name": "Rawdat Sudayr",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -17844,6 +19095,15 @@
       "name": "Riyadh",
       "placeDays": 2557,
       "checked": ["2024-01-01..2030-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2024-01-01..2030-12-31"],
+        "sunrise": ["2024-01-01..2030-12-31"],
+        "dhuhr": ["2024-01-01..2030-12-31"],
+        "asrStandard": ["2024-01-01..2030-12-31"],
+        "maghrib": ["2024-01-01..2030-12-31"],
+        "isha": ["2024-01-01..2030-12-31"],
+        "endOfEating": ["2024-01-01..2030-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -17971,6 +19231,15 @@
       "name": "Riyadh Al Khabra",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -18098,6 +19367,15 @@
       "name": "Rojal",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -18225,6 +19503,15 @@
       "name": "Rumah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -18352,6 +19639,15 @@
       "name": "Sabya",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -18479,6 +19775,15 @@
       "name": "Sakaka",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -18606,6 +19911,15 @@
       "name": "Samtah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -18733,6 +20047,15 @@
       "name": "Sarat Abidah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -18860,6 +20183,15 @@
       "name": "Shagra",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -18987,6 +20319,15 @@
       "name": "Sharorah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -19114,6 +20455,15 @@
       "name": "Simira'",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -19241,6 +20591,15 @@
       "name": "Sudus",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -19368,6 +20727,15 @@
       "name": "Suwayr",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -19495,6 +20863,15 @@
       "name": "Tabuk",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -19622,6 +20999,15 @@
       "name": "Taif",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -19749,6 +21135,15 @@
       "name": "Tanumah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -19876,6 +21271,15 @@
       "name": "Tarib",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -20003,6 +21407,15 @@
       "name": "Tarut",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -20130,6 +21543,15 @@
       "name": "Tathleeth",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -20257,6 +21679,15 @@
       "name": "Tayma",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "unit tayma: 3 min": {
@@ -20380,6 +21811,15 @@
       "name": "Thadig",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -20507,6 +21947,15 @@
       "name": "Thar",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -20634,6 +22083,15 @@
       "name": "Thuwal",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -20761,6 +22219,15 @@
       "name": "Tubarjal",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -20888,6 +22355,15 @@
       "name": "Tumair",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -21015,6 +22491,15 @@
       "name": "Turaif",
       "placeDays": 2192,
       "checked": ["2024-01-01..2024-12-31", "2026-01-01..2030-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2024-01-01..2024-12-31", "2026-01-01..2030-12-31"],
+        "sunrise": ["2024-01-01..2024-12-31", "2026-01-01..2030-12-31"],
+        "dhuhr": ["2024-01-01..2024-12-31", "2026-01-01..2030-12-31"],
+        "asrStandard": ["2024-01-01..2024-12-31", "2026-01-01..2030-12-31"],
+        "maghrib": ["2024-01-01..2024-12-31", "2026-01-01..2030-12-31"],
+        "isha": ["2024-01-01..2024-12-31", "2026-01-01..2030-12-31"],
+        "endOfEating": ["2024-01-01..2024-12-31", "2026-01-01..2030-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min": {
@@ -21142,6 +22627,15 @@
       "name": "Turbah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -21269,6 +22763,15 @@
       "name": "Umluj",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -21396,6 +22899,15 @@
       "name": "Unayzah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -21523,6 +23035,15 @@
       "name": "Uqlat As Suqur",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -21650,6 +23171,15 @@
       "name": "Uyun Al Jawa",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -21777,6 +23307,15 @@
       "name": "Wadi ad-Dawasir",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -21904,6 +23443,15 @@
       "name": "Wadi Al Fara",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -22031,6 +23579,15 @@
       "name": "Yadamah",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {
@@ -22158,6 +23715,15 @@
       "name": "Yanbu",
       "placeDays": 730,
       "checked": ["2026-01-01..2027-12-31"],
+      "checkedByEvent": {
+        "fajr": ["2026-01-01..2027-12-31"],
+        "sunrise": ["2026-01-01..2027-12-31"],
+        "dhuhr": ["2026-01-01..2027-12-31"],
+        "asrStandard": ["2026-01-01..2027-12-31"],
+        "maghrib": ["2026-01-01..2027-12-31"],
+        "isha": ["2026-01-01..2027-12-31"],
+        "endOfEating": ["2026-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
         "entry sa.ummalqura: 2 min (asrStandard)": {

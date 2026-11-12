@@ -60,7 +60,7 @@ table and how to check the engine against it. The header names these columns, in
 | `lat`, `lon` | where the table applies; both empty for the unit's reference point or the method's fixed point |
 | `zone` | the place's civil IANA zone, the one the engine computes in |
 | `clock` | optional; the zone the table is printed in where it is not `zone` (ICC London in GMT all year): an IANA zone or a fixed offset such as `UTC+01:00` |
-| `columns` | each time column's meaning: `F` Fajr, `S` sunrise, `D` Dhuhr, `A` Asr in the row's school, `As`/`Ah` the Standard/Hanafi Asr, `M` Maghrib, `I` Isha, `E` the end of eating, `Im` imsak, `-` not checked; `F+E` for a column that is both |
+| `columns` | each time column's meaning: `F` Fajr, `S` sunrise, `D` Dhuhr, `A` Asr in the row's school, `As`/`Ah` the Standard/Hanafi Asr, `M` Maghrib, `I` Isha, `E` the end of eating, `Im` imsak, `-` not checked; `F+E` for a column that is both, which the gate refuses on a table whose `#` lines say its times were rounded up to the minute (the printed Fajr could then stand up to 59 s after the authority's moment: read the end from a floored column of its own, ruling R149) |
 | `format` | the reader: `daily` for the layout above; a new layout is one `object <Name>Format : OfficialFormat` in `tools/timetables/src/jvmMain/kotlin/world/taqwa/timetables/gate/formats/`, named here in kebab case (`twelve-hour` → `TwelveHourFormat`) |
 | `school` | the school of the `A` column: `standard`, `hanafi`, or `-` |
 | `split` | `fit` (margins are fitted on it) or `test` (held out) |
@@ -83,6 +83,27 @@ table is the one checked. Where no root is given and this folder holds no `archi
 the tests stop at once with a message saying how to restore it, except on CI (`CI` set), where every
 row is skipped and the gate checks "0 rows"; an explicit root that does not exist is skipped the same
 way. Where the root holds its archive, a table it does not hold, or one that yields no day, fails.
+
+## The sun-sanity pass
+
+What needs no table: every app city (`cities.csv`) under Automatic, every registry unit's point
+and every region rule's own point, and each timetable Settings offers (every Other method `other.*`
+included) at a spread sample of the app cities where it applies and Automatic follows another entry
+(40 cities an entry, 400 an Other method, at the default high-latitude setting), every day of a
+window (by default today through 13 months on) and both Asr schools, held to the real sun at the
+point (the exact sun, sea level, standard refraction, as the engine's own real sunset): no Dhuhr
+before transit, no Maghrib before sunset, no Fajr or end of eating after sunrise, no Isha at or
+before Maghrib. A breach the day itself accounts for (an authority time it declares it does not
+show, ruling R82; a time a high-latitude or clock rule set; a polar day) is excused, never a Dhuhr
+before transit; every other is a finding. Both are pinned, each with a ceiling on its worst
+seconds and on its points: `sun-sanity/open-findings.tsv` (committed) lists the known findings with
+the smallest margin raise that clears each and what the gate says after it, and
+`sun-sanity/excused.tsv` the excused groups. A group not listed, or one past a ceiling, fails.
+
+    ./gradlew -p tools/timetables sunSanity [-Pfrom=<today>] [-Pto=<13 months on>] [-PeveryCity=1]
+        [-PchosenPerEntry=40] [-PotherPerEntry=400] [-Pout=<file>]
+
+It needs no archive (`SunSanityTest` runs a sample of it in `jvmTest`).
 
 ## Surveys
 

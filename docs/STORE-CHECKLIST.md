@@ -407,7 +407,10 @@ costs days.
   inside the bundle.
 - **Prayer-time stamps**: `scripts/release.sh` and `scripts/ios-release.sh` both run
   `./gradlew -p tools/timetables checkStamps` first and refuse to build on a stale or red stamp
-  (spec §5, ruling R86).
+  (spec §5, ruling R86). The Ramadan build runs them as `TAQWA_RAMADAN=1448 scripts/release.sh`
+  (and `ios-release.sh`): they then also refuse an A/B timetable with a unit whose Fajr, end of eating
+  and Maghrib were not each checked on every day of Ramadan 1448 and a day each side (7 February to
+  10 March 2027), unless the gate has demoted it (rulings R146 and R148).
 - **Manifest**: `MY_PACKAGE_REPLACED` re-arms prayer alarms after every update; `USE_EXACT_ALARM`
   removed, `SCHEDULE_EXACT_ALARM` kept with an in-app route to "Alarms & reminders"; location and
   compass hardware optional; `localeConfig` lists the seven languages; backup opted out twice

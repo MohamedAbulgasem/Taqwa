@@ -173,6 +173,19 @@ class GateManifestTest {
     }
 
     @Test
+    fun `no committed row reads a dawat-e-islami month with the end of eating on its fajr column`() {
+        // Ruling R149 (E16): the archived months round their starts up from the source's seconds, so the gate refuses
+        // F+E on them when it reads the table (Gate.roundedUp); this holds the same without the archive, so that a
+        // hand-added month copied from the rows of before 18 Oct 2026 is caught in CI too.
+        val manifest = GateManifest.load(TestPaths.repoRoot.resolve("tools/timetables/official/gate"))
+        val rows = manifest.rows.filter { "/off-di-" in it.path }
+        assertTrue(rows.isNotEmpty(), "the Dawat-e-Islami rows")
+        val shared = rows.filter { row -> row.columns.any { Event.FAJR in it && Event.END_OF_EATING in it } }
+        assertEquals(emptyList(), shared.map { it.where }, "rows reading F+E on a rounded-up month")
+        assertTrue(rows.all { it.path.endsWith("-e.txt") }, rows.filter { !it.path.endsWith("-e.txt") }.map { it.where }.toString())
+    }
+
+    @Test
     fun `a group or entry that matches nothing fails`() {
         val manifest = GateManifest.load(TestPaths.repoRoot.resolve("tools/timetables/official/gate"))
         val group = assertFailsWith<GateError> { manifest.only(groups = setOf("sg-muis", "sg-mius")) }

@@ -363,14 +363,43 @@ tasks.register<JavaExec>("gate") {
 }
 
 /**
+ * The sun-sanity pass (engine survey of 11 Nov 2026): every app city, unit point and region point, and each Settings
+ * choice at a sample of the app cities where it applies, every day of the window, both Asr schools, held to the real
+ * sun at the point (no Dhuhr before transit, no Maghrib before sunset, no Fajr or end of eating after sunrise, no Isha
+ * at or before Maghrib). Needs no archive. Fails on a finding not listed in `official/sun-sanity/open-findings.tsv`, an
+ * excused group not listed in `official/sun-sanity/excused.tsv`, or a listed one past its ceilings.
+ *
+ *     ./gradlew -p tools/timetables sunSanity [-Pfrom=<yyyy-mm-dd, today>] [-Pto=<yyyy-mm-dd, 13 months on>] [-PeveryDays=1]
+ *         [-PeveryCity=1] [-PchosenPerEntry=40] [-PotherPerEntry=400] [-Pout=<report file>]
+ */
+tasks.register<JavaExec>("sunSanity") {
+    group = "verification"
+    description = "Holds every app city's and unit's days to the real sun (transit, sunrise, sunset)."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.sanity.SunSanityMainKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    maxHeapSize = "4g"
+    workingDir = repoRoot
+    val root = repoRoot.path
+    val options = listOf("from", "to", "everyDays", "everyCity", "chosenPerEntry", "otherPerEntry", "threads", "out").associateWith { providers.gradleProperty(it).orElse("") }
+    argumentProviders.add(CommandLineArgumentProvider {
+        val flags = mapOf("from" to "--from", "to" to "--to", "everyDays" to "--every-days", "everyCity" to "--every-city", "chosenPerEntry" to "--chosen-per-entry", "otherPerEntry" to "--other-per-entry", "threads" to "--threads", "out" to "--out")
+        listOf("--repo", root) + options.flatMap { (name, value) -> value.get().takeIf { it.isNotBlank() }?.let { listOf(flags.getValue(name), it) }.orEmpty() }
+    })
+}
+
+/**
  * Spec §5 / ruling R86: `release.sh` and `ios-release.sh` refuse to build on a stale or red stamp;
  * this is that check, run first by both. Fails, naming each entry, where a stamp is red (`broken` >
  * 0), stale (its `engineHash` no longer matches what the current engine core and methods give at the
  * manifest's own points), missing (the manifest has rows for an entry with no stamp file), or where
  * `ProofStamps.kt` no longer matches what `generateProofStamps` would write from the committed
- * stamps. Needs **no archive** — see `CheckStamps.kt`'s own comment for why that is enough.
+ * stamps. Needs **no archive** — see `CheckStamps.kt`'s own comment for why that is enough. For the
+ * Ramadan build (spec §5's Ramadan release rule, ruling R146) `-Pramadan=<Hijri year>` also fails on
+ * an A/B entry with a unit whose Fajr, end of eating and Maghrib were not each checked on every day of
+ * that tabular Ramadan (ruling R148); the release scripts pass it from `TAQWA_RAMADAN`.
  *
- *     ./gradlew -p tools/timetables checkStamps
+ *     ./gradlew -p tools/timetables checkStamps [-Pramadan=1448]
  */
 /**
  * The weekly monitor's check half (spec §5, brief P; `scripts/monitor.sh` runs it after the fetchers):
@@ -456,10 +485,15 @@ tasks.register<JavaExec>("prove") {
 
 tasks.register<JavaExec>("checkStamps") {
     group = "verification"
-    description = "Fails on a stale or red stamp, a missing one, or a stale ProofStamps.kt (spec §5). Needs no archive."
+    description = "Fails on a stale or red stamp, a missing one, or a stale ProofStamps.kt (spec §5); with -Pramadan=<Hijri year>, " +
+        "on an A/B unit whose Fajr, end of eating and Maghrib were not each checked on every day of that Ramadan. Needs no archive."
     classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
     mainClass.set("world.taqwa.timetables.gate.CheckStampsKt")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
     workingDir = repoRoot
-    argumentProviders.add(CommandLineArgumentProvider { listOf("--repo", repoRoot.path) })
+    val ramadan = providers.gradleProperty("ramadan").orElse("")
+    val root = repoRoot.path
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", root) + (if (ramadan.get().isNotBlank()) listOf("--ramadan", ramadan.get()) else emptyList())
+    })
 }
