@@ -4,26 +4,26 @@
   "engineHash": "451c52f3e8b9a0c1",
   "broken": 0,
   "places": 34,
-  "first": "2026-09-25",
+  "first": "2026-01-01",
   "last": "2027-12-31",
-  "checked": ["2026-09-25..2026-11-30", "2027-01-01..2027-12-31"],
-  "placeDays": 14153,
-  "heldOutDays": 11777,
-  "ramadanDays": 986,
+  "checked": ["2026-01-01..2027-12-31"],
+  "placeDays": 14908,
+  "heldOutDays": 12532,
+  "ramadanDays": 1046,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 60004,
+      "checked": 61924,
       "early": 0,
       "late": {
-        "0": 27209,
-        "1": 17926,
-        "2": 6185,
-        "3+": 8684
+        "0": 28313,
+        "1": 18674,
+        "2": 6240,
+        "3+": 8697
       },
-      "exactShare": 0.4535,
+      "exactShare": 0.4572,
       "worstLate": 7,
       "lateLimit": 7,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.gent, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -32,75 +32,75 @@
       "declaredDates": ["2027-05-28..2027-07-15"]
     },
     "sunrise": {
-      "checked": 60112,
+      "checked": 62032,
       "lateEnd": 0,
       "late": {
-        "0": 38414,
-        "1": 20538,
+        "0": 39802,
+        "1": 21070,
         "2": 33,
         "3+": 1127
       },
-      "exactShare": 0.639,
+      "exactShare": 0.6416,
       "worstLate": 129,
       "lateLimit": 129,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 60112,
+      "checked": 62032,
       "early": 0,
       "late": {
-        "0": 43894,
-        "1": 16218,
+        "0": 45173,
+        "1": 16859,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7302,
+      "exactShare": 0.7282,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 60112,
+      "checked": 62032,
       "early": 0,
       "late": {
-        "0": 43168,
-        "1": 16944,
+        "0": 44444,
+        "1": 17588,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.7181,
+      "exactShare": 0.7165,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 60112,
+      "checked": 62032,
       "early": 0,
       "late": {
-        "0": 45501,
-        "1": 13937,
+        "0": 46857,
+        "1": 14501,
         "2": 15,
         "3+": 659
       },
-      "exactShare": 0.7569,
+      "exactShare": 0.7554,
       "worstLate": 126,
       "lateLimit": 126,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea",
       "overLimit": 0
     },
     "isha": {
-      "checked": 60011,
+      "checked": 61931,
       "early": 0,
       "late": {
-        "0": 27859,
-        "1": 19611,
-        "2": 6075,
-        "3+": 6466
+        "0": 28874,
+        "1": 20473,
+        "2": 6116,
+        "3+": 6468
       },
-      "exactShare": 0.4642,
+      "exactShare": 0.4662,
       "worstLate": 7,
       "lateLimit": 7,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -109,15 +109,15 @@
       "declaredDates": ["2027-05-31..2027-07-14"]
     },
     "endOfEating": {
-      "checked": 60112,
+      "checked": 62032,
       "lateEnd": 0,
       "late": {
-        "0": 25445,
-        "1": 20378,
-        "2": 5602,
-        "3+": 8687
+        "0": 26697,
+        "1": 20984,
+        "2": 5655,
+        "3+": 8696
       },
-      "exactShare": 0.4233,
+      "exactShare": 0.4304,
       "worstLate": 70,
       "lateLimit": 70,
       "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.gent, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -125,19 +125,19 @@
     }
   },
   "heldOut": {
-    "placeDays": 11777,
-    "ramadanDays": 812,
+    "placeDays": 12532,
+    "ramadanDays": 872,
     "events": {
       "fajr": {
-        "checked": 57628,
+        "checked": 59548,
         "early": 0,
         "late": {
-          "0": 26169,
-          "1": 17123,
-          "2": 5914,
-          "3+": 8422
+          "0": 27273,
+          "1": 17871,
+          "2": 5969,
+          "3+": 8435
         },
-        "exactShare": 0.4541,
+        "exactShare": 0.458,
         "worstLate": 7,
         "lateLimit": 7,
         "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.gent, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -146,75 +146,75 @@
         "declaredDates": ["2027-05-28..2027-07-15"]
       },
       "sunrise": {
-        "checked": 57736,
+        "checked": 59656,
         "lateEnd": 0,
         "late": {
-          "0": 36873,
-          "1": 19704,
+          "0": 38261,
+          "1": 20236,
           "2": 32,
           "3+": 1127
         },
-        "exactShare": 0.6386,
+        "exactShare": 0.6414,
         "worstLate": 129,
         "lateLimit": 129,
         "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 57736,
+        "checked": 59656,
         "early": 0,
         "late": {
-          "0": 42107,
-          "1": 15629,
+          "0": 43386,
+          "1": 16270,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.7293,
+        "exactShare": 0.7273,
         "worstLate": 1,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 57736,
+        "checked": 59656,
         "early": 0,
         "late": {
-          "0": 41420,
-          "1": 16316,
+          "0": 42696,
+          "1": 16960,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.7174,
+        "exactShare": 0.7157,
         "worstLate": 1,
         "lateLimit": 3,
         "lateLimitFrom": "class D (authority)",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 57736,
+        "checked": 59656,
         "early": 0,
         "late": {
-          "0": 43604,
-          "1": 13458,
+          "0": 44960,
+          "1": 14022,
           "2": 15,
           "3+": 659
         },
-        "exactShare": 0.7552,
+        "exactShare": 0.7537,
         "worstLate": 126,
         "lateLimit": 126,
         "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea",
         "overLimit": 0
       },
       "isha": {
-        "checked": 57635,
+        "checked": 59555,
         "early": 0,
         "late": {
-          "0": 26656,
-          "1": 18819,
-          "2": 5856,
-          "3+": 6304
+          "0": 27671,
+          "1": 19681,
+          "2": 5897,
+          "3+": 6306
         },
-        "exactShare": 0.4625,
+        "exactShare": 0.4646,
         "worstLate": 7,
         "lateLimit": 7,
         "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -223,15 +223,15 @@
         "declaredDates": ["2027-05-31..2027-07-14"]
       },
       "endOfEating": {
-        "checked": 57736,
+        "checked": 59656,
         "lateEnd": 0,
         "late": {
-          "0": 24349,
-          "1": 19536,
-          "2": 5397,
-          "3+": 8454
+          "0": 25601,
+          "1": 20142,
+          "2": 5450,
+          "3+": 8463
         },
-        "exactShare": 0.4217,
+        "exactShare": 0.4291,
         "worstLate": 70,
         "lateLimit": 70,
         "lateLimitFrom": "class D (authority), unit tr.diyanet.europe.aalborg, unit tr.diyanet.europe.aarhus, unit tr.diyanet.europe.amsterdam, unit tr.diyanet.europe.antwerpen, unit tr.diyanet.europe.bergen, unit tr.diyanet.europe.berlin, unit tr.diyanet.europe.brussels, unit tr.diyanet.europe.copenhagen, unit tr.diyanet.europe.gent, unit tr.diyanet.europe.goteborg, unit tr.diyanet.europe.helsinki, unit tr.diyanet.europe.kristiansand, unit tr.diyanet.europe.lille, unit tr.diyanet.europe.london, unit tr.diyanet.europe.lulea, unit tr.diyanet.europe.malmo, unit tr.diyanet.europe.oslo, unit tr.diyanet.europe.oulu, unit tr.diyanet.europe.stavanger, unit tr.diyanet.europe.stockholm, unit tr.diyanet.europe.sundsvall, unit tr.diyanet.europe.tampere, unit tr.diyanet.europe.trondheim, unit tr.diyanet.europe.turku, unit tr.diyanet.europe.umea, unit tr.diyanet.europe.uppsala",
@@ -1021,8 +1021,8 @@
     },
     "tr.diyanet.europe.antwerpen": {
       "name": "Antwerpen",
-      "placeDays": 428,
-      "checked": ["2026-09-29..2026-11-30", "2027-01-01..2027-12-31"],
+      "placeDays": 459,
+      "checked": ["2026-09-29..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -1043,105 +1043,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1101,
-            "1": 836,
+            "0": 1166,
+            "1": 863,
             "2": 318,
             "3+": 216
           },
-          "exactShare": 0.4456,
+          "exactShare": 0.4549,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.antwerpen",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 2471,
+          "checked": 2563,
           "lateEnd": 0,
           "late": {
-            "0": 1620,
-            "1": 851,
+            "0": 1681,
+            "1": 882,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6556,
+          "exactShare": 0.6559,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1825,
-            "1": 646,
+            "0": 1892,
+            "1": 671,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7386,
+          "exactShare": 0.7382,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1763,
-            "1": 708,
+            "0": 1825,
+            "1": 738,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7135,
+          "exactShare": 0.7121,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1886,
-            "1": 585,
+            "0": 1955,
+            "1": 608,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7633,
+          "exactShare": 0.7628,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1158,
-            "1": 869,
+            "0": 1218,
+            "1": 901,
             "2": 312,
             "3+": 132
           },
-          "exactShare": 0.4686,
+          "exactShare": 0.4752,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.antwerpen",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 2471,
+          "checked": 2563,
           "lateEnd": 0,
           "late": {
-            "0": 1114,
-            "1": 835,
+            "0": 1168,
+            "1": 873,
             "2": 306,
             "3+": 216
           },
-          "exactShare": 0.4508,
+          "exactShare": 0.4557,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.antwerpen",
@@ -1419,8 +1419,8 @@
     },
     "tr.diyanet.europe.brussels": {
       "name": "Brussels",
-      "placeDays": 432,
-      "checked": ["2026-09-25..2026-11-30", "2027-01-01..2027-12-31"],
+      "placeDays": 463,
+      "checked": ["2026-09-25..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -1441,105 +1441,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1336,
-            "1": 929,
+            "0": 1394,
+            "1": 963,
             "2": 357,
             "3+": 245
           },
-          "exactShare": 0.466,
+          "exactShare": 0.4711,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.brussels",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 2867,
+          "checked": 2959,
           "lateEnd": 0,
           "late": {
-            "0": 1988,
-            "1": 879,
+            "0": 2053,
+            "1": 906,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6934,
+          "exactShare": 0.6938,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 2042,
-            "1": 825,
+            "0": 2102,
+            "1": 857,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7122,
+          "exactShare": 0.7104,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1951,
-            "1": 916,
+            "0": 2019,
+            "1": 940,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6805,
+          "exactShare": 0.6823,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1984,
-            "1": 883,
+            "0": 2056,
+            "1": 903,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.692,
+          "exactShare": 0.6948,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1270,
-            "1": 1086,
+            "0": 1331,
+            "1": 1117,
             "2": 364,
             "3+": 147
           },
-          "exactShare": 0.443,
+          "exactShare": 0.4498,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.brussels",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 2867,
+          "checked": 2959,
           "lateEnd": 0,
           "late": {
-            "0": 1279,
-            "1": 979,
+            "0": 1340,
+            "1": 1010,
             "2": 357,
             "3+": 252
           },
-          "exactShare": 0.4461,
+          "exactShare": 0.4529,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.brussels",
@@ -1797,8 +1797,8 @@
     },
     "tr.diyanet.europe.gent": {
       "name": "Gent",
-      "placeDays": 428,
-      "checked": ["2026-09-29..2026-11-30", "2027-01-01..2027-12-31"],
+      "placeDays": 459,
+      "checked": ["2026-09-29..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -1815,105 +1815,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1122,
-            "1": 821,
+            "0": 1179,
+            "1": 856,
             "2": 318,
             "3+": 210
           },
-          "exactShare": 0.4541,
+          "exactShare": 0.46,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.gent",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 2471,
+          "checked": 2563,
           "lateEnd": 0,
           "late": {
-            "0": 1780,
-            "1": 691,
+            "0": 1844,
+            "1": 719,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7204,
+          "exactShare": 0.7195,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1697,
-            "1": 774,
+            "0": 1761,
+            "1": 802,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6868,
+          "exactShare": 0.6871,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1692,
-            "1": 779,
+            "0": 1762,
+            "1": 801,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6847,
+          "exactShare": 0.6875,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1737,
-            "1": 734,
+            "0": 1808,
+            "1": 755,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.703,
+          "exactShare": 0.7054,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 2471,
+          "checked": 2563,
           "early": 0,
           "late": {
-            "0": 1097,
-            "1": 924,
+            "0": 1155,
+            "1": 958,
             "2": 306,
             "3+": 144
           },
-          "exactShare": 0.4439,
+          "exactShare": 0.4506,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 2471,
+          "checked": 2563,
           "lateEnd": 0,
           "late": {
-            "0": 1113,
-            "1": 836,
+            "0": 1173,
+            "1": 868,
             "2": 318,
             "3+": 204
           },
-          "exactShare": 0.4504,
+          "exactShare": 0.4577,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.gent",
@@ -2719,8 +2719,8 @@
     },
     "tr.diyanet.europe.lyon": {
       "name": "Lyon",
-      "placeDays": 428,
-      "checked": ["2026-09-29..2026-11-30", "2027-01-01..2027-12-31"],
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -2729,105 +2729,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 2471,
+          "checked": 3201,
           "early": 0,
           "late": {
-            "0": 1545,
-            "1": 740,
-            "2": 144,
-            "3+": 42
+            "0": 1996,
+            "1": 951,
+            "2": 199,
+            "3+": 55
           },
-          "exactShare": 0.6253,
+          "exactShare": 0.6236,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 2471,
+          "checked": 3201,
           "lateEnd": 0,
           "late": {
-            "0": 1506,
-            "1": 965,
+            "0": 1959,
+            "1": 1242,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6095,
+          "exactShare": 0.612,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 2471,
+          "checked": 3201,
           "early": 0,
           "late": {
-            "0": 1843,
-            "1": 628,
+            "0": 2398,
+            "1": 803,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7459,
+          "exactShare": 0.7491,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 2471,
+          "checked": 3201,
           "early": 0,
           "late": {
-            "0": 1872,
-            "1": 599,
+            "0": 2440,
+            "1": 761,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7576,
+          "exactShare": 0.7623,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 2471,
+          "checked": 3201,
           "early": 0,
           "late": {
-            "0": 1926,
-            "1": 545,
+            "0": 2496,
+            "1": 705,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7794,
+          "exactShare": 0.7798,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 2471,
+          "checked": 3201,
           "early": 0,
           "late": {
-            "0": 1348,
-            "1": 1009,
-            "2": 114,
-            "3+": 0
+            "0": 1722,
+            "1": 1322,
+            "2": 155,
+            "3+": 2
           },
-          "exactShare": 0.5455,
-          "worstLate": 2,
+          "exactShare": 0.538,
+          "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 2471,
+          "checked": 3201,
           "lateEnd": 0,
           "late": {
-            "0": 1104,
-            "1": 1169,
-            "2": 162,
-            "3+": 36
+            "0": 1421,
+            "1": 1520,
+            "2": 215,
+            "3+": 45
           },
-          "exactShare": 0.4468,
+          "exactShare": 0.4439,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -3085,8 +3085,8 @@
     },
     "tr.diyanet.europe.oslo": {
       "name": "Oslo",
-      "placeDays": 432,
-      "checked": ["2026-09-25..2026-11-30", "2027-01-01..2027-12-31"],
+      "placeDays": 463,
+      "checked": ["2026-09-25..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -3111,105 +3111,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1005,
-            "1": 749,
+            "0": 1055,
+            "1": 791,
             "2": 315,
             "3+": 798
           },
-          "exactShare": 0.3505,
+          "exactShare": 0.3565,
           "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "unit tr.diyanet.europe.oslo",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 2867,
+          "checked": 2959,
           "lateEnd": 0,
           "late": {
-            "0": 1928,
-            "1": 785,
+            "0": 1998,
+            "1": 807,
             "2": 7,
             "3+": 147
           },
-          "exactShare": 0.6725,
+          "exactShare": 0.6752,
           "worstLate": 8,
           "lateLimit": 8,
           "lateLimitFrom": "unit tr.diyanet.europe.oslo",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1841,
-            "1": 1026,
+            "0": 1899,
+            "1": 1060,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6421,
+          "exactShare": 0.6418,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1809,
-            "1": 1058,
+            "0": 1868,
+            "1": 1091,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.631,
+          "exactShare": 0.6313,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1944,
-            "1": 923,
+            "0": 2013,
+            "1": 946,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6781,
+          "exactShare": 0.6803,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1004,
-            "1": 876,
+            "0": 1057,
+            "1": 915,
             "2": 357,
             "3+": 630
           },
-          "exactShare": 0.3502,
+          "exactShare": 0.3572,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit tr.diyanet.europe.oslo",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 2867,
+          "checked": 2959,
           "lateEnd": 0,
           "late": {
-            "0": 1138,
-            "1": 623,
+            "0": 1202,
+            "1": 651,
             "2": 280,
             "3+": 826
           },
-          "exactShare": 0.3969,
+          "exactShare": 0.4062,
           "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "unit tr.diyanet.europe.oslo",
@@ -3361,8 +3361,8 @@
     },
     "tr.diyanet.europe.paris": {
       "name": "Paris",
-      "placeDays": 432,
-      "checked": ["2026-09-25..2026-11-30", "2027-01-01..2027-12-31"],
+      "placeDays": 463,
+      "checked": ["2026-09-25..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -3371,105 +3371,105 @@
       },
       "events": {
         "fajr": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1437,
-            "1": 912,
+            "0": 1493,
+            "1": 948,
             "2": 315,
             "3+": 203
           },
-          "exactShare": 0.5012,
+          "exactShare": 0.5046,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 2867,
+          "checked": 2959,
           "lateEnd": 0,
           "late": {
-            "0": 1805,
-            "1": 1062,
+            "0": 1860,
+            "1": 1099,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.6296,
+          "exactShare": 0.6286,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 2153,
-            "1": 714,
+            "0": 2216,
+            "1": 743,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.751,
+          "exactShare": 0.7489,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 2031,
-            "1": 836,
+            "0": 2093,
+            "1": 866,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7084,
+          "exactShare": 0.7073,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 2254,
-            "1": 613,
+            "0": 2330,
+            "1": 629,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.7862,
+          "exactShare": 0.7874,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "isha": {
-          "checked": 2867,
+          "checked": 2959,
           "early": 0,
           "late": {
-            "0": 1341,
-            "1": 1092,
+            "0": 1396,
+            "1": 1129,
             "2": 294,
             "3+": 140
           },
-          "exactShare": 0.4677,
+          "exactShare": 0.4718,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 2867,
+          "checked": 2959,
           "lateEnd": 0,
           "late": {
-            "0": 1290,
-            "1": 1073,
+            "0": 1352,
+            "1": 1103,
             "2": 294,
             "3+": 210
           },
-          "exactShare": 0.4499,
+          "exactShare": 0.4569,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
@@ -3479,8 +3479,8 @@
     },
     "tr.diyanet.europe.sarajevo": {
       "name": "Sarajevo",
-      "placeDays": 432,
-      "checked": ["2026-09-25..2026-11-30", "2027-01-01..2027-12-31"],
+      "placeDays": 730,
+      "checked": ["2026-01-01..2027-12-31"],
       "broken": 0,
       "lateLimits": {
         "class D (authority): 3 min": {
@@ -3489,71 +3489,71 @@
       },
       "events": {
         "fajr": {
-          "checked": 2867,
+          "checked": 3597,
           "early": 0,
           "late": {
-            "0": 1534,
-            "1": 1333,
+            "0": 1901,
+            "1": 1696,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5351,
+          "exactShare": 0.5285,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 2867,
+          "checked": 3597,
           "lateEnd": 0,
           "late": {
-            "0": 2413,
-            "1": 454,
+            "0": 3033,
+            "1": 564,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8416,
+          "exactShare": 0.8432,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 2867,
+          "checked": 3597,
           "early": 0,
           "late": {
-            "0": 1611,
-            "1": 1256,
+            "0": 2023,
+            "1": 1574,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5619,
+          "exactShare": 0.5624,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 2867,
+          "checked": 3597,
           "early": 0,
           "late": {
-            "0": 1522,
-            "1": 1345,
+            "0": 1909,
+            "1": 1688,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.5309,
+          "exactShare": 0.5307,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 2867,
+          "checked": 3597,
           "early": 0,
           "late": {
-            "0": 1685,
-            "1": 1182,
+            "0": 2114,
+            "1": 1483,
             "2": 0,
             "3+": 0
           },
@@ -3564,30 +3564,30 @@
           "overLimit": 0
         },
         "isha": {
-          "checked": 2867,
+          "checked": 3597,
           "early": 0,
           "late": {
-            "0": 1348,
-            "1": 1519,
+            "0": 1702,
+            "1": 1895,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.4702,
+          "exactShare": 0.4732,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 2867,
+          "checked": 3597,
           "lateEnd": 0,
           "late": {
-            "0": 2441,
-            "1": 426,
+            "0": 3075,
+            "1": 522,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8514,
+          "exactShare": 0.8549,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",

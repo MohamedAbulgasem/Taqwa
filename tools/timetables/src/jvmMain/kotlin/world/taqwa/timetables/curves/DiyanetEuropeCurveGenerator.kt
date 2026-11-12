@@ -34,8 +34,8 @@ import kotlin.system.exitProcess
 /**
  * Writes `DiyanetEuropeCurves.kt` (rulings R39, R42, R44): for each of Diyanet's European city
  * tables north of 44.5°, the per-slot depressions of its Fajr, Isha and end of eating, derived from
- * every held row of that city (the research captures and the monitor's) under the method's own
- * daily sun at the city's point.
+ * the rows [DIYANET_EUROPE_CITIES] names for that city (the research captures and the pinned capture
+ * of 28 September, [PINNED]) under the method's own daily sun at the city's point.
  *
  *     ./gradlew -p tools/timetables generateDiyanetEuropeCurves [-Pofficial=<dir>] [-Pout=<file>]
  *
@@ -277,140 +277,149 @@ object DiyanetEuropeCurveGenerator {
 }
 
 /**
+ * The monitor's capture of 28 September 2026, pinned on 2 October: the rows the curves were derived from. The
+ * monitor's own files (archive/tables/monitor/tr-diyanet-europe/) keep every row ever fetched, and since 9 November
+ * 2026 they also hold the whole of 2026 in an edition Diyanet has since replaced, so the curves and their tests read
+ * this copy, which nothing rewrites. Diyanet's later captures are pinned beside it (2 October on) and checked by the
+ * gate's own rows; the curves take them in only when they are regenerated on purpose.
+ */
+private const val PINNED = "archive/tables/pinned/tr-diyanet-europe/2026-09-28"
+
+/**
  * Diyanet's European city tables north of 44.5°, south to north, with the archive tables each is
- * held in (the research captures of September 2026 and the monitor's of 28 September, restricted;
- * the seven cities the monitor round added, Lyon to Trondheim, are held in the monitor's capture,
- * Copenhagen in the research's too). Sarajevo, south of 44.5°, follows the plain method and has no
- * curve. The points are the units' (Diyanet.europeUnits).
+ * held in (the research captures of September 2026 and the monitor's of 28 September, pinned,
+ * restricted; the seven cities the monitor round added, Lyon to Trondheim, are held in the monitor's
+ * capture, Copenhagen in the research's too). Sarajevo, south of 44.5°, follows the plain method and
+ * has no curve. The points are the units' (Diyanet.europeUnits).
  */
 val DIYANET_EUROPE_CITIES: List<DiyanetEuropeCurveGenerator.City> = listOf(
     DiyanetEuropeCurveGenerator.City(
         "lyon", "Lyon", GeoPoint(45.764, 4.8357), "Europe/Paris",
-        listOf("archive/tables/monitor/tr-diyanet-europe/lyon.txt"),
+        listOf("$PINNED/lyon.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "zurich", "Zürich", GeoPoint(47.36667, 8.55), "Europe/Zurich",
-        listOf("archive/tables/moral-auth-world/europe/verify/dy-zurich.txt", "archive/tables/monitor/tr-diyanet-europe/zurich.txt"),
+        listOf("archive/tables/moral-auth-world/europe/verify/dy-zurich.txt", "$PINNED/zurich.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "freiburg", "Freiburg", GeoPoint(47.9959, 7.85222), "Europe/Berlin",
-        listOf("archive/tables/moral-auth-world/europe/dy-freiburg.txt", "archive/tables/monitor/tr-diyanet-europe/freiburg.txt"),
+        listOf("archive/tables/moral-auth-world/europe/dy-freiburg.txt", "$PINNED/freiburg.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "munich", "München", GeoPoint(48.13743, 11.57549), "Europe/Berlin",
-        listOf("archive/tables/moral-auth-world/europe/dy-munich.txt", "archive/tables/monitor/tr-diyanet-europe/munich.txt"),
+        listOf("archive/tables/moral-auth-world/europe/dy-munich.txt", "$PINNED/munich.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "wien", "Wien", GeoPoint(48.20849, 16.37208), "Europe/Vienna",
-        listOf("archive/tables/moral-auth-world/europe/verify/dy-wien.txt", "archive/tables/monitor/tr-diyanet-europe/wien.txt"),
+        listOf("archive/tables/moral-auth-world/europe/verify/dy-wien.txt", "$PINNED/wien.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "paris", "Paris", GeoPoint(48.85341, 2.3488), "Europe/Paris",
-        listOf("archive/tables/moral-auth-world/europe/dy-paris.txt", "archive/tables/monitor/tr-diyanet-europe/paris.txt"),
+        listOf("archive/tables/moral-auth-world/europe/dy-paris.txt", "$PINNED/paris.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "lille", "Lille", GeoPoint(50.6292, 3.0573), "Europe/Paris",
-        listOf("archive/tables/monitor/tr-diyanet-europe/lille.txt"),
+        listOf("$PINNED/lille.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "brussels", "Brussels", GeoPoint(50.85045, 4.34878), "Europe/Brussels",
-        listOf("archive/tables/moral-auth-world/europe/dy-brussels.txt", "archive/tables/monitor/tr-diyanet-europe/brussels.txt"),
+        listOf("archive/tables/moral-auth-world/europe/dy-brussels.txt", "$PINNED/brussels.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "gent", "Gent", GeoPoint(51.0543, 3.7174), "Europe/Brussels",
-        listOf("archive/tables/monitor/tr-diyanet-europe/gent.txt"),
+        listOf("$PINNED/gent.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "antwerpen", "Antwerpen", GeoPoint(51.2194, 4.4025), "Europe/Brussels",
-        listOf("archive/tables/monitor/tr-diyanet-europe/antwerpen.txt"),
+        listOf("$PINNED/antwerpen.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "london", "London", GeoPoint(51.5074, -0.1278), "Europe/London",
-        listOf("archive/tables/moral-auth-world/europe/dy-london.txt", "archive/tables/monitor/tr-diyanet-europe/london.txt"),
+        listOf("archive/tables/moral-auth-world/europe/dy-london.txt", "$PINNED/london.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "amsterdam", "Amsterdam", GeoPoint(52.37403, 4.88969), "Europe/Amsterdam",
-        listOf("archive/tables/moral-auth-world/europe/dy-amsterdam.txt", "archive/tables/monitor/tr-diyanet-europe/amsterdam.txt"),
+        listOf("archive/tables/moral-auth-world/europe/dy-amsterdam.txt", "$PINNED/amsterdam.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "berlin", "Berlin", GeoPoint(52.52437, 13.41053), "Europe/Berlin",
-        listOf("archive/tables/moral-auth-world/europe/dy-berlin.txt", "archive/tables/monitor/tr-diyanet-europe/berlin.txt"),
+        listOf("archive/tables/moral-auth-world/europe/dy-berlin.txt", "$PINNED/berlin.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "malmo", "Malmö", GeoPoint(55.60587, 13.00073), "Europe/Stockholm",
-        listOf("archive/tables/monitor/tr-diyanet-europe/malmo.txt"),
+        listOf("$PINNED/malmo.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "copenhagen", "Copenhagen", GeoPoint(55.6761, 12.5683), "Europe/Copenhagen",
-        listOf("archive/tables/moral-auth-world/europe/verify/dy-cph.txt", "archive/tables/monitor/tr-diyanet-europe/copenhagen.txt"),
+        listOf("archive/tables/moral-auth-world/europe/verify/dy-cph.txt", "$PINNED/copenhagen.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "aarhus", "Aarhus", GeoPoint(56.15674, 10.21076), "Europe/Copenhagen",
-        listOf("archive/tables/monitor/tr-diyanet-europe/aarhus.txt"),
+        listOf("$PINNED/aarhus.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "aalborg", "Aalborg", GeoPoint(57.048, 9.9187), "Europe/Copenhagen",
-        listOf("archive/tables/monitor/tr-diyanet-europe/aalborg.txt"),
+        listOf("$PINNED/aalborg.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "goteborg", "Göteborg", GeoPoint(57.70716, 11.96679), "Europe/Stockholm",
-        listOf("archive/tables/monitor/tr-diyanet-europe/goteborg.txt"),
+        listOf("$PINNED/goteborg.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "kristiansand", "Kristiansand", GeoPoint(58.14671, 7.9956), "Europe/Oslo",
-        listOf("archive/tables/monitor/tr-diyanet-europe/kristiansand.txt"),
+        listOf("$PINNED/kristiansand.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "stavanger", "Stavanger", GeoPoint(58.97005, 5.73332), "Europe/Oslo",
-        listOf("archive/tables/monitor/tr-diyanet-europe/stavanger.txt"),
+        listOf("$PINNED/stavanger.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "stockholm", "Stockholm", GeoPoint(59.32938, 18.06871), "Europe/Stockholm",
-        listOf("archive/tables/moral-auth-world/europe/verify/dy-stockholm.txt", "archive/tables/monitor/tr-diyanet-europe/stockholm.txt"),
+        listOf("archive/tables/moral-auth-world/europe/verify/dy-stockholm.txt", "$PINNED/stockholm.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "uppsala", "Uppsala", GeoPoint(59.85882, 17.63889), "Europe/Stockholm",
-        listOf("archive/tables/monitor/tr-diyanet-europe/uppsala.txt"),
+        listOf("$PINNED/uppsala.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "oslo", "Oslo", GeoPoint(59.91273, 10.74609), "Europe/Oslo",
-        listOf("archive/tables/moral-auth-world/europe/verify/dy-oslo.txt", "archive/tables/monitor/tr-diyanet-europe/oslo.txt"),
+        listOf("archive/tables/moral-auth-world/europe/verify/dy-oslo.txt", "$PINNED/oslo.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "helsinki", "Helsinki", GeoPoint(60.1699, 24.9384), "Europe/Helsinki",
-        listOf("archive/tables/monitor/tr-diyanet-europe/helsinki.txt"),
+        listOf("$PINNED/helsinki.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "bergen", "Bergen", GeoPoint(60.39299, 5.32415), "Europe/Oslo",
-        listOf("archive/tables/monitor/tr-diyanet-europe/bergen.txt"),
+        listOf("$PINNED/bergen.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "turku", "Turku", GeoPoint(60.45148, 22.26869), "Europe/Helsinki",
-        listOf("archive/tables/monitor/tr-diyanet-europe/turku.txt"),
+        listOf("$PINNED/turku.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "tampere", "Tampere", GeoPoint(61.49911, 23.78712), "Europe/Helsinki",
-        listOf("archive/tables/monitor/tr-diyanet-europe/tampere.txt"),
+        listOf("$PINNED/tampere.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "sundsvall", "Sundsvall", GeoPoint(62.39129, 17.3063), "Europe/Stockholm",
-        listOf("archive/tables/monitor/tr-diyanet-europe/sundsvall.txt"),
+        listOf("$PINNED/sundsvall.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "trondheim", "Trondheim", GeoPoint(63.43049, 10.39506), "Europe/Oslo",
-        listOf("archive/tables/monitor/tr-diyanet-europe/trondheim.txt"),
+        listOf("$PINNED/trondheim.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "umea", "Umeå", GeoPoint(63.82842, 20.25972), "Europe/Stockholm",
-        listOf("archive/tables/monitor/tr-diyanet-europe/umea.txt"),
+        listOf("$PINNED/umea.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "oulu", "Oulu", GeoPoint(65.01236, 25.46816), "Europe/Helsinki",
-        listOf("archive/tables/monitor/tr-diyanet-europe/oulu.txt"),
+        listOf("$PINNED/oulu.txt"),
     ),
     DiyanetEuropeCurveGenerator.City(
         "lulea", "Luleå", GeoPoint(65.58415, 22.15465), "Europe/Stockholm",
-        listOf("archive/tables/monitor/tr-diyanet-europe/lulea.txt"),
+        listOf("$PINNED/lulea.txt"),
     ),
 )
 
@@ -428,6 +437,16 @@ fun main(args: Array<String>) {
     val out = File(
         options["--out"] ?: repo.resolve("shared/src/commonMain/kotlin/world/taqwa/app/prayer/engine/registry/data/DiyanetEuropeCurves.kt").path,
     )
+    out.writeText(renderDiyanetEuropeCurves(official, ::println))
+    println("Wrote ${DIYANET_EUROPE_CITIES.size} cities' curves to ${out.relativeTo(repo).invariantSeparatorsPath}")
+}
+
+/**
+ * `DiyanetEuropeCurves.kt`'s exact text as the rows [DIYANET_EUROPE_CITIES] names under [official]
+ * give it, south to north; [log] gets one line per city. The task writes it, and
+ * DiyanetEuropeCurvesStalenessTest holds the committed file to it byte for byte.
+ */
+fun renderDiyanetEuropeCurves(official: File, log: (String) -> Unit = {}): String {
     val cities = DIYANET_EUROPE_CITIES.sortedBy { it.point.lat }
     val curves = mutableListOf<DiyanetEuropeCurveGenerator.Curves>()
     val counts = mutableListOf<Int>()
@@ -440,10 +459,9 @@ fun main(args: Array<String>) {
         first = listOfNotNull(first, rows.minOf { it.date }).min()
         last = listOfNotNull(last, rows.maxOf { it.date }).max()
         curves += DiyanetEuropeCurveGenerator.derive(rows, city.point, TimeZone.of(city.zone))
-        println(String.format(Locale.ROOT, "%-10s %4d rows %s..%s", city.key, rows.size, rows.minOf { it.date }, rows.maxOf { it.date }))
+        log(String.format(Locale.ROOT, "%-10s %4d rows %s..%s", city.key, rows.size, rows.minOf { it.date }, rows.maxOf { it.date }))
     }
-    out.writeText(DiyanetEuropeCurveGenerator.render(cities, curves, counts, first!!, last!!))
-    println("Wrote ${cities.size} cities' curves to ${out.relativeTo(repo).invariantSeparatorsPath}")
+    return DiyanetEuropeCurveGenerator.render(cities, curves, counts, first!!, last!!)
 }
 
 private fun fail(problem: String): Nothing {

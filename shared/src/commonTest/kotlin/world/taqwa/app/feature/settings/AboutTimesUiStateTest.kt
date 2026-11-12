@@ -209,8 +209,10 @@ class AboutTimesUiStateTest {
         // Review I3. The committed my.jakim stamp's entry-wide worst is 4, the end of eating (each
         // zone's Subuh is printed for its latest point; the end-of-eating audit of 3 Oct 2026), and
         // before it was 3, Perlis's PLS01 sunrise: ends either way. Kuala Lumpur's own zone (WLY01)
-        // measured every start within a minute (on 12 October 2026; the weekly monitor's prove adds
-        // JAKIM's next year to the row), and its row's worst start is the figure its tile claims.
+        // measured every start within a minute on 12 October 2026; the weekly monitor's prove adds
+        // JAKIM's next year to the row, whose Subuh the refit of 4 Nov 2026 holds within its unit's
+        // recorded 3 minutes. Whatever the proof holds, the row's worst start is the figure its tile
+        // claims, and no start is later than a limit the stamp records for it.
         val kualaLumpur = Place(3.1412, 101.68653, "Asia/Kuala_Lumpur", "MY")
         val state = stateFor(kualaLumpur)
         assertIs<AboutTimesUiState.AuthorityChecked>(state)
@@ -222,7 +224,15 @@ class AboutTimesUiStateTest {
         val wly01Starts = stamp.worstLateByUnit.getValue("WLY01")
             .filterKeys { it in setOf("fajr", "dhuhr", "asrStandard", "maghrib", "isha") }.values.max()
         assertEquals(wly01Starts, checkedAtMostMinutes(state.resolution, kualaLumpur, stamp))
-        assertTrue(wly01Starts <= 2, "WLY01's starts within class B's 2 minutes: $wly01Starts")
+        // The rule itself, not whatever limits the stamp holds for any zone: class B's 2 minutes for
+        // every start, and 3 for Kuala Lumpur's Fajr alone, the refit of 4 Nov 2026 (831aff9d).
+        // A later limit recorded for another zone must not loosen Kuala Lumpur's tile.
+        val ceilings = mapOf("fajr" to 3, "dhuhr" to 2, "asrStandard" to 2, "maghrib" to 2, "isha" to 2)
+        val wly01 = stamp.worstLateByUnit.getValue("WLY01")
+        for ((event, ceiling) in ceilings) {
+            val worst = wly01.getValue(event)
+            assertTrue(worst <= ceiling, "WLY01's $event: $worst min, over its $ceiling")
+        }
     }
 
     @Test

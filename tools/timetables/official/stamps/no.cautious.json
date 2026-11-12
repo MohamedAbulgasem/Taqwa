@@ -33,12 +33,12 @@
       "checked": 2648,
       "lateEnd": 0,
       "late": {
-        "0": 1290,
-        "1": 604,
+        "0": 1315,
+        "1": 610,
         "2": 4,
-        "3+": 750
+        "3+": 719
       },
-      "exactShare": 0.4872,
+      "exactShare": 0.4966,
       "worstLate": 58,
       "lateLimit": 58,
       "lateLimitFrom": "entry no.cautious",
@@ -48,12 +48,12 @@
       "checked": 2648,
       "early": 0,
       "late": {
-        "0": 896,
-        "1": 613,
+        "0": 908,
+        "1": 601,
         "2": 3,
         "3+": 1136
       },
-      "exactShare": 0.3384,
+      "exactShare": 0.3429,
       "worstLate": 6,
       "lateLimit": 6,
       "lateLimitFrom": "entry no.cautious",
@@ -63,12 +63,12 @@
       "checked": 2648,
       "early": 0,
       "late": {
-        "0": 1349,
-        "1": 667,
+        "0": 1370,
+        "1": 677,
         "2": 0,
-        "3+": 632
+        "3+": 601
       },
-      "exactShare": 0.5094,
+      "exactShare": 0.5174,
       "worstLate": 6,
       "lateLimit": 8,
       "lateLimitFrom": "entry no.cautious",
@@ -93,12 +93,12 @@
       "checked": 2648,
       "early": 0,
       "late": {
-        "0": 1400,
-        "1": 660,
-        "2": 202,
-        "3+": 386
+        "0": 1425,
+        "1": 666,
+        "2": 201,
+        "3+": 356
       },
-      "exactShare": 0.5287,
+      "exactShare": 0.5381,
       "worstLate": 50,
       "lateLimit": 50,
       "lateLimitFrom": "entry no.cautious",
@@ -108,12 +108,12 @@
       "checked": 2648,
       "early": 0,
       "late": {
-        "0": 719,
-        "1": 527,
+        "0": 738,
+        "1": 539,
         "2": 106,
-        "3+": 1296
+        "3+": 1265
       },
-      "exactShare": 0.2715,
+      "exactShare": 0.2787,
       "worstLate": 135,
       "lateLimit": 135,
       "lateLimitFrom": "entry no.cautious",
@@ -123,12 +123,12 @@
       "checked": 2648,
       "lateEnd": 0,
       "late": {
-        "0": 760,
-        "1": 502,
+        "0": 782,
+        "1": 511,
         "2": 104,
-        "3+": 1282
+        "3+": 1251
       },
-      "exactShare": 0.287,
+      "exactShare": 0.2953,
       "worstLate": 57,
       "lateLimit": 57,
       "lateLimitFrom": "entry no.cautious",
@@ -158,12 +158,12 @@
         "checked": 2648,
         "lateEnd": 0,
         "late": {
-          "0": 1290,
-          "1": 604,
+          "0": 1315,
+          "1": 610,
           "2": 4,
-          "3+": 750
+          "3+": 719
         },
-        "exactShare": 0.4872,
+        "exactShare": 0.4966,
         "worstLate": 58,
         "lateLimit": 58,
         "lateLimitFrom": "entry no.cautious",
@@ -173,12 +173,12 @@
         "checked": 2648,
         "early": 0,
         "late": {
-          "0": 896,
-          "1": 613,
+          "0": 908,
+          "1": 601,
           "2": 3,
           "3+": 1136
         },
-        "exactShare": 0.3384,
+        "exactShare": 0.3429,
         "worstLate": 6,
         "lateLimit": 6,
         "lateLimitFrom": "entry no.cautious",
@@ -188,12 +188,12 @@
         "checked": 2648,
         "early": 0,
         "late": {
-          "0": 1349,
-          "1": 667,
+          "0": 1370,
+          "1": 677,
           "2": 0,
-          "3+": 632
+          "3+": 601
         },
-        "exactShare": 0.5094,
+        "exactShare": 0.5174,
         "worstLate": 6,
         "lateLimit": 8,
         "lateLimitFrom": "entry no.cautious",
@@ -218,12 +218,12 @@
         "checked": 2648,
         "early": 0,
         "late": {
-          "0": 1400,
-          "1": 660,
-          "2": 202,
-          "3+": 386
+          "0": 1425,
+          "1": 666,
+          "2": 201,
+          "3+": 356
         },
-        "exactShare": 0.5287,
+        "exactShare": 0.5381,
         "worstLate": 50,
         "lateLimit": 50,
         "lateLimitFrom": "entry no.cautious",
@@ -233,12 +233,12 @@
         "checked": 2648,
         "early": 0,
         "late": {
-          "0": 719,
-          "1": 527,
+          "0": 738,
+          "1": 539,
           "2": 106,
-          "3+": 1296
+          "3+": 1265
         },
-        "exactShare": 0.2715,
+        "exactShare": 0.2787,
         "worstLate": 135,
         "lateLimit": 135,
         "lateLimitFrom": "entry no.cautious",
@@ -248,12 +248,12 @@
         "checked": 2648,
         "lateEnd": 0,
         "late": {
-          "0": 760,
-          "1": 502,
+          "0": 782,
+          "1": 511,
           "2": 104,
-          "3+": 1282
+          "3+": 1251
         },
-        "exactShare": 0.287,
+        "exactShare": 0.2953,
         "worstLate": 57,
         "lateLimit": 57,
         "lateLimitFrom": "entry no.cautious",
@@ -281,11 +281,11 @@
       }
     },
     "tr.diyanet.europe": {
-      "checked": ["2026-09-25..2026-11-30", "2027-01-01..2027-12-31"],
+      "checked": ["2026-09-25..2027-12-31"],
       "points": {
         "58.14671,7.9956": ["2026-09-29..2026-10-29", "2027-01-01..2027-12-31"],
         "58.97005,5.73332": ["2026-09-29..2026-10-29", "2027-01-01..2027-12-31"],
-        "59.91273,10.74609": ["2026-09-25..2026-11-30", "2027-01-01..2027-12-31"],
+        "59.91273,10.74609": ["2026-09-25..2027-12-31"],
         "60.39299,5.32415": ["2026-09-29..2026-10-29", "2027-01-01..2027-12-31"],
         "63.43049,10.39506": ["2026-09-29..2026-10-29", "2027-01-01..2027-12-31"]
       }

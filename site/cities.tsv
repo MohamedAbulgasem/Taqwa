@@ -22,8 +22,8 @@
 # too once every day of it is checked. tools/timetables applies the rule on every build and holds a
 # row it rejects, with a notice, so a city whose timetable is not yet checked for this month holds
 # by itself (London Unified's ends 31 December 2026: gate the 2027 table before January) and comes
-# back at the first build after its month is checked (Diyanet's captures reach 1 November 2026:
-# İstanbul and Ankara show October alone until a capture completes November). A held row comes back
+# back at the first build after its month is checked (Diyanet's captures reached 1 November 2026
+# until the monitor's of 9 November: İstanbul and Ankara showed October alone till then). A held row comes back
 # by deleting its "# " once its stamp qualifies; a row the rule rejects is never published. The
 # proof is in tools/timetables/official/stamps and summarised at /prayer-times/how-taqwa-checks/.
 #
@@ -134,7 +134,7 @@ algiers-algeria	2507480	en ar fr	fr	fr=Alger
 # port-sudan-sudan	377039	en ar
 
 # ---------------------------------------------------------------- Türkiye and Central Asia
-# Türkiye: Diyanet (tr.diyanet, class A) at İstanbul and Ankara. Its stamp covers 25 September – 1 November 2026 and 2027, so the pages show October alone until November is checked.
+# Türkiye: Diyanet (tr.diyanet, class A) at İstanbul and Ankara. Its stamp covers the whole of 2026 and 2027 since the monitor's capture of 9 November 2026, so the pages show every month through 2027.
 istanbul-turkiye	745044	en tr	en tr
 ankara-turkiye	323786	en tr	tr
 # held: İzmir, Bursa, Konya, Antalya, Gaziantep, Diyarbakır — outside Diyanet's checked districts (class D).

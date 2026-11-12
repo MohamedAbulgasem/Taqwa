@@ -31,8 +31,11 @@ import kotlin.test.assertTrue
  *
  * A cell the day declares not followed (point 8's Fajr after the sun's sunrise, point 9's Isha
  * before the Maghrib shown) is counted, never checked, as in the gate (rulings R82, R90); none falls
- * in the autumn dates. Reads the restricted archive at the official root the build hands it;
- * skipped, and says so, where the archive is not held (CI).
+ * in the autumn dates. Reads the restricted archive at the official root the build hands it, the
+ * tables the curves were derived from (DIYANET_EUROPE_CITIES: the research captures and the
+ * monitor's of 28 September, pinned), never the monitor's live files, which keep every row ever
+ * fetched and since 9 November 2026 mix in an edition of 2026 Diyanet has replaced; skipped, and
+ * says so, where the archive is not held (CI).
  */
 class DiyanetEuropeCrossYearTest {
 

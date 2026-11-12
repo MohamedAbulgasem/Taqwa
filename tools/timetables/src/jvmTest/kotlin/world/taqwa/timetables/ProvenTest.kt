@@ -150,16 +150,36 @@ class ProvenTest {
     }
 
     @Test fun istanbulIsHeldInSeptemberAndShowsOctoberAloneUntilNovemberIsChecked() {
-        // Diyanet's captures hold 25 Sep – 1 Nov 2026 (the research's to 25 Oct, the weekly monitor's of
+        // Diyanet's captures held 25 Sep – 1 Nov 2026 (the research's to 25 Oct, the weekly monitor's of
         // 28 Sep to 29 Oct and of 2 Oct to 1 Nov) and 2027: September's first days were never checked
         // (review C1, ruling R115), so a September page is held; October is checked whole, so from
         // 1 October the page shows it alone (ruling R116) and names 2 November, the first day unchecked.
-        val september = verdict(istanbul)
+        // The case is the rule, so it is held as at that morning (StampsAsOf.firstOctober): the monitor's
+        // later captures hold the whole of 2026, and the committed proof grows with them.
+        val asOf = StampsAsOf.firstOctober(official, stamps)
+        val september = verdict(istanbul, with = asOf)
         assertIs<Verdict.Held>(september)
         assertEquals("tr.diyanet: no checked table day 1 Sep 2026 – 24 Sep 2026", september.reason)
-        val october = verdict(istanbul, oct1)
+        val october = verdict(istanbul, oct1, with = asOf)
         assertIs<Verdict.Published>(october)
         laterProofOnly(october, "tr.diyanet", LocalDate(2026, 11, 2))
+    }
+
+    @Test fun istanbulAndAnkaraDoNotGoDarkOnTheFirstOfDecember() {
+        // The live floor of the frozen case above: the monitor's capture of 9 Nov 2026 holds Diyanet's
+        // whole 2026 and 2027, gated, so a page built on 1 December shows December, and the proof names
+        // no unchecked day before 2028. The weekly prove only adds checked days (docs/MONITOR.md), so this
+        // can only get further, never nearer.
+        val dec1 = LocalDate(2026, 12, 1)
+        val ankara = city("ankara-turkiye", "TR", 39.91987, 32.85427, "Europe/Istanbul", "Ankara")
+        for (c in listOf(istanbul, ankara)) {
+            val v = verdict(c, dec1)
+            assertIs<Verdict.Published>(v, c.slug)
+            assertEquals(dec1..LocalDate(2026, 12, 31), v.months.first(), c.slug)
+            assertTrue(v.through >= LocalDate(2027, 1, 31), "${c.slug}: ${v.through}")
+            val next = v.nextUnchecked
+            assertTrue(next == null || next.day >= LocalDate(2028, 1, 1), "${c.slug}: $next")
+        }
     }
 
     @Test fun birminghamIsHeldAsNotMeasured() {

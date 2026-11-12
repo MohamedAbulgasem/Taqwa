@@ -315,9 +315,11 @@ tasks.register<JavaExec>("generateOwnPointWorst") {
 }
 
 /**
- * Writes `DiyanetEuropeCurves.kt`, the per-city curves of Diyanet's European tables, from every held
- * capture of each city (restricted, read from the official root); the generator's KDoc says how a
- * slot is derived. Re-run when a capture is added to the archive, then run the gate and commit.
+ * Writes `DiyanetEuropeCurves.kt`, the per-city curves of Diyanet's European tables, from the
+ * captures DIYANET_EUROPE_CITIES names for each city (restricted, read from the official root: the
+ * research's and the monitor's of 28 September 2026, pinned, never the monitor's live files); the
+ * generator's KDoc says how a slot is derived. Re-run when a pinned capture is added to that list,
+ * then run the gate and commit.
  *
  *     ./gradlew -p tools/timetables generateDiyanetEuropeCurves [-Pofficial=<dir>] [-Pout=<file>]
  */
