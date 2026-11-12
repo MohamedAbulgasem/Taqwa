@@ -3,8 +3,11 @@ package world.taqwa.timetables.monitor
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
 import kotlinx.datetime.daysUntil
+import kotlinx.datetime.offsetAt
 import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.todayIn
 import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.app.prayer.engine.registry.Registry
@@ -174,23 +177,76 @@ class TableCheck(
         val lat = table.lat ?: return Plan.Refused("a mosque calendar needs its mosque's lat and lon")
         val lon = table.lon ?: return Plan.Refused("a mosque calendar needs its mosque's lat and lon")
         val columns = table.columns.split(' ').filter { it.isNotEmpty() }
-        val calendar = Survey.Calendar(
-            id = table.key, path = table.path, name = table.name, lat = lat, lon = lon, columns = columns, use = "yes",
-            zone = TimeZone.of(table.zone).takeIf { it != whole.zone },
-        )
         val held = whole.calendars.firstOrNull { it.id == table.key }
         if (held != null && !held.used) return Plan.LeftOut(held.use)
+        val zone = TimeZone.of(table.zone)
+        val (clock, clockNote) = clockOf(table, held, zone, columns)
+        val calendar = Survey.Calendar(
+            id = table.key, path = table.path, name = table.name, lat = lat, lon = lon, columns = columns, use = "yes",
+            zone = zone.takeIf { it != whole.zone }, clock = clock,
+        )
         val why = if (held == null) {
             "a calendar the survey does not list yet: checked at the mosque's point with no recorded faults or outliers"
         } else {
             "checked as the survey checks it, with its recorded faults and outliers"
-        }
+        } + (clock?.let { "; read on ${it.id}, the clock it is printed on" } ?: "") + (clockNote?.let { "; $it" } ?: "")
         val survey = Survey(
             whole.entry, whole.zone, whole.countryCode, listOf(calendar),
             whole.faults.filter { it.calendar == table.key },
             whole.outliers.filter { it.calendar == "*" || it.calendar == table.key },
         )
         return Plan.Calendar(survey, why, held, whole.calendars.firstOrNull()?.path?.substringBeforeLast('/'))
+    }
+
+    /**
+     * The clock a calendar is printed on where it is not its civil zone: the survey's held calendar's
+     * `clock` (Winnipeg's calendars, captured on Manitoba's old UTC-6 and read on America/Chicago since
+     * tzdata 2026e), else the index's. A held clock is the held capture's: where the fetched cells moved
+     * about an hour from that capture (most cells of a day, [hourMoved]) on a day the clock and the zone
+     * disagree, the mosque has reprinted those days (on its civil clock, as Winnipeg's did in November
+     * 2026), so the fetch is read on its civil zone and the note says to re-hold the capture. Days edited
+     * by other than an hour, and days the held capture does not hold, stay on the held clock with a note
+     * (neither can hide an early time: a wrong clock reads an hour off, which is red). Returns the clock
+     * (null for the civil zone) and the note.
+     */
+    internal fun clockOf(table: MonitorTable, held: Survey.Calendar?, zone: TimeZone, columns: List<String>): Pair<TimeZone?, String?> {
+        val heldClock = held?.clock
+        if (heldClock == null) return table.clock?.takeIf { it.isNotEmpty() }?.let { TimeZone.of(it) } to null
+        if (held.path == table.path || held.columns != columns) return heldClock to null
+        val own = cells(roots.file(table.path), columns.size)
+        val was = cells(roots.file(held.path), held.columns.size)
+        val apart = own.keys.filter { d -> d.atTime(12, 0).toInstant(zone).let { heldClock.offsetAt(it) != zone.offsetAt(it) } }
+        val inHeld = apart.filter { it in was }
+        val edited = inHeld.filter { own[it] != was[it] }
+        val reprinted = edited.filter { hourMoved(own.getValue(it), was.getValue(it)) }
+        fun spans(dates: List<LocalDate>) = dateRanges(dates).let { r -> r.take(3).joinToString(", ") + if (r.size > 3) ", …" else "" }
+        if (reprinted.isNotEmpty()) {
+            return null to "not read on ${heldClock.id}, the held capture's clock: this fetch moved an hour from that capture on ${reprinted.size} of the " +
+                "${inHeld.size} days the two clocks disagree (${spans(reprinted)}), so the mosque has reprinted them and they are read on ${zone.id}; " +
+                "re-hold the capture without its clock, with faults rows for days still on the old clock"
+        }
+        val notes = mutableListOf<String>()
+        val otherEdits = edited.size
+        if (otherEdits > 0) {
+            notes += "the mosque changed $otherEdits of the held capture's days (${spans(edited)}) by other than an hour, so they stay on ${heldClock.id}"
+        }
+        val beyond = apart.filter { it !in was }
+        if (beyond.isNotEmpty()) {
+            notes += "${beyond.size} days the held capture does not hold (${spans(beyond)}) are read on ${heldClock.id} too, unchecked against it: " +
+                "a red an hour off there may be those days printed on ${zone.id}; re-hold the capture once the mosque prints them"
+        }
+        return heldClock to notes.takeIf { it.isNotEmpty() }?.joinToString("; ")
+    }
+
+    /**
+     * Whether most of a day's cells moved about an hour (60 ± [HOUR_SLACK] min, either way, across
+     * midnight too): a day reprinted on another clock, not a cell or two edited by a few minutes.
+     */
+    internal fun hourMoved(own: List<Int?>, was: List<Int?>): Boolean {
+        val pairs = own.zip(was).mapNotNull { (a, b) -> if (a != null && b != null) a to b else null }
+        if (pairs.isEmpty()) return false
+        val moved = pairs.count { (a, b) -> ((a - b) % 1440 + 1440) % 1440 in HOUR_MOVES }
+        return moved * 2 > pairs.size
     }
 
     private fun checkRows(table: MonitorTable, plan: Plan.Rows, status: Status, today: LocalDate): Outcome {
@@ -470,6 +526,12 @@ class TableCheck(
 
         /** A cell this far off both its neighbours in its column is the calendar's slip (research-uk's rule). */
         const val NEIGHBOUR_MIN = 20
+
+        /** How far from exactly an hour a reprinted cell may stand (a mosque rounding its own times, [hourMoved]). */
+        const val HOUR_SLACK = 3
+
+        /** A cell's move, in minutes mod 1440, that counts as an hour either way ([hourMoved]). */
+        val HOUR_MOVES: Set<Int> = ((60 - HOUR_SLACK)..(60 + HOUR_SLACK)).toSet() + ((1380 - HOUR_SLACK)..(1380 + HOUR_SLACK)).toSet()
 
         /** Exactly an hour or twelve hours off the held capture: a clock-change or 12-hour-clock slip. */
         val CLOCK_SLIPS = setOf(60, 720)

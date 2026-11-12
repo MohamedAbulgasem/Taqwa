@@ -3,7 +3,10 @@ package world.taqwa.timetables.monitor
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.offsetAt
 import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.day.Ends
@@ -16,6 +19,7 @@ import java.nio.file.Files
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
@@ -367,6 +371,93 @@ class TableCheckTest {
     fun `a canadian calendar keeps its own zone`() {
         val plan = check.plan(table("mawaqit", "x", "archive/t.txt", null, 44.65, -63.6, "America/Halifax", "CA", "F S D A M I", survey = "ca-cautious")) as TableCheck.Plan.Calendar
         assertEquals(TimeZone.of("America/Halifax"), plan.survey.calendars.single().zone)
+    }
+
+    /** The engine's own ten days from [from] at a calendar's point, starts a minute early and sunrise a minute late, printed on [printedOn]. */
+    private fun engineDays(plan: TableCheck.Plan.Calendar, zone: TimeZone, printedOn: TimeZone, from: LocalDate): String {
+        val calendar = plan.survey.calendars.single()
+        val resolution = Registry.resolveEntry(plan.survey.entry, Place(calendar.lat, calendar.lon, zone.id, "CA"))
+        return (0 until 10).joinToString("\n") { k ->
+            val date = from.plus(k, DateTimeUnit.DAY)
+            val day = Ends.withNextDay(DayPipeline.unended(resolution, date, zone), DayPipeline.unended(resolution, date.plus(1, DateTimeUnit.DAY), zone))
+            val cells = listOf(day.fajr - 1.minutes, day.sunrise + 1.minutes, day.dhuhr - 1.minutes, day.asr - 1.minutes, day.maghrib - 1.minutes, day.isha - 1.minutes)
+            "$date " + cells.joinToString(" ") { val t = it.toLocalDateTime(printedOn).time; "%02d:%02d".format(t.hour, t.minute) }
+        } + "\n"
+    }
+
+    /** An 'HH:MM' cell moved by [minutes]. */
+    private fun shift(cell: String, minutes: Int): String {
+        val m = (cell.substringBefore(':').toInt() * 60 + cell.substringAfter(':').toInt() + minutes + 1440) % 1440
+        return "%02d:%02d".format(m / 60, m % 60)
+    }
+
+    @Test
+    fun `a day counts as reprinted only when most of its cells moved an hour`() {
+        assertTrue(check.hourMoved(listOf(300, 400, 720, 900, 1000, 1100), listOf(240, 341, 660, 840, 940, 1040)))
+        assertTrue(check.hourMoved(listOf(10, 400), listOf(1390, 340)), "across midnight")
+        assertTrue(check.hourMoved(listOf(240, 340), listOf(300, 400)), "either way")
+        assertFalse(check.hourMoved(listOf(300, 400, 720, 900, 1000, 1100), listOf(296, 400, 720, 900, 1000, 1100)), "a cell edited by a few minutes")
+        assertFalse(check.hourMoved(listOf(300, 400, 720, 900), listOf(240, 340, 720, 900)), "half the cells is not most")
+        assertFalse(check.hourMoved(listOf(null), listOf(300)))
+    }
+
+    @Test
+    fun `a calendar the survey holds on another clock is read on that clock until the mosque reprints it`() {
+        // A Winnipeg calendar: captured on Manitoba's old UTC-6 and held with clock America/Chicago since tzdata 2026e.
+        val listed = officialDir.resolve("survey/ca-cautious/calendars.tsv").readLines()
+            .filter { it.isNotBlank() && !it.startsWith("#") }.drop(1).map { it.split('\t') }
+            .first { it.size > 7 && it[7].isNotEmpty() && it[5] == "yes" && it[4] == "F S D A M I" }
+        val heldPath = listed[0]
+        val slug = heldPath.substringAfterLast('/').removeSuffix(".txt")
+        val zone = TimeZone.of(listed[6])
+        val clock = TimeZone.of(listed[7])
+        val from = LocalDate(2026, 11, 2)
+        val noon = LocalDate(2026, 11, 5).atTime(12, 0).toInstant(zone)
+        assertTrue(clock.offsetAt(noon) != zone.offsetAt(noon), "the clocks must disagree in November 2026: a tz database of 2026e or later")
+        fun calendar(key: String = slug, path: String = "archive/t.txt", clockColumn: String? = null) =
+            table("mawaqit", key, path, null, listed[2].toDouble(), listed[3].toDouble(), zone.id, "CA", "F S D A M I", survey = "ca-cautious", clock = clockColumn)
+
+        // The held calendar's clock is honoured; an unlisted one takes the index's clock, else its civil zone.
+        val plan = check.plan(calendar()) as TableCheck.Plan.Calendar
+        assertEquals(clock, plan.survey.calendars.single().clock)
+        assertTrue("read on ${clock.id}" in plan.why, plan.why)
+        assertEquals(clock, (check.plan(calendar("no-such-mosque", clockColumn = clock.id)) as TableCheck.Plan.Calendar).survey.calendars.single().clock)
+        assertEquals(null, (check.plan(calendar("no-such-mosque")) as TableCheck.Plan.Calendar).survey.calendars.single().clock)
+
+        // The held capture printed on the old clock, fetched unchanged: read on that clock it is fine (read on the civil zone,
+        // every sunrise would be an hour off, the Winnipeg red of 2 Nov 2026).
+        official.resolve(heldPath).parentFile.mkdirs()
+        official.resolve(heldPath).writeText("# an invented held capture on the old clock\n" + engineDays(plan, zone, clock, from))
+        val path = "archive/tables/monitor/mawaqit/$slug.txt"
+        official.resolve(path).parentFile.mkdirs()
+        official.resolve(path).writeText("# the same capture fetched again\n" + engineDays(plan, zone, clock, from))
+        val same = check.check(calendar(path = path))
+        assertEquals(Kind.NEW_TABLE_FINE, same.item.kind, same.item.toString())
+        assertTrue(same.item.details.any { "read on ${clock.id}" in it }, same.item.toString())
+        val asCivil = check.check(calendar("no-such-mosque", path = path))
+        assertEquals(Kind.NEVER_EARLY, asCivil.item.kind, "the old clock read on the civil zone fails: " + asCivil.item.toString())
+
+        // The mosque edits a cell by a few minutes: not a reprint, still read on the held clock, with a note.
+        val edited = engineDays(plan, zone, clock, from).lines().toMutableList()
+        edited[3] = edited[3].split(' ').toMutableList().also { c -> c[3] = shift(c[3], 4) }.joinToString(" ")  // 5 Nov's Dhuhr 4 min later
+        official.resolve(path).writeText("# one cell edited\n" + edited.joinToString("\n"))
+        val tweaked = check.plan(calendar(path = path)) as TableCheck.Plan.Calendar
+        assertEquals(clock, tweaked.survey.calendars.single().clock)
+        assertTrue("changed 1 of the held capture's days (2026-11-05) by other than an hour" in tweaked.why, tweaked.why)
+
+        // Days past the held capture: still the held clock, with a note that they are not checked against it.
+        official.resolve(path).writeText("# ten days more\n" + engineDays(plan, zone, clock, from) + engineDays(plan, zone, clock, from.plus(10, DateTimeUnit.DAY)))
+        val longer = check.plan(calendar(path = path)) as TableCheck.Plan.Calendar
+        assertEquals(clock, longer.survey.calendars.single().clock)
+        assertTrue("10 days the held capture does not hold (2026-11-12..2026-11-21) are read on ${clock.id} too" in longer.why, longer.why)
+
+        // The mosque reprints its November on its civil clock: the fetch is read on the civil zone, and the note says to re-hold.
+        official.resolve(path).writeText("# reprinted on the civil clock\n" + engineDays(plan, zone, zone, from))
+        val reprinted = check.plan(calendar(path = path)) as TableCheck.Plan.Calendar
+        assertEquals(null, reprinted.survey.calendars.single().clock)
+        assertTrue("moved an hour from that capture on 10 of the 10 days" in reprinted.why && "re-hold the capture" in reprinted.why, reprinted.why)
+        val fine = check.check(calendar(path = path))
+        assertEquals(Kind.NEW_TABLE_FINE, fine.item.kind, fine.item.toString())
     }
 
     @Test

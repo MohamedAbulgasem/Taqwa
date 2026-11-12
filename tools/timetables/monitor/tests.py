@@ -24,6 +24,7 @@ from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
 from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, masjidal, mawaqit, mjc, morocco, muis, qatar, qmdb, toronto  # noqa: E402
 from fetchers import ummalqura, ummalqura_cities  # noqa: E402
 from prove_tests import Attention, Handoff, Proof, RecipesCatalogue, Workflow  # noqa: E402,F401  (prove's half: proof.py, recipes.tsv, the workflow)
+from guard_tests import QmdbGuard, TzdbGuard  # noqa: E402,F401  (the run's footing: the JDK's tz database, QMDB answering two ways)
 
 
 class Times(unittest.TestCase):
@@ -131,6 +132,172 @@ class StoreTests(unittest.TestCase):
         store.record("src", t2)
         self.assertEqual(["2026-03-03"], sorted(read_table_rows(os.path.join(self.root, "archive", "tables", "monitor", "src", "k.txt"))))
 
+    def edition(self, first, days, minute="00"):
+        t = Table("oslo", "Oslo", 59.9, 10.7, "Europe/Oslo", "NO", "F+E S D A M I", entry="tr.diyanet.europe")
+        t.editions = True
+        for i in range(days):
+            d = dt.date.fromisoformat(first) + dt.timedelta(days=i)
+            t.add(d.isoformat(), [f"0{h}:{minute}" for h in range(1, 7)])
+        return t
+
+    def test_a_source_that_re_issues_its_days_keeps_each_edition_and_the_live_file_holds_the_latest(self):
+        live = os.path.join(self.root, "archive", "tables", "monitor", "src", "oslo.txt")
+        editions = os.path.join(self.root, "archive", "tables", "monitor", "src", fetch.EDITIONS, "oslo")
+        store = Store(self.root, self.monitor, dt.date(2026, 10, 26))
+        self.assertEqual("new", store.record("src", self.edition("2026-10-26", 40)))
+        self.assertIn("the first edition held", store.edition_notes["src"][0])
+        # A week on, the page's window has moved: the live file is that capture alone, the same edition.
+        store = Store(self.root, self.monitor, dt.date(2026, 11, 2))
+        store.data["tables"]["src/oslo"] = {"hash": "x", "fetched": "2026-10-26"}
+        self.assertEqual("changed", store.record("src", self.edition("2026-11-02", 40)))
+        self.assertEqual(("2026-11-02", 40), (min(read_table_rows(live)), len(read_table_rows(live))))
+        self.assertIn("the same edition moved on", store.edition_notes["src"][0])
+        self.assertIn("7 past days left to the earlier captures", store.edition_notes["src"][0])
+        # The source re-issues its year: days ahead withdrawn, days long past put back, one day changed.
+        store = Store(self.root, self.monitor, dt.date(2026, 11, 9))
+        store.data["tables"]["src/oslo"] = {"hash": "y", "fetched": "2026-11-02"}
+        other = self.edition("2026-10-01", 40)
+        other.rows["2026-11-05"] = ["09:59"] * 6
+        self.assertEqual("changed", store.record("src", other))
+        rows = read_table_rows(live)
+        self.assertEqual(("2026-10-01", "2026-11-09"), (min(rows), max(rows)), "the live file is the latest edition alone, never a union")
+        note = store.edition_notes["src"][0]
+        self.assertIn("a new edition", note)
+        self.assertIn("1 changed", note)
+        self.assertIn("still ahead", note)
+        self.assertFalse(re.search(r"\d{1,2}:\d{2}", note), "a note never carries a printed time")
+        self.assertEqual(["2026-10-26.txt", "2026-11-02.txt", "2026-11-09.txt"], sorted(os.listdir(editions)))
+        self.assertEqual(("2026-11-02", 40), (min(read_table_rows(os.path.join(editions, "2026-11-02.txt"))),
+                                              len(read_table_rows(os.path.join(editions, "2026-11-02.txt")))))
+        # The same capture again: unchanged, no new edition.
+        store.save()
+        again = Store(self.root, self.monitor, dt.date(2026, 11, 16))
+        self.assertEqual("unchanged", again.record("src", other))
+        self.assertEqual({}, again.edition_notes)
+        self.assertEqual(3, len(os.listdir(editions)))
+
+    def test_a_capture_that_came_back_in_part_is_kept_as_an_edition_but_never_made_the_live_file(self):
+        live = os.path.join(self.root, "archive", "tables", "monitor", "src", "oslo.txt")
+        editions = os.path.join(self.root, "archive", "tables", "monitor", "src", fetch.EDITIONS, "oslo")
+        store = Store(self.root, self.monitor, dt.date(2026, 11, 2))
+        store.record("src", self.edition("2026-11-01", 426))  # the month table and the year table ahead
+        store.save()
+        # A week on the page holds its month table alone: 30 days, none changed, 389 still ahead withdrawn.
+        import types
+        module = types.ModuleType("fetchers.fakeshort")
+        module.fetch = lambda ctx: [self.edition("2026-11-01", 30)]
+        sys.modules["fetchers.fakeshort"] = module
+        try:
+            ctx = Context("src", self.root, dt.date(2026, 11, 9), lambda line: None, self.monitor, http=FakeHttp([]))
+            store = Store(self.root, self.monitor, dt.date(2026, 11, 9))
+            status, message, _, statuses = fetch.run_source({"source": "src", "fetcher": "fakeshort"}, store, ctx)
+        finally:
+            del sys.modules["fetchers.fakeshort"]
+        self.assertEqual(("partial", {"oslo": "unchanged"}), (status, statuses))
+        self.assertIn("oslo: a capture of 30 days, 2026-11-01..2026-11-30, against the live file's 426, withdraws 396 days still ahead", message)
+        self.assertIn("the live file is left as it was", message)
+        self.assertEqual(426, len(read_table_rows(live)))
+        self.assertEqual(30, len(read_table_rows(os.path.join(editions, "2026-11-09.txt"))))
+        self.assertEqual("2026-11-02", store.data["tables"]["src/oslo"]["fetched"])
+        self.assertEqual(426, store.data["tables"]["src/oslo"]["rows"])
+        # A whole new edition the next week is made the live file as before.
+        store.save()
+        later = Store(self.root, self.monitor, dt.date(2026, 11, 16))
+        self.assertEqual("changed", later.record("src", self.edition("2026-11-01", 425, minute="01")))
+        self.assertEqual(425, len(read_table_rows(live)))
+        self.assertEqual({}, later.edition_errors)
+
+    def test_a_live_file_merged_before_editions_is_kept_beside_them_the_first_time(self):
+        store = Store(self.root, self.monitor, dt.date(2026, 11, 2))
+        merged = self.edition("2026-01-01", 400)
+        merged.editions = False
+        store.record("src", merged)
+        store.save()
+        later = Store(self.root, self.monitor, dt.date(2026, 11, 9))
+        self.assertEqual("changed", later.record("src", self.edition("2026-11-09", 30)))
+        editions = os.path.join(self.root, "archive", "tables", "monitor", "src", fetch.EDITIONS, "oslo")
+        self.assertEqual(["2026-11-02-merged.txt", "2026-11-09.txt"], sorted(os.listdir(editions)))
+        self.assertEqual(400, len(read_table_rows(os.path.join(editions, "2026-11-02-merged.txt"))))
+        self.assertEqual(30, len(read_table_rows(os.path.join(self.root, "archive", "tables", "monitor", "src", "oslo.txt"))))
+        # The source's message says so, through the driver.
+        import types
+        module = types.ModuleType("fetchers.fakeeditions")
+        module.fetch = lambda ctx: [self.edition("2026-10-01", 30)]
+        sys.modules["fetchers.fakeeditions"] = module
+        try:
+            ctx = Context("src", self.root, dt.date(2026, 11, 16), lambda line: None, self.monitor, http=FakeHttp([]))
+            status, message, _, statuses = fetch.run_source({"source": "src", "fetcher": "fakeeditions"}, Store(self.root, self.monitor, dt.date(2026, 11, 16)), ctx)
+        finally:
+            del sys.modules["fetchers.fakeeditions"]
+        self.assertEqual(("ok", {"oslo": "changed"}), (status, statuses))
+        self.assertIn("oslo: a new edition, 2026-10-01..2026-10-30", message)
+
+    def test_editions_are_rebuilt_from_the_raw_captures_without_touching_the_archive(self):
+        import editions as editions_tool
+
+        def page(first, days):
+            months = {v: k for k, v in diyanet.MON.items()}
+            rows = []
+            for i in range(days):
+                d = dt.date.fromisoformat(first) + dt.timedelta(days=i)
+                rows.append(f"<tr><td>{d.day} {months[d.month]} {d.year} Pazartesi</td><td>x</td>"
+                            + "".join(f"<td>0{h}:{d.day:02d}</td>" for h in range(1, 7)) + "</tr>")
+            return ("<table>" + "".join(rows) + "</table>").encode("utf-8")
+        import gzip as gz
+        raw = os.path.join(self.root, "archive", "raw", "monitor", "tr-diyanet-europe")
+        for date, first, days in (("2026-10-31", "2026-10-31", 30), ("2026-11-09", "2026-01-01", 20)):
+            os.makedirs(os.path.join(raw, date))
+            with open(os.path.join(raw, date, "diyanet-15702.html.gz"), "wb") as f:
+                f.write(gz.compress(page(first, days)))
+        os.makedirs(self.monitor)
+        with open(os.path.join(self.monitor, "diyanet-ids.json"), "w") as f:
+            json.dump({"cities": {"oslo": "15702"}}, f)
+        live = os.path.join(self.root, "archive", "tables", "monitor", "tr-diyanet-europe", "oslo.txt")
+        os.makedirs(os.path.dirname(live))
+        with open(live, "w") as f:
+            f.write("# merged\n2026-01-01 01:01 02:01 03:01 04:01 05:01 06:01\n2026-12-01 01:01 02:01 03:01 04:01 05:01 06:01\n")
+        out = os.path.join(self.root, "out")
+        self.assertEqual(0, editions_tool.main(["--official", self.root, "--source", "tr-diyanet-europe", "--out", out]))
+        folder = os.path.join(out, "tr-diyanet-europe", fetch.EDITIONS, "oslo")
+        self.assertEqual(["2026-10-31.txt", "2026-11-09.txt", "before-merged.txt"], sorted(os.listdir(folder)))
+        self.assertEqual(30, len(read_table_rows(os.path.join(folder, "2026-10-31.txt"))))
+        rebuilt = read_table_rows(os.path.join(out, "tr-diyanet-europe", "oslo.txt"))
+        self.assertEqual(("2026-01-01", 20), (min(rebuilt), len(rebuilt)), "the live file rebuilt as the latest edition alone")
+        with open(live) as f:
+            self.assertTrue(f.read().startswith("# merged"), "--out leaves the archive alone")
+        # --in-place is refused, writing nothing, unless the latest raw capture is the one the index records
+        # and the live file agrees with it on every day both hold.
+        in_place = ["--official", self.root, "--source", "tr-diyanet-europe", "--in-place"]
+        editions_dir = os.path.join(os.path.dirname(live), fetch.EDITIONS)
+        self.assertEqual(1, editions_tool.main(in_place), "not in the index")
+        record = {"source": "tr-diyanet-europe", "key": "oslo", "path": "archive/tables/monitor/tr-diyanet-europe/oslo.txt",
+                  "name": "Oslo", "zone": "Europe/Oslo", "cc": "NO", "columns": "F+E S D A M I", "hash": "old",
+                  "first": "2026-01-01", "last": "2026-12-01", "rows": 2, "fetched": "2026-10-31"}
+        hashes = os.path.join(self.monitor, "hashes.json")
+        with open(hashes, "w") as f:
+            json.dump({"sources": {}, "tables": {"tr-diyanet-europe/oslo": record}}, f)
+        self.assertEqual(1, editions_tool.main(in_place), "the index records an older capture than the latest raw one")
+        record["fetched"] = "2026-11-09"
+        with open(live, "w") as f:
+            f.write("# merged\n2026-01-01 01:59 02:01 03:01 04:01 05:01 06:01\n2026-12-01 01:01 02:01 03:01 04:01 05:01 06:01\n")
+        with open(hashes, "w") as f:
+            json.dump({"sources": {}, "tables": {"tr-diyanet-europe/oslo": record}}, f)
+        self.assertEqual(1, editions_tool.main(in_place), "the live file differs from the latest capture")
+        self.assertFalse(os.path.exists(editions_dir))
+        with open(live, "w") as f:
+            f.write("# merged\n2026-01-01 01:01 02:01 03:01 04:01 05:01 06:01\n2026-12-01 01:01 02:01 03:01 04:01 05:01 06:01\n")
+        self.assertEqual(0, editions_tool.main(in_place))
+        self.assertEqual(["2026-10-31.txt", "2026-11-09-merged.txt", "2026-11-09.txt"], sorted(os.listdir(os.path.join(editions_dir, "oslo"))))
+        self.assertEqual(20, len(read_table_rows(live)))
+        with open(hashes) as f:
+            held = json.load(f)["tables"]["tr-diyanet-europe/oslo"]
+        self.assertEqual((20, "2026-01-01", "2026-01-20", "2026-11-09"), (held["rows"], held["first"], held["last"], held["fetched"]))
+        t = Table("oslo", "Oslo", 0, 0, "Europe/Oslo", "NO", "F+E S D A M I")
+        t.rows = read_table_rows(live)
+        self.assertEqual(t.content_hash(), held["hash"])
+        with open(os.path.join(self.root, "archive", "tables", "monitor", "index.tsv")) as f:
+            self.assertIn(held["hash"], f.read())
+
     def test_due(self):
         weekly = {"source": "a", "fetcher": "x", "cadence": "weekly"}
         monthly = {"source": "b", "fetcher": "x", "cadence": "monthly"}
@@ -225,6 +392,101 @@ class Parsers(unittest.TestCase):
         m = jakim.parse_mirror(mirror, 2027, 1)
         self.assertEqual(["2027-01-01"], sorted(m))
         self.assertEqual(6, len(m["2027-01-01"]))
+
+    def test_jakim_slips_are_left_out_by_the_table_itself(self):
+        # An invented year: each column a slow ramp of hours no Malaysian table prints (ruling R69 keeps
+        # printed times out of tests), then the shapes of e-solat's own slips put in.
+        rows = {}
+        for i in range(40):
+            d = (dt.date(2027, 5, 1) + dt.timedelta(days=i)).isoformat()
+            rows[d] = [f"0{h}:{10 + i // 4:02d}" for h in (1, 2)] + [f"1{h}:{10 + i // 4:02d}" for h in (2, 4, 6, 8)]
+        bad = dict(rows)
+        for d in ("2027-05-20", "2027-05-21", "2027-05-22", "2027-05-23", "2027-05-24", "2027-05-25"):
+            bad[d] = bad[d][:4] + ["06" + bad[d][4][2:]] + bad[d][5:]   # Maghrib twelve hours off, six days running
+        bad["2027-05-10"] = bad["2027-05-10"][:3] + ["13" + bad["2027-05-10"][3][2:]] + bad["2027-05-10"][4:]  # Asr an hour early
+        bad["2027-05-30"] = ["13" + bad["2027-05-30"][0][2:]] + bad["2027-05-30"][1:]  # Fajr after noon
+        clean, notes, dropped = jakim.slips(bad)
+        self.assertEqual(set(), dropped)
+        self.assertEqual(["-"] * 6, [clean[d][4] for d in ("2027-05-20", "2027-05-21", "2027-05-22", "2027-05-23", "2027-05-24", "2027-05-25")])
+        self.assertEqual("-", clean["2027-05-10"][3])
+        self.assertEqual("-", clean["2027-05-30"][0])
+        self.assertEqual(8, len(notes), notes)
+        self.assertIn("2027-05-10 Asr about 1 hour early against its neighbours", notes)
+        self.assertIn("2027-05-20 Maghrib printed before noon", notes)
+        self.assertFalse(any(re.search(r"\d{1,2}:\d{2}", n) for n in notes), "a note never carries a printed time")
+        changed = {(d, c) for d in rows for c in range(6) if clean[d][c] != rows[d][c]}
+        self.assertEqual(8, len(changed), "nothing else is touched")
+        self.assertEqual((rows, [], set()), jakim.slips(rows), "a clean table passes as it is")
+        # A day still out of order once its slips are out is left out whole.
+        close = {d: v[:3] + ["13" + v[3][2:], "13:" + f"{int(v[3][3:]) + 20:02d}"] + v[5:] for d, v in rows.items()}
+        close["2027-05-15"] = close["2027-05-15"][:4] + ["13:" + f"{int(close['2027-05-15'][3][3:]) - 5:02d}"] + close["2027-05-15"][5:]
+        clean, notes, dropped = jakim.slips(close)
+        self.assertEqual({"2027-05-15"}, dropped)
+        self.assertEqual(["-"] * 6, clean["2027-05-15"], "every cell '-', so the merge cannot keep an earlier capture's row for it")
+        # Through the store, the day's earlier row in the live file is replaced, not kept.
+        t = Table("WLY02-2027", "Labuan", None, None, "Asia/Kuching", "MY", "F+E S D A M I")
+        t.rows = {d: list(v) for d, v in close.items()}
+        root = tempfile.mkdtemp("jakim-merge")
+        try:
+            store = Store(root, os.path.join(root, "monitor"), dt.date(2026, 11, 12))
+            store.record("my-jakim", t)
+            again = Table("WLY02-2027", "Labuan", None, None, "Asia/Kuching", "MY", "F+E S D A M I")
+            for d, v in clean.items():
+                again.add(d, v)
+            store.record("my-jakim", again)
+            held = read_table_rows(os.path.join(root, "archive", "tables", "monitor", "my-jakim", "WLY02-2027.txt"))
+            self.assertEqual(["-"] * 6, held["2027-05-15"])
+        finally:
+            shutil.rmtree(root)
+
+    def test_jakim_takes_the_year_ahead_from_esolat_and_the_mirror_only_when_esolat_fails(self):
+        def year(zone, y):
+            return json.dumps({"status": "OK!", "serverTime": "x", "zone": zone, "prayerTime": [
+                {"date": (dt.date(y, 1, 1) + dt.timedelta(days=i)).strftime("%d-%b-%Y").replace("May", "Mei"),
+                 "fajr": "01:00:00", "syuruk": "02:00:00", "dhuhr": "13:00:00", "asr": "14:00:00", "maghrib": "15:00:00", "isha": "16:00:00"}
+                for i in range(365)]}).encode()
+        no_record = json.dumps({"prayerTime": {"data": ["No data available for the current request"]}, "status": "NO_RECORD!"}).encode()
+        mirror_month = json.dumps({"prayers": [{"day": d, "fajr": 1798736400 + d * 86400, "syuruk": 1798740000 + d * 86400,
+                                                 "dhuhr": 1798779600 + d * 86400, "asr": 1798783200 + d * 86400,
+                                                 "maghrib": 1798786800 + d * 86400, "isha": 1798790400 + d * 86400} for d in range(1, 29)]}).encode()
+        answers = []
+        for zone, _, _ in jakim.ZONES:
+            answers.append((jakim.ESOLAT + zone, year(zone, 2026)))
+        posted = []
+
+        class Http(FakeHttp):
+            def get(self, url, headers=None, data=None, timeout=None, retries=1):
+                if url.startswith(jakim.ESOLAT_DURATION):
+                    zone = url.rsplit("=", 1)[1]
+                    posted.append((zone, data))
+                    if zone == "SGR01":
+                        return no_record
+                    if zone == "SBH01":
+                        raise FetchError("HTTP 500 from e-solat")
+                    if zone == "SBH07":
+                        raise FetchError("HTTP 500 from e-solat")
+                    return year(zone, 2027)
+                return super().get(url, headers=headers, data=data, timeout=timeout, retries=retries)
+        answers.append((jakim.MIRROR + "SBH01?year=2027&month=", mirror_month))
+        answers.append((jakim.MIRROR + "SBH07?year=2027&month=1", FetchError("HTTP 404 from the mirror")))
+        root = tempfile.mkdtemp("monitor-jakim")
+        try:
+            http = Http(answers)
+            ctx = Context("my-jakim", root, dt.date(2026, 11, 12), lambda line: None, root, http=http)
+            tables = {t.key: t for t in jakim.fetch(ctx)}
+        finally:
+            shutil.rmtree(root)
+        self.assertEqual(13, len(posted))
+        self.assertEqual({"datestart": "2027-01-01", "dateend": "2027-12-31"}, posted[0][1])
+        self.assertEqual(365, len(tables["WLY02-2027"].rows))
+        self.assertIn("period=duration", tables["WLY02-2027"].source_line)
+        self.assertNotIn("SGR01-2027", tables)
+        self.assertNotIn("SBH07-2027", tables)
+        self.assertIn("(mirror)", tables["SBH01-2027"].name)
+        self.assertEqual(12 * 28, len(tables["SBH01-2027"].rows))
+        self.assertEqual([], ctx.errors)
+        self.assertTrue(any("2027 not published yet for SGR01, SBH07" in n for n in ctx.notes), ctx.notes)
+        self.assertEqual(13 + 12 + 1, len(http.urls), "e-solat's year for each zone, then the mirror for the two zones e-solat failed")
 
     def test_muis(self):
         self.assertEqual("05:44", muis.h24("5:44", 0))
@@ -626,6 +888,10 @@ class MoreParsers(unittest.TestCase):
         self.assertIn("has 1 days, month 3 of 2027 has 31", str(counted.exception))
         with self.assertRaises(FetchError):
             irn.page_config("<html>nothing</html>")
+        shell = ('<!doctype html><html><head><script type="module" crossorigin src="/assets/index-Ab12.js"></script></head>'
+                 '<body>\n    <div id="root"></div>\n  </body></html>')
+        with self.assertRaisesRegex(FetchError, "now an app whose calendars come from a data API that needs a key"):
+            irn.page_config(shell)
         # The AJAX URL must be the site's own.
         elsewhere = page.replace("https://bonnetid.info/wp-admin/admin-ajax.php", "https://evil.example/admin-ajax.php")
         with self.assertRaises(FetchError) as host:
@@ -770,6 +1036,23 @@ class RoundTwo(unittest.TestCase):
             self.assertEqual({"cities": {"berlin": "1"}}, json.load(f))
         self.assertFalse(any(n.endswith(".tmp") for n in os.listdir(self.monitor)))
         self.assertEqual({"cities": {"berlin": "1"}}, diyanet.Ids(ctx).data)
+
+    def test_diyanet_keeps_editions_only_once_switched_on(self):
+        # Off until the Diyanet Europe curves read pinned copies (diyanet.py's docstring): the live file
+        # stays merged, so its 2027 days are not dropped from under them.
+        page = ("<table><tr><td>28 Eylül 2026 Pazartesi</td><td>x</td><td>05:11</td><td>06:38</td>"
+                "<td>12:59</td><td>16:19</td><td>19:09</td><td>20:30</td></tr></table>").encode()
+        self.assertFalse(diyanet.KEEP_EDITIONS)
+        tables = diyanet.fetch(self.ctx("tr-diyanet", http=FakeHttp([(diyanet.BASE, page)])))
+        self.assertTrue(tables)
+        self.assertTrue(all(not t.editions for t in tables))
+        saved = diyanet.KEEP_EDITIONS
+        diyanet.KEEP_EDITIONS = True
+        try:
+            tables = diyanet.fetch(self.ctx("tr-diyanet", http=FakeHttp([(diyanet.BASE, page)])))
+        finally:
+            diyanet.KEEP_EDITIONS = saved
+        self.assertTrue(all(t.editions for t in tables))
 
     def test_london_quotes_the_key_in_the_url(self):
         with open(os.path.join(self.monitor, "keys.env"), "w") as f:
@@ -1434,44 +1717,101 @@ class HijriMonth(unittest.TestCase):
 
 
 class HabousPlaces(unittest.TestCase):
-    """The Morocco fetcher's ten units and its 29 edge cities: each edge page must show its own place, is
+    """The Morocco fetcher's ten units and its 29 edge cities, read from Habous's month files (since
+    November 2026, the old city pages answer 404): each place must carry the name its old page showed, is
     read at the app's city point as ma.habous, and has its row in ma-habous.tsv at that very point."""
 
     @staticmethod
-    def page(label):
-        return ('<select name="ville"><option value=\'index.php?ville=1\' selected=selected >' + label + "</option></select>"
-                '<table id="horaire"><tr><th>الأيام</th><th>ربيع الآخر</th><th>شتنبر / أكتوبر</th><th>الصبح</th><th>الشروق</th>'
-                "<th>الظهر</th><th>العصر</th><th>المغرب</th><th>العشاء</th></tr>"
-                "<tr><td>الأحد</td><td>1</td><td>13</td><td>01:13</td><td>02:13</td><td>03:13</td><td>04:13</td><td>05:13</td><td>06:13</td></tr>"
-                "<tr><td>الإثنين</td><td>2</td><td>14</td><td>01:14</td><td>02:14</td><td>03:14</td><td>04:14</td><td>05:14</td><td>06:14</td></tr></table>").encode()
-
-    def test_edge_pages_are_read_at_the_apps_points_and_a_page_for_another_place_is_left_out(self):
-        answers = {morocco.PAGE + str(ville): self.page("x") for _, _, ville in morocco.CITIES}
+    def month_file(year, month, names=None, fuseau="GMT", cols=None, short=()):
+        """An invented month file: every place the fetcher reads, each time the day's number as minutes of
+        hours no Moroccan table prints (ruling R69)."""
+        days = calendar.monthrange(year, month)[1]
+        names = dict(names or {})
+        villes = []
+        for _, _, ville in morocco.CITIES:
+            villes.append((ville, morocco.CITY_LABELS[ville]))
         for key, name, ville, label, lat, lon, zone in morocco.EDGE_PLACES:
-            answers[morocco.PAGE + str(ville)] = self.page(label)
-        answers[morocco.PAGE + "104"] = self.page("فاس")  # Marrakesh's id showing Fes's page
+            villes.append((ville, label))
+        villes.append((999, "مكان آخر"))
+        data = {"annee": year, "mois": month, "fuseau": fuseau, "cols": cols or list(morocco.FILE_COLUMNS), "villes": [
+            {"c": c, "n": names.get(c, n), "h": [[f"0{h}:{d:02d}" for h in (1, 2, 3, 4, 5, 6)] for d in range(1, days + 1 - (c in short))]}
+            for c, n in villes]}
+        return ("(window.HORAIRES_MOIS=window.HORAIRES_MOIS||[]).push(" + json.dumps(data, ensure_ascii=False) + ");").encode("utf-8")
 
+    def run_fetch(self, answers, today=dt.date(2026, 11, 12)):
         class ExactHttp(FakeHttp):
             def get(self, url, **kw):
                 self.urls.append(url)
                 if url not in answers:
                     raise FetchError("no canned answer")
-                return answers[url]
+                answer = answers[url]
+                if isinstance(answer, Exception):
+                    raise answer
+                return answer
         root = tempfile.mkdtemp("monitor-habous")
         try:
-            ctx = Context("ma-habous", root, dt.date(2026, 9, 28), lambda line: None, root, http=ExactHttp([]))
+            http = ExactHttp([])
+            ctx = Context("ma-habous", root, today, lambda line: None, root, http=http)
             tables = {t.key: t for t in morocco.fetch(ctx)}
         finally:
             shutil.rmtree(root)
-        self.assertEqual(10 + 29 - 1, len(tables))
-        self.assertNotIn("marrakesh", tables)
-        self.assertTrue(any("Marrakesh: the page shows another place" in e for e in ctx.errors), ctx.errors)
+        return ctx, tables, http.urls
+
+    def test_the_month_files_are_read_at_the_apps_points_and_an_id_naming_another_place_is_left_out(self):
+        nov, dec = morocco.MONTH_FILE.format(y=2026, m=11), morocco.MONTH_FILE.format(y=2026, m=12)
+        ctx, tables, urls = self.run_fetch({nov: self.month_file(2026, 11, names={104: "فاس"}),  # Marrakesh's id naming Fes
+                                            dec: self.month_file(2026, 12)})
+        self.assertEqual([nov, dec], urls, "two requests a run: the current month and the next")
+        self.assertEqual(10 + 29, len(tables))
+        self.assertEqual(("2026-12-01", "2026-12-31"), (tables["marrakesh"].first(), tables["marrakesh"].last()),
+                         "the month whose file names another place at Marrakesh's id is left out, the other kept")
+        self.assertTrue(any("Marrakesh: ville 104 names another place in 2026-11" in e for e in ctx.errors), ctx.errors)
         unit, fes, boujdour = tables["rabat"], tables["fes"], tables["boujdour"]
         self.assertEqual(("ma.habous/rabat", None, None, "Africa/Casablanca", "UTC"), (unit.entry, unit.lat, unit.lon, unit.zone, unit.clock))
         self.assertEqual(("ma.habous", 34.03313, -5.00028, "Africa/Casablanca", "MA", "UTC", "F+E S D A M I"),
                          (fes.entry, fes.lat, fes.lon, fes.zone, fes.cc, fes.clock, fes.columns))
         self.assertEqual(("Africa/El_Aaiun", "EH"), (boujdour.zone, boujdour.cc))
-        self.assertEqual(["2026-09-13", "2026-09-14"], sorted(fes.rows))
+        self.assertEqual(61, len(fes.rows))
+        self.assertEqual(("2026-11-01", "2026-12-31"), (fes.first(), fes.last()))
+        self.assertEqual(["01:30", "02:30", "03:30", "04:30", "05:30", "06:30"], fes.rows["2026-11-30"])
+        self.assertEqual(["horaires-2026-11.js", "horaires-2026-12.js"], [name for name, _ in fes.raw])
+        self.assertIn("fuseau GMT", fes.source_line)
+
+    def test_a_next_month_not_posted_yet_is_a_note_and_a_missing_current_month_an_error(self):
+        nov, dec = morocco.MONTH_FILE.format(y=2026, m=11), morocco.MONTH_FILE.format(y=2026, m=12)
+        ctx, tables, _ = self.run_fetch({nov: self.month_file(2026, 11), dec: FetchError(f"HTTP 404 from {dec}")})
+        self.assertEqual([], ctx.errors)
+        self.assertTrue(any("2026-12 not posted yet" in n for n in ctx.notes), ctx.notes)
+        self.assertEqual(39, len(tables))
+        self.assertEqual("2026-11-30", tables["casablanca"].last())
+        ctx, tables, _ = self.run_fetch({nov: FetchError(f"HTTP 404 from {nov}"), dec: FetchError(f"HTTP 404 from {dec}")})
+        self.assertEqual({}, tables)
+        self.assertTrue(any(e.startswith("2026-11: HTTP 404") for e in ctx.errors), ctx.errors)
+        # December's turn: January 2027 is the next month.
+        jan = morocco.MONTH_FILE.format(y=2027, m=1)
+        ctx, tables, urls = self.run_fetch({morocco.MONTH_FILE.format(y=2026, m=12): self.month_file(2026, 12), jan: FetchError("HTTP 404")},
+                                           today=dt.date(2026, 12, 30))
+        self.assertEqual(jan, urls[-1])
+        self.assertEqual([], ctx.errors)
+
+    def test_a_file_in_another_zone_or_with_other_columns_or_a_short_month_is_refused(self):
+        nov, dec = morocco.MONTH_FILE.format(y=2026, m=11), morocco.MONTH_FILE.format(y=2026, m=12)
+        no_dec = FetchError("HTTP 404")
+        ctx, tables, _ = self.run_fetch({nov: self.month_file(2026, 11, fuseau="GMT+1"), dec: no_dec})
+        self.assertEqual({}, tables)
+        self.assertTrue(any("zone is 'GMT+1', not GMT" in e for e in ctx.errors), ctx.errors)
+        ctx, tables, _ = self.run_fetch({nov: self.month_file(2026, 11, cols=["Imsak", "Fajr", "Chorouq", "Dhuhr", "Asr", "Maghrib"]), dec: no_dec})
+        self.assertEqual({}, tables)
+        self.assertTrue(any("columns are not the six expected" in e for e in ctx.errors), ctx.errors)
+        ctx, tables, _ = self.run_fetch({nov: self.month_file(2026, 11, short=(58,)), dec: no_dec})
+        self.assertNotIn("casablanca", tables)
+        self.assertEqual(38, len(tables))
+        self.assertTrue(any("Casablanca: 2026-11's file does not hold the whole month" in e for e in ctx.errors), ctx.errors)
+        ctx, tables, _ = self.run_fetch({nov: b"<html>Just a moment...</html>", dec: no_dec})
+        self.assertEqual({}, tables)
+        self.assertTrue(any("not a month file" in e for e in ctx.errors), ctx.errors)
+        ctx, tables, _ = self.run_fetch({nov: self.month_file(2026, 10), dec: no_dec})
+        self.assertTrue(any("the file holds 2026-10" in e for e in ctx.errors), ctx.errors)
 
     def test_every_edge_place_has_its_row_in_the_gate_at_its_own_point(self):
         gate = os.path.join(HERE, "..", "official", "gate", "ma-habous.tsv")

@@ -21,6 +21,14 @@ import urllib.parse
 from common import FetchError, Table
 
 SOURCE = "no-irn"
+# Since 31 October 2026 bonnetid.info is a React app (an empty `<div id="root">` and one script under
+# /assets/) whose calendars come from a Supabase data API at disp-api.bonnetider.eu, which answers 401 "No
+# API key found in request" without the key the app's script carries (checked 12 Nov 2026). The monitor
+# sends no key it was not given: the owner decides how IRN is read (docs/MONITOR.md), and until then this
+# says so instead of "no prayerAjax".
+APP_SHELL = re.compile(r"<div id=\"root\">\s*</div>|src=\"/assets/index-[^\"]+\.js\"")
+APP_SHELL_MESSAGE = ("bonnetid.info is now an app whose calendars come from a data API that needs a key (disp-api.bonnetider.eu, "
+                     "401 without it): not read until the owner decides how (the key the app carries, IRN's leave, or a hand export)")
 HOME = "https://bonnetid.info/"
 HOST = "bonnetid.info"
 # The month a reply names, in the site's Norwegian or in English, folded.
@@ -49,6 +57,8 @@ def page_config(page):
     """(ajaxurl, nonce, {folded city: value the AJAX call takes}) from the home page: the city list
     is the searchable one (`data-value` of each `city-option`) or, as before, a `<select>`."""
     m = re.search(r"prayerAjax\s*=\s*(\{.*?\});", page, flags=re.S)
+    if not m and APP_SHELL.search(page):
+        raise FetchError(APP_SHELL_MESSAGE)
     if not m:
         raise FetchError("no prayerAjax on the page")
     cfg = json.loads(m.group(1))

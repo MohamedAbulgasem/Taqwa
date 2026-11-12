@@ -27,10 +27,28 @@ coordinates, listed by api.muftyat.kz/cities/, 5,694 of them, every one on UTC+5
   there the year API answers HTTP 500 (9 Oct 2026), so QMDB publishes no table to check.
 
 The fast begins at the printed Fajr (the API's "imsak", after its Fajr, is not used), so the Fajr column
-is also the end of eating (F+E)."""
-import json
+is also the end of eating (F+E).
 
-from common import FetchError, Table, add_all
+The API sometimes answers a place two ways (engine survey, 11-12 Nov 2026): on 9 Nov it answered
+Zhezkazgan (47.80N) with the minutes of the band at and above 48N from 5 Mar to 31 Dec, sunrise 2 min
+earlier and Dhuhr, Asr and Maghrib 2 min later on 302 days, and 19 of 20 sequential requests on 11 Nov
+gave the right year again. So a reply is taken only when it keeps QMDB's own band rule on every day
+(Maghrib is sunset + 3 min below 48N, + 5 at or above, which every capture from 3 Oct to 9 Nov 2026
+keeps, 127,385 days, but that one) and either says what the held copy says or a second reply says the
+same. Otherwise the place is asked again, sequentially, up to REQUESTS times; when no reply can be taken
+the held copy stays and the run says "QMDB answered two ways" as a fetch error, never as a new table.
+
+A change that breaks the band rule (a new Maghrib offset, a moved 48N line) is never taken here, however
+often it is said: it would freeze every held copy and give a year with none no table. Once METHOD_PLACES
+places in one run have each answered the same way every time against the rule, the rest are asked once
+each, not REQUESTS times (87 places and two years would otherwise cost some 520 requests and half an
+hour of pauses from the run's budget), and the error names what to change after a look by hand:
+BAND_LAT and band_minutes below (docs/MONITOR.md, "QMDB's band rule")."""
+import collections
+import json
+import time
+
+from common import FetchError, Table, add_all, norm_time
 
 SOURCE = "kz-qmdb"
 BASE = "https://api.muftyat.kz/prayer-times"
@@ -136,6 +154,13 @@ POINTS = [
 
 FIELDS = ("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")
 
+# QMDB's band rule: Maghrib is sunset + 3 min below 48N, + 5 at or above (CentralAsia.kt, Regions.kt kazakhNorth).
+BAND_LAT = 48.0
+REQUESTS = 3  # at most, for one place and year, when a reply cannot be taken
+METHOD_PLACES = 3  # places in one run answering the same way against the band rule before the rest are asked once
+KNOB = "if it has, change BAND_LAT/band_minutes in tools/timetables/monitor/fetchers/qmdb.py (docs/MONITOR.md)"
+RETRY_PAUSE = 5.0  # seconds before asking again (on top of the client's own spacing); requests stay sequential
+
 
 def parse(body):
     """The API's year: {"result": [{"Date": yyyy-mm-dd, "fajr": HH:MM, ...}, ...]}."""
@@ -152,21 +177,148 @@ def parse(body):
     return rows
 
 
+def _minutes(t):
+    h, m = str(t).split(":")[:2]
+    return int(h) * 60 + int(m)
+
+
+def band_minutes(lat):
+    return 5 if float(lat) >= BAND_LAT else 3
+
+
+def off_band(body, lat):
+    """The dates of a reply whose Maghrib is not sunset + QMDB's band minutes for `lat` (days without
+    a sunset or a Maghrib are not judged)."""
+    want = band_minutes(lat)
+    out = []
+    for x in json.loads(body.decode("utf-8", "replace")).get("result") or []:
+        try:
+            if _minutes(x["maghrib"]) - _minutes(x["sunset"]) != want:
+                out.append(str(x["Date"])[:10])
+        except (KeyError, TypeError, ValueError):
+            continue
+    return sorted(out)
+
+
+def normalised(rows):
+    """Rows as a held table file has them ('HH:MM'); a cell that is not a time stays as it is."""
+    out = {}
+    for d, cells in rows.items():
+        line = []
+        for c in cells:
+            try:
+                line.append(norm_time(c))
+            except FetchError:
+                line.append(c)
+        out[d] = line
+    return out
+
+
+def differ(rows, held):
+    """The dates both hold whose cells differ."""
+    return sorted(d for d in rows if d in held and rows[d] != held[d])
+
+
+def shifts(rows, held, dates):
+    """'sunrise -2, dhuhr +2' : each column's most common move over `dates`, where it moved."""
+    parts = []
+    for i, name in enumerate(FIELDS):
+        moves = collections.Counter()
+        for d in dates:
+            try:
+                moves[_minutes(rows[d][i]) - _minutes(held[d][i])] += 1
+            except (IndexError, ValueError):
+                continue
+        moves.pop(0, None)
+        if moves:
+            move, n = moves.most_common(1)[0]
+            parts.append(f"{name} {move:+d} on {n} days")
+    return ", ".join(parts)
+
+
+def span(dates):
+    return f"{len(dates)} day{'s' if len(dates) != 1 else ''} {dates[0]}..{dates[-1]}" if dates else "no days"
+
+
+def ask(ctx, url, lat, held, label, state=None):
+    """The reply to take for `url`: (body, rows) or None, with why when None. A reply is taken when it
+    keeps the band rule and says what the held copy says on every day both hold, or when a second
+    reply that keeps the band rule says exactly the same. Raises FetchError when the API answers no year.
+    `state` is the run's: {"against": [labels answered the same way every time against the band rule]};
+    from METHOD_PLACES of them on, a place is asked once."""
+    state = {"against": []} if state is None else state
+    against = state.setdefault("against", [])
+    tries = 1 if len(against) >= METHOD_PLACES else REQUESTS
+    replies = []  # (body, rows, off-band dates)
+    for attempt in range(tries):
+        if attempt:
+            time.sleep(RETRY_PAUSE)
+        body = ctx.http.get(url)
+        rows = normalised(parse(body))
+        off = off_band(body, lat)
+        if not off:
+            moved = differ(rows, held) if held else []
+            if not moved:
+                if attempt:
+                    ctx.note(f"{label}: reply {attempt + 1} taken, as the held copy has it")
+                return body, rows
+            if any(not o and r == rows for _, r, o in replies):
+                ctx.note(f"{label}: reply {attempt + 1} taken, two replies agree on a new table ({span(moved)} moved from the held copy: {shifts(rows, held, moved)})")
+                return body, rows
+            reason = f"{span(moved)} differ from the held copy ({shifts(rows, held, moved)})"
+        else:
+            reason = f"Maghrib is not sunset + {band_minutes(lat)} min (QMDB's band rule) on {span(off)}"
+            if held:
+                moved = differ(rows, held)
+                if moved:
+                    reason += f"; against the held copy {shifts(rows, held, moved)}"
+        replies.append((body, rows, off))
+        ctx.log(f"  {label}: reply {attempt + 1} not taken yet: {reason}" + ("; asking again" if attempt + 1 < tries else ""))
+    off = replies[-1][2]
+    if tries == 1:
+        if off:
+            return None, (f"QMDB answered against its own band rule ({reason}), asked once since {len(against)} places this run "
+                          f"({', '.join(against[:METHOD_PLACES])}) answered the same way every time; it may have changed its method: "
+                          f"look by hand, and {KNOB}")
+        return None, f"QMDB's reply differs from the held copy ({reason}), asked once since {len(against)} places this run answered against its band rule"
+    agreeing = len(replies) > 1 and all(r == replies[0][1] for _, r, _ in replies)
+    if not agreeing:
+        return None, f"QMDB answered two ways in {len(replies)} requests ({reason})"
+    if off:
+        against.append(label)
+        if len(against) == METHOD_PLACES:
+            ctx.note(f"{METHOD_PLACES} places ({', '.join(against)}) answered the same way every time against QMDB's band rule: "
+                     f"the rest of this run asks each place once")
+        return None, (f"QMDB answered the same {len(replies)} times against its own band rule ({reason}); it may have changed its "
+                      f"method: look by hand, and {KNOB}")
+    return None, f"QMDB answered two ways in {len(replies)} requests ({reason})"
+
+
 def fetch(ctx):
     tables = []
+    state = {"against": []}
     for year in (ctx.today.year, ctx.today.year + 1):
         for key, name, lat, lon, zone in POINTS:
             url = f"{BASE}/{year}/{lat}/{lon}"
+            label = f"{name} {year}"
+            held = ctx.held(f"{key}-{year}")
             try:
-                body = ctx.http.get(url)
-                rows = parse(body)
+                got = ask(ctx, url, lat, held, label, state)
             except FetchError as e:
-                ctx.error(f"{name} {year}: {e}")
+                ctx.error(f"{label}: {e}")
                 continue
-            t = Table(f"{key}-{year}", f"{name} {year}", float(lat), float(lon), zone, "KZ", "F+E S D A M I", entry=ENTRY,
-                      school="hanafi", source_line=f"QMDB (muftyat.kz) {url} (the year API the official site calls)",
-                      raw=[(f"{key}-{year}.json", body)])
-            add_all(ctx, t, rows, f"{name} {year}")
+            t = Table(f"{key}-{year}", label, float(lat), float(lon), zone, "KZ", "F+E S D A M I", entry=ENTRY,
+                      school="hanafi", source_line=f"QMDB (muftyat.kz) {url} (the year API the official site calls)")
+            if got[0] is None:
+                if held:
+                    ctx.error(f"{label}: {got[1]}; the held copy is kept")
+                    add_all(ctx, t, held, label)
+                else:
+                    ctx.error(f"{label}: {got[1]}; nothing is held, so no table")
+            else:
+                body, rows = got
+                t.raw = [(f"{key}-{year}.json", body)]
+                add_all(ctx, t, rows, label)
             t.merge = False
             if t.rows:
                 tables.append(t)

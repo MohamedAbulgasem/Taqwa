@@ -1,24 +1,35 @@
-"""Morocco, the Ministry of Habous and Islamic Affairs (habous.gov.ma): each city's live page, the
-current Hijri month, for the ten cities ma-habous.tsv checks at their units, and for 29 more of the
-app's own Moroccan cities beyond them (EDGE_PLACES), each at the app's city point, where the edge's
-national margins answer most of Morocco. The page prints the legal time, UTC+0
-all the year round since 20 September 2026 (ClockChanges), so the table is read with `clock` UTC
-like the gate's live rows. Habous prints no imsak: the fast begins at its Fajr (F+E). Restricted:
-archive only.
+"""Morocco, the Ministry of Habous and Islamic Affairs (habous.gov.ma): the ten cities ma-habous.tsv
+checks at their units, and 29 more of the app's own Moroccan cities beyond them (EDGE_PLACES), each at
+the app's city point, where the edge's national margins answer most of Morocco. Habous prints the legal
+time, UTC+0 all the year round since 20 September 2026 (ClockChanges), so each table is read with
+`clock` UTC like the gate's live rows. Habous prints no imsak: the fast begins at its Fajr (F+E).
+Restricted: archive only.
 
-The Ministry publishes one Hijri month at a time, on the day it begins (after the sighting on the
-evening of the 29th), with 30 rows from its first day; nothing further ahead (no year table, PDF,
-month parameter or app data, 6 Oct 2026). Each city's file keeps every month fetched (the store
-merges), and the source's cadence `hijri-month` fetches the new month as it turns. The site's server
-omits its certificate's intermediate: common.EXTRA_CA completes the chain (monitor/certs/)."""
+Since late October 2026 the site is a maintenance notice and the old city pages
+(prieres/index.php?ville=N) answer 404. Its times now come from static month files,
+data/horaires-<yyyy>-<mm>.js: one whole Gregorian month for 190 places, as
+`window.HORAIRES_MOIS.push({annee, mois, fuseau, cols, villes: [{c: ville id, n: Arabic name, h: [[six
+times] per day]}]})`. The ids are the old pages' ville ids. A run reads the current month and the next;
+the next is posted a few days before it begins (November's on 31 October), so a 404 for it is a note
+("not posted yet"), never an error, while a 404 for the current month is one. The file must say
+`fuseau` "GMT": another zone (Morocco back on summer time, say) is refused until the tables' clock is
+reconsidered, never read an hour off. Each place must carry the Arabic name its old page showed, so an id
+that now names another place is left out. Each city's file keeps every month fetched (the store merges);
+the old page parser (`parse`) stays for the day the portal returns."""
+import calendar
 import datetime as dt
 import html
+import json
 import re
 
 from common import FetchError, Table, add_all
 
 SOURCE = "ma-habous"
 PAGE = "https://www.habous.gov.ma/prieres/index.php?ville="
+MONTH_FILE = "https://www.habous.gov.ma/data/horaires-{y:04d}-{m:02d}.js"
+# The month files' own column names, in the order F+E S D A M I reads them, and the zone they must name.
+FILE_COLUMNS = ["Fajr", "Chorouq", "Dhuhr", "Asr", "Maghrib", "Ishae"]
+FUSEAU = "GMT"
 MONTHS = {"يناير": 1, "فبراير": 2, "مارس": 3, "أبريل": 4, "ابريل": 4, "ماي": 5, "يونيو": 6, "يوليوز": 7, "غشت": 8,
           "شتنبر": 9, "أكتوبر": 10, "اكتوبر": 10, "نونبر": 11, "دجنبر": 12}
 # The six time columns the page heads, in the order the table reads them (F+E S D A M I): Fajr, sunrise,
@@ -32,6 +43,10 @@ CITIES = [
     ("laayoune", "Laayoune", 156), ("dakhla", "Dakhla", 165), ("figuig", "Figuig", 33), ("midelt", "Midelt", 136),
     ("lagouira", "Lagouira", 166), ("ifrane", "Ifrane", 100),
 ]
+# The Arabic name each unit's ville id carried on its old page (the held captures' 'page selected'), which
+# the month files' `n` must repeat.
+CITY_LABELS = {58: "الدار البيضاء", 1: "الرباط", 31: "وجدة", 14: "طنجة", 156: "العيون", 165: "الداخلة", 33: "فكيك",
+               136: "ميدلت", 166: "الكويرة", 100: "يفرن"}
 
 # The app's cities (shared/.../files/cities.csv, GeoNames) whose Arabic name is a place on Habous's list,
 # beyond the ten units but Azrou (inside Ifrane's): key, name, the site's ville id, the place the page must
@@ -125,28 +140,95 @@ def parse(page, today):
     return out
 
 
-def fetch(ctx):
-    tables = []
-    places = [(unit, name, ville, None, None, None, "Africa/Casablanca") for unit, name, ville in CITIES] + list(EDGE_PLACES)
-    for key, name, ville, label, lat, lon, zone in places:
-        url = PAGE + str(ville)
+def parse_month_file(text):
+    """(year, month, {ville id: (name, {date: [6 times]})}) of one month file. Refuses a file whose zone
+    is not GMT, whose columns are not the six expected, or whose place has a day too few or too many."""
+    i, j = text.find("push("), text.rfind(")")
+    if i < 0 or j <= i:
+        raise FetchError("not a month file (no push(...))")
+    try:
+        data = json.loads(text[i + 5:j])
+    except ValueError as e:
+        raise FetchError(f"the month file's data is not JSON ({e.__class__.__name__})")
+    if not isinstance(data, dict):
+        raise FetchError("the month file's data is not an object")
+    try:
+        year, month = int(data["annee"]), int(data["mois"])
+    except (KeyError, TypeError, ValueError):
+        raise FetchError("the month file names no year and month")
+    if data.get("fuseau") != FUSEAU:
+        raise FetchError(f"the month file's zone is {str(data.get('fuseau'))[:20]!r}, not {FUSEAU}: its clock must be "
+                         "reconsidered before it is read (Morocco has kept UTC+0 since 20 September 2026)")
+    if data.get("cols") != FILE_COLUMNS:
+        raise FetchError(f"the month file's columns are not the six expected ({' | '.join(map(str, data.get('cols') or []))[:80]})")
+    days = calendar.monthrange(year, month)[1]
+    out = {}
+    for v in data.get("villes") or []:
         try:
-            page = ctx.http.text(url)
-            rows = parse(page, ctx.today)
+            ville, name, h = int(v["c"]), str(v["n"]).strip(), v["h"]
+        except (KeyError, TypeError, ValueError):
+            continue
+        if not isinstance(h, list) or len(h) != days or any(not isinstance(r, list) or len(r) != 6 for r in h):
+            out[ville] = (name, None)
+            continue
+        out[ville] = (name, {dt.date(year, month, d + 1).isoformat(): h[d] for d in range(days)})
+    if not out:
+        raise FetchError("the month file holds no place")
+    return year, month, out
+
+
+def months_to_read(today):
+    """The current Gregorian month and the next: [(year, month)]."""
+    nxt = (today.year + (today.month == 12), today.month % 12 + 1)
+    return [(today.year, today.month), nxt]
+
+
+def fetch(ctx):
+    places = [(unit, name, ville, CITY_LABELS[ville], None, None, "Africa/Casablanca") for unit, name, ville in CITIES] + list(EDGE_PLACES)
+    files = []  # (url, text, {ville: (name, rows)})
+    for n, (y, m) in enumerate(months_to_read(ctx.today)):
+        url = MONTH_FILE.format(y=y, m=m)
+        try:
+            text = ctx.http.text(url)
         except FetchError as e:
-            ctx.error(f"{name}: {e}")
+            if re.search(r"HTTP 404\b", str(e)) and n > 0:
+                ctx.note(f"{y:04d}-{m:02d} not posted yet (HTTP 404): the Ministry posts each month a few days before it begins")
+            else:
+                ctx.error(f"{y:04d}-{m:02d}: {e}")
             continue
-        sel = re.findall(r"<option[^>]*selected[^>]*>([^<]*)", page)
-        selected = sel[0].strip() if sel else "?"
-        if label is not None and selected != label:
-            # A ville id that now names another place would check the wrong point.
-            ctx.error(f"{name}: the page shows another place (ville={ville}); left out")
+        try:
+            fy, fm, villes = parse_month_file(text)
+        except FetchError as e:
+            ctx.error(f"{y:04d}-{m:02d}: {e}")
             continue
+        if (fy, fm) != (y, m):
+            ctx.error(f"{y:04d}-{m:02d}: the file holds {fy:04d}-{fm:02d}; left out")
+            continue
+        files.append((url, text, villes))
+    tables = []
+    for key, name, ville, label, lat, lon, zone in places:
         entry = f"ma.habous/{key}" if lat is None else "ma.habous"
         cc = "EH" if zone == "Africa/El_Aaiun" else "MA"
+        used = [url for url, _, _ in files]
         t = Table(key, name, lat, lon, zone, cc, "F+E S D A M I", entry=entry, clock="UTC",
-                  source_line=f"Ministry of Habous and Islamic Affairs, Morocco: {url} (the current Hijri month, legal time UTC+0; page selected '{selected}')",
-                  raw=[(f"habous-{ville}.html", page)])
-        if add_all(ctx, t, rows, name):
+                  source_line=f"Ministry of Habous and Islamic Affairs, Morocco: {', '.join(used)} (whole Gregorian months, "
+                              f"fuseau {FUSEAU} = legal time UTC+0; ville {ville} '{label}')")
+        for url, text, villes in files:
+            month = url.rsplit("horaires-", 1)[1][:-3]
+            got = villes.get(ville)
+            if got is None:
+                ctx.error(f"{name}: ville {ville} is not in {month}'s file")
+                continue
+            shown, rows = got
+            if shown != label:
+                # A ville id that now names another place would check the wrong point.
+                ctx.error(f"{name}: ville {ville} names another place in {month}'s file; left out")
+                continue
+            if rows is None:
+                ctx.error(f"{name}: {month}'s file does not hold the whole month for ville {ville}; left out")
+                continue
+            if add_all(ctx, t, rows, name):
+                t.raw.append((f"horaires-{month}.js", text))
+        if t.rows:
             tables.append(t)
     return tables

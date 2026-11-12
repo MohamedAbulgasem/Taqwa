@@ -25,7 +25,7 @@ TOWNS = [
     ("shalatin", "شلاتين"), ("farafra", "الفرافرة"), ("nuweiba", "نويبع"), ("suez", "السويس"), ("dahab", "دهب"),
 ]
 ALIASES = {"الأسكندرية": "alexandria", "أسوان": "aswan", "الأقصر": "luxor", "أدفو": "edfu", "الضبعة": "el-dabaa",
-           "رفح": "rafah", "سانت كاترين": "saint-catherine", "الداخلة": "mut", "موط": "mut", "رأس غارب": "ras-gharib"}
+           "رفح": "rafah", "سانت كاترين": "saint-catherine", "الداخلة": "mut", "موط": "mut", "موط (الداخلة)": "mut", "رأس غارب": "ras-gharib"}
 T = r"(\d{1,2}:\d{1,2}) ([صم])"
 ROW = re.compile(r"(\d{2}) (\S+) (\d{4}) م " + " ".join([T] * 6))
 
@@ -59,6 +59,8 @@ def h24(tok, half):
 
 def norm_city(n):
     n = n.replace("ـ", "").replace("ى", "ي").replace("أ", "ا").replace("إ", "ا").replace("آ", "ا").replace("ة", "ه")
+    # ESA prints Mut as "موط (الداخلة )", with a space before the bracket
+    n = re.sub(r"\(\s+", "(", re.sub(r"\s+\)", ")", n))
     return re.sub(r"\s+", " ", n).strip()
 
 

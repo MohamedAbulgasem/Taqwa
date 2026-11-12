@@ -194,6 +194,14 @@ jobs:
             taqwa/shared/build.gradle.kts
             taqwa/widgetcore/build.gradle.kts
 
+      - name: The JDK's tz database
+        # Printed times are read on the JDK's own clock rules, and the runner's Temurin moved from 21.0.12 to 21.0.13
+        # (tzdata 2026e) between the 26 Oct and 2 Nov 2026 runs, which changed what the gate and the surveys found. The
+        # version goes into the log here, and one older than tzdb.py's minimum is annotated; scripts/monitor.sh then
+        # refuses the run before it fetches, so the issue says why (failing this step would skip the issue).
+        run: |
+          line="$(python3 taqwa/tools/timetables/monitor/tzdb.py --java-home "$JAVA_HOME")" && echo "$line" || echo "::error::$line"
+
       - name: Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:

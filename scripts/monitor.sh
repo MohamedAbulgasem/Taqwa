@@ -191,6 +191,17 @@ LOG="$MONITOR/fetch/run-$TODAY.log"
 : > "$LOG"
 echo "== monitor $(date) python=$PY java_home=${JAVA_HOME:-unset} official=$OFFICIAL" >> "$LOG"
 
+# The JDK's tz database (gate/Tzdb.kt): every printed time is read on its clock rules, and the runner's JDK once moved
+# under the monitor silently (Temurin 21.0.12 to 21.0.13, tzdata 2026e, between the 26 Oct and 2 Nov 2026 runs). One
+# older than tzdb.py's minimum (its exit 4) stops the run before anything is fetched; one that cannot be read (3),
+# or tzdb.py itself failing (any other code), is left to the Kotlin tasks' own check.
+STEP="tzdb"
+TZDB_LINE="$("$PY" tools/timetables/monitor/tzdb.py ${JAVA_HOME:+--java-home "$JAVA_HOME"} 2>&1)"
+TZDB_CODE=$?
+echo "== $TZDB_LINE" >> "$LOG"
+say "monitor: $TZDB_LINE"
+[ "$TZDB_CODE" = 4 ] && failed "$TZDB_LINE"
+
 ONLY_PY=()
 ONLY_GRADLE=""
 for s in ${ONLY[@]+"${ONLY[@]}"}; do

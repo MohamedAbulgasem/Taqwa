@@ -29,7 +29,24 @@ needs attention, so that a Claude session can act on it.
    city missing from a turn keeps it open, and a city a month behind never hides the next turn. A
    fetch whose newest table still ends more than three days ago (the page has not turned) is recorded
    as fetched in part, so it is a fetch finding in the report: retried on the next run, then weekly.
-   Its tables keep every month fetched. A fetcher that fails is a finding in
+   Its tables keep every month fetched. A table's file keeps every day ever fetched (the store merges
+   each capture into it), except for a source that re-issues days it already published (a table whose
+   `editions` is set; Diyanet's, whose year table on 9 November 2026 was its 2026 edition again, whose
+   takdir differs from the 2027 edition it served until 31 October, so the merged files mixed the two):
+   each of its captures is kept whole as `<source>/editions/<key>/<capture date>.txt`, the live file holds
+   the latest capture alone, and the source's message says what changed, in days (a re-issue: days changed,
+   days still ahead withdrawn, or days long past put back; else the same edition moved on). The first such
+   capture keeps the live file as it stood beside the editions as `<its fetched date>-merged.txt`.
+   `tools/timetables/monitor/editions.py` rebuilds a source's editions from its raw captures (`--out` to
+   look, `--in-place` to write them and the live files, refused unless the latest raw capture is the one
+   the index records and agrees with the live file on every day both hold): the migration for Diyanet's
+   files written before. Diyanet's tables do not set `editions` yet (`KEEP_EDITIONS` in
+   `fetchers/diyanet.py`): the live file would then drop the 2027 days only an earlier edition holds,
+   which the Diyanet Europe curves (`DiyanetEuropeCurveGenerator`, `DiyanetEuropeCrossYearTest`) still
+   read; switch it on, and run the migration, once those read pinned copies. An editions capture that
+   withdraws days still ahead without changing a held day and covers under half the held span (a page
+   that came back with its month table alone) is an error, kept as its edition, the live file left alone.
+   A fetcher that fails is a finding in
    the report, never a crash, and a driver that breaks is one too (what is held is still checked). A
    source that failed or came back in part is fetched once more on the next run, then waits for its
    cadence (one mosque gone from Mawaqit for good does not refetch all 125 calendars weekly; a
@@ -136,9 +153,11 @@ closed if that was all, and the next Monday raises it again); and when the 1st i
 runs queue, the second finds nothing new due and rewrites that day's report (the first's stays in
 the repository's history).
 
-**The daily check.** Habous (`ma-habous`) publishes one Hijri month at a time, on the day it begins,
+**The daily check.** Habous (`ma-habous`) published one Hijri month at a time, on the day it began,
 and a city page shows only days the gate has checked, so the new month is worth fetching the day it
-appears, not the Monday after. The workflow therefore also fires every day at 01:23 UTC (after midnight
+appears, not the Monday after. (Since November 2026 it posts whole Gregorian months a few days ahead,
+which the weekly run reads with the current one; the daily check still catches a month posted only the
+day before it starts, as Ramadan's may be.) The workflow therefore also fires every day at 01:23 UTC (after midnight
 in Morocco), where a small first job, `due`, checks out only the archive repository's `monitor/` and
 the public repository's monitor code and runs `fetch.py --month-turn`: it reads `monitor/hashes.json`
 alone and prints each hijri-month source whose month is turning today. Only when it prints one does the
@@ -387,7 +406,15 @@ token or deleted.
 holds `archive/` and `monitor/`; the `monitor` Gradle task refuses to run without it or
 `-Pofficial`, so that no state lands in the checkout); `TAQWA_OFFICIAL_BACKUP` an optional mirror
 folder; `TAQWA_PYTHON` the interpreter (else Homebrew's `python3`, else the first on `PATH`;
-3.9 or later, standard library only); `JAVA_HOME` the JDK (else macOS's own lookup for 21). Two
+3.9 or later, standard library only); `JAVA_HOME` the JDK (else macOS's own lookup for 21), whose tz
+database must be 2026e or later: every printed time is read on its clock rules, and the cloud runner's
+Temurin once moved from 21.0.12 to 21.0.13 (tzdata 2026e) under the monitor between the 26 Oct and 2 Nov
+2026 runs and changed what it found, so `monitor.sh` refuses an older JDK before it fetches
+(`tools/timetables/monitor/tzdb.py`), and the gate, monitor and prove tasks refuse one before they read
+anything (`gate/Tzdb.kt`; raise both minimums together). `tzdb.py` reads `JAVA_HOME`'s JDK, while the Kotlin
+tasks run on Gradle's `jvmToolchain(21)`, so `JAVA_HOME` must be that JDK (on the Mac,
+`/opt/homebrew/opt/openjdk@21`; on the runner, setup-java's); where they differ, the Kotlin check is the one
+that counts, and `tzdb.py`'s refusal says so. Two
 runs never overlap (`monitor/lock`). The Python code and its tests run under both the Mac's
 `/usr/bin/python3` (3.9, LibreSSL) and Homebrew's; a site the Mac's TLS stack cannot reach goes
 through `curl`. A notification is posted on macOS when the attention set changed, and always when
@@ -409,7 +436,7 @@ repository.
 
 ## Where things live
 
-- Code: `scripts/monitor.sh`; `tools/timetables/monitor/` (`fetch.py`, `backup.py`, `common.py`,
+- Code: `scripts/monitor.sh`; `tools/timetables/monitor/` (`fetch.py`, `backup.py`, `common.py`, `editions.py`,
   `fetchers/*.py`, `certs/` (public certificates that complete a server's incomplete chain), `tests.py`,
   `ci/monitor-weekly.yml`); `tools/timetables/src/jvmMain/kotlin/world/taqwa/timetables/monitor/`
   (`MonitorMain`, `TableCheck`, `Horizons`, `Report`, `MonitorIndex`) and the `monitor` task in
@@ -428,16 +455,28 @@ about 8 minutes at the 1.5 s interval, on the run it falls due), Diyanet
 Trondheim among them), Kemenag (eighteen kab/kota, Surabaya, Medan, Semarang, Palembang and
 Yogyakarta among them), JAKIM, MUIS, Egypt (ESA via Dar al-Ifta, and ESA's daily page), Qatar (the
 ministry API and the Calendar House header), Libya (the Awqaf widget and api.ifta.ly), Tunisia (INM),
-Morocco (Habous: the live Hijri month at its ten fitted cities and, since 6 October 2026, at 29 more of
-the app's cities, 28 at the edge (Fes, Marrakesh and Agadir among them) and Azrou at Ifrane's unit; fetched as each month turns; its server omits its
-certificate's intermediate, which `tools/timetables/monitor/certs/habous.gov.ma.pem` completes for that
-host alone, `EXTRA_CA` in `common.py`), Jamiatul Ulama, Kazakhstan's QMDB (its year API at 87 of its own
+Morocco (Habous: its ten fitted cities and, since 6 October 2026, 29 more of
+the app's cities, 28 at the edge (Fes, Marrakesh and Agadir among them) and Azrou at Ifrane's unit; since
+November 2026 from the Ministry's month files, `data/horaires-<yyyy>-<mm>.js`, a whole Gregorian month for 190
+places by the old pages' ville ids, the current month and the next on each run, the next one's 404 a note
+("not posted yet"), a file whose `fuseau` is not GMT refused; the old city pages answer 404 since the site
+became a maintenance notice on 26 October 2026; `tools/timetables/monitor/certs/habous.gov.ma.pem` once
+completed its server's chain for that host alone, `EXTRA_CA` in `common.py`, harmless now that Cloudflare
+serves it), Jamiatul Ulama, Kazakhstan's QMDB (its year API at 87 of its own
 places, monthly, from its southernmost to its northernmost, since 3 and 6 October 2026, and since 9 October 2026
-QMDB's place for every other city of the app's list: 174 requests, about 4.5 minutes), the Muslim
+QMDB's place for every other city of the app's list: 174 requests, about 4.5 minutes; a reply is taken
+only when it keeps QMDB's band rule, Maghrib at sunset + 3 min below 48° N and + 5 at or above, and says what
+the held copy says or a second reply says the same, else the place is asked again up to three times and the
+held copy stays with a fetch error, since the API answered Zhezkazgan with the northern band's minutes on
+9 November 2026. A change that breaks the band rule itself, a new Maghrib offset or a moved 48° N line, is
+never taken: once three places in a run have each answered the same way every time against the rule, the
+rest are asked once each, and every error says to look by hand and, if QMDB has changed its method, to
+change `BAND_LAT` and `band_minutes` in `tools/timetables/monitor/fetchers/qmdb.py`), the Muslim
 Judicial Council (mjc.org.za's current month for Cape Town, month-start, each month kept as
 `za-mjc/cape-town-<yyyy>-<mm>` and checked as za.mjc at its
 unit and as za.cape's member there), IRN (bonnetid.info's own month tables, no token, ruling R95; its
-searchable city list and month bar since October 2026), and since 2 October 2026 Jordan's Ministry of
+searchable city list and month bar since October 2026; since 31 October 2026 the site is an app whose data
+API needs the key its script carries, so nothing is read until the owner decides how, and the fetch says so), and since 2 October 2026 Jordan's Ministry of
 Awqaf (awqaf.gov.jo's region table for Amman, Balqa, Zarqa and Madaba, walked by its pager within one
 session, checked at Amman's unit and at Zarqa), Toronto's three mosques (IFT's year CSV, IIT's month
 tables, MAC's Mawaqit calendar, each at its unit and as ca.toronto's member; a day printed on the

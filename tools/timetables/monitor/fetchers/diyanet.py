@@ -6,7 +6,18 @@ start and the end of eating (F+E). Restricted: archive only.
 
 A European city's district id is resolved from the site's own dropdown endpoints by name
 (GetRegList: the country's states, each state's districts) and cached in <monitor>/diyanet-ids.json,
-so the lookups run once. Country ids are the site's own (its country dropdown, read 28 Sep 2026)."""
+so the lookups run once. Country ids are the site's own (its country dropdown, read 28 Sep 2026).
+
+Diyanet re-issues days it already published: on 9 November 2026 its year table was the 2026 edition
+again, whose takdir differs from the 2027 edition served until 31 October, and merging every capture
+into one file mixed the two. Each capture is therefore kept whole as its own edition
+(archive/tables/monitor/<source>/editions/<key>/<date>.txt, fetch.Store.keep_edition), and the live
+file holds the latest capture alone (`editions` on each table) once KEEP_EDITIONS is on.
+
+KEEP_EDITIONS is off until the Diyanet Europe curves (DiyanetEuropeCurveGenerator,
+DiyanetEuropeCrossYearTest) read pinned copies, not the live files: with it on, the first run would
+rewrite each live file as its latest capture alone and drop the 2027 days only an earlier edition holds,
+which those still read. Switch it on, and run editions.py --in-place, after that lands (docs/MONITOR.md)."""
 import html as H
 import json
 import os
@@ -16,6 +27,8 @@ from common import FetchError, Table, add_all, write_json
 
 SOURCE_TR = "tr-diyanet"
 SOURCE_EU = "tr-diyanet-europe"
+# Each capture kept as its own edition, the live file the latest alone (the docstring says why it waits).
+KEEP_EDITIONS = False
 BASE = "https://namazvakitleri.diyanet.gov.tr/tr-TR"
 AJAX = {"X-Requested-With": "XMLHttpRequest"}
 MON = {"Ocak": 1, "Şubat": 2, "Mart": 3, "Nisan": 4, "Mayıs": 5, "Haziran": 6, "Temmuz": 7,
@@ -94,6 +107,22 @@ def parse_page(text):
         if m and m.group(2) in MON:
             out[f"{m.group(3)}-{MON[m.group(2)]:02d}-{int(m.group(1)):02d}"] = c[2:8]
     return out
+
+
+def raw_keys(source, monitor_dir):
+    """{raw file name: table key} of a source's captures, for rebuilding its editions from the raw
+    responses (editions.py): Türkiye's ids are listed here, Europe's are the cached ones."""
+    if source == SOURCE_TR:
+        return {f"diyanet-{ilce}.html": key for ilce, key, *_ in TURKEY}
+    path = os.path.join(monitor_dir, "diyanet-ids.json")
+    with open(path, encoding="utf-8") as f:
+        cities = json.load(f).get("cities") or {}
+    return {f"diyanet-{ilce}.html": key for key, ilce in cities.items()}
+
+
+def parse_raw(text):
+    """The rows of one raw capture, as fetch() reads them (parse_page)."""
+    return parse_page(text)
 
 
 def district_page(ctx, ilce):
@@ -194,6 +223,7 @@ def fetch(ctx):
             t = Table(key, name, lat, lon, "Europe/Istanbul", "TR", "F+E S D A M I", entry=entry,
                       source_line=f"Diyanet {BASE}/{ilce} (namazvakitleri.diyanet.gov.tr, IlceID {ilce}; the month and the year tables)",
                       raw=[(f"diyanet-{ilce}.html", text)])
+            t.editions = KEEP_EDITIONS
             if add_all(ctx, t, rows, name):
                 tables.append(t)
         return tables
@@ -208,6 +238,7 @@ def fetch(ctx):
         t = Table(key, name, lat, lon, zone, cc, "F+E S D A M I", entry=entry,
                   source_line=f"Diyanet {BASE}/{ilce} (namazvakitleri.diyanet.gov.tr, {name}, IlceID {ilce}; the month and the year tables)",
                   raw=[(f"diyanet-{ilce}.html", text)])
+        t.editions = KEEP_EDITIONS
         if add_all(ctx, t, rows, name):
             tables.append(t)
     return tables

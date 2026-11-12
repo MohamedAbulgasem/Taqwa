@@ -324,4 +324,9 @@ za-mjc	cape-town-*	za-cape.tsv	za.cape	za.jamiat.shafii	all	month	za-jamiat/cpt-
 ca-toronto	*	ca-toronto.tsv	index	-	index	all	-
 ca-toronto	*	ca-toronto.tsv	ca.toronto	index	all	excused	-
 no-irn	*	no-irn.tsv	index	-	index	all	-
+# IRN's Oslo and Trondheim calendars are also no.cautious's member rows (no-cautious.tsv, member no.irn, at IRN's own points); Tromsø is not a no.cautious member row.
+# Prove adds a capture only where it holds days the gate does not: the 2026 captures add nothing beside the hand-read off-irn-*-2026.txt rows (a prove dry run of 12 Nov 2026), a new year's capture its row.
+# no.cautious has no fixed point, so each is read at IRN's own point as its hand-read row is (a prove dry run of 12 Nov 2026 found `index` read as `unit`, which the gate refuses).
+no-irn	oslo-*	no-cautious.tsv	no.cautious	no.irn	59.91273,10.74609	all	-
+no-irn	trondheim-*	no-cautious.tsv	no.cautious	no.irn	63.43049,10.39506	all	-
 us-chicago	*	us-chicago.tsv	us.chicago	index	index	all	-

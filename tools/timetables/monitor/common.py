@@ -280,7 +280,13 @@ class Table:
       with `survey` set to its survey folder;
     - columns / school / clock: as a gate row's;
     - rows: {date iso: [6 or more 'HH:MM' or '-']}, written in date order;
-    - raw: [(file name, bytes)] kept under raw/monitor/<source>/<date>/ when the table is new or changed.
+    - raw: [(file name, bytes)] kept under raw/monitor/<source>/<date>/ when the table is new or changed;
+    - merge (attribute, default True): the store merges the rows into what is held (a page that shows a
+      sliding window keeps every day ever fetched); False: the table replaces it;
+    - editions (attribute, default False): the source re-issues days it already published (a whole
+      year table served again in another edition), so each capture is kept whole as its own edition
+      (archive/tables/monitor/<source>/editions/<key>/<date>.txt) and the live file holds the latest
+      alone, never a union of editions; the change is said in the source's message.
     """
 
     def __init__(self, key, name, lat, lon, zone, cc, columns, entry=None, survey=None, school="standard",

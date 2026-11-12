@@ -4,6 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import world.taqwa.timetables.Json
+import world.taqwa.timetables.gate.Tzdb
 import java.io.File
 import kotlin.system.exitProcess
 import kotlin.time.Clock
@@ -21,6 +22,7 @@ import kotlin.time.Clock
  * refused before anything was added, or its inputs unreadable.
  */
 fun main(args: Array<String>) {
+    Tzdb.require(::fail)
     val options = mutableListOf<Pair<String, String>>()
     var dryRun = false
     var i = 0

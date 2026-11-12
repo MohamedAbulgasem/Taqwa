@@ -65,6 +65,11 @@ jobs:
           # ships (site/timetables.py corrects the clocks from tzdata until then).
           check-latest: true
           cache: gradle
+      - name: The JDK's tz database
+        # The gate's and the surveys' tests read printed times on the JDK's clock rules: one older than
+        # the minimum (tools/timetables/monitor/tzdb.py, gate/Tzdb.kt) stops the build here, saying why; one whose
+        # version cannot be read (exit 3) is left to the Kotlin tests' own check.
+        run: python3 tools/timetables/monitor/tzdb.py --java-home "$JAVA_HOME" || [ $? -eq 3 ]
       - name: Prayer times from the app's own engine
         # The app's engine, Qibla and Hijri tests run on the JVM first; a change that breaks
         # them, or a city the engine cannot place, stops the build before anything is published.

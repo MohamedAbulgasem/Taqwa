@@ -69,6 +69,9 @@ DEFAULT_BUDGET_MINUTES = 90
 # days ago is recorded in part (`unturned`), the report's fetch finding: retried once, then weekly, not
 # every day.
 MONTH_TURN_DAYS = 3
+# Where a source that re-issues days it already published (a table whose `editions` is set) keeps each
+# capture whole: archive/tables/monitor/<source>/editions/<key>/<capture date>.txt.
+EDITIONS = "editions"
 
 
 def month_turn_due(last, today):
@@ -180,6 +183,8 @@ class Store:
         self.data.setdefault("sources", {})
         self.data.setdefault("tables", {})
         self.run_status = {}
+        self.edition_notes = {}  # source -> what each new edition changed, for the source's message
+        self.edition_errors = {}  # source -> captures kept as editions but not made the live file (short_edition)
 
     def last_fetch(self, source):
         s = self.data["sources"].get(source, {}).get("lastFetch")
@@ -219,15 +224,20 @@ class Store:
         tid = f"{source}/{table.key}"
         rel = self.rel_path(source, table.key)
         path = os.path.join(self.official, rel)
-        if getattr(table, "merge", True):
-            held = read_table_rows(path)
-            held.update(table.rows)
-            table.rows = held
+        editions = getattr(table, "editions", False)
+        held = read_table_rows(path)
+        if not editions and getattr(table, "merge", True):
+            # Every day ever fetched is kept (a page that shows a sliding window); an edition is never merged.
+            table.rows = {**held, **table.rows}
         h = table.content_hash()
         prev = self.data["tables"].get(tid)
         status = "new" if prev is None else ("unchanged" if prev.get("hash") == h else "changed")
+        short = status != "unchanged" and editions and self.short_edition(source, table.key, table.rows)
         if status != "unchanged":
-            write_atomic(path, table.text(self.today.isoformat()))
+            if editions:
+                self.keep_edition(source, table, path, prev, held, short)
+            if not short:
+                write_atomic(path, table.text(self.today.isoformat()))
             raw_dir = os.path.join(self.official, "archive", "raw", "monitor", source, self.today.isoformat())
             for name, body in table.raw:
                 buf = io.BytesIO()
@@ -242,8 +252,77 @@ class Store:
             "fetched": self.today.isoformat() if status != "unchanged" else prev.get("fetched"),
             "seen": self.today.isoformat(),
         }
+        if short:
+            # The live file and its record stay as they were; the capture is kept as its edition and the
+            # source's message says so as an error (`edition_errors`).
+            if prev is None:
+                self.data["tables"].pop(tid, None)
+            else:
+                self.data["tables"][tid] = dict(prev, seen=self.today.isoformat())
+            status = "unchanged"
         self.run_status[tid] = status
         return status
+
+    def short_edition(self, source, key, new):
+        """A capture of an editions table that, against the latest edition kept, withdraws days still
+        ahead without changing any day both hold and holds under half as many days: a page that came back
+        in part (Diyanet's month table without its year table), not a new edition; never made the live
+        file. Judged against a kept edition only, never a live file merged across editions (the first
+        edition after the switch is not judged; editions.py's migration keeps them first)."""
+        folder = self.edition_dir(self.official, source, key)
+        kept = sorted(n for n in os.listdir(folder) if n.endswith(".txt") and not n.endswith("-merged.txt")) if os.path.isdir(folder) else []
+        held = read_table_rows(os.path.join(folder, kept[-1])) if kept else {}
+        if not held or not new:
+            return False
+        today = self.today.isoformat()
+        if any(d in held and held[d] != new[d] for d in new):
+            return False
+        return any(d >= today and d not in new for d in held) and len(new) * 2 < len(held)
+
+    @staticmethod
+    def edition_dir(official, source, key):
+        return os.path.join(official, "archive", "tables", "monitor", source, EDITIONS, key)
+
+    def keep_edition(self, source, table, path, prev, held, short=False):
+        """A capture of a source that re-issues what it already published (its table's `editions`): kept
+        whole as `editions/<key>/<date>.txt`, the live file then holding this edition alone, never a union
+        of editions (Diyanet's 2026 year table, served again on 9 November 2026, merged with its 2027 one).
+        The first time, the live file as it stood (every row ever fetched, merged) is kept beside them as
+        `<its fetched date>-merged.txt`, so nothing held is lost. What changed is said in the source's
+        message (`edition_notes`), in days, never a printed time."""
+        folder = self.edition_dir(self.official, source, table.key)
+        kept = sorted(n for n in os.listdir(folder) if n.endswith(".txt")) if os.path.isdir(folder) else []
+        if not kept and os.path.exists(path):
+            since = (prev or {}).get("fetched") or "before"
+            with open(path, encoding="utf-8") as f:
+                old = f.read()
+            write_atomic(os.path.join(folder, f"{since}-merged.txt"),
+                         "# The live file as it stood before the monitor kept each edition apart: every row ever fetched, "
+                         "merged across editions (fetch.py, Store.keep_edition).\n" + old)
+        write_atomic(os.path.join(folder, self.today.isoformat() + ".txt"), table.text(self.today.isoformat()))
+        new = table.rows
+        today = self.today.isoformat()
+        added = sum(1 for d in new if d not in held)
+        dropped = [d for d in held if d not in new]
+        changed = sum(1 for d in new if d in held and held[d] != new[d])
+        where = f"kept as {EDITIONS}/{table.key}/{today}.txt"
+        if short:
+            self.edition_errors.setdefault(source, []).append(
+                f"{table.key}: a capture of {len(new)} days, {table.first()}..{table.last()}, against the live file's {len(held)}, withdraws "
+                f"{sum(1 for d in dropped if d >= today)} days still ahead and changes none: the page came back in part, so it is "
+                f"{where} and the live file is left as it was")
+            return
+        if not held:
+            note = f"{table.key}: the first edition held, {table.first()}..{table.last()} ({len(new)} days); {where}"
+        elif changed or any(d >= today for d in dropped) or (held and new and min(new) < min(held)):
+            # Days changed, days still ahead withdrawn, or days before the held ones put back: a re-issue.
+            note = (f"{table.key}: a new edition, {table.first()}..{table.last()} ({len(new)} days): {added} days added, "
+                    f"{changed} changed, {len(dropped)} no longer in it ({sum(1 for d in dropped if d >= today)} of them still ahead), "
+                    f"the earlier editions kept in {EDITIONS}/{table.key}/; {where}, and the live file holds this edition alone")
+        else:
+            note = (f"{table.key}: the same edition moved on, {table.first()}..{table.last()}: {added} days added, "
+                    f"{len(dropped)} past days left to the earlier captures; {where}")
+        self.edition_notes.setdefault(source, []).append(note)
 
     def source_done(self, source, status, message, requests, started=None):
         """Records the run. A source that failed or came back in part (a breaker, the budget, one
@@ -330,6 +409,10 @@ def run_source(row, store, ctx):
             statuses[t.key] = store.record(source, t)
         except Exception as e:
             ctx.error(f"{t.key}: could not be written: {type(e).__name__}: {e}")
+    for error in store.edition_errors.pop(source, []):
+        ctx.error(error)
+    for note in store.edition_notes.pop(source, []):
+        ctx.note(note)
     status = "ok" if not ctx.errors else ("partial" if statuses else "failed")
     message = scrub("; ".join(ctx.errors + ctx.notes)[:4000])
     return status, message, ctx.requests, statuses

@@ -16,6 +16,7 @@ import kotlin.system.exitProcess
  * inputs are wrong.
  */
 fun main(args: Array<String>) {
+    Tzdb.require(::fail)
     val options = mutableListOf<Pair<String, String>>()
     var stamps = true
     var i = 0
