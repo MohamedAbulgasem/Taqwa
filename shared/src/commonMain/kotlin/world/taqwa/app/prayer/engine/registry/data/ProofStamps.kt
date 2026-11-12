@@ -339,7 +339,7 @@ object ProofStamps {
     private fun bnMora() = ProofStamp(
         entryId = "bn.mora",
         places = 1,
-        placeDays = 355,
+        placeDays = 356,
         ramadanDays = 29,
         lastChecked = "2026-12-31",
         worstLateMinutes = mapOf("asrStandard" to 2, "dhuhr" to 1, "endOfEating" to 1, "fajr" to 2, "isha" to 2, "maghrib" to 2, "sunrise" to 2),
@@ -347,7 +347,7 @@ object ProofStamps {
         lateLimits = listOf(
             ProofLateLimit(minutes = 2, reason = null, events = listOf("asrStandard", "dhuhr", "endOfEating", "fajr", "isha", "maghrib", "sunrise")),
         ),
-        checked = listOf("2026-01-01..2026-01-21", "2026-01-23..2026-03-16", "2026-03-18..2026-03-23", "2026-03-25..2026-04-07", "2026-04-09..2026-04-22", "2026-04-24..2026-06-17", "2026-06-19..2026-07-15", "2026-07-17..2026-08-04", "2026-08-06..2026-08-10", "2026-08-12..2026-12-13", "2026-12-15..2026-12-31"),
+        checked = listOf("2026-01-01..2026-01-21", "2026-01-23..2026-03-16", "2026-03-18..2026-03-23", "2026-03-25..2026-04-07", "2026-04-09..2026-04-22", "2026-04-24..2026-06-17", "2026-06-19..2026-07-15", "2026-07-17..2026-08-04", "2026-08-06..2026-08-10", "2026-08-12..2026-12-31"),
     )
 
     private fun bnMoraUnits(): Map<String, Map<String, Int>> = mapOf(

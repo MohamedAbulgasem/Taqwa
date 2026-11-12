@@ -11,3 +11,11 @@
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/sea/off-bn-2026-clean.txt	bn.mora/brunei-muara			Asia/Brunei	F+E S D A M I	daily	standard	fit	BSB, 356 days deduped
 archive/tables/moral-auth-world/sea/off-bn-2026-09.txt	bn.mora/brunei-muara			Asia/Brunei	F+E S D A M I	daily	standard	test	BSB, September re-capture
+# Ruling R162 (approved by the owner, 12 Nov 2026): a single-table page may span one day the authority itself
+# misprinted, recorded here with its reason, when the misprinted cell is the only one left unchecked and the day's other
+# columns are checked. 14 December 2026 is one of the 9 rows the "-clean" file drops: MORA prints its Dhuhr 9 min before
+# both neighbouring days' and before the sun's noon that day (a Dhuhr before the zenith is no Dhuhr), while its other
+# five columns run on from their neighbours by a minute or less. That one day's row, held out, checks those five
+# columns (Fajr also as the end of eating) and leaves Dhuhr unchecked; Taqwa's Dhuhr that day is after the sun's noon,
+# so it is not before even the misprinted minute. Without it R116 holds all of December at Bandar Seri Begawan.
+archive/tables/moral-auth-world/sea/off-bn-2026-12-14.txt	bn.mora/brunei-muara			Asia/Brunei	F+E S - A M I	daily	standard	test	BSB, 14 December 2026, its five columns MORA printed right (Dhuhr misprinted, R162)
