@@ -6,3 +6,5 @@ path	entry	lat	lon	zone	columns	format	school	split	note
 open/SG-MUIS/off-muis-singapore-2024.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	fit	2024, data.gov.sg consolidated set
 open/SG-MUIS/off-muis-singapore-2025.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	fit	2025, data.gov.sg consolidated set
 open/SG-MUIS/off-muis-singapore-2026.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	test	2026, the same as the MUIS website's own file
+# prove, 2026-11-16: the monitor's captures pinned as they were under archive/tables/pinned/{sg-muis}/2026-11-16/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
+archive/tables/pinned/sg-muis/2026-11-16/website-2027.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	test	MUIS website 2027, the monitor capture of 16 Nov 2026 (prove)
