@@ -159,17 +159,39 @@ html[dir="rtl"] .month-head a, html[dir="rtl"] .tt-stale a { direction: rtl; }
 .section h2 { font-size: clamp(26px, 3.6vw, 34px); margin-bottom: 10px; }
 .section > .wrap > .lede { margin-bottom: 36px; font-size: 18px; }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-.card {
-  background: var(--surface); border: 1px solid var(--hair); border-radius: 18px; padding: 22px 22px 24px;
-  display: flex; flex-direction: column; gap: 12px;
+/* The features: nine cards in three rows of three, On your wrist the eighth and Seven languages last.
+   At the wrap's 992 px a column is 317 px, the same columns (and gap) as the phone screens'
+   below. Three hold while a column keeps about 270 px, a text column of some 216 px: the wrap
+   gives that from a 900 px window (852 px of content). Below it two to a row, and one under
+   600 px, where two would fall under 266 px. A row's cards are one height: the grid stretches
+   them to its tallest. */
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+@media (max-width: 899px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Nine in two columns leave the ninth alone: it keeps a column's width, centred under the
+     eight, so the set closes on it instead of on an empty cell beside it. */
+  .grid > .card:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc((100% - 20px) / 2); }
 }
-.card .glyph { width: 28px; height: 28px; color: var(--t1); }
-.card h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
-.card p { font-size: 15px; line-height: 1.55; color: var(--t2); text-wrap: pretty; }
-/* A card that is a row of its own, last in the grid at any column count (On your wrist). */
-.card.wide { grid-column: 1 / -1; }
-.card.wide p { max-width: 68ch; }
+@media (max-width: 599px) {
+  .grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .grid > .card:last-child:nth-child(odd) { grid-column: auto; justify-self: stretch; width: auto; }
+}
+/* A card: its glyph and title on one line, the text under both. The glyph sits in a rounded
+   square of the accent at 12 %, drawn in the accent, as About Taqwa's promises are in the app
+   (AboutScreen.kt, PromiseRow); under a right-to-left page the square is on the right. */
+.card {
+  background: var(--surface); border: 1px solid var(--hair); border-radius: 18px; padding: 26px 26px 28px;
+  display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px 14px; align-content: start;
+}
+.card .glyph {
+  width: 40px; height: 40px; padding: 8px; border-radius: 11px;
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+.card h3 { align-self: center; font-size: 18px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.33; }
+.card p { grid-column: 1 / -1; font-size: 15px; line-height: 1.6; color: var(--t2); text-wrap: pretty; }
+@media (max-width: 599px) {
+  .card { padding: 22px 22px 24px; }
+}
 
 .screens { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px 20px; }
 .screen { display: flex; flex-direction: column; gap: 10px; align-items: center; }
@@ -370,9 +392,15 @@ html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt 
   .nav { gap: 16px; font-size: 14px; }
   .section { padding: 44px 0; }
 }
+/* Under a pointer, a card's hairline warms to the site's amber hairline (the chips' 45 %) and its
+   glyph's square deepens to 18 % (the app's halo on the current prayer); no lift, no shadow. Only
+   where hover is real, so a tap on a phone leaves nothing lit; it fades unless motion is reduced. */
+@media (hover: hover) {
+  .card:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--hair)); }
+  .card:hover .glyph { background: color-mix(in srgb, var(--accent) 18%, var(--surface)); }
+}
 @media (prefers-reduced-motion: no-preference) {
-  .card { transition: border-color 160ms ease; }
-  .card:hover { border-color: var(--t3); }
+  .card, .card .glyph { transition: border-color 200ms ease, background-color 200ms ease; }
 }
 
 /* Task 2 — the city page */
