@@ -1,0 +1,272 @@
+{
+  "entry": "default.safe.balkans",
+  "class": "D (none)",
+  "engineHash": "2af25020476126cf",
+  "broken": 0,
+  "places": 4,
+  "first": "2026-01-01",
+  "last": "2026-12-31",
+  "checked": ["2026-01-01..2026-12-31"],
+  "checkedByEvent": {
+    "fajr": ["2026-01-01..2026-12-31"],
+    "sunrise": ["2026-01-01..2026-12-31"],
+    "dhuhr": ["2026-01-01..2026-12-31"],
+    "asrStandard": ["2026-01-01..2026-12-31"],
+    "maghrib": ["2026-01-01..2026-12-31"],
+    "isha": ["2026-01-01..2026-12-31"],
+    "endOfEating": ["2026-01-01..2026-12-31"]
+  },
+  "placeDays": 1125,
+  "heldOutDays": 1125,
+  "sharedDays": 1125,
+  "tables": 0,
+  "ramadanDays": 90,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 1125,
+      "early": 0,
+      "late": {
+        "0": 1,
+        "1": 35,
+        "2": 81,
+        "3+": 1008
+      },
+      "exactShare": 9.0E-4,
+      "worstLate": 26,
+      "lateLimit": 27,
+      "lateLimitFrom": "entry default.safe.balkans",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 760,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 22,
+        "3+": 738
+      },
+      "exactShare": 0,
+      "worstLate": 6,
+      "lateLimit": 10,
+      "lateLimitFrom": "entry default.safe.balkans",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 1125,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 1125
+      },
+      "exactShare": 0,
+      "worstLate": 9,
+      "lateLimit": 10,
+      "lateLimitFrom": "entry default.safe.balkans",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 760,
+      "early": 0,
+      "late": {
+        "0": 64,
+        "1": 231,
+        "2": 70,
+        "3+": 395
+      },
+      "exactShare": 0.0842,
+      "worstLate": 7,
+      "lateLimit": 10,
+      "lateLimitFrom": "entry default.safe.balkans",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 1125,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 1125
+      },
+      "exactShare": 0,
+      "worstLate": 8,
+      "lateLimit": 10,
+      "lateLimitFrom": "entry default.safe.balkans",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 1125,
+      "early": 0,
+      "late": {
+        "0": 31,
+        "1": 98,
+        "2": 96,
+        "3+": 900
+      },
+      "exactShare": 0.0276,
+      "worstLate": 33,
+      "lateLimit": 34,
+      "lateLimitFrom": "entry default.safe.balkans",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 760,
+      "lateEnd": 0,
+      "late": {
+        "0": 18,
+        "1": 12,
+        "2": 0,
+        "3+": 730
+      },
+      "exactShare": 0.0237,
+      "worstLate": 16,
+      "lateLimit": 17,
+      "lateLimitFrom": "entry default.safe.balkans",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 1125,
+    "ramadanDays": 90,
+    "checkedByEvent": {
+      "fajr": ["2026-01-01..2026-12-31"],
+      "sunrise": ["2026-01-01..2026-12-31"],
+      "dhuhr": ["2026-01-01..2026-12-31"],
+      "asrStandard": ["2026-01-01..2026-12-31"],
+      "maghrib": ["2026-01-01..2026-12-31"],
+      "isha": ["2026-01-01..2026-12-31"],
+      "endOfEating": ["2026-01-01..2026-12-31"]
+    },
+    "events": {
+      "fajr": {
+        "checked": 1125,
+        "early": 0,
+        "late": {
+          "0": 1,
+          "1": 35,
+          "2": 81,
+          "3+": 1008
+        },
+        "exactShare": 9.0E-4,
+        "worstLate": 26,
+        "lateLimit": 27,
+        "lateLimitFrom": "entry default.safe.balkans",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 760,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 22,
+          "3+": 738
+        },
+        "exactShare": 0,
+        "worstLate": 6,
+        "lateLimit": 10,
+        "lateLimitFrom": "entry default.safe.balkans",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 1125,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 1125
+        },
+        "exactShare": 0,
+        "worstLate": 9,
+        "lateLimit": 10,
+        "lateLimitFrom": "entry default.safe.balkans",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 760,
+        "early": 0,
+        "late": {
+          "0": 64,
+          "1": 231,
+          "2": 70,
+          "3+": 395
+        },
+        "exactShare": 0.0842,
+        "worstLate": 7,
+        "lateLimit": 10,
+        "lateLimitFrom": "entry default.safe.balkans",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 1125,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 1125
+        },
+        "exactShare": 0,
+        "worstLate": 8,
+        "lateLimit": 10,
+        "lateLimitFrom": "entry default.safe.balkans",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 1125,
+        "early": 0,
+        "late": {
+          "0": 31,
+          "1": 98,
+          "2": 96,
+          "3+": 900
+        },
+        "exactShare": 0.0276,
+        "worstLate": 33,
+        "lateLimit": 34,
+        "lateLimitFrom": "entry default.safe.balkans",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 760,
+        "lateEnd": 0,
+        "late": {
+          "0": 18,
+          "1": 12,
+          "2": 0,
+          "3+": 730
+        },
+        "exactShare": 0.0237,
+        "worstLate": 16,
+        "lateLimit": 17,
+        "lateLimitFrom": "entry default.safe.balkans",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "entry default.safe.balkans: 10 min": {
+      "reason": "Diyanet's temkin (sunrise − 7, Dhuhr + 5, Asr + 4) and Montenegro's Maghrib + 9 as floors, with the safety cushion on top, against tables printing smaller minutes: Dhuhr up to 9 min after the printed one, Maghrib up to 8, Asr up to 7, sunrise up to 6 before (engine wave W5, safe-default-balkans.tsv).",
+      "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
+    },
+    "entry default.safe.balkans: 17 min": {
+      "reason": "The fast begins 2 min before the 19° dawn; Bosnia's and Albania's tables begin it at a shallower dawn, 7 to 16 min later (engine wave W5, safe-default-balkans.tsv).",
+      "events": ["endOfEating"]
+    },
+    "entry default.safe.balkans: 27 min": {
+      "reason": "This region's Fajr is Kosovo's Sabah, the latest in the Balkans (the 19° dawn + 20 min): 10 to 26 min after the dawn Bosnia's, Albania's and Montenegro's tables print, and up to 7 min after BIK's own Sabah at its base point (engine wave W5, safe-default-balkans.tsv).",
+      "events": ["fajr"]
+    },
+    "entry default.safe.balkans: 34 min": {
+      "reason": "This region's Isha is the latest convention in the Balkans (18.5° + 2 min): 6 to 33 min after the 17° to 18° Isha Bosnia, Albania, Kosovo and Montenegro print, most in summer (engine wave W5, safe-default-balkans.tsv).",
+      "events": ["isha"]
+    }
+  }
+}

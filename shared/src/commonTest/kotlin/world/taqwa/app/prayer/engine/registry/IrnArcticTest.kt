@@ -2,7 +2,6 @@ package world.taqwa.app.prayer.engine.registry
 
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.offsetAt
@@ -11,9 +10,12 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.DayPipeline
+import world.taqwa.app.prayer.engine.EngineSettings
+import world.taqwa.app.prayer.engine.PrayerEngine
 import world.taqwa.app.prayer.engine.astro.AsrModel
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.astro.altitudeTime
 import world.taqwa.app.prayer.engine.day.Ends
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.ClockTimes
@@ -31,6 +33,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 /**
@@ -288,19 +291,92 @@ class IrnArcticTest {
     }
 
     @Test
-    fun `across the unit's reach no day is repaired and isha loses its end only on a night before the midnight sun`() {
-        // Review M2: R72's kind of night. In the week before the midnight sun the real sunset is past
-        // midnight, Isha follows the Maghrib after it, and at some points of the reach, on some night
-        // of the decade, that Isha is not before the next day's end of eating (the dawn before the
-        // real sunrise): the day shows no Isha end, and the planner skips its alert (ruling R83).
-        // Nothing is early and no end late. Walked 2026-2035 they are 16 May 2026 at 27 km north and
-        // 18 May 2029 at the reach's south edge (16 May 2033 at its north-east and north-west, not
-        // walked here); the unit's own point has none ([decade]).
+    fun `across the unit's reach no day is repaired and isha loses its end only on a night too short for any day in order`() {
+        // Review M2: R72's kind of night, the week before the midnight sun and the week after it. The real sunset is past
+        // midnight and the sun is down for minutes; Isha follows the Maghrib after it, and the next day's end of eating
+        // is the dawn before the real sunrise. Ruling R292: the Maghrib shown there is the minute after the sun has set
+        // (never before IRN's) and Isha the minute after it wherever that is before the next day's end of eating, so
+        // the day stays in order; only where even those are not before it (a night of a minute or three at a point of
+        // the reach) does the day show no Isha end (ruling R26), and the planner skip its alert (ruling R83).
+        // Ruling R302: the day shows no Isha end exactly where the real sun alone says no day can (the declaration the
+        // gate recomputes), never on a night a day in order fits. Nothing is early and no end late.
+        val zone = TimeZone.of("Europe/Oslo")
         for ((where, days) in reachDecade) {
             val repaired = days.filter { it.repaired }.map { it.date }
             assertTrue(repaired.isEmpty(), "$where: ${repaired.size} days repaired: ${repaired.take(5)}")
-            val empty = days.filter { Prayer.ISHA !in it.ends }.map { it.date }
-            assertTrue(empty.size <= 1 && empty.all { it.month == Month.MAY && it.day in 14..20 }, "$where: $empty")
+            val point = reachPoints.getValue(where)
+            for ((today, next) in days.zipWithNext()) {
+                assertEquals(
+                    DayPipeline.nightTooShortForIsha(point, today.date, zone), Prayer.ISHA !in today.ends,
+                    "$where ${today.date}: Isha's end shown on a declared night, or missing on one a day in order fits",
+                )
+                if (Prayer.ISHA in today.ends) continue
+                val sunset = assertNotNull(DayPipeline.realSunset(point, today.date, zone), "$where ${today.date}: no sunset")
+                val earliestIsha = Instant.fromEpochSeconds(sunset.epochSeconds.floorDiv(60L) * 60 + 120)
+                assertTrue(earliestIsha >= next.endOfEating, "$where ${today.date}: Isha could have come before the next end of eating")
+                // Not the engine's own end of eating alone (the review of 17 Nov 2026): it is the dawn the real sun gives,
+                // the minute or two before the real sunrise, so the night itself is what is too short.
+                val sunrise = assertNotNull(DayPipeline.realSunrise(point, next.date, zone), "$where ${next.date}: no sunrise")
+                val dawn = Instant.fromEpochSeconds(sunrise.epochSeconds.floorDiv(60L) * 60) - 2.minutes
+                assertTrue(next.endOfEating >= dawn, "$where ${next.date}: end of eating ${next.endOfEating} before the sun's dawn $dawn")
+            }
+            // zipWithNext leaves the last day walked as a today: it has its Isha end (the last of December).
+            assertTrue(Prayer.ISHA in days.last().ends, "$where ${days.last().date}: no Isha end")
+        }
+    }
+
+    @Test
+    fun `on the night the sun first sets again maghrib and isha come before the next dawn`() {
+        // The gate's reach row of 25 Jul 2026, at 99.5 % of the reach due west (the far-north days out of order of
+        // 15 Nov 2026): the sun sets five and a half minutes before it rises. Before R292 Maghrib was IRN's ordinary
+        // five minutes and the margin after that sunset, past the next sunrise, and Isha had no end.
+        val place = Place(69.681215, 18.214069, "Europe/Oslo", "NO")
+        val zone = TimeZone.of("Europe/Oslo")
+        val resolution = Registry.resolveEntry(Registry.byId("no.irn")!!, place)
+        assertEquals("Tromsø", resolution.unitName)
+        val date = LocalDate(2026, 7, 25)
+        val day = DayPipeline.day(resolution, date, zone)
+        val sunset = assertNotNull(DayPipeline.realSunset(GeoPoint(place.lat, place.lon), date, zone))
+        val t = unit.method!!.clockRule!!.on(date, GeoPoint(place.lat, place.lon), zone)
+        assertEquals(Instant.fromEpochSeconds(sunset.epochSeconds.floorDiv(60L) * 60 + 60), day.maghrib, "the minute after the sun has set")
+        assertTrue(day.maghrib >= startOf(t.maghrib!!.epochSeconds + unit.method!!.margins.maghrib), "never before IRN's")
+        assertEquals(day.maghrib + 1.minutes, day.isha)
+        assertFalse(day.repaired)
+        val next = DayPipeline.day(resolution, date.next(), zone)
+        assertEquals(next.endOfEating, day.ends[Prayer.ISHA], "Isha ends at the next day's end of eating")
+        assertTrue(day.isha < next.endOfEating && next.fajr < next.sunrise)
+    }
+
+    @Test
+    fun `on a night too short for isha's end maghrib is the minute after the sun has set where that is before the next fajr`() {
+        // Ruling R302 (the owner's (a′) of 17 Nov 2026), at two points of a probe's grid over the unit (16 Nov 2026), each
+        // inside the reach. The real sun alone declares both nights too short for Isha's end. On the first the minute
+        // after the real sunset is before the next day's Fajr: Maghrib is that minute (it was IRN's five minutes and the
+        // margin after the sunset, after the next sunrise), Isha the minute after it, with no end. On the second even that
+        // minute is not before the next Fajr: nothing moves, and Maghrib and Isha come after the next dawn (the planner
+        // skips both alerts, ruling R83). Neither day is repaired, and neither Maghrib is before the real sunset.
+        val zone = TimeZone.of("Europe/Oslo")
+        for ((at, pulled) in listOf((GeoPoint(69.67, 18.225) to LocalDate(2026, 5, 17)) to true, (GeoPoint(69.895, 19.025) to LocalDate(2026, 5, 16)) to false)) {
+            val (point, date) = at
+            val resolution = Registry.resolveEntry(Registry.byId("no.irn")!!, Place(point.lat, point.lon, "Europe/Oslo", "NO"))
+            assertEquals("Tromsø", resolution.unitName, "$point")
+            val day = DayPipeline.day(resolution, date, zone)
+            val next = DayPipeline.day(resolution, date.next(), zone)
+            assertTrue(DayPipeline.nightTooShortForIsha(point, date, zone), "$point $date: not declared")
+            assertFalse(day.repaired, "$point $date")
+            assertNull(day.ends[Prayer.ISHA], "$point $date: Isha's end is not shown")
+            val sunset = assertNotNull(DayPipeline.realSunset(point, date, zone))
+            val afterSunset = Instant.fromEpochSeconds(sunset.epochSeconds.floorDiv(60L) * 60 + 60)
+            assertTrue(day.maghrib >= afterSunset, "$point $date: Maghrib before the real sunset")
+            assertEquals(pulled, afterSunset < next.fajr, "$point $date: the probe's night")
+            if (pulled) {
+                assertEquals(afterSunset, day.maghrib, "$point $date: the minute after the sun has set")
+                assertEquals(day.maghrib + 1.minutes, day.isha)
+                assertTrue(day.maghrib < next.fajr)
+            } else {
+                assertTrue(day.maghrib >= next.fajr && day.maghrib >= next.sunrise, "$point $date: Maghrib moved, ${day.maghrib}")
+                assertTrue(day.isha > day.maghrib)
+            }
         }
     }
 
@@ -353,6 +429,19 @@ class IrnArcticTest {
         assertNotNull(day.ends[Prayer.ISHA])
     }
 
+    @Test
+    fun `a place off the app's grid is read at its three-decimal point under ruling R321`() {
+        // A point of the gate's continuum off the app's grid: the app keeps a location to three decimals
+        // (SettingsRepository.setLocation) and the engine rounds every place it is handed the same way, so a user there
+        // is shown the day of 69.832, 19.446.
+        val date = LocalDate(2026, 8, 1)
+        val off = PrayerEngine.dayTimes(Place(69.8318, 19.446, "Europe/Oslo", "NO"), date, EngineSettings())
+        val on = PrayerEngine.dayTimes(Place(69.832, 19.446, "Europe/Oslo", "NO"), date, EngineSettings())
+        assertEquals(GeoPoint(69.832, 19.446), off.resolution.point)
+        assertEquals("no.irn.tromso", off.resolution.unitId)
+        assertEquals(on.day, off.day)
+    }
+
     private companion object {
         val tromsoPlace = Place(69.6489, 18.95508, "Europe/Oslo", "NO")
         val unit = Registry.resolveEntry(Registry.byId("no.irn")!!, tromsoPlace)
@@ -371,18 +460,22 @@ class IrnArcticTest {
          * Points across the unit's reach, each walked as [decade] is: just inside it due north, south,
          * east and west, and 27 km north (review M2).
          */
-        val reachDecade: Map<String, List<PrayerDay>> by lazy {
+        val reachPoints: Map<String, GeoPoint> by lazy {
             val reach = Europe.irnUnits.unit("no.irn.tromso").radiusKm - 0.5
             val kmPerLon = 111.2 * cos(tromsoPlace.lat * PI / 180)
             val kmNorthEast = listOf(
                 "north" to (reach to 0.0), "south" to (-reach to 0.0), "east" to (0.0 to reach), "west" to (0.0 to -reach),
                 "27 km north" to (27.0 to 0.0),
             )
-            kmNorthEast.associate { (name, km) ->
-                val place = Place(tromsoPlace.lat + km.first / 111.2, tromsoPlace.lon + km.second / kmPerLon, "Europe/Oslo", "NO")
+            kmNorthEast.associate { (name, km) -> name to GeoPoint(tromsoPlace.lat + km.first / 111.2, tromsoPlace.lon + km.second / kmPerLon) }
+        }
+
+        val reachDecade: Map<String, List<PrayerDay>> by lazy {
+            reachPoints.mapValues { (name, point) ->
+                val place = Place(point.lat, point.lon, "Europe/Oslo", "NO")
                 assertEquals("Tromsø", Registry.resolveEntry(Registry.byId("no.irn")!!, place).unitName, name)
                 assertEquals("no.irn", Registry.resolve(place).entry.id, name)
-                name to walk(place)
+                walk(place)
             }
         }
 

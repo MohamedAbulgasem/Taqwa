@@ -55,8 +55,8 @@ doha-qatar	290030	en ar ur bn
 # manama-bahrain	290340	en ar ur
 # Oman: the Ministry of Endowments (om.mara, class B) at Muscat.
 muscat-oman	287286	en ar ur
-# held: Salalah — outside om.mara's checked unit (class D).
-# salalah-oman	286621	en ar		en=Salalah
+# Salalah: the ministry's unit since 12 November 2026 (ruling R166), checked every day to 31 December 2027 from its own day page.
+salalah-oman	286621	en ar		en=Salalah
 # Jordan: the Ministry of Awqaf (jo.awqaf, class A) at Amman and Zarqa, its one table for Amman, Balqa, Zarqa and Madaba.
 # Its 2026 days are checked from 2 October (the monitor's first capture), so October, which lacks its 1st, is never shown:
 # the generator holds both until 1 November, when they show November and December.
@@ -94,10 +94,10 @@ port-said-egypt	358619	en ar
 suez-egypt	359796	en ar		ar=السويس
 luxor-egypt	360502	en ar
 aswan-egypt	359792	en ar		en=Aswan
-# held: Mansoura, Tanta and Assiut — outside ESA's checked units (class D).
-# mansoura-egypt	360761	en ar		en=Mansoura;ar=المنصورة
-# tanta-egypt	347497	en ar
-# assiut-egypt	359783	en ar
+# Mansoura, Tanta and Assiut: ESA's units since 12 November 2026 (ruling R163), each its own town's, checked on all of 2026 from ESA's own daily pages.
+mansoura-egypt	360761	en ar		en=Mansoura;ar=المنصورة
+tanta-egypt	347497	en ar
+assiut-egypt	359783	en ar
 # held: Libya — the Awqaf table's method not yet fully checked (ly.awqaf, class D everywhere; ruling R73).
 # tripoli-libya	2210247	en ar	ar
 # benghazi-libya	88319	en ar
@@ -116,16 +116,16 @@ sfax-tunisia	2467454	en ar fr
 # sousse-tunisia	2464915	en ar fr
 # Algeria: the ministry's calendar (dz.marw, class B) at Algiers.
 algiers-algeria	2507480	en ar fr	fr	fr=Alger
-# held: Oran, Constantine — class D at the city (Oran's unit is not fully checked; Constantine is outside dz.marw's checked units).
+# held: Oran, Constantine — class D at the city (fitted units, margins of our own never before the city's table and up to 3 min after it, not the checked timetable itself; rulings R230, R233).
 # oran-algeria	2485926	en ar fr
 # constantine-algeria	2501152	en ar fr
-# held: Morocco — ma.habous's stamp ends 12 October 2026 (Casablanca, Rabat, Tangier); Marrakesh, Fes and Agadir are outside its checked units (class D).
-# casablanca-morocco	2553604	en ar fr	fr
-# rabat-morocco	2538475	en ar fr		ar=الرباط
-# marrakesh-morocco	2542997	en ar fr
-# fes-morocco	2548885	en ar fr
-# tangier-morocco	2530335	en ar fr
-# agadir-morocco	2561668	en ar fr
+# Morocco: the Ministry of Habous's month tables (ma.habous, class B), each city at its own unit (rulings R195-R199).
+casablanca-morocco	2553604	en ar fr	fr
+rabat-morocco	2538475	en ar fr		ar=الرباط
+marrakesh-morocco	2542997	en ar fr
+fes-morocco	2548885	en ar fr
+tangier-morocco	2530335	en ar fr
+agadir-morocco	2561668	en ar fr
 # held: Mauritania — the ministry's method not yet fully checked (class D).
 # nouakchott-mauritania	2377450	en ar fr
 # held: Sudan — the ministry's method not yet fully checked (class D).
@@ -134,16 +134,15 @@ algiers-algeria	2507480	en ar fr	fr	fr=Alger
 # port-sudan-sudan	377039	en ar
 
 # ---------------------------------------------------------------- Türkiye and Central Asia
-# Türkiye: Diyanet (tr.diyanet, class A) at İstanbul and Ankara. Its stamp covers the whole of 2026 and 2027 since the monitor's capture of 9 November 2026, so the pages show every month through 2027.
+# Türkiye: Diyanet (tr.diyanet, class A) at İstanbul, Ankara and, since 12 November 2026 (ruling R140), İzmir, Bursa, Konya, Antalya, Gaziantep and Diyarbakır, each its own checked district. Their stamps cover the whole of 2026 and 2027 since the monitor's capture of 9 November 2026, so the pages show every month through 2027.
 istanbul-turkiye	745044	en tr	en tr
 ankara-turkiye	323786	en tr	tr
-# held: İzmir, Bursa, Konya, Antalya, Gaziantep, Diyarbakır — outside Diyanet's checked districts (class D).
-# izmir-turkiye	311046	en tr	tr	en=Izmir
-# bursa-turkiye	750269	en tr	tr
-# konya-turkiye	306571	en tr	tr
-# antalya-turkiye	323777	en tr
-# gaziantep-turkiye	314830	en tr
-# diyarbakir-turkiye	316541	en tr
+izmir-turkiye	311046	en tr	tr	en=Izmir
+bursa-turkiye	750269	en tr	tr
+konya-turkiye	306571	en tr	tr
+antalya-turkiye	323777	en tr
+gaziantep-turkiye	314830	en tr
+diyarbakir-turkiye	316541	en tr
 # held: Uzbekistan — the Muslim Board's method not yet fully checked (class D).
 # tashkent-uzbekistan	1512569	en
 # samarkand-uzbekistan	1216265	en
@@ -166,7 +165,10 @@ ankara-turkiye	323786	en tr	tr
 # bengaluru-india	1277333	en ur
 # srinagar-india	1255634	en ur
 # kolkata-india	1275004	en bn ur	bn	bn=কলকাতা
-# held: Bangladesh — the Islamic Foundation's method not yet fully checked (class D).
+# held: Bangladesh — the Islamic Foundation (bd.ifb): each of its 64 district towns is a unit since 13 Nov 2026
+# (rulings R220–R224), under the Foundation's published method like the rest of the country: it prints its
+# district pages for Ramadan alone and the year-round Dhaka table is held as sampled days from a republisher's
+# mirror. No month is checked whole, so the rule above holds these.
 # dhaka-bangladesh	1185241	en bn	en bn
 # chittagong-bangladesh	1205733	en bn	bn	en=Chittagong
 # sylhet-bangladesh	1185099	en bn	bn

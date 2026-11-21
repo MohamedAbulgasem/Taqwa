@@ -24,6 +24,13 @@
 # 2027 held out was early by 1 min on a few days of Fajr, sunrise, Maghrib and Isha at al-Aqsa (a
 # perpetual table against the leap cycle): those margins are widened to the three years' bound
 # (Levant.kt). Class D (ruling R57): never early, at most 3 min late at every town, no exception.
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+# The review round of 14 Nov 2026 (ruling R214): a derived table is held out only where what it was made from is. Every town's table is
+# al-Aqsa's plus the town's printed minutes, so a town's 2012 and 2026 tables print what the two fit tables print, and its 2027
+# what al-Aqsa's 2027 does: in-sample wherever al-Aqsa's own cell is (2027's Dhuhr and Asr, which no margin was widened to, stay held out).
+@fitted	ps.iftaa	archive/tables/manual/ps-iftaa/2026-10-02/*-2027.txt	F S M I E	2027 was early on a few days of Fajr, sunrise, Maghrib and Isha and late on its end of eating, and those margins were widened to the three years' bound (Levant.kt, proof 7e); a town's 2027 table is al-Aqsa's 2027 plus its printed minutes (derived)
+@fitted	ps.iftaa	archive/tables/manual/ps-iftaa/2026-10-02/*-2026.txt	*	a town's 2026 table is al-Aqsa's 2026 table, which every margin was fitted on, plus the town's printed minutes (derived)
+@fitted	ps.iftaa	archive/tables/manual/ps-iftaa/2026-10-02/*-2012.txt	*	a town's 2012 table is al-Aqsa's 2012 table, which every margin was fitted on, plus the town's printed minutes (derived)
 path	entry	lat	lon	zone	clock	columns	format	school	split	note
 archive/tables/manual/ps-iftaa/2026-10-02/aqsa-2012.txt	ps.iftaa/ps.iftaa.jerusalem	31.7767	35.2345	Asia/Hebron	UTC+02:00	F+E S D A M I	daily	standard	fit	al-Aqsa (Jerusalem + 0), the perpetual table on 2012
 archive/tables/manual/ps-iftaa/2026-10-02/aqsa-2026.txt	ps.iftaa/ps.iftaa.jerusalem	31.7767	35.2345	Asia/Hebron	UTC+02:00	F+E S D A M I	daily	standard	fit	al-Aqsa (Jerusalem + 0), the perpetual table on 2026

@@ -63,6 +63,27 @@ class Proof(unittest.TestCase):
         self.assertNotIn("2026-11-01", text)
         self.assertNotIn("Co-Authored-By", text)
 
+    DEMOTED = dict(REPORT, demoted=[{"gate": "xx-test.tsv", "entry": "xx.test/beta", "since": "2026-11-02",
+                                     "reason": "the monitor's capture xx-test/beta, at unit: fajr early on 2 place-days, by up to 1 min (2026-11-03)"}])
+
+    def test_a_demotion_is_listed_with_its_reason_in_the_issue_and_by_name_alone_in_the_commit_message(self):
+        # Ruling R185: prove demotes a checked timetable by itself on the first failing day.
+        text = proof.section(self.DEMOTED, self.BEFORE, self.AFTER)
+        self.assertIn("Demoted by the monitor itself (ruling R185)", text)
+        self.assertIn("- xx.test/beta in xx-test.tsv, since 2026-11-02: the monitor's capture xx-test/beta, at unit: fajr early on 2 place-days, by up to 1 min (2026-11-03)", text)
+        self.assertNotIn("Demoted by the monitor", proof.section(self.REPORT, self.BEFORE, self.AFTER))
+        message = proof.message(self.DEMOTED, self.BEFORE, self.AFTER)
+        self.assertTrue(message.startswith("Gate: the weekly monitor's captures of 2026-11-02 proven (2 rows), 1 demoted\n"), message)
+        self.assertIn("xx.test/beta.", message)
+        self.assertIn("Cities newly held: delta-town.", message)
+        self.assertNotIn("2026-11-03", message)
+        self.assertNotIn(" min", message)
+        self.assertEqual([], proof.timed_lines(message))
+        self.assertNotIn("Demoted", proof.message(self.REPORT, self.BEFORE, self.AFTER))
+        # Put back with everything else when a later check fails: the issue says the next run writes it again.
+        put_back = dict(self.DEMOTED, putBack="the tools' tests failed", changed=False)
+        self.assertIn("The demotions below were put back with them", proof.section(put_back, self.BEFORE, self.BEFORE))
+
     def test_load_reads_the_proof_folder(self):
         with tempfile.TemporaryDirectory() as d:
             self.assertEqual((None, [], []), proof.load(d))
@@ -96,6 +117,36 @@ class Attention(unittest.TestCase):
         fp2, tier1_2, _ = proof.attention(other, Proof.BEFORE, Proof.BEFORE, "", "0")
         self.assertNotEqual(fp, fp2)
         self.assertFalse(tier1_2)
+
+    def test_a_checked_timetables_own_row_left_out_is_tier_one_whatever_the_reason(self):
+        # The review of 13 Nov 2026: a refused row, or a mirror's capture, demotes nothing, so the issue must say it loudly.
+        row = "xx-test.tsv xx.test/gamma at unit from xx-test/gamma"
+        refused = dict(Proof.REPORT, leftOut=[{"row": row, "reason": "refused by the gate's reader: zone is empty", "checked": True, "mirror": False}])
+        fp, tier1, summary = proof.attention(refused, Proof.BEFORE, Proof.BEFORE, "", "0")
+        self.assertTrue(fp and tier1)
+        self.assertIn("1 rows left out (1 a checked timetable's own row: its days are unchecked)", summary)
+        self.assertIn("1 of these were a checked timetable's own row", proof.section(refused, Proof.BEFORE, Proof.BEFORE))
+        # The same refusal of a row that is no checked timetable's own (a cautious member's, a published method's) stays tier 2.
+        member = dict(Proof.REPORT, leftOut=[{"row": row, "reason": "refused by the gate's reader: zone is empty", "checked": False, "mirror": False}])
+        self.assertFalse(proof.attention(member, Proof.BEFORE, Proof.BEFORE, "", "0")[1])
+        self.assertNotIn("a checked timetable's own row", proof.section(member, Proof.BEFORE, Proof.BEFORE))
+        # A mirror's capture over its limit: no demotion, tier 1 all the same.
+        mirror = dict(Proof.REPORT, leftOut=[{"row": row, "reason": "xx.test isha: 4 over the late limit — the capture is a republisher's mirror",
+                                              "checked": True, "mirror": True}])
+        self.assertTrue(proof.attention(mirror, Proof.BEFORE, Proof.BEFORE, "", "0")[1])
+        # A report written before the mark existed reads as before.
+        self.assertFalse(proof.attention(dict(Proof.REPORT, leftOut=[{"row": row, "reason": "xx.test isha: 4 over the late limit"}]), Proof.BEFORE, Proof.BEFORE, "", "0")[1])
+
+    def test_a_demotion_is_tier_one_whatever_else_the_run_found(self):
+        demoted = dict(self.CLEAN, demoted=Proof.DEMOTED["demoted"])
+        fp, tier1, summary = proof.attention(demoted, Proof.BEFORE, Proof.BEFORE, "pushed to main (abc1234)", "0")
+        self.assertTrue(fp and tier1)
+        self.assertIn("demoted by the monitor (ruling R185): xx.test/beta", summary)
+        # The fingerprint is the set's: the same unit a week later, with another reason, is no new notice; another unit is.
+        later = dict(demoted, date="2026-11-09", demoted=[dict(Proof.DEMOTED["demoted"][0], since="2026-11-09", reason="another")])
+        self.assertEqual(fp, proof.attention(later, Proof.BEFORE, Proof.BEFORE, "pushed to main (def5678)", "0")[0])
+        other = dict(demoted, demoted=[dict(Proof.DEMOTED["demoted"][0], entry="xx.test/gamma")])
+        self.assertNotEqual(fp, proof.attention(other, Proof.BEFORE, Proof.BEFORE, "", "0")[0])
 
     def test_a_push_that_did_not_land_a_city_newly_held_or_prove_stopping_needs_the_owner(self):
         self.assertTrue(proof.attention(self.CLEAN, Proof.BEFORE, Proof.BEFORE, "not pushed: the secret TAQWA_PUSH_TOKEN is not set", "0")[0])
@@ -331,6 +382,19 @@ class Workflow(unittest.TestCase):
         self.assertRegex(script, r'\nCI=true "\$GRADLE" --no-daemon -q :shared:testAndroidHostTest \|\| put_back ')
         self.assertLess(script.index("site/test_timetables.py ||"), script.index(":shared:testAndroidHostTest ||"))
         self.assertLess(script.index(":shared:testAndroidHostTest ||"), script.index('echo true > "$OUT/changed"'))
+
+    def test_prove_writes_the_envelope_rows_a_new_year_needs(self):
+        # The second trust audit's G24 (14 Nov 2026): a year appended to a group file with units must reach its envelope
+        # rows too, gated, before the stamps are read into ProofStamps.kt; and the release scripts check them.
+        root = os.path.join(HERE, "..", "..", "..")
+        with open(os.path.join(root, "scripts", "prove.sh"), encoding="utf-8") as f:
+            script = f.read()
+        self.assertLess(script.index("gradle prove "), script.index("gradle checkEnvelopeRows"))
+        self.assertLess(script.index("gradle generateEnvelopeRows ||"), script.index("gradle generateProofStamps ||"))
+        self.assertIn('-PgateGroup=$envelopes" -Pstamps=false || put_back', script)
+        for name in ("release.sh", "ios-release.sh"):
+            with open(os.path.join(root, "scripts", name), encoding="utf-8") as f:
+                self.assertIn("./gradlew -q -p tools/timetables checkEnvelopeRows", f.read(), name)
 
 
 class Handoff(unittest.TestCase):

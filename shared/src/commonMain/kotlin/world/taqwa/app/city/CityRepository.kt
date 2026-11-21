@@ -5,6 +5,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import world.taqwa.app.location.LocationRepository
+import world.taqwa.app.prayer.FixCountry
 import kotlin.concurrent.Volatile
 
 /**
@@ -150,7 +151,8 @@ class CityRepository(
     /**
      * The nearest bundled city to a raw GPS fix, by great-circle distance. A linear scan over
      * ~34k rows is a few milliseconds — not worth a spatial index for a call that happens once
-     * per location resolution. Returns null only when the database itself is empty.
+     * per location resolution. Returns null only when the database itself is empty. Not for a fix's country: across a
+     * border the nearest city is often the neighbour's ([forFix], ruling R256).
      */
     suspend fun nearest(latitude: Double, longitude: Double): City? =
         withContext(Dispatchers.Default) {
@@ -159,6 +161,35 @@ class CityRepository(
                 LocationRepository.distanceMetres(latitude, longitude, it.latitude, it.longitude)
             }?.let { it.copy(localizedName = loaded.names[it.id]) }
         }
+
+    /**
+     * The bundled cities a raw GPS fix takes its facts from, under the device's time zone [zoneId] ([FixCountry],
+     * rulings R256 and R259): the nearest city, whose name, country and region the place takes, and, where the zone
+     * belongs to other countries than that city's and one of their cities stands near enough, that city too, whose
+     * country the place may be in as well (the engine then holds the day to both). Null only when the database is
+     * empty.
+     */
+    suspend fun forFix(latitude: Double, longitude: Double, zoneId: String?): FixCities? =
+        withContext(Dispatchers.Default) {
+            val names = data().names
+            FixCountry.choice(latitude, longitude, zoneId, fixIndex())?.let { choice ->
+                FixCities(
+                    city = choice.city.copy(localizedName = names[choice.city.id]),
+                    beside = choice.beside?.let { it.copy(localizedName = names[it.id]) },
+                )
+            }
+        }
+
+    /** The latitude-sorted index [forFix] searches, built once on first use (a sort of the ~34k rows). */
+    private var fixIndex: FixCountry.Index<City>? = null
+
+    private suspend fun fixIndex(): FixCountry.Index<City> {
+        val cities = data().cities
+        return cacheLock.withLock {
+            fixIndex ?: FixCountry.Index(cities, { it.latitude }, { it.longitude }, { it.countryCode }, { it.timeZoneId })
+                .also { fixIndex = it }
+        }
+    }
 
     private suspend fun parse(csv: String): List<City> = withContext(Dispatchers.Default) {
         csv.lineSequence()
@@ -204,3 +235,10 @@ class CityRepository(
         val SUPPORTED_LANGUAGES = setOf("ar", "id", "ur", "bn", "tr", "fr")
     }
 }
+
+/**
+ * What a GPS fix takes from the city list ([CityRepository.forFix], rulings R256 and R259): [city], the nearest, for
+ * the name, country and region; [beside], where the device zone says the place may be in another country, that
+ * country's nearest city, for that country and its region (`GeoLocation.alsoCountryCode`).
+ */
+data class FixCities(val city: City, val beside: City? = null)

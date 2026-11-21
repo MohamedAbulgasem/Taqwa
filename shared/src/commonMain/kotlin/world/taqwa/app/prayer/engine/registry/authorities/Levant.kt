@@ -133,8 +133,8 @@ object Levant {
 
     /**
      * The end of eating's own margin (seconds), fitted by the gate's fitter at al-Aqsa on the printed
-     * Fajr as an end (the gate's `F+E`): − 96 s on 2012 and 2026; 2027 held out was 1 min late on 7
-     * days of April with it, so it is widened to the three years' bound, − 116 s, never silently.
+     * Fajr as an end (the gate's `F+E`) on 2012 and 2026; 2027 held out was 1 min late on 7 days with
+     * it, so it is widened to the three years' bound, − 116 s, never silently.
      */
     private const val PA_END_OF_EATING_MARGIN = -116
 
@@ -240,9 +240,25 @@ object Levant {
      * entry) the edge: the al-Aqsa method at the user's own point a minute later, the nearest town's
      * point still bounding the ends (rulings R44, R45), no town's offset carried beyond its town.
      */
+    /**
+     * Ruling R265: the towns where the real sun's Asr floor puts Asr past class D's 3 min after the print, each at its
+     * measured worst (the gate, 14 Nov 2026). The print moves a town from al-Aqsa by whole minutes of longitude alone,
+     * and these four lie a degree north of it, where the first shadow comes later in summer.
+     */
+    private val paShadowAsr = mapOf("acre" to 4, "haifa" to 4, "safed" to 4, "tiberias" to 4)
+
+    private const val PA_SHADOW_ASR = "Asr is never before the first whole minute after the real shadow-1 Asr at the place " +
+        "itself (ruling R265), and the table moves this town from al-Aqsa by its longitude alone, though it lies about a " +
+        "degree north of al-Aqsa: in summer the first shadow there comes after the printed Asr, and Asr up to 4 min after the print"
+
     val paUnits: UnitSet = run {
         val reachKm = lateReachKm(aqsa.lat, EntryClass.D_AUTHORITY)
-        val units = paTowns.map { AuthorityUnit("ps.iftaa.${it.key}", it.name, it.point, reachKm, paTable(it)) }
+        val units = paTowns.map { town ->
+            AuthorityUnit(
+                "ps.iftaa.${town.key}", town.name, town.point, reachKm, paTable(town),
+                lateLimits = paShadowAsr[town.key]?.let { listOf(LateLimit(it, PA_SHADOW_ASR, setOf(TimedEvent.ASR))) }.orEmpty(),
+            )
+        }
         UnitSet(pa.id, units) { user ->
             val nearest = units.minBy { distanceKm(user, it.point) }
             paMethod.beyondTable("ps.iftaa.edge", nearest.point, user, nearest.radiusKm)
@@ -292,9 +308,9 @@ object Levant {
      * Two more captures were checked and stayed excluded (see proof.md): 25 Jan 2023 is a genuine
      * widget bug (every printed time ~60 min off its own displayed date, nowhere near a real
      * daylight-saving change). 28 Mar 2024 reads correctly on the DST clock on every OTHER event
-     * (1-14 min of the fitted margins above) but its sunrise would be 10 min late under that same
+     * (1-14 min of the fitted margins above) but its sunrise would be about 10 min late under that same
      * reading -- and a sunrise may never be late by any amount, no exception can cover it, so
-     * including this one date would cost every other day 11 more minutes of earlier sunrise. One
+     * including this one date would cost every other day about 11 more minutes of earlier sunrise. One
      * capture (1 Apr 2023) reads correctly and is included with its own fixed clock, below.
      */
     val lebanonMethod = TimetableMethod(
@@ -331,18 +347,15 @@ object Levant {
      * The 20° end of eating's margin (end-of-eating audit, 3 Oct 2026): Dar al-Fatwa prints no
      * end-of-eating column, and the fast begins at its printed Fajr (lb-fatwa.tsv now checks the end
      * against it, F+E). Never after it on any of the 384 days held; the fitter's bound on the
-     * perpetual table, with its 5 s safety, is −5 s (decided by its 9 September row), so the end moves
-     * 5 s earlier.
+     * perpetual table, with its 5 s safety, is −5 s, so the end moves 5 s earlier.
      */
     private const val LEBANON_END_OF_EATING = -5
 
     /**
      * Syria's Ministry of Awqaf: the MWL method plus a 2-minute tamkin, officially since 28 Feb 2025
      * (SANA; the + 2 sits on Maghrib and Dhuhr here, MEDIUM, 2 dates). Margins fitted on the earlier of
-     * the two dated samples the research found (a Ramadan 1447 imsakiya reading), widened on Dhuhr by
-     * +125 s and Asr/Maghrib by +65 s: the later sample (the Umayyad Mosque, a different point), held
-     * out, was early by 2 min on Dhuhr and 1 min on Asr and Maghrib, never silently. Too thin for a
-     * class above D_AUTHORITY (spec §6.2 a).
+     * the two dated samples the research found (a Ramadan 1447 imsakiya reading), widened on Dhuhr,
+     * Asr and Maghrib, never silently. Too thin for a class above D_AUTHORITY (spec §6.2 a).
      */
     val syriaMethod = TimetableMethod(
         id = "sy.awqaf",
@@ -359,8 +372,8 @@ object Levant {
 
     /**
      * Iraq's Sunni Endowment: 18°/17°, Dhuhr ≈ + 5, Asr + 3..4.5, Maghrib ≈ + 3 (MEDIUM, one official
-     * sample). Margins fitted on that one dated sample (4 Dec 2025,
-     * archive/tables/normalized-7e/iq-sunni-baghdad-official.txt); a third-party site's month was
+     * sample). Margins fitted on that one dated sample
+     * (archive/tables/normalized-7e/iq-sunni-baghdad-official.txt); a third-party site's month was
      * normalised too but excluded from the gate (its Dhuhr/Asr/Maghrib/Isha disagree with this date by
      * 6-27 min, one-sided, far beyond ordinary variation -- not established reliable, see proof.md).
      * One date proves nothing beyond itself: D_AUTHORITY.
@@ -438,8 +451,8 @@ object Levant {
      * day read at the Umayyad Mosque, 2.8 km east), so a place in either unit reads the other's point for its starts too
      * ([TimetableMethod.startPoints]): never before either sample. The nearest sample alone left the app's al-Yarmūk,
      * Babīlā, Jaramānā, ʿIrbīn, Ḩarastā, At Tall and Dūmā, all in the Umayyad Mosque's unit and within the imsakiya's
-     * reach, a minute before the imsakiya's Fajr on a day and its Isha on another (the fix round of 11 Oct 2026; as on
-     * main). The ends stay the nearest sample's and the user's own; each city is gated against both samples.
+     * reach, before the imsakiya's Fajr and Isha (the fix round of 11 Oct 2026; as on main). The ends stay the nearest
+     * sample's and the user's own; each city is gated against both samples.
      */
     val syriaUnits: UnitSet = tablesAtTheirPoints(
         syria.id, EntryClass.A, syriaMethod,

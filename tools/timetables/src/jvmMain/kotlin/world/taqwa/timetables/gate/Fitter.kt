@@ -5,10 +5,12 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.EventOffsets
+import world.taqwa.app.prayer.engine.method.ImsakFrom
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.Units
 import java.util.Locale
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 /**
@@ -26,8 +28,12 @@ import kotlin.time.Instant
  * over every fit day where the time follows its margin. Days where it does not (a fixed Dhuhr,
  * DUM RT's white nights, an end of eating held at Fajr) and days whose time the high-latitude rule
  * set are left out and counted. Both Asr columns share the Asr margin (the larger is used), the
- * end of eating and imsak the end-of-eating margin (the smaller). A cautious entry has no margins
- * of its own: fit its members' entries instead.
+ * end of eating and imsak the end-of-eating margin (the smaller), but for an imsak counted back from
+ * the printed Fajr ([ImsakFrom.PrintedFajr]), which has its own: there each printed Fajr is also
+ * fitted as the imsak, less the method's minutes, the rule's own claim (the JAKIM imsak round of
+ * 12 Nov 2026: e-solat prints Subuh − 10 on every day held), so the years that hold no printed
+ * imsak fit it too, and an `Im` column read beside it holds it to the imsak itself. A cautious entry
+ * has no margins of its own: fit its members' entries instead.
  *
  * `fit("entry/unit")` fits one authority unit (a JAKIM zone, a Diyanet district, a Habous city, a
  * Brunei district): only the rows whose point resolves to that unit, and the holdout applies the
@@ -69,6 +75,10 @@ class Fitter(private val roots: OfficialRoots, private val manifest: GateManifes
                         val fit = fits.getOrPut(event) { EventFit(event) }
                         val at = Gate.officialInstant(official.date, minutes, event, setup.clock, setup.zone)
                         fit.add(official.date, at, probe)
+                        val imsakMinutes = method.imsakMinutesBeforeFajr
+                        if (event == Event.FAJR && method.imsakFrom is ImsakFrom.PrintedFajr && imsakMinutes != null) {
+                            fits.getOrPut(Event.IMSAK) { EventFit(Event.IMSAK) }.add(official.date, at - imsakMinutes.minutes, probe)
+                        }
                     }
                 }
             }
@@ -178,7 +188,12 @@ class Fitter(private val roots: OfficialRoots, private val manifest: GateManifes
                 Event.ASR_STANDARD, Event.ASR_HANAFI -> method.copy(margins = m.copy(asr = seconds))
                 Event.MAGHRIB -> method.copy(margins = m.copy(maghrib = seconds))
                 Event.ISHA -> method.copy(margins = m.copy(isha = seconds))
-                Event.END_OF_EATING, Event.IMSAK -> method.copy(endOfEatingMarginSeconds = seconds)
+                Event.END_OF_EATING -> method.copy(endOfEatingMarginSeconds = seconds)
+                Event.IMSAK -> if (method.imsakFrom is ImsakFrom.PrintedFajr) {
+                    method.copy(imsakFrom = ImsakFrom.PrintedFajr(seconds))
+                } else {
+                    method.copy(endOfEatingMarginSeconds = seconds)
+                }
             }
         }
 
@@ -190,17 +205,20 @@ class Fitter(private val roots: OfficialRoots, private val manifest: GateManifes
             Event.ASR_STANDARD, Event.ASR_HANAFI -> method.margins.asr
             Event.MAGHRIB -> method.margins.maghrib
             Event.ISHA -> method.margins.isha
-            Event.END_OF_EATING, Event.IMSAK -> method.endOfEatingMarginSeconds
+            Event.END_OF_EATING -> method.endOfEatingMarginSeconds
+            Event.IMSAK -> (method.imsakFrom as? ImsakFrom.PrintedFajr)?.marginSeconds ?: method.endOfEatingMarginSeconds
         }
 
         /**
          * [method] with every fitted margin: where two events share one (the two Asr schools, the
-         * end of eating and imsak), the later start or the earlier end.
+         * end of eating and imsak but for an [ImsakFrom.PrintedFajr]'s), the later start or the earlier end.
          */
         fun withMargins(method: TimetableMethod, margins: Map<Event, Int>): TimetableMethod {
             fun pick(events: List<Event>, start: Boolean): Int? =
                 events.mapNotNull { margins[it] }.let { if (it.isEmpty()) null else if (start) it.max() else it.min() }
             val m = method.margins
+            val printed = method.imsakFrom as? ImsakFrom.PrintedFajr
+            val eating = if (printed != null) listOf(Event.END_OF_EATING) else listOf(Event.END_OF_EATING, Event.IMSAK)
             return method.copy(
                 margins = EventOffsets(
                     fajr = margins[Event.FAJR] ?: m.fajr,
@@ -210,7 +228,8 @@ class Fitter(private val roots: OfficialRoots, private val manifest: GateManifes
                     maghrib = margins[Event.MAGHRIB] ?: m.maghrib,
                     isha = margins[Event.ISHA] ?: m.isha,
                 ),
-                endOfEatingMarginSeconds = pick(listOf(Event.END_OF_EATING, Event.IMSAK), start = false) ?: method.endOfEatingMarginSeconds,
+                endOfEatingMarginSeconds = pick(eating, start = false) ?: method.endOfEatingMarginSeconds,
+                imsakFrom = printed?.let { margins[Event.IMSAK]?.let(ImsakFrom::PrintedFajr) ?: it } ?: method.imsakFrom,
             )
         }
     }

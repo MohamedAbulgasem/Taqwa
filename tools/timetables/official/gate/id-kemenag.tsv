@@ -13,7 +13,7 @@
 # the fast begins at Subuh, so the Fajr column is also checked as the end of eating (F+E).
 # 2027 (track T4, 11 Oct 2026): the weekly monitor first read Kemenag's 2027 on 5 Oct 2026; every place's 2027 table is a
 # row below (the prove of 5 Oct 2026 added nine; the other nine were one minute early on 21 or 22 March 2027, and at
-# Palembang's Asr on 30 September 2027). Kemenag's tables lag a day's change on 21 and 22 March (its step at the
+# Palembang's Asr on one day). Kemenag's tables lag a day's change on 21 and 22 March (its step at the
 # equinox): the method now carries that step (DayRule.LAG_EQUINOX_KEMENAG) and every unit's margins are fitted over
 # every 2026 and 2027 row alike (Kemenag.kt), so all of them are fit, Oct-Dec 2026 too, and none is held out.
 # 2028 (review of track T4, 11 Oct 2026): myQuran answers 2028 already, for all eighteen (read with the monitor's own
@@ -70,7 +70,7 @@ archive/tables/pinned/id-kemenag/2026-10-05/medan-2027.txt	id.kemenag/0228			Asi
 archive/tables/pinned/id-kemenag/2026-10-05/semarang-2027.txt	id.kemenag/1433			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Semarang 2027, the monitor capture of 5 Oct 2026 (prove)
 archive/tables/pinned/id-kemenag/2026-10-05/surabaya-2027.txt	id.kemenag/1638			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Surabaya 2027, the monitor capture of 5 Oct 2026 (prove)
 archive/tables/pinned/id-kemenag/2026-10-05/yogyakarta-2027.txt	id.kemenag/1505			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Yogyakarta 2027, the monitor capture of 5 Oct 2026 (prove)
-# The other nine 2027 tables (11 Oct 2026): the monitor captures of 5 Oct 2026 (equal on every day to a fresh fetch of 11 Oct 2026), pinned as they were under archive/tables/pinned/id-kemenag/2026-10-11/. Prove of 5 Oct 2026 left them out: one minute early on 21 or 22 March 2027 at eight places (Dhuhr, Maghrib or Isha; Kemenag's equinox step, see the header) and Asr at Palembang on 30 September 2027; the method carries the step and the margins are refitted over 2026 and 2027 (Kemenag.kt); the rows are split=fit, as the header says.
+# The other nine 2027 tables (11 Oct 2026): the monitor captures of 5 Oct 2026 (equal on every day to a fresh fetch of 11 Oct 2026), pinned as they were under archive/tables/pinned/id-kemenag/2026-10-11/. Prove of 5 Oct 2026 left them out: one minute early on 21 or 22 March 2027 at eight places (Dhuhr, Maghrib or Isha; Kemenag's equinox step, see the header) and at Palembang's Asr on one day; the method carries the step and the margins are refitted over 2026 and 2027 (Kemenag.kt); the rows are split=fit, as the header says.
 archive/tables/pinned/id-kemenag/2026-10-11/bandaaceh-2027.txt	id.kemenag/0119			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Banda Aceh 2027, the monitor capture of 5 Oct 2026
 archive/tables/pinned/id-kemenag/2026-10-11/bukittinggi-2027.txt	id.kemenag/0313			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bukittinggi 2027, the monitor capture of 5 Oct 2026
 archive/tables/pinned/id-kemenag/2026-10-11/palembang-2027.txt	id.kemenag/0816			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Palembang 2027, the monitor capture of 5 Oct 2026
@@ -99,3 +99,699 @@ archive/tables/pinned/id-kemenag/2026-10-11/medan-2028.txt	id.kemenag/0228			Asi
 archive/tables/pinned/id-kemenag/2026-10-11/semarang-2028.txt	id.kemenag/1433			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Semarang 2028, read from myQuran on 11 Oct 2026 (held out)
 archive/tables/pinned/id-kemenag/2026-10-11/palembang-2028.txt	id.kemenag/0816			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Palembang 2028, read from myQuran on 11 Oct 2026 (held out)
 archive/tables/pinned/id-kemenag/2026-10-11/yogyakarta-2028.txt	id.kemenag/1505			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Yogyakarta 2028, read from myQuran on 11 Oct 2026 (held out)
+# Round of 12 Nov 2026: 109 more kab/kota (Kemenag.kt, KemenagKabkota.kt), the largest of those whose app cities had all
+# been on the edge, each fetched whole for 2026, 2027 and 2028 from the same republication on 12 Nov 2026 (the monitor's
+# endpoint, one month a request, the place name checked on every month; tables under
+# archive/tables/round/kemenag-kabkota/, the raw answers under archive/raw/round/kemenag-kabkota/2026-11-12/). Checked
+# at each unit's own point (lat/lon empty): the app's own GeoNames point for the kota or regency seat. First fitted on
+# 2026 alone and held to 2027: 108 of the 109 held every 2027 day; Kota Pontianak's Asr was one minute early on two days
+# of March 2027 (on the equator Asr's daily change turns as the noon sun crosses overhead). So, as for the eighteen since
+# track T4, the margins are fitted over 2026 and 2027 together and 2028, never fitted on, is the held-out year.
+archive/tables/round/kemenag-kabkota/kotabekasi-2026.txt	id.kemenag/1221			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bekasi 2026
+archive/tables/round/kemenag-kabkota/kotabekasi-2027.txt	id.kemenag/1221			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bekasi 2027
+archive/tables/round/kemenag-kabkota/kotabekasi-2028.txt	id.kemenag/1221			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Bekasi 2028
+archive/tables/round/kemenag-kabkota/depok-2026.txt	id.kemenag/1225			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Depok 2026
+archive/tables/round/kemenag-kabkota/depok-2027.txt	id.kemenag/1225			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Depok 2027
+archive/tables/round/kemenag-kabkota/depok-2028.txt	id.kemenag/1225			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Depok 2028
+archive/tables/round/kemenag-kabkota/kotatangerang-2026.txt	id.kemenag/1107			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tangerang 2026
+archive/tables/round/kemenag-kabkota/kotatangerang-2027.txt	id.kemenag/1107			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tangerang 2027
+archive/tables/round/kemenag-kabkota/kotatangerang-2028.txt	id.kemenag/1107			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Tangerang 2028
+archive/tables/round/kemenag-kabkota/tangsel-2026.txt	id.kemenag/1108			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tangerang Selatan 2026
+archive/tables/round/kemenag-kabkota/tangsel-2027.txt	id.kemenag/1108			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tangerang Selatan 2027
+archive/tables/round/kemenag-kabkota/tangsel-2028.txt	id.kemenag/1108			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Tangerang Selatan 2028
+archive/tables/round/kemenag-kabkota/batam-2026.txt	id.kemenag/0506			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Batam 2026
+archive/tables/round/kemenag-kabkota/batam-2027.txt	id.kemenag/0506			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Batam 2027
+archive/tables/round/kemenag-kabkota/batam-2028.txt	id.kemenag/0506			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Batam 2028
+archive/tables/round/kemenag-kabkota/pekanbaru-2026.txt	id.kemenag/0412			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pekanbaru 2026
+archive/tables/round/kemenag-kabkota/pekanbaru-2027.txt	id.kemenag/0412			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pekanbaru 2027
+archive/tables/round/kemenag-kabkota/pekanbaru-2028.txt	id.kemenag/0412			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Pekanbaru 2028
+archive/tables/round/kemenag-kabkota/bandarlampung-2026.txt	id.kemenag/1014			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bandar Lampung 2026
+archive/tables/round/kemenag-kabkota/bandarlampung-2027.txt	id.kemenag/1014			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bandar Lampung 2027
+archive/tables/round/kemenag-kabkota/bandarlampung-2028.txt	id.kemenag/1014			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Bandar Lampung 2028
+archive/tables/round/kemenag-kabkota/padang-2026.txt	id.kemenag/0314			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Padang 2026
+archive/tables/round/kemenag-kabkota/padang-2027.txt	id.kemenag/0314			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Padang 2027
+archive/tables/round/kemenag-kabkota/padang-2028.txt	id.kemenag/0314			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Padang 2028
+archive/tables/round/kemenag-kabkota/samarinda-2026.txt	id.kemenag/2310			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Samarinda 2026
+archive/tables/round/kemenag-kabkota/samarinda-2027.txt	id.kemenag/2310			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Samarinda 2027
+archive/tables/round/kemenag-kabkota/samarinda-2028.txt	id.kemenag/2310			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Samarinda 2028
+archive/tables/round/kemenag-kabkota/tasikmalaya-2026.txt	id.kemenag/1227			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tasikmalaya 2026
+archive/tables/round/kemenag-kabkota/tasikmalaya-2027.txt	id.kemenag/1227			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tasikmalaya 2027
+archive/tables/round/kemenag-kabkota/tasikmalaya-2028.txt	id.kemenag/1227			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Tasikmalaya 2028
+archive/tables/round/kemenag-kabkota/kotaserang-2026.txt	id.kemenag/1106			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Serang 2026
+archive/tables/round/kemenag-kabkota/kotaserang-2027.txt	id.kemenag/1106			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Serang 2027
+archive/tables/round/kemenag-kabkota/kotaserang-2028.txt	id.kemenag/1106			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Serang 2028
+archive/tables/round/kemenag-kabkota/balikpapan-2026.txt	id.kemenag/2308			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Balikpapan 2026
+archive/tables/round/kemenag-kabkota/balikpapan-2027.txt	id.kemenag/2308			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Balikpapan 2027
+archive/tables/round/kemenag-kabkota/balikpapan-2028.txt	id.kemenag/2308			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Balikpapan 2028
+archive/tables/round/kemenag-kabkota/pontianak-2026.txt	id.kemenag/2013			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kota Pontianak 2026
+archive/tables/round/kemenag-kabkota/pontianak-2027.txt	id.kemenag/2013			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kota Pontianak 2027
+archive/tables/round/kemenag-kabkota/pontianak-2028.txt	id.kemenag/2013			Asia/Pontianak	F+E S D A M I	daily	standard	test	Kota Pontianak 2028
+archive/tables/round/kemenag-kabkota/banjarmasin-2026.txt	id.kemenag/2113			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Banjarmasin 2026
+archive/tables/round/kemenag-kabkota/banjarmasin-2027.txt	id.kemenag/2113			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Banjarmasin 2027
+archive/tables/round/kemenag-kabkota/banjarmasin-2028.txt	id.kemenag/2113			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Banjarmasin 2028
+archive/tables/round/kemenag-kabkota/jambi-2026.txt	id.kemenag/0610			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Jambi 2026
+archive/tables/round/kemenag-kabkota/jambi-2027.txt	id.kemenag/0610			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Jambi 2027
+archive/tables/round/kemenag-kabkota/jambi-2028.txt	id.kemenag/0610			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Jambi 2028
+archive/tables/round/kemenag-kabkota/cimahi-2026.txt	id.kemenag/1223			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Cimahi 2026, highland
+archive/tables/round/kemenag-kabkota/cimahi-2027.txt	id.kemenag/1223			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Cimahi 2027, highland
+archive/tables/round/kemenag-kabkota/cimahi-2028.txt	id.kemenag/1223			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Cimahi 2028, highland
+archive/tables/round/kemenag-kabkota/surakarta-2026.txt	id.kemenag/1434			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Surakarta 2026
+archive/tables/round/kemenag-kabkota/surakarta-2027.txt	id.kemenag/1434			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Surakarta 2027
+archive/tables/round/kemenag-kabkota/surakarta-2028.txt	id.kemenag/1434			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Surakarta 2028
+archive/tables/round/kemenag-kabkota/kupang-2026.txt	id.kemenag/1922			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Kupang 2026
+archive/tables/round/kemenag-kabkota/kupang-2027.txt	id.kemenag/1922			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Kupang 2027
+archive/tables/round/kemenag-kabkota/kupang-2028.txt	id.kemenag/1922			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Kupang 2028
+archive/tables/round/kemenag-kabkota/cilegon-2026.txt	id.kemenag/1105			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Cilegon 2026
+archive/tables/round/kemenag-kabkota/cilegon-2027.txt	id.kemenag/1105			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Cilegon 2027
+archive/tables/round/kemenag-kabkota/cilegon-2028.txt	id.kemenag/1105			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Cilegon 2028
+archive/tables/round/kemenag-kabkota/manado-2026.txt	id.kemenag/2914			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Manado 2026
+archive/tables/round/kemenag-kabkota/manado-2027.txt	id.kemenag/2914			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Manado 2027
+archive/tables/round/kemenag-kabkota/manado-2028.txt	id.kemenag/2914			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Manado 2028
+archive/tables/round/kemenag-kabkota/mataram-2026.txt	id.kemenag/1810			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Mataram 2026
+archive/tables/round/kemenag-kabkota/mataram-2027.txt	id.kemenag/1810			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Mataram 2027
+archive/tables/round/kemenag-kabkota/mataram-2028.txt	id.kemenag/1810			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Mataram 2028
+archive/tables/round/kemenag-kabkota/bengkulu-2026.txt	id.kemenag/0710			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bengkulu 2026
+archive/tables/round/kemenag-kabkota/bengkulu-2027.txt	id.kemenag/0710			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Bengkulu 2027
+archive/tables/round/kemenag-kabkota/bengkulu-2028.txt	id.kemenag/0710			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Bengkulu 2028
+archive/tables/round/kemenag-kabkota/palu-2026.txt	id.kemenag/2813			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Palu 2026
+archive/tables/round/kemenag-kabkota/palu-2027.txt	id.kemenag/2813			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Palu 2027
+archive/tables/round/kemenag-kabkota/palu-2028.txt	id.kemenag/2813			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Palu 2028
+archive/tables/round/kemenag-kabkota/kotasukabumi-2026.txt	id.kemenag/1226			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Sukabumi 2026, highland
+archive/tables/round/kemenag-kabkota/kotasukabumi-2027.txt	id.kemenag/1226			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Sukabumi 2027, highland
+archive/tables/round/kemenag-kabkota/kotasukabumi-2028.txt	id.kemenag/1226			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Sukabumi 2028, highland
+archive/tables/round/kemenag-kabkota/kendari-2026.txt	id.kemenag/2717			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Kendari 2026
+archive/tables/round/kemenag-kabkota/kendari-2027.txt	id.kemenag/2717			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Kendari 2027
+archive/tables/round/kemenag-kabkota/kendari-2028.txt	id.kemenag/2717			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Kendari 2028
+archive/tables/round/kemenag-kabkota/dumai-2026.txt	id.kemenag/0411			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Dumai 2026
+archive/tables/round/kemenag-kabkota/dumai-2027.txt	id.kemenag/0411			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Dumai 2027
+archive/tables/round/kemenag-kabkota/dumai-2028.txt	id.kemenag/0411			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Dumai 2028
+archive/tables/round/kemenag-kabkota/ambon-2026.txt	id.kemenag/3110			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Ambon 2026
+archive/tables/round/kemenag-kabkota/ambon-2027.txt	id.kemenag/3110			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Ambon 2027
+archive/tables/round/kemenag-kabkota/ambon-2028.txt	id.kemenag/3110			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kota Ambon 2028
+archive/tables/round/kemenag-kabkota/kotacirebon-2026.txt	id.kemenag/1224			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Cirebon 2026
+archive/tables/round/kemenag-kabkota/kotacirebon-2027.txt	id.kemenag/1224			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Cirebon 2027
+archive/tables/round/kemenag-kabkota/kotacirebon-2028.txt	id.kemenag/1224			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Cirebon 2028
+archive/tables/round/kemenag-kabkota/kotapekalongan-2026.txt	id.kemenag/1431			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pekalongan 2026
+archive/tables/round/kemenag-kabkota/kotapekalongan-2027.txt	id.kemenag/1431			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pekalongan 2027
+archive/tables/round/kemenag-kabkota/kotapekalongan-2028.txt	id.kemenag/1431			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Pekalongan 2028
+archive/tables/round/kemenag-kabkota/palangkaraya-2026.txt	id.kemenag/2214			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kota Palangkaraya 2026
+archive/tables/round/kemenag-kabkota/palangkaraya-2027.txt	id.kemenag/2214			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kota Palangkaraya 2027
+archive/tables/round/kemenag-kabkota/palangkaraya-2028.txt	id.kemenag/2214			Asia/Pontianak	F+E S D A M I	daily	standard	test	Kota Palangkaraya 2028
+archive/tables/round/kemenag-kabkota/kotakediri-2026.txt	id.kemenag/1632			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Kediri 2026
+archive/tables/round/kemenag-kabkota/kotakediri-2027.txt	id.kemenag/1632			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Kediri 2027
+archive/tables/round/kemenag-kabkota/kotakediri-2028.txt	id.kemenag/1632			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Kediri 2028
+archive/tables/round/kemenag-kabkota/kotategal-2026.txt	id.kemenag/1435			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tegal 2026
+archive/tables/round/kemenag-kabkota/kotategal-2027.txt	id.kemenag/1435			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tegal 2027
+archive/tables/round/kemenag-kabkota/kotategal-2028.txt	id.kemenag/1435			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Tegal 2028
+archive/tables/round/kemenag-kabkota/banjarbaru-2026.txt	id.kemenag/2112			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Banjarbaru 2026
+archive/tables/round/kemenag-kabkota/banjarbaru-2027.txt	id.kemenag/2112			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Banjarbaru 2027
+archive/tables/round/kemenag-kabkota/banjarbaru-2028.txt	id.kemenag/2112			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Banjarbaru 2028
+archive/tables/round/kemenag-kabkota/binjai-2026.txt	id.kemenag/0226			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Binjai 2026
+archive/tables/round/kemenag-kabkota/binjai-2027.txt	id.kemenag/0226			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Binjai 2027
+archive/tables/round/kemenag-kabkota/binjai-2028.txt	id.kemenag/0226			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Binjai 2028
+archive/tables/round/kemenag-kabkota/pematangsiantar-2026.txt	id.kemenag/0230			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pematangsiantar 2026
+archive/tables/round/kemenag-kabkota/pematangsiantar-2027.txt	id.kemenag/0230			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pematangsiantar 2027
+archive/tables/round/kemenag-kabkota/pematangsiantar-2028.txt	id.kemenag/0230			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Pematangsiantar 2028
+archive/tables/round/kemenag-kabkota/tarakan-2026.txt	id.kemenag/2405			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Tarakan 2026
+archive/tables/round/kemenag-kabkota/tarakan-2027.txt	id.kemenag/2405			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Tarakan 2027
+archive/tables/round/kemenag-kabkota/tarakan-2028.txt	id.kemenag/2405			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Tarakan 2028
+archive/tables/round/kemenag-kabkota/singkawang-2026.txt	id.kemenag/2014			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kota Singkawang 2026
+archive/tables/round/kemenag-kabkota/singkawang-2027.txt	id.kemenag/2014			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kota Singkawang 2027
+archive/tables/round/kemenag-kabkota/singkawang-2028.txt	id.kemenag/2014			Asia/Pontianak	F+E S D A M I	daily	standard	test	Kota Singkawang 2028
+archive/tables/round/kemenag-kabkota/tanjungpinang-2026.txt	id.kemenag/0507			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tanjung Pinang 2026
+archive/tables/round/kemenag-kabkota/tanjungpinang-2027.txt	id.kemenag/0507			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tanjung Pinang 2027
+archive/tables/round/kemenag-kabkota/tanjungpinang-2028.txt	id.kemenag/0507			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Tanjung Pinang 2028
+archive/tables/round/kemenag-kabkota/pangkalpinang-2026.txt	id.kemenag/0907			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pangkal Pinang 2026
+archive/tables/round/kemenag-kabkota/pangkalpinang-2027.txt	id.kemenag/0907			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pangkal Pinang 2027
+archive/tables/round/kemenag-kabkota/pangkalpinang-2028.txt	id.kemenag/0907			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Pangkal Pinang 2028
+archive/tables/round/kemenag-kabkota/kotagorontalo-2026.txt	id.kemenag/2506			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Gorontalo 2026
+archive/tables/round/kemenag-kabkota/kotagorontalo-2027.txt	id.kemenag/2506			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Gorontalo 2027
+archive/tables/round/kemenag-kabkota/kotagorontalo-2028.txt	id.kemenag/2506			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Gorontalo 2028
+archive/tables/round/kemenag-kabkota/kabbekasi-2026.txt	id.kemenag/1203			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bekasi 2026
+archive/tables/round/kemenag-kabkota/kabbekasi-2027.txt	id.kemenag/1203			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bekasi 2027
+archive/tables/round/kemenag-kabkota/kabbekasi-2028.txt	id.kemenag/1203			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bekasi 2028
+archive/tables/round/kemenag-kabkota/kabbogor-2026.txt	id.kemenag/1204			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bogor 2026
+archive/tables/round/kemenag-kabkota/kabbogor-2027.txt	id.kemenag/1204			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bogor 2027
+archive/tables/round/kemenag-kabkota/kabbogor-2028.txt	id.kemenag/1204			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bogor 2028
+archive/tables/round/kemenag-kabkota/kabbandung-2026.txt	id.kemenag/1201			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bandung 2026, highland
+archive/tables/round/kemenag-kabkota/kabbandung-2027.txt	id.kemenag/1201			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bandung 2027, highland
+archive/tables/round/kemenag-kabkota/kabbandung-2028.txt	id.kemenag/1201			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bandung 2028, highland
+archive/tables/round/kemenag-kabkota/kabmalang-2026.txt	id.kemenag/1614			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Malang 2026
+archive/tables/round/kemenag-kabkota/kabmalang-2027.txt	id.kemenag/1614			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Malang 2027
+archive/tables/round/kemenag-kabkota/kabmalang-2028.txt	id.kemenag/1614			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Malang 2028
+archive/tables/round/kemenag-kabkota/jember-2026.txt	id.kemenag/1607			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Jember 2026
+archive/tables/round/kemenag-kabkota/jember-2027.txt	id.kemenag/1607			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Jember 2027
+archive/tables/round/kemenag-kabkota/jember-2028.txt	id.kemenag/1607			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Jember 2028
+archive/tables/round/kemenag-kabkota/kabsukabumi-2026.txt	id.kemenag/1216			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sukabumi 2026
+archive/tables/round/kemenag-kabkota/kabsukabumi-2027.txt	id.kemenag/1216			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sukabumi 2027
+archive/tables/round/kemenag-kabkota/kabsukabumi-2028.txt	id.kemenag/1216			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Sukabumi 2028
+archive/tables/round/kemenag-kabkota/cianjur-2026.txt	id.kemenag/1206			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Cianjur 2026
+archive/tables/round/kemenag-kabkota/cianjur-2027.txt	id.kemenag/1206			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Cianjur 2027
+archive/tables/round/kemenag-kabkota/cianjur-2028.txt	id.kemenag/1206			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Cianjur 2028
+archive/tables/round/kemenag-kabkota/karawang-2026.txt	id.kemenag/1210			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Karawang 2026
+archive/tables/round/kemenag-kabkota/karawang-2027.txt	id.kemenag/1210			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Karawang 2027
+archive/tables/round/kemenag-kabkota/karawang-2028.txt	id.kemenag/1210			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Karawang 2028
+archive/tables/round/kemenag-kabkota/kabcirebon-2026.txt	id.kemenag/1207			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Cirebon 2026
+archive/tables/round/kemenag-kabkota/kabcirebon-2027.txt	id.kemenag/1207			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Cirebon 2027
+archive/tables/round/kemenag-kabkota/kabcirebon-2028.txt	id.kemenag/1207			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Cirebon 2028
+archive/tables/round/kemenag-kabkota/sidoarjo-2026.txt	id.kemenag/1624			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sidoarjo 2026
+archive/tables/round/kemenag-kabkota/sidoarjo-2027.txt	id.kemenag/1624			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sidoarjo 2027
+archive/tables/round/kemenag-kabkota/sidoarjo-2028.txt	id.kemenag/1624			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Sidoarjo 2028
+archive/tables/round/kemenag-kabkota/cilacap-2026.txt	id.kemenag/1407			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Cilacap 2026
+archive/tables/round/kemenag-kabkota/cilacap-2027.txt	id.kemenag/1407			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Cilacap 2027
+archive/tables/round/kemenag-kabkota/cilacap-2028.txt	id.kemenag/1407			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Cilacap 2028
+archive/tables/round/kemenag-kabkota/kabtasikmalaya-2026.txt	id.kemenag/1218			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tasikmalaya 2026
+archive/tables/round/kemenag-kabkota/kabtasikmalaya-2027.txt	id.kemenag/1218			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tasikmalaya 2027
+archive/tables/round/kemenag-kabkota/kabtasikmalaya-2028.txt	id.kemenag/1218			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Tasikmalaya 2028
+archive/tables/round/kemenag-kabkota/indramayu-2026.txt	id.kemenag/1209			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Indramayu 2026
+archive/tables/round/kemenag-kabkota/indramayu-2027.txt	id.kemenag/1209			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Indramayu 2027
+archive/tables/round/kemenag-kabkota/indramayu-2028.txt	id.kemenag/1209			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Indramayu 2028
+archive/tables/round/kemenag-kabkota/banyumas-2026.txt	id.kemenag/1402			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Banyumas 2026
+archive/tables/round/kemenag-kabkota/banyumas-2027.txt	id.kemenag/1402			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Banyumas 2027
+archive/tables/round/kemenag-kabkota/banyumas-2028.txt	id.kemenag/1402			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Banyumas 2028
+archive/tables/round/kemenag-kabkota/subang-2026.txt	id.kemenag/1215			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Subang 2026
+archive/tables/round/kemenag-kabkota/subang-2027.txt	id.kemenag/1215			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Subang 2027
+archive/tables/round/kemenag-kabkota/subang-2028.txt	id.kemenag/1215			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Subang 2028
+archive/tables/round/kemenag-kabkota/gresik-2026.txt	id.kemenag/1606			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Gresik 2026
+archive/tables/round/kemenag-kabkota/gresik-2027.txt	id.kemenag/1606			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Gresik 2027
+archive/tables/round/kemenag-kabkota/gresik-2028.txt	id.kemenag/1606			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Gresik 2028
+archive/tables/round/kemenag-kabkota/klaten-2026.txt	id.kemenag/1414			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Klaten 2026
+archive/tables/round/kemenag-kabkota/klaten-2027.txt	id.kemenag/1414			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Klaten 2027
+archive/tables/round/kemenag-kabkota/klaten-2028.txt	id.kemenag/1414			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Klaten 2028
+archive/tables/round/kemenag-kabkota/jepara-2026.txt	id.kemenag/1410			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Jepara 2026
+archive/tables/round/kemenag-kabkota/jepara-2027.txt	id.kemenag/1410			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Jepara 2027
+archive/tables/round/kemenag-kabkota/jepara-2028.txt	id.kemenag/1410			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Jepara 2028
+archive/tables/round/kemenag-kabkota/sleman-2026.txt	id.kemenag/1504			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sleman 2026
+archive/tables/round/kemenag-kabkota/sleman-2027.txt	id.kemenag/1504			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sleman 2027
+archive/tables/round/kemenag-kabkota/sleman-2028.txt	id.kemenag/1504			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Sleman 2028
+archive/tables/round/kemenag-kabkota/bantul-2026.txt	id.kemenag/1501			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bantul 2026
+archive/tables/round/kemenag-kabkota/bantul-2027.txt	id.kemenag/1501			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bantul 2027
+archive/tables/round/kemenag-kabkota/bantul-2028.txt	id.kemenag/1501			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bantul 2028
+archive/tables/round/kemenag-kabkota/kabsemarang-2026.txt	id.kemenag/1423			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Semarang 2026
+archive/tables/round/kemenag-kabkota/kabsemarang-2027.txt	id.kemenag/1423			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Semarang 2027
+archive/tables/round/kemenag-kabkota/kabsemarang-2028.txt	id.kemenag/1423			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Semarang 2028
+archive/tables/round/kemenag-kabkota/kudus-2026.txt	id.kemenag/1415			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Kudus 2026
+archive/tables/round/kemenag-kabkota/kudus-2027.txt	id.kemenag/1415			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Kudus 2027
+archive/tables/round/kemenag-kabkota/kudus-2028.txt	id.kemenag/1415			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Kudus 2028
+archive/tables/round/kemenag-kabkota/demak-2026.txt	id.kemenag/1408			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Demak 2026
+archive/tables/round/kemenag-kabkota/demak-2027.txt	id.kemenag/1408			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Demak 2027
+archive/tables/round/kemenag-kabkota/demak-2028.txt	id.kemenag/1408			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Demak 2028
+archive/tables/round/kemenag-kabkota/purwakarta-2026.txt	id.kemenag/1214			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Purwakarta 2026
+archive/tables/round/kemenag-kabkota/purwakarta-2027.txt	id.kemenag/1214			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Purwakarta 2027
+archive/tables/round/kemenag-kabkota/purwakarta-2028.txt	id.kemenag/1214			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Purwakarta 2028
+archive/tables/round/kemenag-kabkota/sumedang-2026.txt	id.kemenag/1217			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sumedang 2026
+archive/tables/round/kemenag-kabkota/sumedang-2027.txt	id.kemenag/1217			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sumedang 2027
+archive/tables/round/kemenag-kabkota/sumedang-2028.txt	id.kemenag/1217			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Sumedang 2028
+archive/tables/round/kemenag-kabkota/kabpasuruan-2026.txt	id.kemenag/1620			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pasuruan 2026
+archive/tables/round/kemenag-kabkota/kabpasuruan-2027.txt	id.kemenag/1620			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pasuruan 2027
+archive/tables/round/kemenag-kabkota/kabpasuruan-2028.txt	id.kemenag/1620			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Pasuruan 2028
+archive/tables/round/kemenag-kabkota/kotapasuruan-2026.txt	id.kemenag/1636			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pasuruan 2026
+archive/tables/round/kemenag-kabkota/kotapasuruan-2027.txt	id.kemenag/1636			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pasuruan 2027
+archive/tables/round/kemenag-kabkota/kotapasuruan-2028.txt	id.kemenag/1636			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Pasuruan 2028
+archive/tables/round/kemenag-kabkota/kotaprobolinggo-2026.txt	id.kemenag/1637			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Probolinggo 2026
+archive/tables/round/kemenag-kabkota/kotaprobolinggo-2027.txt	id.kemenag/1637			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Probolinggo 2027
+archive/tables/round/kemenag-kabkota/kotaprobolinggo-2028.txt	id.kemenag/1637			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Probolinggo 2028
+archive/tables/round/kemenag-kabkota/kotamadiun-2026.txt	id.kemenag/1633			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Madiun 2026
+archive/tables/round/kemenag-kabkota/kotamadiun-2027.txt	id.kemenag/1633			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Madiun 2027
+archive/tables/round/kemenag-kabkota/kotamadiun-2028.txt	id.kemenag/1633			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Madiun 2028
+archive/tables/round/kemenag-kabkota/kotablitar-2026.txt	id.kemenag/1631			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Blitar 2026
+archive/tables/round/kemenag-kabkota/kotablitar-2027.txt	id.kemenag/1631			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Blitar 2027
+archive/tables/round/kemenag-kabkota/kotablitar-2028.txt	id.kemenag/1631			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Blitar 2028
+archive/tables/round/kemenag-kabkota/kotamojokerto-2026.txt	id.kemenag/1635			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Mojokerto 2026
+archive/tables/round/kemenag-kabkota/kotamojokerto-2027.txt	id.kemenag/1635			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Mojokerto 2027
+archive/tables/round/kemenag-kabkota/kotamojokerto-2028.txt	id.kemenag/1635			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Mojokerto 2028
+archive/tables/round/kemenag-kabkota/kotamagelang-2026.txt	id.kemenag/1430			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Magelang 2026
+archive/tables/round/kemenag-kabkota/kotamagelang-2027.txt	id.kemenag/1430			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Magelang 2027
+archive/tables/round/kemenag-kabkota/kotamagelang-2028.txt	id.kemenag/1430			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Magelang 2028
+archive/tables/round/kemenag-kabkota/salatiga-2026.txt	id.kemenag/1432			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Salatiga 2026, highland
+archive/tables/round/kemenag-kabkota/salatiga-2027.txt	id.kemenag/1432			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Salatiga 2027, highland
+archive/tables/round/kemenag-kabkota/salatiga-2028.txt	id.kemenag/1432			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Salatiga 2028, highland
+archive/tables/round/kemenag-kabkota/bitung-2026.txt	id.kemenag/2912			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Bitung 2026
+archive/tables/round/kemenag-kabkota/bitung-2027.txt	id.kemenag/2912			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Bitung 2027
+archive/tables/round/kemenag-kabkota/bitung-2028.txt	id.kemenag/2912			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Bitung 2028
+archive/tables/round/kemenag-kabkota/lhokseumawe-2026.txt	id.kemenag/0121			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Lhokseumawe 2026
+archive/tables/round/kemenag-kabkota/lhokseumawe-2027.txt	id.kemenag/0121			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Lhokseumawe 2027
+archive/tables/round/kemenag-kabkota/lhokseumawe-2028.txt	id.kemenag/0121			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Lhokseumawe 2028
+archive/tables/round/kemenag-kabkota/ternate-2026.txt	id.kemenag/3209			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Ternate 2026
+archive/tables/round/kemenag-kabkota/ternate-2027.txt	id.kemenag/3209			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Ternate 2027
+archive/tables/round/kemenag-kabkota/ternate-2028.txt	id.kemenag/3209			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kota Ternate 2028
+archive/tables/round/kemenag-kabkota/bontang-2026.txt	id.kemenag/2309			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Bontang 2026
+archive/tables/round/kemenag-kabkota/bontang-2027.txt	id.kemenag/2309			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Bontang 2027
+archive/tables/round/kemenag-kabkota/bontang-2028.txt	id.kemenag/2309			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Bontang 2028
+archive/tables/round/kemenag-kabkota/baubau-2026.txt	id.kemenag/2716			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Bau-Bau 2026
+archive/tables/round/kemenag-kabkota/baubau-2027.txt	id.kemenag/2716			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Bau-Bau 2027
+archive/tables/round/kemenag-kabkota/baubau-2028.txt	id.kemenag/2716			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Bau-Bau 2028
+archive/tables/round/kemenag-kabkota/parepare-2026.txt	id.kemenag/2624			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Parepare 2026
+archive/tables/round/kemenag-kabkota/parepare-2027.txt	id.kemenag/2624			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Parepare 2027
+archive/tables/round/kemenag-kabkota/parepare-2028.txt	id.kemenag/2624			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Parepare 2028
+archive/tables/round/kemenag-kabkota/palopo-2026.txt	id.kemenag/2623			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Palopo 2026
+archive/tables/round/kemenag-kabkota/palopo-2027.txt	id.kemenag/2623			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Palopo 2027
+archive/tables/round/kemenag-kabkota/palopo-2028.txt	id.kemenag/2623			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Palopo 2028
+archive/tables/round/kemenag-kabkota/kotabima-2026.txt	id.kemenag/1809			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Bima 2026
+archive/tables/round/kemenag-kabkota/kotabima-2027.txt	id.kemenag/1809			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Bima 2027
+archive/tables/round/kemenag-kabkota/kotabima-2028.txt	id.kemenag/1809			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Bima 2028
+archive/tables/round/kemenag-kabkota/metro-2026.txt	id.kemenag/1015			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Metro 2026
+archive/tables/round/kemenag-kabkota/metro-2027.txt	id.kemenag/1015			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Metro 2027
+archive/tables/round/kemenag-kabkota/metro-2028.txt	id.kemenag/1015			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Metro 2028
+archive/tables/round/kemenag-kabkota/kabtegal-2026.txt	id.kemenag/1426			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tegal 2026
+archive/tables/round/kemenag-kabkota/kabtegal-2027.txt	id.kemenag/1426			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tegal 2027
+archive/tables/round/kemenag-kabkota/kabtegal-2028.txt	id.kemenag/1426			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Tegal 2028
+archive/tables/round/kemenag-kabkota/situbondo-2026.txt	id.kemenag/1625			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Situbondo 2026
+archive/tables/round/kemenag-kabkota/situbondo-2027.txt	id.kemenag/1625			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Situbondo 2027
+archive/tables/round/kemenag-kabkota/situbondo-2028.txt	id.kemenag/1625			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Situbondo 2028
+archive/tables/round/kemenag-kabkota/banyuwangi-2026.txt	id.kemenag/1602			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Banyuwangi 2026
+archive/tables/round/kemenag-kabkota/banyuwangi-2027.txt	id.kemenag/1602			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Banyuwangi 2027
+archive/tables/round/kemenag-kabkota/banyuwangi-2028.txt	id.kemenag/1602			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Banyuwangi 2028
+archive/tables/round/kemenag-kabkota/jombang-2026.txt	id.kemenag/1608			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Jombang 2026
+archive/tables/round/kemenag-kabkota/jombang-2027.txt	id.kemenag/1608			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Jombang 2027
+archive/tables/round/kemenag-kabkota/jombang-2028.txt	id.kemenag/1608			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Jombang 2028
+archive/tables/round/kemenag-kabkota/tulungagung-2026.txt	id.kemenag/1629			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tulungagung 2026
+archive/tables/round/kemenag-kabkota/tulungagung-2027.txt	id.kemenag/1629			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tulungagung 2027
+archive/tables/round/kemenag-kabkota/tulungagung-2028.txt	id.kemenag/1629			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Tulungagung 2028
+archive/tables/round/kemenag-kabkota/pati-2026.txt	id.kemenag/1417			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pati 2026
+archive/tables/round/kemenag-kabkota/pati-2027.txt	id.kemenag/1417			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pati 2027
+archive/tables/round/kemenag-kabkota/pati-2028.txt	id.kemenag/1417			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Pati 2028
+archive/tables/round/kemenag-kabkota/pemalang-2026.txt	id.kemenag/1419			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pemalang 2026
+archive/tables/round/kemenag-kabkota/pemalang-2027.txt	id.kemenag/1419			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pemalang 2027
+archive/tables/round/kemenag-kabkota/pemalang-2028.txt	id.kemenag/1419			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Pemalang 2028
+archive/tables/round/kemenag-kabkota/boyolali-2026.txt	id.kemenag/1405			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Boyolali 2026
+archive/tables/round/kemenag-kabkota/boyolali-2027.txt	id.kemenag/1405			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Boyolali 2027
+archive/tables/round/kemenag-kabkota/boyolali-2028.txt	id.kemenag/1405			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Boyolali 2028
+archive/tables/round/kemenag-kabkota/bojonegoro-2026.txt	id.kemenag/1604			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bojonegoro 2026
+archive/tables/round/kemenag-kabkota/bojonegoro-2027.txt	id.kemenag/1604			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bojonegoro 2027
+archive/tables/round/kemenag-kabkota/bojonegoro-2028.txt	id.kemenag/1604			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bojonegoro 2028
+archive/tables/round/kemenag-kabkota/lamongan-2026.txt	id.kemenag/1610			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lamongan 2026
+archive/tables/round/kemenag-kabkota/lamongan-2027.txt	id.kemenag/1610			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lamongan 2027
+archive/tables/round/kemenag-kabkota/lamongan-2028.txt	id.kemenag/1610			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Lamongan 2028
+archive/tables/round/kemenag-kabkota/tuban-2026.txt	id.kemenag/1628			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tuban 2026
+archive/tables/round/kemenag-kabkota/tuban-2027.txt	id.kemenag/1628			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tuban 2027
+archive/tables/round/kemenag-kabkota/tuban-2028.txt	id.kemenag/1628			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Tuban 2028
+archive/tables/round/kemenag-kabkota/kuningan-2026.txt	id.kemenag/1211			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Kuningan 2026, highland
+archive/tables/round/kemenag-kabkota/kuningan-2027.txt	id.kemenag/1211			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Kuningan 2027, highland
+archive/tables/round/kemenag-kabkota/kuningan-2028.txt	id.kemenag/1211			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Kuningan 2028, highland
+archive/tables/round/kemenag-kabkota/majalengka-2026.txt	id.kemenag/1212			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Majalengka 2026
+archive/tables/round/kemenag-kabkota/majalengka-2027.txt	id.kemenag/1212			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Majalengka 2027
+archive/tables/round/kemenag-kabkota/majalengka-2028.txt	id.kemenag/1212			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Majalengka 2028
+archive/tables/round/kemenag-kabkota/ciamis-2026.txt	id.kemenag/1205			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ciamis 2026
+archive/tables/round/kemenag-kabkota/ciamis-2027.txt	id.kemenag/1205			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ciamis 2027
+archive/tables/round/kemenag-kabkota/ciamis-2028.txt	id.kemenag/1205			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Ciamis 2028
+archive/tables/round/kemenag-kabkota/lebak-2026.txt	id.kemenag/1101			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lebak 2026
+archive/tables/round/kemenag-kabkota/lebak-2027.txt	id.kemenag/1101			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lebak 2027
+archive/tables/round/kemenag-kabkota/lebak-2028.txt	id.kemenag/1101			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Lebak 2028
+archive/tables/round/kemenag-kabkota/pandeglang-2026.txt	id.kemenag/1102			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pandeglang 2026
+archive/tables/round/kemenag-kabkota/pandeglang-2027.txt	id.kemenag/1102			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pandeglang 2027
+archive/tables/round/kemenag-kabkota/pandeglang-2028.txt	id.kemenag/1102			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Pandeglang 2028
+archive/tables/round/kemenag-kabkota/sumenep-2026.txt	id.kemenag/1626			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sumenep 2026
+archive/tables/round/kemenag-kabkota/sumenep-2027.txt	id.kemenag/1626			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sumenep 2027
+archive/tables/round/kemenag-kabkota/sumenep-2028.txt	id.kemenag/1626			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Sumenep 2028
+archive/tables/round/kemenag-kabkota/pamekasan-2026.txt	id.kemenag/1619			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pamekasan 2026
+archive/tables/round/kemenag-kabkota/pamekasan-2027.txt	id.kemenag/1619			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pamekasan 2027
+archive/tables/round/kemenag-kabkota/pamekasan-2028.txt	id.kemenag/1619			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Pamekasan 2028
+archive/tables/round/kemenag-kabkota/bangkalan-2026.txt	id.kemenag/1601			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bangkalan 2026
+archive/tables/round/kemenag-kabkota/bangkalan-2027.txt	id.kemenag/1601			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bangkalan 2027
+archive/tables/round/kemenag-kabkota/bangkalan-2028.txt	id.kemenag/1601			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bangkalan 2028
+archive/tables/round/kemenag-kabkota/nganjuk-2026.txt	id.kemenag/1616			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Nganjuk 2026
+archive/tables/round/kemenag-kabkota/nganjuk-2027.txt	id.kemenag/1616			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Nganjuk 2027
+archive/tables/round/kemenag-kabkota/nganjuk-2028.txt	id.kemenag/1616			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Nganjuk 2028
+archive/tables/round/kemenag-kabkota/ponorogo-2026.txt	id.kemenag/1621			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ponorogo 2026
+archive/tables/round/kemenag-kabkota/ponorogo-2027.txt	id.kemenag/1621			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ponorogo 2027
+archive/tables/round/kemenag-kabkota/ponorogo-2028.txt	id.kemenag/1621			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Ponorogo 2028
+archive/tables/round/kemenag-kabkota/lumajang-2026.txt	id.kemenag/1611			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lumajang 2026
+archive/tables/round/kemenag-kabkota/lumajang-2027.txt	id.kemenag/1611			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lumajang 2027
+archive/tables/round/kemenag-kabkota/lumajang-2028.txt	id.kemenag/1611			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Lumajang 2028
+archive/tables/round/kemenag-kabkota/bondowoso-2026.txt	id.kemenag/1605			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bondowoso 2026
+archive/tables/round/kemenag-kabkota/bondowoso-2027.txt	id.kemenag/1605			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bondowoso 2027
+archive/tables/round/kemenag-kabkota/bondowoso-2028.txt	id.kemenag/1605			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bondowoso 2028
+archive/tables/round/kemenag-kabkota/sragen-2026.txt	id.kemenag/1424			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sragen 2026
+archive/tables/round/kemenag-kabkota/sragen-2027.txt	id.kemenag/1424			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sragen 2027
+archive/tables/round/kemenag-kabkota/sragen-2028.txt	id.kemenag/1424			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Sragen 2028
+archive/tables/round/kemenag-kabkota/grobogan-2026.txt	id.kemenag/1409			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Grobogan 2026
+archive/tables/round/kemenag-kabkota/grobogan-2027.txt	id.kemenag/1409			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Grobogan 2027
+archive/tables/round/kemenag-kabkota/grobogan-2028.txt	id.kemenag/1409			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Grobogan 2028
+archive/tables/round/kemenag-kabkota/kabprobolinggo-2026.txt	id.kemenag/1622			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Probolinggo 2026
+archive/tables/round/kemenag-kabkota/kabprobolinggo-2027.txt	id.kemenag/1622			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Probolinggo 2027
+archive/tables/round/kemenag-kabkota/kabprobolinggo-2028.txt	id.kemenag/1622			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Probolinggo 2028
+archive/tables/round/kemenag-kabkota/kotasorong-2026.txt	id.kemenag/3413			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Sorong 2026
+archive/tables/round/kemenag-kabkota/kotasorong-2027.txt	id.kemenag/3413			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Sorong 2027
+archive/tables/round/kemenag-kabkota/kotasorong-2028.txt	id.kemenag/3413			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kota Sorong 2028
+# Second round of 12 Nov 2026: 119 more kab/kota (Kemenag.kt, KemenagKabkota.kt's round2), the largest of those whose kota
+# or regency seat was an app city still on the edge, fetched whole for 2026, 2027 and 2028 the same way (tables under
+# archive/tables/round/kemenag-kabkota/, the raw answers beside the first round's). Checked at each unit's own point
+# (lat/lon empty): the app's own GeoNames point for the kota or regency seat. Fitted on 2026 and 2027; 2028 is held out.
+archive/tables/round/kemenag-kabkota/lomboktimur-2026.txt	id.kemenag/1805			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Lombok Timur 2026
+archive/tables/round/kemenag-kabkota/lomboktimur-2027.txt	id.kemenag/1805			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Lombok Timur 2027
+archive/tables/round/kemenag-kabkota/lomboktimur-2028.txt	id.kemenag/1805			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Lombok Timur 2028
+archive/tables/round/kemenag-kabkota/asahan-2026.txt	id.kemenag/0201			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Asahan 2026
+archive/tables/round/kemenag-kabkota/asahan-2027.txt	id.kemenag/0201			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Asahan 2027
+archive/tables/round/kemenag-kabkota/asahan-2028.txt	id.kemenag/0201			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Asahan 2028
+archive/tables/round/kemenag-kabkota/lomboktengah-2026.txt	id.kemenag/1804			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Lombok Tengah 2026
+archive/tables/round/kemenag-kabkota/lomboktengah-2027.txt	id.kemenag/1804			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Lombok Tengah 2027
+archive/tables/round/kemenag-kabkota/lomboktengah-2028.txt	id.kemenag/1804			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Lombok Tengah 2028
+archive/tables/round/kemenag-kabkota/langkat-2026.txt	id.kemenag/0210			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Langkat 2026
+archive/tables/round/kemenag-kabkota/langkat-2027.txt	id.kemenag/0210			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Langkat 2027
+archive/tables/round/kemenag-kabkota/langkat-2028.txt	id.kemenag/0210			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Langkat 2028
+archive/tables/round/kemenag-kabkota/purbalingga-2026.txt	id.kemenag/1420			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Purbalingga 2026
+archive/tables/round/kemenag-kabkota/purbalingga-2027.txt	id.kemenag/1420			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Purbalingga 2027
+archive/tables/round/kemenag-kabkota/purbalingga-2028.txt	id.kemenag/1420			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Purbalingga 2028
+archive/tables/round/kemenag-kabkota/lampungutara-2026.txt	id.kemenag/1002			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lampung Utara 2026
+archive/tables/round/kemenag-kabkota/lampungutara-2027.txt	id.kemenag/1002			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lampung Utara 2027
+archive/tables/round/kemenag-kabkota/lampungutara-2028.txt	id.kemenag/1002			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Lampung Utara 2028
+archive/tables/round/kemenag-kabkota/blora-2026.txt	id.kemenag/1404			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Blora 2026
+archive/tables/round/kemenag-kabkota/blora-2027.txt	id.kemenag/1404			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Blora 2027
+archive/tables/round/kemenag-kabkota/blora-2028.txt	id.kemenag/1404			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Blora 2028
+archive/tables/round/kemenag-kabkota/buleleng-2026.txt	id.kemenag/1703			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Buleleng 2026
+archive/tables/round/kemenag-kabkota/buleleng-2027.txt	id.kemenag/1703			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Buleleng 2027
+archive/tables/round/kemenag-kabkota/buleleng-2028.txt	id.kemenag/1703			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Buleleng 2028
+archive/tables/round/kemenag-kabkota/gunungkidul-2026.txt	id.kemenag/1502			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Gunungkidul 2026
+archive/tables/round/kemenag-kabkota/gunungkidul-2027.txt	id.kemenag/1502			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Gunungkidul 2027
+archive/tables/round/kemenag-kabkota/gunungkidul-2028.txt	id.kemenag/1502			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Gunungkidul 2028
+archive/tables/round/kemenag-kabkota/sambas-2026.txt	id.kemenag/2009			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Sambas 2026
+archive/tables/round/kemenag-kabkota/sambas-2027.txt	id.kemenag/2009			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Sambas 2027
+archive/tables/round/kemenag-kabkota/sambas-2028.txt	id.kemenag/2009			Asia/Pontianak	F+E S D A M I	daily	standard	test	Kab. Sambas 2028
+archive/tables/round/kemenag-kabkota/rembang-2026.txt	id.kemenag/1422			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Rembang 2026
+archive/tables/round/kemenag-kabkota/rembang-2027.txt	id.kemenag/1422			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Rembang 2027
+archive/tables/round/kemenag-kabkota/rembang-2028.txt	id.kemenag/1422			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Rembang 2028
+archive/tables/round/kemenag-kabkota/kabbanjar-2026.txt	id.kemenag/2102			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Banjar 2026
+archive/tables/round/kemenag-kabkota/kabbanjar-2027.txt	id.kemenag/2102			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Banjar 2027
+archive/tables/round/kemenag-kabkota/kabbanjar-2028.txt	id.kemenag/2102			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Banjar 2028
+archive/tables/round/kemenag-kabkota/polewalimandar-2026.txt	id.kemenag/3006			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Polewali Mandar 2026
+archive/tables/round/kemenag-kabkota/polewalimandar-2027.txt	id.kemenag/3006			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Polewali Mandar 2027
+archive/tables/round/kemenag-kabkota/polewalimandar-2028.txt	id.kemenag/3006			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Polewali Mandar 2028
+archive/tables/round/kemenag-kabkota/wajo-2026.txt	id.kemenag/2621			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Wajo 2026
+archive/tables/round/kemenag-kabkota/wajo-2027.txt	id.kemenag/2621			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Wajo 2027
+archive/tables/round/kemenag-kabkota/wajo-2028.txt	id.kemenag/2621			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Wajo 2028
+archive/tables/round/kemenag-kabkota/tabanan-2026.txt	id.kemenag/1708			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Tabanan 2026
+archive/tables/round/kemenag-kabkota/tabanan-2027.txt	id.kemenag/1708			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Tabanan 2027
+archive/tables/round/kemenag-kabkota/tabanan-2028.txt	id.kemenag/1708			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Tabanan 2028
+archive/tables/round/kemenag-kabkota/pidie-2026.txt	id.kemenag/0116			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pidie 2026
+archive/tables/round/kemenag-kabkota/pidie-2027.txt	id.kemenag/0116			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Pidie 2027
+archive/tables/round/kemenag-kabkota/pidie-2028.txt	id.kemenag/0116			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Pidie 2028
+archive/tables/round/kemenag-kabkota/oganilir-2026.txt	id.kemenag/0808			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ogan Ilir 2026
+archive/tables/round/kemenag-kabkota/oganilir-2027.txt	id.kemenag/0808			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ogan Ilir 2027
+archive/tables/round/kemenag-kabkota/oganilir-2028.txt	id.kemenag/0808			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Ogan Ilir 2028
+archive/tables/round/kemenag-kabkota/lahat-2026.txt	id.kemenag/0803			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lahat 2026
+archive/tables/round/kemenag-kabkota/lahat-2027.txt	id.kemenag/0803			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Lahat 2027
+archive/tables/round/kemenag-kabkota/lahat-2028.txt	id.kemenag/0803			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Lahat 2028
+archive/tables/round/kemenag-kabkota/malukutengah-2026.txt	id.kemenag/3105			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Maluku Tengah 2026
+archive/tables/round/kemenag-kabkota/malukutengah-2027.txt	id.kemenag/3105			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Maluku Tengah 2027
+archive/tables/round/kemenag-kabkota/malukutengah-2028.txt	id.kemenag/3105			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Maluku Tengah 2028
+archive/tables/round/kemenag-kabkota/labuhanbatu-2026.txt	id.kemenag/0207			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Labuhanbatu 2026
+archive/tables/round/kemenag-kabkota/labuhanbatu-2027.txt	id.kemenag/0207			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Labuhanbatu 2027
+archive/tables/round/kemenag-kabkota/labuhanbatu-2028.txt	id.kemenag/0207			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Labuhanbatu 2028
+archive/tables/round/kemenag-kabkota/kapuas-2026.txt	id.kemenag/2205			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Kapuas 2026
+archive/tables/round/kemenag-kabkota/kapuas-2027.txt	id.kemenag/2205			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Kapuas 2027
+archive/tables/round/kemenag-kabkota/kapuas-2028.txt	id.kemenag/2205			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Kapuas 2028
+archive/tables/round/kemenag-kabkota/kotawaringintimur-2026.txt	id.kemenag/2208			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Kotawaringin Timur 2026
+archive/tables/round/kemenag-kabkota/kotawaringintimur-2027.txt	id.kemenag/2208			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Kotawaringin Timur 2027
+archive/tables/round/kemenag-kabkota/kotawaringintimur-2028.txt	id.kemenag/2208			Asia/Pontianak	F+E S D A M I	daily	standard	test	Kab. Kotawaringin Timur 2028
+archive/tables/round/kemenag-kabkota/sintang-2026.txt	id.kemenag/2012			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Sintang 2026
+archive/tables/round/kemenag-kabkota/sintang-2027.txt	id.kemenag/2012			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Sintang 2027
+archive/tables/round/kemenag-kabkota/sintang-2028.txt	id.kemenag/2012			Asia/Pontianak	F+E S D A M I	daily	standard	test	Kab. Sintang 2028
+archive/tables/round/kemenag-kabkota/luwuutara-2026.txt	id.kemenag/2611			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Luwu Utara 2026
+archive/tables/round/kemenag-kabkota/luwuutara-2027.txt	id.kemenag/2611			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Luwu Utara 2027
+archive/tables/round/kemenag-kabkota/luwuutara-2028.txt	id.kemenag/2611			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Luwu Utara 2028
+archive/tables/round/kemenag-kabkota/tanjungjabungbarat-2026.txt	id.kemenag/0607			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tanjung Jabung Barat 2026
+archive/tables/round/kemenag-kabkota/tanjungjabungbarat-2027.txt	id.kemenag/0607			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tanjung Jabung Barat 2027
+archive/tables/round/kemenag-kabkota/tanjungjabungbarat-2028.txt	id.kemenag/0607			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Tanjung Jabung Barat 2028
+archive/tables/round/kemenag-kabkota/sikka-2026.txt	id.kemenag/1915			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sikka 2026
+archive/tables/round/kemenag-kabkota/sikka-2027.txt	id.kemenag/1915			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sikka 2027
+archive/tables/round/kemenag-kabkota/sikka-2028.txt	id.kemenag/1915			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Sikka 2028
+archive/tables/round/kemenag-kabkota/jembrana-2026.txt	id.kemenag/1705			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Jembrana 2026
+archive/tables/round/kemenag-kabkota/jembrana-2027.txt	id.kemenag/1705			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Jembrana 2027
+archive/tables/round/kemenag-kabkota/jembrana-2028.txt	id.kemenag/1705			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Jembrana 2028
+archive/tables/round/kemenag-kabkota/sumbabaratdaya-2026.txt	id.kemenag/1917			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sumba Barat Daya 2026
+archive/tables/round/kemenag-kabkota/sumbabaratdaya-2027.txt	id.kemenag/1917			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sumba Barat Daya 2027
+archive/tables/round/kemenag-kabkota/sumbabaratdaya-2028.txt	id.kemenag/1917			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Sumba Barat Daya 2028
+archive/tables/round/kemenag-kabkota/bangka-2026.txt	id.kemenag/0901			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bangka 2026
+archive/tables/round/kemenag-kabkota/bangka-2027.txt	id.kemenag/0901			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bangka 2027
+archive/tables/round/kemenag-kabkota/bangka-2028.txt	id.kemenag/0901			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bangka 2028
+archive/tables/round/kemenag-kabkota/niasselatan-2026.txt	id.kemenag/0214			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Nias Selatan 2026
+archive/tables/round/kemenag-kabkota/niasselatan-2027.txt	id.kemenag/0214			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Nias Selatan 2027
+archive/tables/round/kemenag-kabkota/niasselatan-2028.txt	id.kemenag/0214			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Nias Selatan 2028
+archive/tables/round/kemenag-kabkota/bengkayang-2026.txt	id.kemenag/2001			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Bengkayang 2026
+archive/tables/round/kemenag-kabkota/bengkayang-2027.txt	id.kemenag/2001			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Bengkayang 2027
+archive/tables/round/kemenag-kabkota/bengkayang-2028.txt	id.kemenag/2001			Asia/Pontianak	F+E S D A M I	daily	standard	test	Kab. Bengkayang 2028
+archive/tables/round/kemenag-kabkota/karo-2026.txt	id.kemenag/0206			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Karo 2026, highland
+archive/tables/round/kemenag-kabkota/karo-2027.txt	id.kemenag/0206			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Karo 2027, highland
+archive/tables/round/kemenag-kabkota/karo-2028.txt	id.kemenag/0206			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Karo 2028, highland
+archive/tables/round/kemenag-kabkota/tapanuliutara-2026.txt	id.kemenag/0224			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tapanuli Utara 2026, highland
+archive/tables/round/kemenag-kabkota/tapanuliutara-2027.txt	id.kemenag/0224			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Tapanuli Utara 2027, highland
+archive/tables/round/kemenag-kabkota/tapanuliutara-2028.txt	id.kemenag/0224			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Tapanuli Utara 2028, highland
+archive/tables/round/kemenag-kabkota/ende-2026.txt	id.kemenag/1903			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Ende 2026
+archive/tables/round/kemenag-kabkota/ende-2027.txt	id.kemenag/1903			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Ende 2027
+archive/tables/round/kemenag-kabkota/ende-2028.txt	id.kemenag/1903			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Ende 2028
+archive/tables/round/kemenag-kabkota/dairi-2026.txt	id.kemenag/0203			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Dairi 2026, highland
+archive/tables/round/kemenag-kabkota/dairi-2027.txt	id.kemenag/0203			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Dairi 2027, highland
+archive/tables/round/kemenag-kabkota/dairi-2028.txt	id.kemenag/0203			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Dairi 2028, highland
+archive/tables/round/kemenag-kabkota/rejanglebong-2026.txt	id.kemenag/0708			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Rejang Lebong 2026, highland
+archive/tables/round/kemenag-kabkota/rejanglebong-2027.txt	id.kemenag/0708			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Rejang Lebong 2027, highland
+archive/tables/round/kemenag-kabkota/rejanglebong-2028.txt	id.kemenag/0708			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Rejang Lebong 2028, highland
+archive/tables/round/kemenag-kabkota/sinjai-2026.txt	id.kemenag/2616			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sinjai 2026
+archive/tables/round/kemenag-kabkota/sinjai-2027.txt	id.kemenag/2616			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sinjai 2027
+archive/tables/round/kemenag-kabkota/sinjai-2028.txt	id.kemenag/2616			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Sinjai 2028
+archive/tables/round/kemenag-kabkota/manggaraibarat-2026.txt	id.kemenag/1909			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Manggarai Barat 2026
+archive/tables/round/kemenag-kabkota/manggaraibarat-2027.txt	id.kemenag/1909			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Manggarai Barat 2027
+archive/tables/round/kemenag-kabkota/manggaraibarat-2028.txt	id.kemenag/1909			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Manggarai Barat 2028
+archive/tables/round/kemenag-kabkota/timortengahutara-2026.txt	id.kemenag/1921			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Timor Tengah Utara 2026
+archive/tables/round/kemenag-kabkota/timortengahutara-2027.txt	id.kemenag/1921			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Timor Tengah Utara 2027
+archive/tables/round/kemenag-kabkota/timortengahutara-2028.txt	id.kemenag/1921			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Timor Tengah Utara 2028
+archive/tables/round/kemenag-kabkota/hulusungaitengah-2026.txt	id.kemenag/2105			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Hulu Sungai Tengah 2026
+archive/tables/round/kemenag-kabkota/hulusungaitengah-2027.txt	id.kemenag/2105			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Hulu Sungai Tengah 2027
+archive/tables/round/kemenag-kabkota/hulusungaitengah-2028.txt	id.kemenag/2105			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Hulu Sungai Tengah 2028
+archive/tables/round/kemenag-kabkota/poso-2026.txt	id.kemenag/2809			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Poso 2026
+archive/tables/round/kemenag-kabkota/poso-2027.txt	id.kemenag/2809			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Poso 2027
+archive/tables/round/kemenag-kabkota/poso-2028.txt	id.kemenag/2809			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Poso 2028
+archive/tables/round/kemenag-kabkota/torajautara-2026.txt	id.kemenag/2620			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Toraja Utara 2026, highland
+archive/tables/round/kemenag-kabkota/torajautara-2027.txt	id.kemenag/2620			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Toraja Utara 2027, highland
+archive/tables/round/kemenag-kabkota/torajautara-2028.txt	id.kemenag/2620			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Toraja Utara 2028, highland
+archive/tables/round/kemenag-kabkota/sumbatimur-2026.txt	id.kemenag/1919			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sumba Timur 2026
+archive/tables/round/kemenag-kabkota/sumbatimur-2027.txt	id.kemenag/1919			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sumba Timur 2027
+archive/tables/round/kemenag-kabkota/sumbatimur-2028.txt	id.kemenag/1919			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Sumba Timur 2028
+archive/tables/round/kemenag-kabkota/sijunjung-2026.txt	id.kemenag/0309			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sijunjung 2026
+archive/tables/round/kemenag-kabkota/sijunjung-2027.txt	id.kemenag/0309			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sijunjung 2027
+archive/tables/round/kemenag-kabkota/sijunjung-2028.txt	id.kemenag/0309			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Sijunjung 2028
+archive/tables/round/kemenag-kabkota/merauke-2026.txt	id.kemenag/3315			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Merauke 2026
+archive/tables/round/kemenag-kabkota/merauke-2027.txt	id.kemenag/3315			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Merauke 2027
+archive/tables/round/kemenag-kabkota/merauke-2028.txt	id.kemenag/3315			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Merauke 2028
+archive/tables/round/kemenag-kabkota/hulusungaiutara-2026.txt	id.kemenag/2106			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Hulu Sungai Utara 2026
+archive/tables/round/kemenag-kabkota/hulusungaiutara-2027.txt	id.kemenag/2106			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Hulu Sungai Utara 2027
+archive/tables/round/kemenag-kabkota/hulusungaiutara-2028.txt	id.kemenag/2106			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Hulu Sungai Utara 2028
+archive/tables/round/kemenag-kabkota/minahasautara-2026.txt	id.kemenag/2911			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Minahasa Utara 2026
+archive/tables/round/kemenag-kabkota/minahasautara-2027.txt	id.kemenag/2911			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Minahasa Utara 2027
+archive/tables/round/kemenag-kabkota/minahasautara-2028.txt	id.kemenag/2911			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Minahasa Utara 2028
+archive/tables/round/kemenag-kabkota/belu-2026.txt	id.kemenag/1902			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Belu 2026
+archive/tables/round/kemenag-kabkota/belu-2027.txt	id.kemenag/1902			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Belu 2027
+archive/tables/round/kemenag-kabkota/belu-2028.txt	id.kemenag/1902			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Belu 2028
+archive/tables/round/kemenag-kabkota/dompu-2026.txt	id.kemenag/1802			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Dompu 2026
+archive/tables/round/kemenag-kabkota/dompu-2027.txt	id.kemenag/1802			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Dompu 2027
+archive/tables/round/kemenag-kabkota/dompu-2028.txt	id.kemenag/1802			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Dompu 2028
+archive/tables/round/kemenag-kabkota/lubuklinggau-2026.txt	id.kemenag/0814			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Lubuklinggau 2026
+archive/tables/round/kemenag-kabkota/lubuklinggau-2027.txt	id.kemenag/0814			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Lubuklinggau 2027
+archive/tables/round/kemenag-kabkota/lubuklinggau-2028.txt	id.kemenag/0814			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Lubuklinggau 2028
+archive/tables/round/kemenag-kabkota/alor-2026.txt	id.kemenag/1901			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Alor 2026
+archive/tables/round/kemenag-kabkota/alor-2027.txt	id.kemenag/1901			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Alor 2027
+archive/tables/round/kemenag-kabkota/alor-2028.txt	id.kemenag/1901			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Alor 2028
+archive/tables/round/kemenag-kabkota/puncakjaya-2026.txt	id.kemenag/3322			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Puncak Jaya 2026, highland
+archive/tables/round/kemenag-kabkota/puncakjaya-2027.txt	id.kemenag/3322			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Puncak Jaya 2027, highland
+archive/tables/round/kemenag-kabkota/puncakjaya-2028.txt	id.kemenag/3322			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Puncak Jaya 2028, highland
+archive/tables/round/kemenag-kabkota/prabumulih-2026.txt	id.kemenag/0817			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Prabumulih 2026
+archive/tables/round/kemenag-kabkota/prabumulih-2027.txt	id.kemenag/0817			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Prabumulih 2027
+archive/tables/round/kemenag-kabkota/prabumulih-2028.txt	id.kemenag/0817			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Prabumulih 2028
+archive/tables/round/kemenag-kabkota/bangkabarat-2026.txt	id.kemenag/0902			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bangka Barat 2026
+archive/tables/round/kemenag-kabkota/bangkabarat-2027.txt	id.kemenag/0902			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bangka Barat 2027
+archive/tables/round/kemenag-kabkota/bangkabarat-2028.txt	id.kemenag/0902			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bangka Barat 2028
+archive/tables/round/kemenag-kabkota/halmaherautara-2026.txt	id.kemenag/3203			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Halmahera Utara 2026
+archive/tables/round/kemenag-kabkota/halmaherautara-2027.txt	id.kemenag/3203			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Halmahera Utara 2027
+archive/tables/round/kemenag-kabkota/halmaherautara-2028.txt	id.kemenag/3203			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Halmahera Utara 2028
+archive/tables/round/kemenag-kabkota/acehbarat-2026.txt	id.kemenag/0101			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Aceh Barat 2026
+archive/tables/round/kemenag-kabkota/acehbarat-2027.txt	id.kemenag/0101			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Aceh Barat 2027
+archive/tables/round/kemenag-kabkota/acehbarat-2028.txt	id.kemenag/0101			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Aceh Barat 2028
+archive/tables/round/kemenag-kabkota/langsa-2026.txt	id.kemenag/0120			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Langsa 2026
+archive/tables/round/kemenag-kabkota/langsa-2027.txt	id.kemenag/0120			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Langsa 2027
+archive/tables/round/kemenag-kabkota/langsa-2028.txt	id.kemenag/0120			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Langsa 2028
+archive/tables/round/kemenag-kabkota/tebingtinggi-2026.txt	id.kemenag/0233			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tebing Tinggi 2026
+archive/tables/round/kemenag-kabkota/tebingtinggi-2027.txt	id.kemenag/0233			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Tebing Tinggi 2027
+archive/tables/round/kemenag-kabkota/tebingtinggi-2028.txt	id.kemenag/0233			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Tebing Tinggi 2028
+archive/tables/round/kemenag-kabkota/nunukan-2026.txt	id.kemenag/2403			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Nunukan 2026
+archive/tables/round/kemenag-kabkota/nunukan-2027.txt	id.kemenag/2403			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Nunukan 2027
+archive/tables/round/kemenag-kabkota/nunukan-2028.txt	id.kemenag/2403			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Nunukan 2028
+archive/tables/round/kemenag-kabkota/nabire-2026.txt	id.kemenag/3317			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Nabire 2026
+archive/tables/round/kemenag-kabkota/nabire-2027.txt	id.kemenag/3317			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Nabire 2027
+archive/tables/round/kemenag-kabkota/nabire-2028.txt	id.kemenag/3317			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Nabire 2028
+archive/tables/round/kemenag-kabkota/kabjayapura-2026.txt	id.kemenag/3307			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Jayapura 2026
+archive/tables/round/kemenag-kabkota/kabjayapura-2027.txt	id.kemenag/3307			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Jayapura 2027
+archive/tables/round/kemenag-kabkota/kabjayapura-2028.txt	id.kemenag/3307			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Jayapura 2028
+archive/tables/round/kemenag-kabkota/belitung-2026.txt	id.kemenag/0905			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Belitung 2026
+archive/tables/round/kemenag-kabkota/belitung-2027.txt	id.kemenag/0905			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Belitung 2027
+archive/tables/round/kemenag-kabkota/belitung-2028.txt	id.kemenag/0905			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Belitung 2028
+archive/tables/round/kemenag-kabkota/biaknumfor-2026.txt	id.kemenag/3302			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Biak Numfor 2026
+archive/tables/round/kemenag-kabkota/biaknumfor-2027.txt	id.kemenag/3302			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Biak Numfor 2027
+archive/tables/round/kemenag-kabkota/biaknumfor-2028.txt	id.kemenag/3302			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Biak Numfor 2028
+archive/tables/round/kemenag-kabkota/baritoutara-2026.txt	id.kemenag/2203			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Barito Utara 2026
+archive/tables/round/kemenag-kabkota/baritoutara-2027.txt	id.kemenag/2203			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Barito Utara 2027
+archive/tables/round/kemenag-kabkota/baritoutara-2028.txt	id.kemenag/2203			Asia/Pontianak	F+E S D A M I	daily	standard	test	Kab. Barito Utara 2028
+archive/tables/round/kemenag-kabkota/acehbaratdaya-2026.txt	id.kemenag/0102			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Aceh Barat Daya 2026
+archive/tables/round/kemenag-kabkota/acehbaratdaya-2027.txt	id.kemenag/0102			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Aceh Barat Daya 2027
+archive/tables/round/kemenag-kabkota/acehbaratdaya-2028.txt	id.kemenag/0102			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Aceh Barat Daya 2028
+archive/tables/round/kemenag-kabkota/samosir-2026.txt	id.kemenag/0219			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Samosir 2026, highland
+archive/tables/round/kemenag-kabkota/samosir-2027.txt	id.kemenag/0219			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Samosir 2027, highland
+archive/tables/round/kemenag-kabkota/samosir-2028.txt	id.kemenag/0219			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Samosir 2028, highland
+archive/tables/round/kemenag-kabkota/kepulauansangihe-2026.txt	id.kemenag/2905			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Kepulauan Sangihe 2026
+archive/tables/round/kemenag-kabkota/kepulauansangihe-2027.txt	id.kemenag/2905			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Kepulauan Sangihe 2027
+archive/tables/round/kemenag-kabkota/kepulauansangihe-2028.txt	id.kemenag/2905			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Kepulauan Sangihe 2028
+archive/tables/round/kemenag-kabkota/gunungsitoli-2026.txt	id.kemenag/0227			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Gunungsitoli 2026
+archive/tables/round/kemenag-kabkota/gunungsitoli-2027.txt	id.kemenag/0227			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Gunungsitoli 2027
+archive/tables/round/kemenag-kabkota/gunungsitoli-2028.txt	id.kemenag/0227			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Gunungsitoli 2028
+archive/tables/round/kemenag-kabkota/pagaralam-2026.txt	id.kemenag/0815			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pagar Alam 2026, highland
+archive/tables/round/kemenag-kabkota/pagaralam-2027.txt	id.kemenag/0815			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pagar Alam 2027, highland
+archive/tables/round/kemenag-kabkota/pagaralam-2028.txt	id.kemenag/0815			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Pagar Alam 2028, highland
+archive/tables/round/kemenag-kabkota/sumbawabarat-2026.txt	id.kemenag/1808			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sumbawa Barat 2026
+archive/tables/round/kemenag-kabkota/sumbawabarat-2027.txt	id.kemenag/1808			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sumbawa Barat 2027
+archive/tables/round/kemenag-kabkota/sumbawabarat-2028.txt	id.kemenag/1808			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Sumbawa Barat 2028
+archive/tables/round/kemenag-kabkota/lembata-2026.txt	id.kemenag/1906			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Lembata 2026, highland
+archive/tables/round/kemenag-kabkota/lembata-2027.txt	id.kemenag/1906			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Lembata 2027, highland
+archive/tables/round/kemenag-kabkota/lembata-2028.txt	id.kemenag/1906			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Lembata 2028, highland
+archive/tables/round/kemenag-kabkota/acehsingkil-2026.txt	id.kemenag/0106			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Aceh Singkil 2026
+archive/tables/round/kemenag-kabkota/acehsingkil-2027.txt	id.kemenag/0106			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Aceh Singkil 2027
+archive/tables/round/kemenag-kabkota/acehsingkil-2028.txt	id.kemenag/0106			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Aceh Singkil 2028
+archive/tables/round/kemenag-kabkota/bulungan-2026.txt	id.kemenag/2401			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Bulungan 2026
+archive/tables/round/kemenag-kabkota/bulungan-2027.txt	id.kemenag/2401			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Bulungan 2027
+archive/tables/round/kemenag-kabkota/bulungan-2028.txt	id.kemenag/2401			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Bulungan 2028
+archive/tables/round/kemenag-kabkota/payakumbuh-2026.txt	id.kemenag/0317			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Payakumbuh 2026
+archive/tables/round/kemenag-kabkota/payakumbuh-2027.txt	id.kemenag/0317			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Payakumbuh 2027
+archive/tables/round/kemenag-kabkota/payakumbuh-2028.txt	id.kemenag/0317			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Payakumbuh 2028
+archive/tables/round/kemenag-kabkota/kepulauansula-2026.txt	id.kemenag/3205			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Kepulauan Sula 2026
+archive/tables/round/kemenag-kabkota/kepulauansula-2027.txt	id.kemenag/3205			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Kepulauan Sula 2027
+archive/tables/round/kemenag-kabkota/kepulauansula-2028.txt	id.kemenag/3205			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Kepulauan Sula 2028
+archive/tables/round/kemenag-kabkota/kotamobagu-2026.txt	id.kemenag/2913			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Kotamobagu 2026
+archive/tables/round/kemenag-kabkota/kotamobagu-2027.txt	id.kemenag/2913			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Kotamobagu 2027
+archive/tables/round/kemenag-kabkota/kotamobagu-2028.txt	id.kemenag/2913			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Kotamobagu 2028
+archive/tables/round/kemenag-kabkota/lannyjaya-2026.txt	id.kemenag/3311			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Lanny Jaya 2026, highland
+archive/tables/round/kemenag-kabkota/lannyjaya-2027.txt	id.kemenag/3311			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Lanny Jaya 2027, highland
+archive/tables/round/kemenag-kabkota/lannyjaya-2028.txt	id.kemenag/3311			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Lanny Jaya 2028, highland
+archive/tables/round/kemenag-kabkota/belitungtimur-2026.txt	id.kemenag/0906			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Belitung Timur 2026
+archive/tables/round/kemenag-kabkota/belitungtimur-2027.txt	id.kemenag/0906			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Belitung Timur 2027
+archive/tables/round/kemenag-kabkota/belitungtimur-2028.txt	id.kemenag/0906			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Belitung Timur 2028
+archive/tables/round/kemenag-kabkota/sungaipenuh-2026.txt	id.kemenag/0611			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Sungai Penuh 2026, highland
+archive/tables/round/kemenag-kabkota/sungaipenuh-2027.txt	id.kemenag/0611			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Sungai Penuh 2027, highland
+archive/tables/round/kemenag-kabkota/sungaipenuh-2028.txt	id.kemenag/0611			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Sungai Penuh 2028, highland
+archive/tables/round/kemenag-kabkota/asmat-2026.txt	id.kemenag/3301			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Asmat 2026
+archive/tables/round/kemenag-kabkota/asmat-2027.txt	id.kemenag/3301			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Asmat 2027
+archive/tables/round/kemenag-kabkota/asmat-2028.txt	id.kemenag/3301			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Asmat 2028
+archive/tables/round/kemenag-kabkota/kepulauanaru-2026.txt	id.kemenag/3103			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Kepulauan Aru 2026
+archive/tables/round/kemenag-kabkota/kepulauanaru-2027.txt	id.kemenag/3103			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Kepulauan Aru 2027
+archive/tables/round/kemenag-kabkota/kepulauanaru-2028.txt	id.kemenag/3103			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Kepulauan Aru 2028
+archive/tables/round/kemenag-kabkota/tomohon-2026.txt	id.kemenag/2915			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Tomohon 2026, highland
+archive/tables/round/kemenag-kabkota/tomohon-2027.txt	id.kemenag/2915			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kota Tomohon 2027, highland
+archive/tables/round/kemenag-kabkota/tomohon-2028.txt	id.kemenag/2915			Asia/Makassar	F+E S D A M I	daily	standard	test	Kota Tomohon 2028, highland
+archive/tables/round/kemenag-kabkota/sibolga-2026.txt	id.kemenag/0231			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Sibolga 2026
+archive/tables/round/kemenag-kabkota/sibolga-2027.txt	id.kemenag/0231			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Sibolga 2027
+archive/tables/round/kemenag-kabkota/sibolga-2028.txt	id.kemenag/0231			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Sibolga 2028
+archive/tables/round/kemenag-kabkota/pariaman-2026.txt	id.kemenag/0316			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pariaman 2026
+archive/tables/round/kemenag-kabkota/pariaman-2027.txt	id.kemenag/0316			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Pariaman 2027
+archive/tables/round/kemenag-kabkota/pariaman-2028.txt	id.kemenag/0316			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Pariaman 2028
+archive/tables/round/kemenag-kabkota/fakfak-2026.txt	id.kemenag/3401			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Fakfak 2026
+archive/tables/round/kemenag-kabkota/fakfak-2027.txt	id.kemenag/3401			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Fakfak 2027
+archive/tables/round/kemenag-kabkota/fakfak-2028.txt	id.kemenag/3401			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Fakfak 2028
+archive/tables/round/kemenag-kabkota/tual-2026.txt	id.kemenag/3111			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Tual 2026
+archive/tables/round/kemenag-kabkota/tual-2027.txt	id.kemenag/3111			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kota Tual 2027
+archive/tables/round/kemenag-kabkota/tual-2028.txt	id.kemenag/3111			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kota Tual 2028
+archive/tables/round/kemenag-kabkota/subulussalam-2026.txt	id.kemenag/0123			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Subulussalam 2026
+archive/tables/round/kemenag-kabkota/subulussalam-2027.txt	id.kemenag/0123			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Subulussalam 2027
+archive/tables/round/kemenag-kabkota/subulussalam-2028.txt	id.kemenag/0123			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Subulussalam 2028
+archive/tables/round/kemenag-kabkota/telukbintuni-2026.txt	id.kemenag/3411			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Teluk Bintuni 2026
+archive/tables/round/kemenag-kabkota/telukbintuni-2027.txt	id.kemenag/3411			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Teluk Bintuni 2027
+archive/tables/round/kemenag-kabkota/telukbintuni-2028.txt	id.kemenag/3411			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Teluk Bintuni 2028
+archive/tables/round/kemenag-kabkota/malinau-2026.txt	id.kemenag/2402			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Malinau 2026
+archive/tables/round/kemenag-kabkota/malinau-2027.txt	id.kemenag/2402			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Malinau 2027
+archive/tables/round/kemenag-kabkota/malinau-2028.txt	id.kemenag/2402			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Malinau 2028
+archive/tables/round/kemenag-kabkota/buruselatan-2026.txt	id.kemenag/3102			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Buru Selatan 2026
+archive/tables/round/kemenag-kabkota/buruselatan-2027.txt	id.kemenag/3102			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Buru Selatan 2027
+archive/tables/round/kemenag-kabkota/buruselatan-2028.txt	id.kemenag/3102			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Buru Selatan 2028
+archive/tables/round/kemenag-kabkota/kotasolok-2026.txt	id.kemenag/0319			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Solok 2026
+archive/tables/round/kemenag-kabkota/kotasolok-2027.txt	id.kemenag/0319			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Solok 2027
+archive/tables/round/kemenag-kabkota/kotasolok-2028.txt	id.kemenag/0319			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Solok 2028
+archive/tables/round/kemenag-kabkota/sorongselatan-2026.txt	id.kemenag/3409			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Sorong Selatan 2026
+archive/tables/round/kemenag-kabkota/sorongselatan-2027.txt	id.kemenag/3409			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Sorong Selatan 2027
+archive/tables/round/kemenag-kabkota/sorongselatan-2028.txt	id.kemenag/3409			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Sorong Selatan 2028
+archive/tables/round/kemenag-kabkota/padangpanjang-2026.txt	id.kemenag/0315			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Padangpanjang 2026, highland
+archive/tables/round/kemenag-kabkota/padangpanjang-2027.txt	id.kemenag/0315			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Padangpanjang 2027, highland
+archive/tables/round/kemenag-kabkota/padangpanjang-2028.txt	id.kemenag/0315			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Padangpanjang 2028, highland
+archive/tables/round/kemenag-kabkota/sabang-2026.txt	id.kemenag/0122			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Sabang 2026
+archive/tables/round/kemenag-kabkota/sabang-2027.txt	id.kemenag/0122			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Sabang 2027
+archive/tables/round/kemenag-kabkota/sabang-2028.txt	id.kemenag/0122			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Sabang 2028
+archive/tables/round/kemenag-kabkota/manokwariselatan-2026.txt	id.kemenag/3404			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Manokwari Selatan 2026
+archive/tables/round/kemenag-kabkota/manokwariselatan-2027.txt	id.kemenag/3404			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Manokwari Selatan 2027
+archive/tables/round/kemenag-kabkota/manokwariselatan-2028.txt	id.kemenag/3404			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Manokwari Selatan 2028
+archive/tables/round/kemenag-kabkota/ngawi-2026.txt	id.kemenag/1617			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ngawi 2026
+archive/tables/round/kemenag-kabkota/ngawi-2027.txt	id.kemenag/1617			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ngawi 2027
+archive/tables/round/kemenag-kabkota/ngawi-2028.txt	id.kemenag/1617			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Ngawi 2028
+archive/tables/round/kemenag-kabkota/sampang-2026.txt	id.kemenag/1623			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sampang 2026
+archive/tables/round/kemenag-kabkota/sampang-2027.txt	id.kemenag/1623			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Sampang 2027
+archive/tables/round/kemenag-kabkota/sampang-2028.txt	id.kemenag/1623			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Sampang 2028
+archive/tables/round/kemenag-kabkota/trenggalek-2026.txt	id.kemenag/1627			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Trenggalek 2026
+archive/tables/round/kemenag-kabkota/trenggalek-2027.txt	id.kemenag/1627			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Trenggalek 2027
+archive/tables/round/kemenag-kabkota/trenggalek-2028.txt	id.kemenag/1627			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Trenggalek 2028
+archive/tables/round/kemenag-kabkota/sumbawa-2026.txt	id.kemenag/1807			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sumbawa 2026
+archive/tables/round/kemenag-kabkota/sumbawa-2027.txt	id.kemenag/1807			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Sumbawa 2027
+archive/tables/round/kemenag-kabkota/sumbawa-2028.txt	id.kemenag/1807			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Sumbawa 2028
+archive/tables/round/kemenag-kabkota/manggarai-2026.txt	id.kemenag/1908			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Manggarai 2026, highland
+archive/tables/round/kemenag-kabkota/manggarai-2027.txt	id.kemenag/1908			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Manggarai 2027, highland
+archive/tables/round/kemenag-kabkota/manggarai-2028.txt	id.kemenag/1908			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Manggarai 2028, highland
+archive/tables/round/kemenag-kabkota/timortengahselatan-2026.txt	id.kemenag/1920			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Timor Tengah Selatan 2026, highland
+archive/tables/round/kemenag-kabkota/timortengahselatan-2027.txt	id.kemenag/1920			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Timor Tengah Selatan 2027, highland
+archive/tables/round/kemenag-kabkota/timortengahselatan-2028.txt	id.kemenag/1920			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Timor Tengah Selatan 2028, highland
+archive/tables/round/kemenag-kabkota/bone-2026.txt	id.kemenag/2603			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Bone 2026
+archive/tables/round/kemenag-kabkota/bone-2027.txt	id.kemenag/2603			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Bone 2027
+archive/tables/round/kemenag-kabkota/bone-2028.txt	id.kemenag/2603			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Bone 2028
+archive/tables/round/kemenag-kabkota/muna-2026.txt	id.kemenag/2713			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Muna 2026
+archive/tables/round/kemenag-kabkota/muna-2027.txt	id.kemenag/2713			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Muna 2027
+archive/tables/round/kemenag-kabkota/muna-2028.txt	id.kemenag/2713			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Muna 2028
+archive/tables/round/kemenag-kabkota/banggai-2026.txt	id.kemenag/2801			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Banggai 2026
+archive/tables/round/kemenag-kabkota/banggai-2027.txt	id.kemenag/2801			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Banggai 2027
+archive/tables/round/kemenag-kabkota/banggai-2028.txt	id.kemenag/2801			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Banggai 2028
+archive/tables/round/kemenag-kabkota/morowali-2026.txt	id.kemenag/2806			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Morowali 2026
+archive/tables/round/kemenag-kabkota/morowali-2027.txt	id.kemenag/2806			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Morowali 2027
+archive/tables/round/kemenag-kabkota/morowali-2028.txt	id.kemenag/2806			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Morowali 2028
+archive/tables/round/kemenag-kabkota/minahasa-2026.txt	id.kemenag/2908			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Minahasa 2026, highland
+archive/tables/round/kemenag-kabkota/minahasa-2027.txt	id.kemenag/2908			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Minahasa 2027, highland
+archive/tables/round/kemenag-kabkota/minahasa-2028.txt	id.kemenag/2908			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Minahasa 2028, highland
+archive/tables/round/kemenag-kabkota/buru-2026.txt	id.kemenag/3101			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Buru 2026
+archive/tables/round/kemenag-kabkota/buru-2027.txt	id.kemenag/3101			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Buru 2027
+archive/tables/round/kemenag-kabkota/buru-2028.txt	id.kemenag/3101			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Buru 2028
+archive/tables/round/kemenag-kabkota/manokwari-2026.txt	id.kemenag/3403			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Manokwari 2026
+archive/tables/round/kemenag-kabkota/manokwari-2027.txt	id.kemenag/3403			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Manokwari 2027
+archive/tables/round/kemenag-kabkota/manokwari-2028.txt	id.kemenag/3403			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Manokwari 2028
+archive/tables/round/kemenag-kabkota/padangsidempuan-2026.txt	id.kemenag/0229			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Padangsidempuan 2026
+archive/tables/round/kemenag-kabkota/padangsidempuan-2027.txt	id.kemenag/0229			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kota Padangsidempuan 2027
+archive/tables/round/kemenag-kabkota/padangsidempuan-2028.txt	id.kemenag/0229			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kota Padangsidempuan 2028
+archive/tables/round/kemenag-kabkota/bungo-2026.txt	id.kemenag/0602			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bungo 2026
+archive/tables/round/kemenag-kabkota/bungo-2027.txt	id.kemenag/0602			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bungo 2027
+archive/tables/round/kemenag-kabkota/bungo-2028.txt	id.kemenag/0602			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bungo 2028
+archive/tables/round/kemenag-kabkota/ogankomeringulu-2026.txt	id.kemenag/0810			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ogan Komering Ulu 2026
+archive/tables/round/kemenag-kabkota/ogankomeringulu-2027.txt	id.kemenag/0810			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Ogan Komering Ulu 2027
+archive/tables/round/kemenag-kabkota/ogankomeringulu-2028.txt	id.kemenag/0810			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Ogan Komering Ulu 2028
+archive/tables/round/kemenag-kabkota/bireuen-2026.txt	id.kemenag/0113			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bireuen 2026
+archive/tables/round/kemenag-kabkota/bireuen-2027.txt	id.kemenag/0113			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Bireuen 2027
+archive/tables/round/kemenag-kabkota/bireuen-2028.txt	id.kemenag/0113			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Bireuen 2028
+archive/tables/round/kemenag-kabkota/maros-2026.txt	id.kemenag/2612			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Maros 2026
+archive/tables/round/kemenag-kabkota/maros-2027.txt	id.kemenag/2612			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Maros 2027
+archive/tables/round/kemenag-kabkota/maros-2028.txt	id.kemenag/2612			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Maros 2028
+archive/tables/round/kemenag-kabkota/kotawaringinbarat-2026.txt	id.kemenag/2207			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Kotawaringin Barat 2026
+archive/tables/round/kemenag-kabkota/kotawaringinbarat-2027.txt	id.kemenag/2207			Asia/Pontianak	F+E S D A M I	daily	standard	fit	Kab. Kotawaringin Barat 2027
+archive/tables/round/kemenag-kabkota/kotawaringinbarat-2028.txt	id.kemenag/2207			Asia/Pontianak	F+E S D A M I	daily	standard	test	Kab. Kotawaringin Barat 2028
+archive/tables/round/kemenag-kabkota/karimun-2026.txt	id.kemenag/0502			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Karimun 2026
+archive/tables/round/kemenag-kabkota/karimun-2027.txt	id.kemenag/0502			Asia/Jakarta	F+E S D A M I	daily	standard	fit	Kab. Karimun 2027
+archive/tables/round/kemenag-kabkota/karimun-2028.txt	id.kemenag/0502			Asia/Jakarta	F+E S D A M I	daily	standard	test	Kab. Karimun 2028
+archive/tables/round/kemenag-kabkota/tabalong-2026.txt	id.kemenag/2108			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Tabalong 2026
+archive/tables/round/kemenag-kabkota/tabalong-2027.txt	id.kemenag/2108			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Tabalong 2027
+archive/tables/round/kemenag-kabkota/tabalong-2028.txt	id.kemenag/2108			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Tabalong 2028
+archive/tables/round/kemenag-kabkota/tolitoli-2026.txt	id.kemenag/2812			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Toli-Toli 2026
+archive/tables/round/kemenag-kabkota/tolitoli-2027.txt	id.kemenag/2812			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Toli-Toli 2027
+archive/tables/round/kemenag-kabkota/tolitoli-2028.txt	id.kemenag/2812			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Toli-Toli 2028
+archive/tables/round/kemenag-kabkota/majene-2026.txt	id.kemenag/3001			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Majene 2026
+archive/tables/round/kemenag-kabkota/majene-2027.txt	id.kemenag/3001			Asia/Makassar	F+E S D A M I	daily	standard	fit	Kab. Majene 2027
+archive/tables/round/kemenag-kabkota/majene-2028.txt	id.kemenag/3001			Asia/Makassar	F+E S D A M I	daily	standard	test	Kab. Majene 2028
+archive/tables/round/kemenag-kabkota/pulaumorotai-2026.txt	id.kemenag/3207			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Pulau Morotai 2026
+archive/tables/round/kemenag-kabkota/pulaumorotai-2027.txt	id.kemenag/3207			Asia/Jayapura	F+E S D A M I	daily	standard	fit	Kab. Pulau Morotai 2027
+archive/tables/round/kemenag-kabkota/pulaumorotai-2028.txt	id.kemenag/3207			Asia/Jayapura	F+E S D A M I	daily	standard	test	Kab. Pulau Morotai 2028

@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.first
+import world.taqwa.app.feature.prayer.homeWatchCard
 import org.jetbrains.compose.resources.stringResource
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
@@ -92,6 +93,11 @@ fun App(container: AppContainer) {
     val backStackState = navigator.backStack.collectAsState()
     val backStack by backStackState
     val scope = rememberCoroutineScope()
+    // Home's watch card (1.7.0): held here, for the app's composition, because only the top of the
+    // back stack composes: a holder inside PrayerRoute would be made anew on every return from the
+    // Qibla screen, and the card would be put in again each time, moving the Qibla card under the
+    // thumb. It reads the watch only while Home is in front (FollowWatchCard in PrayerRoute).
+    val watchCard = remember { homeWatchCard(settings, scope) }
     val soundPreviewPlayer = remember { createSoundPreviewPlayer() }
     // Recitation (spec 3a §5). One controller for the process, held by the container, so the bar
     // and the voice survive every navigation this screen can perform.
@@ -414,6 +420,7 @@ fun App(container: AppContainer) {
                                 navigator = navigator,
                                 notificationSettingsState = notificationSettingsState,
                                 exactAlarmsAllowedState = exactAlarmsAllowedState,
+                                watchCard = watchCard,
                             )
                         }
 

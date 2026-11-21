@@ -163,6 +163,41 @@ class CanonicalTest {
         assertFailsWith<IllegalArgumentException> { Canonical.of(Any()) }
     }
 
+    /**
+     * Ruling R249 gave a Kazakh place every other place's method whose reach holds it, each written in the
+     * fingerprint in full: half a million characters at the longest, 508 million over the entry's rows, which
+     * the gate (it keeps each distinct fingerprint until the stamp is written) ran out of memory on. A
+     * fingerprint longer than [Stamps.WHOLE_WORDS] is held as its SHA-256 (ruling R253); a shorter one, which is every other
+     * entry's, stays in its own words, so no other stamp's hash moved.
+     */
+    @Test
+    fun `a fingerprint longer than the words kept whole is held as its digest and still moves with a change`() {
+        val entry = requireNotNull(Registry.byId("kz.qmdb"))
+        val almaty = Registry.resolveEntry(entry, Place(43.25, 76.95, "Asia/Almaty", "KZ"))
+        val riders = requireNotNull(almaty.method).alongside
+        assertTrue(riders.size > 10, "Almaty's riders: ${riders.size}")
+        val held = Stamps.fingerprint(almaty)
+        assertTrue(held.length < 200, "held as a digest: ${held.length} characters")
+        assertTrue(held.startsWith("kz.qmdb ") && " sha256 " in held, held)
+        // The words it stands for print no double and no identity either, as every other entry's (below).
+        val whole = Stamps.words(almaty)
+        assertTrue(whole.length > Stamps.WHOLE_WORDS, "Almaty's words: ${whole.length} characters")
+        assertTrue(Regex("""\d\.\d|\d[eE]-?\d""").find(whole) == null && Regex("""@[0-9a-f]{4,}""").find(whole) == null)
+        assertEquals(held, Stamps.fingerprint(Registry.resolveEntry(entry, Place(43.25, 76.95, "Asia/Almaty", "KZ"))))
+        // One rider fewer, and one rider's point a ten-thousandth of a degree away: each is another fingerprint.
+        val fewer = almaty.copy(method = almaty.method!!.copy(alongside = riders.drop(1)))
+        assertNotEquals(held, Stamps.fingerprint(fewer))
+        val first = riders.first()
+        val nudged = first.copy(point = GeoPoint(first.point.lat + 1e-4, first.point.lon))
+        assertNotEquals(held, Stamps.fingerprint(almaty.copy(method = almaty.method!!.copy(alongside = listOf(nudged) + riders.drop(1)))))
+        // A place alone in its reach, and any other entry's, keeps its own words.
+        val alone = almaty.copy(method = almaty.method!!.copy(alongside = emptyList()))
+        val words = Stamps.fingerprint(alone)
+        assertTrue(words.length <= Stamps.WHOLE_WORDS && " sha256 " !in words, "${words.length} characters")
+        assertTrue(fp(alone.method!!) in words)
+        assertTrue(fp(paris).length < Stamps.WHOLE_WORDS)
+    }
+
     @Test
     fun `no fingerprint of the manifest prints a double or an identity`() {
         val checkout = TestPaths.repoRoot.resolve("tools/timetables/official")

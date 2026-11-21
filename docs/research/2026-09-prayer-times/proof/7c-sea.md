@@ -290,6 +290,397 @@ tables (the monitor fetches them from November 2026) hold at each with the same 
 monitor's 28 Sep recaptures of the 13 are identical to the held files on every day, so they add no
 rows.
 
+### Round of 12 Nov 2026: 109 more kab/kota
+
+430 of the app's 448 Indonesian places were on the edge (sunrise 6–7 min early and Maghrib 6–7 min late at a
+lowland place). This round adds the largest kab/kota among them as units, the R104 way: each one's whole 2026, 2027
+and 2028 fetched from myQuran's republication (`api.myquran.com/v2/sholat/jadwal/<id>/<yyyy>/<mm>`, the monitor's own
+endpoint, one month a request, about a second apart, the place name checked on every month; 3,924 requests on
+12 Nov 2026), kept in the archive under `archive/tables/round/kemenag-kabkota/`.
+
+- **Which.** 57 kota with an app city at their point, from Kota Bekasi, Depok, Tangerang and Tangerang Selatan down to
+  Kota Metro, and 52 regencies whose seat is an app city, largest first (Kab. Bogor at Cibinong, Kab. Bekasi at Cikarang,
+  Kab. Bandung at Soreang, Kab. Malang at Kepanjen, Sidoarjo, Jember, Karawang, …). Not added: regencies whose seat is
+  not an app city (Kab. Tangerang's Tigaraksa, Kab. Serang, Deli Serdang's Lubuk Pakam, Bandung Barat's Ngamprah,
+  Brebes), and DKI Jakarta beyond Kota Jakarta's core: one circle per kab/kota reaches only those.
+- **Point.** The app's own GeoNames point for the kota or the regency seat, as for the 18 (RegistryCitiesTest holds each
+  unit to an app city entry at its point). Kemenag publishes no point and myQuran's JSON carries none; a table rounded
+  to the minute cannot separate a point's longitude from a constant offset, so each unit's margins absorb its residual
+  level (Kota Dumai's, about 20 s later than the rest, is the largest; Kota Depok's about 15 s).
+- **Horizon.** Read from each table: a first fit at −1° whose sunrise and Maghrib margins land about 4.5 min (±270 s)
+  out marks a highland kab/kota, refitted at −2°. Five are: Kota Cimahi, Kota Sukabumi, Kota Salatiga, Kab. Bandung and
+  Kab. Kuningan. Kota Magelang (about 380 m) and Kab. Cianjur are lowland, which again shows that elevation does not
+  tell the class.
+- **Split.** First fitted on 2026 alone (safety 5 s) and held to 2027, a true held-out year: 108 of the 109 held every one
+  of their 39,785 held-out days, worst 1 min. Kota Pontianak's Asr was a minute early on two days of March 2027: on the
+  equator Asr's daily change turns as the noon sun crosses overhead, and 2026 alone did not show the 2027 days' step.
+  So, as for the 18 since track T4, the registry's margins are fitted over 2026 and 2027 together and 2028, never fitted
+  on, is held out.
+- **Reach (R103/R113).** As for the 18: the distance from the point to the nearest other kab/kota on OpenStreetMap's
+  admin_level-5 boundaries (Overpass `rel(around:30000,…)[boundary=administrative][admin_level=5]; out geom;`, one
+  request a unit, 12 Nov 2026; point-to-segment distances in the engine's spherical distance), less 0.5 km, floored to
+  0.1 km; a coast bounds nothing. The method reproduces the 18's radii it was checked on (Kota Jakarta 8.365 km to
+  Kota Bekasi, Kota Bogor 1.822 km to Kab. Bogor). Radii run from 0.2 km (Kota Mojokerto) to 24.9 km (Kab. Sumenep), all
+  well inside class B's late reach (about 55 km at these latitudes), so the user's own sun, which bounds each start
+  inside a unit (R15), adds less than the class's limit even at a circle's edge.
+
+Gate, `id-kemenag` group after the round: 399 rows, 127 places, 139,192 place-days (46,482 held out, 11,176 in Ramadan),
+0 early, 0 late ends, 0 over the class-B limit. Worst after Kemenag's: a minute on every event except Asr (2 min on 3
+days) and the end of eating (2 min, as at the 18). The round's own 109 units hold 119,464 place-days: Ramadan 1447
+in their 2026 rows, Ramadan 1448 (Feb–Mar 2027) in their fitted 2027 rows, and Ramadan 1449 (Jan–Feb 2028) held out.
+
+**Across each circle (the review of 12 Nov 2026).** The figures above are at each unit's point; the circles now reach
+24.9 km, so every one of the 127 units' own tables is replayed across its circle as Umm al-Qura's and QMDB's are
+(`generateReachRows`, `gate/id-kemenag-reach.tsv`: 8 bearings at 50 and 95 % of the radius, and each event's worst
+point of a 392-point sweep; 2,032 grid points and 166 worst points, 6,903 rows, all held out; the monitor's recipes
+read each new year there too). Whole gate after it: `id.kemenag — class B, late limit 2 (by exception: endOfEating 3
+from unit 1626) · 2325 places · 2548200 place-days (2455490 held out, 204600 in Ramadan) · 7302 rows`; never early,
+no end late, worst 2 on every event: near a circle's edge a point's minute becomes 2 (Fajr on 122 place-days, Asr on
+2,072), which the stamps and About now say. The end of eating reached 3 once, on one day of December 2028, at Kab.
+Sumenep's worst point (near the reach's eastern edge, its islands east of the seat), where the user's own dawn comes about a
+minute before the seat's: an earlier end, never a start, recorded as Sumenep's own exception (3 min, end of eating
+only, as Dubai's) rather than shrinking the circle, which would hand those islands back to the edge's 6–7 min.
+
+Share of each kab/kota inside its circle (area, sampled on its own OSM polygon): about 15 % of the 109 kab/kota's
+combined population (about 17 of 110 million, assuming an even density, so approximate). 139 app city entries now
+resolve to a unit of their own instead of the edge. Most of each kab/kota stays on the edge: more circles per
+kab/kota (the triage's multi-circle follow-up) are what would move the rest.
+
+| kab/kota (myQuran id) | horizon | radius km (nearest other kab/kota, km) | share of its area inside |
+|---|---|---|---|
+| Kota Bekasi (1221) | −1° | 3.3 (Jakarta Timur, 3.898) | 16.1% |
+| Kota Depok (1225) | −1° | 3.5 (Jakarta Selatan, 4.079) | 19.4% |
+| Kota Tangerang (1107) | −1° | 3.3 (Kabupaten Tangerang, 3.859) | 19.6% |
+| Kota Tangerang Selatan (1108) | −1° | 3.2 (Tangerang, 3.701) | 19.6% |
+| Kota Batam (0506) | −1° | 17.3 (East Region, 17.854) | 40.4% |
+| Kota Pekanbaru (0412) | −1° | 6.6 (Kampar, 7.176) | 21.6% |
+| Kota Bandar Lampung (1014) | −1° | 4.2 (Pesawaran, 4.762) | 27.9% |
+| Kota Padang (0314) | −1° | 14.0 (Pesisir Selatan, 14.553) | 43.7% |
+| Kota Samarinda (2310) | −1° | 8.5 (Kutai Kartanegara, 9.084) | 31.8% |
+| Kota Tasikmalaya (1227) | −1° | 2.1 (Ciamis, 2.669) | 7.7% |
+| Kota Serang (1106) | −1° | 4.4 (Kab Serang, 4.923) | 22.4% |
+| Kota Balikpapan (2308) | −1° | 5.5 (Penajam Paser Utara, 6.038) | 8.4% |
+| Kota Pontianak (2013) | −1° | 3.4 (Kubu Raya, 3.942) | 30.0% |
+| Kota Banjarmasin (2113) | −1° | 2.6 (Barito Kuala, 3.196) | 21.4% |
+| Kota Jambi (0610) | −1° | 3.6 (Muaro Jambi, 4.189) | 23.9% |
+| Kota Cimahi (1223) | −2° | 0.9 (Bandung Barat, 1.495) | 6.1% |
+| Kota Surakarta (1434) | −1° | 2.0 (Sukoharjo, 2.579) | 27.3% |
+| Kota Kupang (1922) | −1° | 3.3 (Kupang, 3.862) | 20.3% |
+| Kota Cilegon (1105) | −1° | 2.4 (Kab Serang, 2.903) | 10.7% |
+| Kota Manado (2914) | −1° | 2.7 (Minahasa, 3.215) | 12.5% |
+| Kota Mataram (1810) | −1° | 1.7 (Lombok Barat, 2.264) | 15.0% |
+| Kota Bengkulu (0710) | −1° | 4.5 (Bengkulu Tengah, 5.019) | 21.4% |
+| Kota Palu (2813) | −1° | 1.2 (Sigi, 1.767) | 1.2% |
+| Kota Sukabumi (1226) | −2° | 1.0 (Kab Sukabumi, 1.525) | 6.3% |
+| Kota Kendari (2717) | −1° | 3.6 (Konawe, 4.178) | 13.9% |
+| Kota Dumai (0411) | −1° | 4.1 (Bengkalis, 4.661) | 2.2% |
+| Kota Ambon (3110) | −1° | 7.0 (Maluku Tengah, 7.552) | 33.9% |
+| Kota Cirebon (1224) | −1° | 0.3 (Kabupaten Cirebon, 0.885) | 0.7% |
+| Kota Pekalongan (1431) | −1° | 1.3 (Pekalongan, 1.804) | 11.7% |
+| Kota Palangkaraya (2214) | −1° | 4.9 (Pulang Pisau, 5.421) | 2.8% |
+| Kota Kediri (1632) | −1° | 1.1 (Kabupaten Kediri, 1.6) | 5.6% |
+| Kota Tegal (1435) | −1° | 0.4 (Tegal, 0.945) | 1.3% |
+| Kota Banjarbaru (2112) | −1° | 0.4 (Banjar, 0.967) | 0.2% |
+| Kota Binjai (0226) | −1° | 1.6 (Kabupaten Langkat, 2.167) | 8.4% |
+| Kota Pematangsiantar (0230) | −1° | 0.7 (Simalungun, 1.258) | 2.0% |
+| Kota Tarakan (2405) | −1° | 7.2 (Bulungan, 7.735) | 45.1% |
+| Kota Singkawang (2014) | −1° | 9.1 (Sambas, 9.681) | 35.3% |
+| Kota Tanjung Pinang (0507) | −1° | 6.4 (Bintan, 6.935) | 54.6% |
+| Kota Pangkal Pinang (0907) | −1° | 2.0 (Bangka Tengah, 2.575) | 11.9% |
+| Kota Gorontalo (2506) | −1° | 1.5 (Bone Bolango, 2.087) | 9.8% |
+| Kab. Bekasi (1203) | −1° | 8.7 (Karawang, 9.286) | 18.3% |
+| Kab. Bogor (1204) | −1° | 2.3 (Depok, 2.893) | 0.6% |
+| Kab. Bandung (1201) | −2° | 3.5 (Bandung Barat, 4.02) | 2.2% |
+| Kab. Malang (1614) | −1° | 10.9 (Kota Malang, 11.4) | 10.6% |
+| Kab. Jember (1607) | −1° | 12.5 (Bondowoso, 13.032) | 15.0% |
+| Kab. Sukabumi (1216) | −1° | 16.5 (Lebak, 17.077) | 15.0% |
+| Kab. Cianjur (1206) | −1° | 12.6 (Kab Sukabumi, 13.107) | 13.9% |
+| Kab. Karawang (1210) | −1° | 5.7 (Kab Bekasi, 6.234) | 5.3% |
+| Kab. Cirebon (1207) | −1° | 2.7 (Kuningan, 3.227) | 2.2% |
+| Kab. Sidoarjo (1624) | −1° | 10.3 (Pasuruan, 10.883) | 46.5% |
+| Kab. Cilacap (1407) | −1° | 17.6 (Banyumas, 18.16) | 20.6% |
+| Kab. Tasikmalaya (1218) | −1° | 4.4 (Tasikmalaya, 4.936) | 2.2% |
+| Kab. Indramayu (1209) | −1° | 24.0 (Kabupaten Cirebon, 24.524) | 44.6% |
+| Kab. Banyumas (1402) | −1° | 8.0 (Purbalingga, 8.533) | 14.4% |
+| Kab. Subang (1215) | −1° | 9.7 (Sumedang, 10.208) | 13.7% |
+| Kab. Gresik (1606) | −1° | 3.3 (Bangkalan, 3.893) | 1.5% |
+| Kab. Klaten (1414) | −1° | 9.0 (Gunungkidul, 9.588) | 35.8% |
+| Kab. Jepara (1410) | −1° | 13.1 (Demak, 13.697) | 30.3% |
+| Kab. Sleman (1504) | −1° | 5.1 (Kota Yogyakarta, 5.675) | 14.4% |
+| Kab. Bantul (1501) | −1° | 5.6 (Kulonprogo, 6.163) | 19.5% |
+| Kab. Semarang (1423) | −1° | 2.2 (Kendal, 2.706) | 1.5% |
+| Kab. Kudus (1415) | −1° | 3.9 (Demak, 4.473) | 10.8% |
+| Kab. Demak (1408) | −1° | 8.8 (Grobogan, 9.341) | 24.3% |
+| Kab. Purwakarta (1214) | −1° | 8.1 (Karawang, 8.618) | 20.6% |
+| Kab. Sumedang (1217) | −1° | 9.1 (Garut, 9.684) | 16.9% |
+| Kab. Pasuruan (1620) | −1° | 3.2 (Sidoarjo, 3.792) | 2.2% |
+| Kota Pasuruan (1636) | −1° | 1.4 (Pasuruan, 1.993) | 15.5% |
+| Kota Probolinggo (1637) | −1° | 1.3 (Probolinggo, 1.882) | 9.2% |
+| Kota Madiun (1633) | −1° | 1.0 (Madiun, 1.508) | 9.4% |
+| Kota Blitar (1631) | −1° | 1.1 (Blitar, 1.665) | 11.4% |
+| Kota Mojokerto (1635) | −1° | 0.2 (Mojokerto, 0.709) | 0.6% |
+| Kota Magelang (1430) | −1° | 0.3 (Magelang, 0.852) | 1.6% |
+| Kota Salatiga (1432) | −2° | 1.7 (Kabupaten Semarang, 2.267) | 17.2% |
+| Kota Bitung (2912) | −1° | 3.2 (Minahasa Utara, 3.753) | 7.4% |
+| Kota Lhokseumawe (0121) | −1° | 5.0 (Aceh Utara, 5.569) | 22.7% |
+| Kota Ternate (3209) | −1° | 3.6 (Tidore Kepulauan, 4.134) | 13.5% |
+| Kota Bontang (2309) | −1° | 4.4 (Kutai Timur, 4.967) | 27.9% |
+| Kota Bau-Bau (2716) | −1° | 2.8 (Buton Tengah, 3.303) | 5.1% |
+| Kota Parepare (2624) | −1° | 1.1 (Pinrang, 1.642) | 3.4% |
+| Kota Palopo (2623) | −1° | 5.2 (Luwu, 5.741) | 19.8% |
+| Kota Bima (1809) | −1° | 2.7 (Bima, 3.23) | 8.3% |
+| Kota Metro (1015) | −1° | 1.2 (Lampung Tengah, 1.748) | 6.0% |
+| Kab. Tegal (1426) | −1° | 6.8 (Brebes, 7.367) | 14.6% |
+| Kab. Situbondo (1625) | −1° | 5.1 (Bondowoso, 5.63) | 4.8% |
+| Kab. Banyuwangi (1602) | −1° | 9.4 (Jembrana, 9.95) | 5.0% |
+| Kab. Jombang (1608) | −1° | 8.7 (Nganjuk, 9.23) | 20.8% |
+| Kab. Tulungagung (1629) | −1° | 6.8 (Trenggalek, 7.3) | 12.5% |
+| Kab. Pati (1417) | −1° | 7.5 (Kudus, 8.009) | 11.4% |
+| Kab. Pemalang (1419) | −1° | 3.0 (Tegal, 3.559) | 2.4% |
+| Kab. Boyolali (1405) | −1° | 3.5 (Klaten, 4.044) | 3.5% |
+| Kab. Bojonegoro (1604) | −1° | 1.4 (Tuban, 1.927) | 0.3% |
+| Kab. Lamongan (1610) | −1° | 6.0 (Gresik, 6.531) | 6.3% |
+| Kab. Tuban (1628) | −1° | 11.1 (Lamongan, 11.618) | 12.0% |
+| Kab. Kuningan (1211) | −2° | 9.5 (Majalengka, 10.079) | 24.1% |
+| Kab. Majalengka (1212) | −1° | 4.2 (Sumedang, 4.718) | 4.3% |
+| Kab. Ciamis (1205) | −1° | 2.2 (Tasikmalaya, 2.798) | 1.0% |
+| Kab. Lebak (1101) | −1° | 4.9 (Kab Serang, 5.456) | 2.3% |
+| Kab. Pandeglang (1102) | −1° | 2.8 (Lebak, 3.356) | 0.9% |
+| Kab. Sumenep (1626) | −1° | 24.9 (Pamekasan, 25.403) | 56.0% |
+| Kab. Pamekasan (1619) | −1° | 9.3 (Sampang, 9.851) | 32.5% |
+| Kab. Bangkalan (1601) | −1° | 8.5 (Gresik, 9.076) | 11.1% |
+| Kab. Nganjuk (1616) | −1° | 9.4 (Madiun, 9.909) | 21.6% |
+| Kab. Ponorogo (1621) | −1° | 8.6 (Madiun, 9.116) | 16.1% |
+| Kab. Lumajang (1611) | −1° | 13.8 (Jember, 14.376) | 33.4% |
+| Kab. Bondowoso (1605) | −1° | 10.4 (Situbondo, 10.937) | 21.9% |
+| Kab. Sragen (1424) | −1° | 8.4 (Karanganyar, 8.988) | 21.8% |
+| Kab. Grobogan (1409) | −1° | 10.5 (Pati, 11.081) | 17.0% |
+| Kab. Probolinggo (1622) | −1° | 16.9 (Kota Probolinggo, 17.433) | 28.5% |
+| Kota Sorong (3413) | −1° | 3.9 (Sorong, 4.417) | 11.9% |
+
+### Second round of 12 Nov 2026: 119 more kab/kota
+
+After the first round 291 of the app's 448 Indonesian places were still on the edge. This round adds the largest
+kab/kota among them whose kota or regency seat is itself an app city, the same way: each one's whole 2026, 2027 and
+2028 from myQuran's republication (4,284 requests on 12 Nov 2026, the place name checked on every month), kept beside
+the first round's under `archive/tables/round/kemenag-kabkota/`. The printed imsak is Subuh − 10 on all 130,424 days.
+
+- **Which.** Ranked by population (Wikidata's P1082, or the English Wikipedia infobox where Wikidata has none), with
+  each regency's seat from Indonesian Wikipedia's *Daftar kabupaten di Indonesia*: 18 kota (Lubuklinggau, Prabumulih,
+  Langsa, Tebing Tinggi, Gunungsitoli, Pagar Alam, Payakumbuh, Kotamobagu, Sungai Penuh, Tomohon, Sibolga, Pariaman,
+  Tual, Subulussalam, Solok, Padangpanjang, Sabang, Padangsidempuan) and 101 regencies at their seats, from Kab. Lombok
+  Timur (Selong), Asahan (Kisaran), Lombok Tengah (Praya) and Langkat (Stabat) down to Manokwari Selatan (Ransiki).
+  Eight of the regencies are at the app's entry for the seat under another name: Bireuen (Bireun), Maros (Maros for
+  Turikale), Kotawaringin Barat (Pangkalanbuun), Karimun (Tanjung Balai), Tabalong (Tanjung), Toli-Toli (Toli-Toli for
+  Baolan), Majene (Majene for Banggae) and Pulau Morotai (Daruba for Morotai Selatan); Kab. Rembang's is the app's
+  "Rembangan", GeoNames' point for Rembang town. Each point was checked to lie inside its own kab/kota's OSM polygon.
+- **Not added.** Kab. Kubu Raya (the app's "Sungai Raya" is the one in Bengkayang), Sanggau, Pasaman Barat, Berau and
+  Tapin (no app city at the seat; a name match found a different town), Kota Sofifi (myQuran lists it twice, 3211 and
+  3212, and the town lies inside Kota Tidore Kepulauan's boundary, which prints its own table), Kab. Mimika (the app's
+  Timika is about 25 km from the seat's coordinates) and Raja Ampat (Waisai about 40 km off): no clean point. And the
+  regencies whose seat is not an app city: Kab. Tangerang (Tigaraksa), Deli Serdang (Lubuk Pakam), Brebes, Bandung
+  Barat (Ngamprah; the app's Padalarang is 2.7 km away), Lampung Tengah, Kebumen, Serang (Ciruas), Magelang (Mungkid),
+  Wonogiri, Kendal, Pekalongan (Kajen), Sukoharjo, Karanganyar, Simalungun, Purworejo, Kutai Kartanegara, Serdang
+  Bedagai, Ketapang, Muara Enim, Bengkalis, Bima (Woha), Kupang (Oelamasi), Tapanuli Tengah, Takalar, Halmahera
+  Selatan, Tanjung Jabung Timur, Penajam Paser Utara, Pidie Jaya, Nias Utara and Sorong (Aimas).
+- **Horizon.** Read from each table as before: sixteen are highland (−2°): Kab. Karo, Tapanuli Utara, Dairi, Samosir,
+  Rejang Lebong, Toraja Utara, Puncak Jaya, Lanny Jaya, Lembata, Manggarai, Timor Tengah Selatan, Minahasa and Kota
+  Pagar Alam, Sungai Penuh, Tomohon and Padangpanjang.
+- **Papua's mountains.** Kab. Puncak Jaya (Mulia) and Lanny Jaya (Tiom) print a Subuh about 4 min before the 20°
+  dawn at their points and an Isya about 4.5 min after the 18° dusk, on top of the highland horizon: the fitted Fajr
+  and Isha margins (−230 and +276 s, −237 and +270 s) take both and hold 2028 at worst 1. The end of eating follows
+  the dawn, not the Fajr margin, so it ran up to a minute after Kemenag's Subuh on 716 days; it now has its own margin
+  (`Kabkota.endOfEating`, −215 and −220 s: the latest that holds every 2026 and 2027 day, less 5 s), never after the
+  Subuh on any day, 2028 included, and at most a minute before it.
+- **Split.** Fitted on 2026 and 2027 together (safety 5 s), 2028 held out: never early on any of the round's
+  130,424 place-days; 2028 at most a minute after Kemenag's on every event but Asr (2).
+- **Reach (R103/R113).** As before, from 0.1 km (Kota Sibolga, Solok, Padangpanjang) up. Eighteen points have no other
+  kab/kota within the Overpass query's 30 km (Sambas, Nias Selatan, Manggarai Barat, Sumba Timur, Merauke, Alor,
+  Halmahera Utara, Nabire, Biak Numfor, Kepulauan Sangihe, Bulungan, Kepulauan Sula, Belitung Timur, Asmat, Kepulauan
+  Aru, Fakfak, Teluk Bintuni, Sumbawa): their radius is the query's own reach less 0.5 km, 29.5 km, which stays inside
+  their own kab/kota (a coast bounds nothing, so two circles may share open sea: Halmahera Utara's and Pulau Morotai's).
+
+Gate, `id-kemenag` group after the round, at each unit's point: 756 rows, 246 places, 269,616 place-days (90,036 held
+out, 21,648 in Ramadan), 0 early, 0 late ends, worst 1 min on every event but Asr and the end of eating (2).
+
+**Across each circle.** Every unit's own tables replayed across its circle (`generateReachRows --only id.kemenag`:
+3,934 grid points and 515 sweep-worst points, 13,656 rows; the first round's rows unchanged byte for byte): never early
+and no end late. Three circles went to 3 min at Asr on a day near their edge, so they are cut back to where every event
+holds (probed at 32 bearings from 10 to 29 km, then the rows themselves): Kab. Sambas 29.5 → 20.0 km, Nias Selatan
+29.5 → 21.0, Pulau Morotai 28.3 → 26.0. At 29 wide kab/kota the end of eating reached 3 min before Kemenag's Subuh toward
+the circle's edge (1,046 place-days, most at Asmat, Alor, Sumba Timur, Nabire, Merauke and Kepulauan Aru), the user's
+own dawn there coming about a minute before the point's, and nothing else went past 2: an earlier end, never a start,
+recorded as each unit's exception as Kab. Sumenep's is (`KemenagKabkota.round2EarlierEnd`). The alternative is a
+smaller circle: probed in rings of whole km at 32 bearings (10, 12, 14, 16, 18, then every km to the radius), each of
+the 29 holds class B's 2 min out to the radius below, and the ring beyond it would fall back to the edge's 6–7 min.
+That is a far larger step than Sumenep's (3 min on one day), so it was the owner's choice, and he made it on 12 Nov
+2026 (ruling R186): the 30 exceptions of 3 min at the end of eating are approved, Kab. Sumenep's and these 29, being
+nearer Kemenag's table for the people in that ring than the edge's 6–7 min. An earlier end, never a start; the table
+below stays as the record of the alternative he did not take. Whole gate after it: `id.kemenag — class B, late limit 2
+(by exception: endOfEating 3 from 30 units) · 4695 places · 5145720 place-days (4966140 held out, 413160 in Ramadan) ·
+14479 rows`; worst 2 on every start, 3 at those 30 units' end of eating; the imsak rows unchanged.
+
+| kab/kota (myQuran id) | radius km | holds class B's 2 min out to (km, ring probe) |
+|---|---|---|
+| Kab. Bireuen (0113) | 18.8 | 18 (largest ring probed) |
+| Kota Sabang (0122) | 28.3 | 18 |
+| Kab. Karimun (0502) | 22.1 | 16 |
+| Kab. Bangka Barat (0902) | 28.6 | 27 |
+| Kab. Belitung Timur (0906) | 29.5 | 26 |
+| Kab. Sumbawa (1807) | 29.5 | 25 |
+| Kab. Alor (1901) | 29.5 | 21 |
+| Kab. Ende (1903) | 26.8 | 24 |
+| Kab. Manggarai Barat (1909) | 29.5 | 23 |
+| Kab. Sumba Timur (1919) | 29.5 | 23 |
+| Kab. Sintang (2012) | 23.3 | 18 |
+| Kab. Barito Utara (2203) | 22.9 | 20 |
+| Kab. Bulungan (2401) | 29.5 | 20 |
+| Kab. Bone (2603) | 29.5 | 22 |
+| Kab. Luwu Utara (2611) | 24.4 | 21 |
+| Kab. Banggai (2801) | 28.2 | 25 |
+| Kab. Toli-Toli (2812) | 21.4 | 19 |
+| Kab. Kepulauan Sangihe (2905) | 29.5 | 21 |
+| Kab. Buru (3101) | 24.1 | 23 |
+| Kab. Kepulauan Aru (3103) | 29.5 | 24 |
+| Kab. Halmahera Utara (3203) | 29.5 | 24 |
+| Kab. Kepulauan Sula (3205) | 29.5 | 25 |
+| Kab. Asmat (3301) | 29.5 | 20 |
+| Kab. Biak Numfor (3302) | 29.5 | 22 |
+| Kab. Merauke (3315) | 29.5 | 24 |
+| Kab. Nabire (3317) | 29.5 | 24 |
+| Kab. Fakfak (3401) | 29.5 | 23 |
+| Kab. Manokwari (3403) | 23.6 | 22 |
+| Kab. Teluk Bintuni (3411) | 29.5 | 24 |
+
+Kab. Bireuen's rings stopped at 18 km, below its 18.8 km radius, so where it would hold is not known beyond 18.
+
+122 app city entries now resolve to a unit of their own instead of the edge (169 of the 448 remain on it). Share of
+each kab/kota inside its circle (area, sampled on its own OSM polygon): about 17 % of the 119 kab/kota's combined
+population (about 6.5 of 37 million, assuming an even density, so approximate and low, since the seats are the densest
+part).
+
+| kab/kota (myQuran id) | seat (app city) | horizon | radius km (nearest other kab/kota, km) | share of its area inside |
+|---|---|---|---|---|
+| Kab. Lombok Timur (1805) | Selong | −1° | 11.6 (Lombok Tengah, 12.173) | 22.5% |
+| Kab. Asahan (0201) | Kisaran | −1° | 6.1 (Batu Bara, 6.654) | 3.1% |
+| Kab. Lombok Tengah (1804) | Praya | −1° | 8.3 (Lombok Barat, 8.900) | 18.6% |
+| Kab. Langkat (0210) | Stabat | −1° | 5.5 (Kabupaten Deli Serdang, 6.075) | 1.6% |
+| Kab. Purbalingga (1420) | Purbalingga | −1° | 4.9 (Banyumas, 5.451) | 9.3% |
+| Kab. Lampung Utara (1002) | Kotabumi | −1° | 11.4 (Lampung Tengah, 11.917) | 16.7% |
+| Kab. Blora (1404) | Blora | −1° | 7.9 (Rembang, 8.433) | 10.0% |
+| Kab. Buleleng (1703) | Singaraja | −1° | 17.1 (Tabanan, 17.663) | 32.7% |
+| Kab. Gunungkidul (1502) | Wonosari | −1° | 12.1 (Bantul, 12.653) | 30.9% |
+| Kab. Sambas (2009) | Kota Sambas | −1° | 20.0 (none within 30 km); cut back for Asr | 21.7% |
+| Kab. Rembang (1422) | Rembangan | −1° | 10.5 (Pati, 11.017) | 18.8% |
+| Kab. Banjar (2102) | Martapura | −1° | 2.6 (Banjarbaru, 3.144) | 0.5% |
+| Kab. Polewali Mandar (3006) | Polewali | −1° | 13.1 (Mamasa, 13.699) | 15.9% |
+| Kab. Wajo (2621) | Sengkang | −1° | 8.3 (Soppeng, 8.831) | 8.6% |
+| Kab. Tabanan (1708) | Tabanan | −1° | 3.5 (Badung, 4.094) | 4.5% |
+| Kab. Pidie (0116) | Sigli | −1° | 13.7 (Pidie Jaya, 14.212) | 10.2% |
+| Kab. Ogan Ilir (0808) | Indralaya | −1° | 13.3 (Ogan Komering Ilir, 13.863) | 24.9% |
+| Kab. Lahat (0803) | Lahat | −1° | 18.1 (Muara Enim, 18.616) | 23.7% |
+| Kab. Maluku Tengah (3105) | Masohi | −1° | 14.7 (Seram Bagian Barat, 15.298) | 4.3% |
+| Kab. Labuhanbatu (0207) | Rantauprapat | −1° | 7.8 (Kabupaten Padang Lawas Utara, 8.371) | 7.1% |
+| Kab. Kapuas (2205) | Kualakapuas | −1° | 11.9 (Pulang Pisau, 12.402) | 2.6% |
+| Kab. Kotawaringin Timur (2208) | Sampit | −1° | 21.5 (Katingan, 22.092) | 9.2% |
+| Kab. Sintang (2012) | Sintang | −1° | 23.3 (Sekadau, 23.837); end of eating 3 | 8.0% |
+| Kab. Luwu Utara (2611) | Masamba | −1° | 24.4 (Luwu, 24.949); end of eating 3 | 24.6% |
+| Kab. Tanjung Jabung Barat (0607) | Kuala Tungkal | −1° | 4.5 (Indragiri Hilir, 5.007) | 1.1% |
+| Kab. Sikka (1915) | Maumere | −1° | 24.4 (Ende, 24.932) | 52.8% |
+| Kab. Jembrana (1705) | Negara | −1° | 14.4 (Buleleng, 14.990) | 45.0% |
+| Kab. Sumba Barat Daya (1917) | Tambolaka | −1° | 14.7 (Sumba Barat, 15.207) | 36.5% |
+| Kab. Bangka (0901) | Sungailiat | −1° | 22.0 (Pangkalpinang, 22.597) | 25.5% |
+| Kab. Nias Selatan (0214) | Teluk Dalam | −1° | 21.0 (none within 30 km); cut back for Asr | 5.5% |
+| Kab. Bengkayang (2001) | Bengkayang | −1° | 7.1 (Landak, 7.611) | 2.9% |
+| Kab. Karo (0206) | Kabanjahe | −2° | 10.1 (Simalungun, 10.617) | 14.3% |
+| Kab. Tapanuli Utara (0224) | Tarutung | −2° | 18.1 (Kabupaten Tapanuli Tengah, 18.650) | 27.3% |
+| Kab. Ende (1903) | Ende | −1° | 26.8 (Nagekeo, 27.394); end of eating 3 | 53.2% |
+| Kab. Dairi (0203) | Sidikalang | −2° | 4.5 (Kabupaten Pakpak Bharat, 5.064) | 3.1% |
+| Kab. Rejang Lebong (0708) | Curup | −2° | 2.3 (Kepahiang, 2.813) | 1.1% |
+| Kab. Sinjai (2616) | Sinjai | −1° | 0.7 (Bone, 1.219) | 0.2% |
+| Kab. Manggarai Barat (1909) | Labuan Bajo | −1° | 29.5 (none within 30 km); end of eating 3 | 42.7% |
+| Kab. Timor Tengah Utara (1921) | Kefamenanu | −1° | 11.4 (Oe-Silu, 11.977) | 15.7% |
+| Kab. Hulu Sungai Tengah (2105) | Barabai | −1° | 8.2 (Hulu Sungai Utara, 8.703) | 14.5% |
+| Kab. Poso (2809) | Poso | −1° | 14.6 (Tojo Una-Una, 15.104) | 5.2% |
+| Kab. Toraja Utara (2620) | Rantepao | −2° | 5.5 (Tana Toraja, 6.088) | 7.3% |
+| Kab. Sumba Timur (1919) | Waingapu | −1° | 29.5 (none within 30 km); end of eating 3 | 27.7% |
+| Kab. Sijunjung (0309) | Sijunjung | −1° | 13.0 (Solok, 13.564) | 16.3% |
+| Kab. Merauke (3315) | Merauke | −1° | 29.5 (none within 30 km); end of eating 3 | 3.5% |
+| Kab. Hulu Sungai Utara (2106) | Amuntai | −1° | 6.6 (Tabalong, 7.199) | 14.8% |
+| Kab. Minahasa Utara (2911) | Airmadidi | −1° | 6.2 (Bitung, 6.789) | 12.3% |
+| Kab. Belu (1902) | Atambua | −1° | 7.7 (Timor Tengah Utara, 8.294) | 16.8% |
+| Kab. Dompu (1802) | Dompu | −1° | 3.7 (Bima, 4.240) | 1.9% |
+| Kota Lubuklinggau (0814) | Lubuklinggau | −1° | 4.3 (Rejang Lebong, 4.857) | 15.2% |
+| Kab. Alor (1901) | Kalabahi | −1° | 29.5 (none within 30 km); end of eating 3 | 47.4% |
+| Kab. Puncak Jaya (3322) | Mulia | −2° | 12.1 (Puncak, 12.637); end of eating -215 s | 9.2% |
+| Kota Prabumulih (0817) | Prabumulih | −1° | 7.2 (Muara Enim, 7.749) | 34.6% |
+| Kab. Bangka Barat (0902) | Muntok | −1° | 28.6 (Banyuasin, 29.180); end of eating 3 | 23.9% |
+| Kab. Halmahera Utara (3203) | Tobelo | −1° | 29.5 (none within 30 km); end of eating 3 | 30.0% |
+| Kab. Aceh Barat (0101) | Meulaboh | −1° | 7.9 (Nagan Raya, 8.478) | 3.1% |
+| Kota Langsa (0120) | Langsa | −1° | 3.8 (Aceh Timur, 4.349) | 22.5% |
+| Kota Tebing Tinggi (0233) | Tebingtinggi | −1° | 1.1 (Kabupaten Serdang Bedagai, 1.660) | 9.6% |
+| Kab. Nunukan (2403) | Nunukan | −1° | 3.3 (Bahagian Tawau, 3.881) | 0.1% |
+| Kab. Nabire (3317) | Nabire | −1° | 29.5 (none within 30 km); end of eating 3 | 14.7% |
+| Kab. Jayapura (3307) | Sentani | −1° | 11.0 (Jayapura, 11.584) | 2.7% |
+| Kab. Belitung (0905) | Tanjung Pandan | −1° | 20.4 (Belitung Timur, 20.951) | 32.8% |
+| Kab. Biak Numfor (3302) | Biak | −1° | 29.5 (none within 30 km); end of eating 3 | 48.9% |
+| Kab. Barito Utara (2203) | Muara Teweh | −1° | 22.9 (Murung Raya, 23.466); end of eating 3 | 16.4% |
+| Kab. Aceh Barat Daya (0102) | Blangpidie | −1° | 19.3 (Aceh Selatan, 19.845) | 42.2% |
+| Kab. Samosir (0219) | Pangururan | −2° | 14.4 (Kabupaten Dairi, 14.971) | 41.1% |
+| Kab. Kepulauan Sangihe (2905) | Tahuna | −1° | 29.5 (none within 30 km); end of eating 3 | 84.9% |
+| Kota Gunungsitoli (0227) | Gunungsitoli | −1° | 3.9 (Nias Regency, 4.419) | 2.8% |
+| Kota Pagar Alam (0815) | Pagar Alam | −2° | 2.0 (Lahat, 2.548) | 2.0% |
+| Kab. Sumbawa Barat (1808) | Taliwang | −1° | 18.7 (Sumbawa, 19.222) | 48.8% |
+| Kab. Lembata (1906) | Lewoleba | −2° | 11.7 (Flores Timur, 12.230) | 22.2% |
+| Kab. Aceh Singkil (0106) | Singkil | −1° | 15.5 (Aceh Selatan, 16.042) | 21.0% |
+| Kab. Bulungan (2401) | Tanjung Selor | −1° | 29.5 (none within 30 km); end of eating 3 | 19.8% |
+| Kota Payakumbuh (0317) | Payakumbuh | −1° | 1.9 (Lima Puluh Kota, 2.453) | 14.9% |
+| Kab. Kepulauan Sula (3205) | Sanana | −1° | 29.5 (none within 30 km); end of eating 3 | 44.0% |
+| Kota Kotamobagu (2913) | Kotamobagu | −1° | 0.8 (Bolaang Mongondow, 1.347) | 1.8% |
+| Kab. Lanny Jaya (3311) | Tiom | −2° | 14.8 (Tolikara, 15.305); end of eating -220 s | 23.6% |
+| Kab. Belitung Timur (0906) | Manggar | −1° | 29.5 (none within 30 km); end of eating 3 | 44.6% |
+| Kota Sungai Penuh (0611) | Sungai Penuh | −2° | 2.5 (Kerinci, 3.006) | 5.4% |
+| Kab. Asmat (3301) | Agats | −1° | 29.5 (none within 30 km); end of eating 3 | 7.9% |
+| Kab. Kepulauan Aru (3103) | Dobo | −1° | 29.5 (none within 30 km); end of eating 3 | 9.7% |
+| Kota Tomohon (2915) | Tomohon | −2° | 3.0 (Minahasa, 3.592) | 16.5% |
+| Kota Sibolga (0231) | Sibolga | −1° | 0.1 (Kabupaten Tapanuli Tengah, 0.525) | 0.3% |
+| Kota Pariaman (0316) | Pariaman | −1° | 4.0 (Padang Pariaman, 4.510) | 28.1% |
+| Kab. Fakfak (3401) | Fakfak | −1° | 29.5 (none within 30 km); end of eating 3 | 25.7% |
+| Kota Tual (3111) | Tual | −1° | 1.4 (Maluku Tenggara, 1.979) | 2.9% |
+| Kota Subulussalam (0123) | Subulussalam | −1° | 6.4 (Aceh Selatan, 6.968) | 10.8% |
+| Kab. Teluk Bintuni (3411) | Bintuni | −1° | 29.5 (none within 30 km); end of eating 3 | 11.2% |
+| Kab. Malinau (2402) | Malinau | −1° | 7.9 (Tana Tidung, 8.420) | 0.5% |
+| Kab. Buru Selatan (3102) | Namrole | −1° | 25.8 (Buru, 26.317) | 23.5% |
+| Kota Solok (0319) | Solok | −1° | 0.1 (Solok, 0.620) | 0.1% |
+| Kab. Sorong Selatan (3409) | Teminabuan | −1° | 16.6 (Maybrat, 17.183) | 12.7% |
+| Kota Padangpanjang (0315) | Padangpanjang | −2° | 0.1 (Tanah Datar, 0.235) | 0.1% |
+| Kota Sabang (0122) | Sabang | −1° | 28.3 (Aceh Besar, 28.867); end of eating 3 | 98.6% |
+| Kab. Manokwari Selatan (3404) | Ransiki | −1° | 12.1 (Pegunungan Arfak, 12.662) | 15.5% |
+| Kab. Ngawi (1617) | Ngawi | −1° | 2.8 (Blora, 3.303) | 1.7% |
+| Kab. Sampang (1623) | Sampang | −1° | 12.9 (Pamekasan, 13.498) | 28.5% |
+| Kab. Trenggalek (1627) | Trenggalek | −1° | 6.8 (Tulungagung, 7.321) | 11.7% |
+| Kab. Sumbawa (1807) | Sumbawa Besar | −1° | 29.5 (none within 30 km); end of eating 3 | 28.5% |
+| Kab. Manggarai (1908) | Ruteng | −2° | 4.3 (Manggarai Timur, 4.828) | 4.4% |
+| Kab. Timor Tengah Selatan (1920) | Soe | −2° | 20.5 (Kupang, 21.074) | 33.0% |
+| Kab. Bone (2603) | Watampone | −1° | 29.5 (Soppeng, 30.004); end of eating 3 | 39.5% |
+| Kab. Muna (2713) | Raha | −1° | 9.4 (Muna Barat, 9.990) | 9.2% |
+| Kab. Banggai (2801) | Luwuk | −1° | 28.2 (Banggai Kepulauan, 28.780); end of eating 3 | 16.8% |
+| Kab. Morowali (2806) | Bungku | −1° | 22.7 (Luwu Timur, 23.276) | 17.8% |
+| Kab. Minahasa (2908) | Tondano | −2° | 3.3 (Minahasa Utara, 3.874) | 3.0% |
+| Kab. Buru (3101) | Namlea | −1° | 24.1 (Buru Selatan, 24.618); end of eating 3 | 16.5% |
+| Kab. Manokwari (3403) | Manokwari | −1° | 23.6 (Pegunungan Arfak, 24.191); end of eating 3 | 22.6% |
+| Kota Padangsidempuan (0229) | Padangsidempuan | −1° | 2.5 (Kabupaten Tapanuli Selatan, 3.066) | 12.5% |
+| Kab. Bungo (0602) | Muara Bungo | −1° | 5.4 (Tebo, 5.950) | 1.9% |
+| Kab. Ogan Komering Ulu (0810) | Baturaja | −1° | 14.4 (Ogan Komering Ulu Timur, 14.934) | 16.7% |
+| Kab. Bireuen (0113) | Bireun | −1° | 18.8 (Aceh Utara, 19.356); end of eating 3 | 37.1% |
+| Kab. Maros (2612) | Maros | −1° | 7.6 (Makassar, 8.157) | 12.5% |
+| Kab. Kotawaringin Barat (2207) | Pangkalanbuun | −1° | 24.8 (Sukamara, 25.329) | 20.3% |
+| Kab. Karimun (0502) | Tanjung Balai | −1° | 22.1 (Kepulauan Meranti, 22.696); end of eating 3 | 35.6% |
+| Kab. Tabalong (2108) | Tanjung | −1° | 9.8 (Balangan, 10.352) | 8.7% |
+| Kab. Toli-Toli (2812) | Toli-Toli | −1° | 21.4 (Buol, 21.959); end of eating 3 | 29.2% |
+| Kab. Majene (3001) | Majene | −1° | 3.0 (Polewali Mandar, 3.587) | 2.4% |
+| Kab. Pulau Morotai (3207) | Daruba | −1° | 26.0 (Halmahera Utara, 28.868); cut back for Asr | 27.9% |
+
 ## 7h's ADHAN2_ASR_ALLOWANCE (added to `other.singapore`, per the coordinator's message)
 
 `other.singapore`'s Asr now carries `SAFE_START + ADHAN2_ASR_ALLOWANCE` instead of the plain

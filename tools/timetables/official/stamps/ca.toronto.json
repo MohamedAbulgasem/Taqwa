@@ -1,9 +1,9 @@
 {
   "entry": "ca.toronto",
   "class": "C",
-  "engineHash": "591ef03173f4b400",
+  "engineHash": "67232d8f25590119",
   "broken": 0,
-  "places": 6,
+  "places": 1,
   "first": "2026-01-01",
   "last": "2026-12-31",
   "checked": ["2026-01-01..2026-03-07", "2026-03-13..2026-03-27", "2026-03-29..2026-10-31", "2026-11-07..2026-11-27", "2026-12-01..2026-12-31"],
@@ -17,9 +17,11 @@
     "isha": ["2026-01-01..2026-03-07", "2026-03-13..2026-03-27", "2026-03-29..2026-10-31", "2026-11-07..2026-11-27", "2026-12-01..2026-12-31"],
     "endOfEating": ["2026-01-01..2026-03-07", "2026-03-13..2026-03-27", "2026-03-29..2026-10-31", "2026-11-07..2026-11-27", "2026-12-01..2026-12-31"]
   },
-  "placeDays": 1400,
-  "heldOutDays": 1050,
-  "ramadanDays": 50,
+  "placeDays": 350,
+  "heldOutDays": 0,
+  "sharedDays": 267,
+  "tables": 0,
+  "ramadanDays": 25,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
@@ -146,130 +148,13 @@
     }
   },
   "heldOut": {
-    "placeDays": 1050,
+    "placeDays": 0,
     "ramadanDays": 0,
-    "events": {
-      "fajr": {
-        "checked": 1050,
-        "early": 0,
-        "late": {
-          "0": 127,
-          "1": 278,
-          "2": 204,
-          "3+": 441
-        },
-        "exactShare": 0.121,
-        "worstLate": 6,
-        "lateLimit": 7,
-        "lateLimitFrom": "entry ca.toronto",
-        "overLimit": 0
-      },
-      "sunrise": {
-        "checked": 1050,
-        "lateEnd": 0,
-        "late": {
-          "0": 372,
-          "1": 409,
-          "2": 231,
-          "3+": 38
-        },
-        "exactShare": 0.3543,
-        "worstLate": 3,
-        "lateLimit": 3,
-        "lateLimitFrom": "entry ca.toronto",
-        "overLimit": 0
-      },
-      "dhuhr": {
-        "checked": 1050,
-        "early": 0,
-        "late": {
-          "0": 232,
-          "1": 293,
-          "2": 244,
-          "3+": 281
-        },
-        "exactShare": 0.221,
-        "worstLate": 5,
-        "lateLimit": 6,
-        "lateLimitFrom": "entry ca.toronto",
-        "overLimit": 0
-      },
-      "asrStandard": {
-        "checked": 1050,
-        "early": 0,
-        "late": {
-          "0": 125,
-          "1": 303,
-          "2": 261,
-          "3+": 361
-        },
-        "exactShare": 0.119,
-        "worstLate": 6,
-        "lateLimit": 6,
-        "lateLimitFrom": "entry ca.toronto",
-        "overLimit": 0
-      },
-      "asrHanafi": {
-        "checked": 1050,
-        "early": 0,
-        "late": {
-          "0": 4,
-          "1": 97,
-          "2": 379,
-          "3+": 570
-        },
-        "exactShare": 0.0038,
-        "worstLate": 6,
-        "lateLimit": 6,
-        "lateLimitFrom": "entry ca.toronto",
-        "overLimit": 0
-      },
-      "maghrib": {
-        "checked": 1050,
-        "early": 0,
-        "late": {
-          "0": 159,
-          "1": 273,
-          "2": 250,
-          "3+": 368
-        },
-        "exactShare": 0.1514,
-        "worstLate": 7,
-        "lateLimit": 7,
-        "lateLimitFrom": "entry ca.toronto",
-        "overLimit": 0
-      },
-      "isha": {
-        "checked": 1050,
-        "early": 0,
-        "late": {
-          "0": 252,
-          "1": 219,
-          "2": 254,
-          "3+": 325
-        },
-        "exactShare": 0.24,
-        "worstLate": 7,
-        "lateLimit": 7,
-        "lateLimitFrom": "entry ca.toronto",
-        "overLimit": 0
-      },
-      "endOfEating": {
-        "checked": 1050,
-        "lateEnd": 0,
-        "late": {
-          "0": 52,
-          "1": 585,
-          "2": 286,
-          "3+": 127
-        },
-        "exactShare": 0.0495,
-        "worstLate": 4,
-        "lateLimit": 4,
-        "lateLimitFrom": "entry ca.toronto",
-        "overLimit": 0
-      }
-    }
+    "events": {}
+  },
+  "replays": {
+    "places": 5,
+    "placeDays": 1050
   },
   "members": {
     "ca.ift": {

@@ -35,14 +35,18 @@ class SunSanityTest {
         maghrib: Double = sky.sunset!! + 60,
         isha: Double = sky.sunset!! + 91 * 60,
         endOfEating: Double = fajr - 60,
+        asr: Double = sky.asrStandard!! + 60,
+        asrOther: Double = sky.asrHanafi!! + 60,
+        sunrise: Double = sky.sunrise!!,
+        ends: Map<Prayer, Double> = emptyMap(),
         notFollowed: Set<Prayer> = emptySet(),
         setByRule: Set<Prayer> = emptySet(),
         polar: Boolean = false,
     ) = PrayerDay(
-        date = date, fajr = up(fajr), sunrise = down(sky.sunrise!!), dhuhr = up(dhuhr), asr = up(dhuhr + 3 * 3600),
-        asrOther = up(dhuhr + 4 * 3600), maghrib = up(maghrib), isha = up(isha), sunset = down(sky.sunset!!),
+        date = date, fajr = up(fajr), sunrise = down(sunrise), dhuhr = up(dhuhr), asr = up(asr),
+        asrOther = up(asrOther), maghrib = up(maghrib), isha = up(isha), sunset = down(sky.sunset!!),
         endOfEating = down(endOfEating), imsak = null, methodId = "test", notFollowed = notFollowed, setByRule = setByRule,
-        polar = polar,
+        polar = polar, ends = ends.mapValues { down(it.value) },
     )
 
     private fun up(s: Double) = Instant.fromEpochSeconds((ceil(s / 60) * 60).toLong())
@@ -67,6 +71,44 @@ class SunSanityTest {
             listOf(SunSanity.Check.ISHA),
             SunSanity.breaches(day(isha = sky.sunset!! + 30), sky).map { it.check }.filter { it == SunSanity.Check.ISHA },
         )
+    }
+
+    @Test
+    fun `ruling R265's checks find an asr before its shadow and a sunrise or an end after the sun`() {
+        assertTrue(sky.asrHanafi!! > sky.asrStandard!! && sky.asrStandard!! > sky.transit)
+        val asr = SunSanity.breaches(day(asr = sky.asrStandard!! - 100), sky).single()
+        assertEquals(SunSanity.Check.ASR, asr.check)
+        assertTrue(asr.seconds in 40.0..100.0, "${asr.seconds}")
+        // The other school's against its own shadow, and a day computed in the Hanafi school reads its asr as Hanafi.
+        assertEquals(listOf(SunSanity.Check.ASR), SunSanity.breaches(day(asrOther = sky.asrHanafi!! - 120), sky).map { it.check })
+        val hanafiDay = day(asr = sky.asrHanafi!! + 60, asrOther = sky.asrStandard!! + 60)
+        assertEquals(emptyList(), SunSanity.breaches(hanafiDay, sky, AsrSchool.HANAFI).map { it.check })
+        assertEquals(listOf(SunSanity.Check.ASR), SunSanity.breaches(hanafiDay, sky, AsrSchool.STANDARD).map { it.check })
+        // The sunrise shown, or Fajr's end, past the minute the sun rose in; Dhuhr's end past the first shadow's minute.
+        assertEquals(listOf(SunSanity.Check.SUNRISE), SunSanity.breaches(day(sunrise = sky.sunrise!! + 60), sky).map { it.check })
+        assertEquals(listOf(SunSanity.Check.SUNRISE), SunSanity.breaches(day(ends = mapOf(Prayer.FAJR to sky.sunrise!! + 60)), sky).map { it.check })
+        assertEquals(emptyList(), SunSanity.breaches(day(ends = mapOf(Prayer.FAJR to sky.sunrise!!, Prayer.DHUHR to sky.asrStandard!!)), sky).map { it.check })
+        assertEquals(listOf(SunSanity.Check.DHUHR_END), SunSanity.breaches(day(ends = mapOf(Prayer.DHUHR to sky.asrStandard!! + 60)), sky).map { it.check })
+        // A rule's Asr is excused by name, never dropped.
+        assertEquals(SunSanity.Excuse.SET_BY_RULE, SunSanity.breaches(day(asr = sky.asrStandard!! - 600, setByRule = setOf(Prayer.ASR)), sky).single().excuse)
+    }
+
+    @Test
+    fun `ruling R265's checks fail the pass unexcused or listed as open and are listed when the day excuses them`() {
+        for (check in SunSanity.FLOORED_UNLESS_EXCUSED) {
+            val result = SunSanity.Result(date, date)
+            val key = SunSanity.Key("xx.test", check, null)
+            result.groups[key] = mutableListOf(SunSanity.PointTally("a", null).apply { add(date, AsrSchool.STANDARD, 1.0) })
+            val listed = SunSanity.Listed(key.entryId, key.check, null, 600, 10, "note")
+            assertTrue(SunSanity.problems(result, emptyList(), emptyList()).single().contains("R265"), "$check unexcused")
+            assertEquals(2, SunSanity.problems(result, listOf(listed), emptyList()).size, "$check listed as open")
+            val excusedKey = SunSanity.Key("xx.test", check, SunSanity.Excuse.SET_BY_RULE)
+            val excusedOnly = SunSanity.Result(date, date).apply {
+                groups[excusedKey] = mutableListOf(SunSanity.PointTally("a", null).apply { add(date, AsrSchool.STANDARD, 1.0) })
+            }
+            val excusedListed = SunSanity.Listed(excusedKey.entryId, check, SunSanity.Excuse.SET_BY_RULE, 600, 10, "note")
+            assertEquals(emptyList(), SunSanity.problems(excusedOnly, emptyList(), listOf(excusedListed)), "$check excused and listed")
+        }
     }
 
     @Test
@@ -95,7 +137,7 @@ class SunSanityTest {
     fun `a listed group fails past either ceiling, and an unlisted excused group fails too`() {
         val result = SunSanity.Result(date, date)
         fun tally(label: String, worst: Double) = SunSanity.PointTally(label, null).apply { add(date, AsrSchool.STANDARD, worst) }
-        val finding = SunSanity.Key("xx.test", SunSanity.Check.DHUHR, null)
+        val finding = SunSanity.Key("xx.test", SunSanity.Check.ISHA, null)
         val excused = SunSanity.Key("xx.test", SunSanity.Check.FAJR, SunSanity.Excuse.DECLARED)
         result.groups[finding] = mutableListOf(tally("a", 20.4), tally("b", 3.0))
         result.groups[excused] = mutableListOf(tally("a", 600.0))
@@ -105,6 +147,41 @@ class SunSanityTest {
         assertEquals(1, SunSanity.problems(result, listOf(listed(finding, 21, 1)), listOf(listed(excused, 600, 1))).size, "more points")
         val unlisted = SunSanity.problems(result, listOf(listed(finding, 21, 2)), emptyList())
         assertTrue(unlisted.single().contains("not listed in excused.tsv"), unlisted.toString())
+    }
+
+    @Test
+    fun `a Dhuhr before transit or a Maghrib before sunset fails the pass found or listed, whatever its ceilings`() {
+        // Ruling R180: the engine's floor forbids both, so no list can give either a ceiling to stay under.
+        for (check in SunSanity.FLOORED) {
+            val result = SunSanity.Result(date, date)
+            val key = SunSanity.Key("xx.test", check, null)
+            val listed = SunSanity.Listed(key.entryId, key.check, key.excuse, 600, 10, "note")
+            assertEquals(1, SunSanity.problems(result, listOf(listed), emptyList()).size, "$check listed, not found")
+            result.groups[key] = mutableListOf(SunSanity.PointTally("a", null).apply { add(date, AsrSchool.STANDARD, 1.0) })
+            assertTrue(SunSanity.problems(result, emptyList(), emptyList()).single().contains("R180"), "$check found, not listed")
+            assertEquals(2, SunSanity.problems(result, listOf(listed), emptyList()).size, "$check found and listed within its ceilings")
+        }
+        assertEquals(setOf(SunSanity.Check.DHUHR, SunSanity.Check.MAGHRIB), SunSanity.FLOORED)
+    }
+
+    @Test
+    fun `a method five minutes before the sun is found nowhere and the floor's cost is counted instead`() {
+        // The what-if the open findings were once cleared with, turned round: every method's Dhuhr and Maghrib put
+        // five minutes earlier. The floor leaves the pass nothing to find, and says what it moved.
+        val cities = SunSanity.cities(TestPaths.appFiles.resolve("cities.csv"))
+        val points = SunSanity.points(cities, everyCity = 1500, chosenPerEntry = 1, otherPerEntry = 1).filter { it.kind == SunSanity.Kind.CITY }
+        val from = LocalDate(2027, 2, 8)
+        val result = SunSanity.run(points, from, LocalDate(2027, 3, 9), everyDays = 5) { method ->
+            method.copy(margins = method.margins.copy(dhuhr = method.margins.dhuhr - 300, maghrib = method.margins.maghrib - 300))
+        }
+        assertTrue(result.groups.keys.none { it.check in SunSanity.FLOORED }, "${result.groups.keys}")
+        assertTrue(result.raised.keys.any { it.second == Prayer.DHUHR } && result.raised.keys.any { it.second == Prayer.MAGHRIB })
+        val untouched = SunSanity.run(points, from, from)
+        assertTrue(untouched.raised.values.flatten().all { it.worst >= 60 && it.worst % 60 == 0.0 }, "a start is moved by whole minutes")
+        assertTrue(SunSanity.report(result, emptyList()).contains("ruling R180"))
+        // What the raise moved along with it is counted, never more than the days raised.
+        assertTrue(SunSanity.report(result, emptyList()).contains("moved another time too"))
+        assertTrue(result.cascaded.values.sum() <= result.raised.values.flatten().sumOf { it.days })
     }
 
     @Test
@@ -121,19 +198,22 @@ class SunSanityTest {
 
     @Test
     fun `where the sun does not set, Maghrib is not checked`() {
-        val noSunset = SunSanity.Sky(sky.transit, sky.sunrise, null)
+        val noSunset = SunSanity.Sky(sky.transit, sky.sunrise, null, sky.asrStandard, sky.asrHanafi)
         assertTrue(SunSanity.breaches(day(maghrib = sky.sunset!! - 3600, isha = sky.sunset!! + 3600), noSunset).none { it.check == SunSanity.Check.MAGHRIB })
     }
 
     @Test
-    fun `the open findings and the excused groups parse, each names a check and its ceilings`() {
+    fun `the open findings and the excused groups parse and none is a start before the real sun`() {
         val open = SunSanity.openFindings(TestPaths.repoRoot.resolve(OPEN_FINDINGS))
         val excused = SunSanity.excusedGroups(TestPaths.repoRoot.resolve(EXCUSED))
-        assertTrue(open.isNotEmpty() && excused.isNotEmpty())
         val all = open + excused
         assertTrue(all.all { it.note.isNotBlank() && it.worstSeconds > 0 && it.points > 0 }, "a listed group without its note or ceilings")
         assertEquals(all.size, all.map { it.key }.toSet().size, "a group listed twice")
-        assertTrue(excused.none { it.check == SunSanity.Check.DHUHR }, "a Dhuhr is never excused")
+        // Ruling R180: the engine's floor leaves no Dhuhr before transit and no Maghrib before sunset to list or excuse.
+        assertTrue(all.none { it.check in SunSanity.FLOORED }, "a Dhuhr before transit or a Maghrib before sunset is listed")
+        // Ruling R265: an Asr, a sunrise or Dhuhr's end on the wrong side of the sun is listed only with the day's excuse.
+        assertTrue(open.none { it.check in SunSanity.FLOORED_UNLESS_EXCUSED }, "an R265 check is listed as open")
+        assertTrue(excused.all { it.excuse != null } && open.all { it.excuse == null })
     }
 
     @Test

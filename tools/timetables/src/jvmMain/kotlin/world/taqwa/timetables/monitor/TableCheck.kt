@@ -252,7 +252,7 @@ class TableCheck(
     private fun checkRows(table: MonitorTable, plan: Plan.Rows, status: Status, today: LocalDate): Outcome {
         val manifest = GateManifest.parse(
             "monitor:${table.id}",
-            rowHeader() + "\n" + plan.rows.joinToString("\n") { rowText(table, it, table.path) },
+            rowHeader() + "\n" + plan.rows.joinToString("\n") { rowText(table, it, table.path, checkedColumns(table)) },
         )
         val result = try {
             Gate(roots, lookup = lookup).evaluate(manifest)
@@ -499,9 +499,21 @@ class TableCheck(
 
     private fun rowHeader(): String = (GateManifest.HEADER + GateManifest.OPTIONAL).joinToString("\t")
 
+    /**
+     * The columns the check reads [table] with. A printed imsak's capture (`…-imsak`, ruling R284) is `- Im` (or `- E`): it
+     * reads ends alone, which the gate checks only on days a row reading a start holds. Its first column is the Subuh
+     * the fetcher writes beside the imsak, so the check reads that column as the day's Fajr, and the imsak is checked on
+     * its own capture; a gate row still reads it as the gate file's convention says (`- Im`).
+     */
+    internal fun checkedColumns(table: MonitorTable): String {
+        val tokens = table.columns.split(' ').filter { it.isNotEmpty() }
+        if (!table.key.endsWith(IMSAK_KEY) || tokens.firstOrNull() != "-") return table.columns
+        return (listOf("F") + tokens.drop(1)).joinToString(" ")
+    }
+
     /** A gate row in the header order of [rowHeader], `member` and `clock` last, naming [path]. */
-    private fun rowText(table: MonitorTable, row: PlannedRow, path: String): String = listOf(
-        path, row.entry, row.lat?.toString().orEmpty(), row.lon?.toString().orEmpty(), table.zone, table.columns, table.format,
+    private fun rowText(table: MonitorTable, row: PlannedRow, path: String, columns: String = table.columns): String = listOf(
+        path, row.entry, row.lat?.toString().orEmpty(), row.lon?.toString().orEmpty(), table.zone, columns, table.format,
         table.school, "test", "${table.name}, ${table.source} fetched ${table.fetched}", row.member.orEmpty(), table.clock.orEmpty(),
     ).joinToString("\t")
 

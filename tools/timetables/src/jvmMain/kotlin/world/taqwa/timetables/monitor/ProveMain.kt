@@ -17,7 +17,7 @@ import kotlin.time.Clock
  *
  * `--date` names the pinned folder (default today, UTC); `--report` writes the outcome as JSON (rows
  * added and left out with their reasons: dates, counts and minutes, never a printed time) for the
- * workflow's issue; `--dry-run` plans and checks without writing anything. Exits 0 when the gate is
+ * workflow's issue, and the entries it demoted by itself, ruling R185); `--dry-run` plans and checks without writing anything. Exits 0 when the gate is
  * green afterwards (whether or not anything was added), 2 when prove could not run: the gate red or
  * refused before anything was added, or its inputs unreadable.
  */
@@ -54,6 +54,12 @@ fun main(args: Array<String>) {
     if (unknown.isNotEmpty()) fail("no recipe for ${unknown.sorted().joinToString(" ")}")
     val outcome = try {
         Prove(repo, official, date, recipes, index, only).run(write = !dryRun)
+    } catch (e: OutOfMemoryError) {
+        // Ruling R280 (the second audit's G17): the stack is unwound and Prove's results are let go, so the report can
+        // still say why it stopped (the issue quotes it); Prove removed the pinned copies it wrote.
+        val why = "prove stopped: its JVM ran out of heap (OutOfMemoryError; the heaps are set in tools/timetables/build.gradle.kts, ruling R280)"
+        one("--report")?.let { File(it).apply { parentFile?.mkdirs() }.writeText(Json.pretty(mapOf("failure" to why, "changed" to false, "date" to date.toString(), "dryRun" to dryRun))) }
+        fail(why)
     } catch (e: Exception) {
         // Prove removed the pinned copies it wrote; the report still says why it stopped, for the issue.
         val why = "prove stopped: ${e.javaClass.simpleName}: ${(e.message ?: "").lineSequence().take(5).joinToString("; ")}"
@@ -65,10 +71,12 @@ fun main(args: Array<String>) {
         System.err.println("prove: ${outcome.failure}")
         exitProcess(2)
     }
-    println("prove ${date}${if (dryRun) " (dry run)" else ""}: ${outcome.added.size} rows added, ${outcome.leftOut.size} left out; " +
+    println("prove ${date}${if (dryRun) " (dry run)" else ""}: ${outcome.added.size} rows added, ${outcome.leftOut.size} left out" +
+        (if (outcome.demoted.isEmpty()) "" else ", ${outcome.demoted.size} entries demoted") + "; " +
         "gate ${outcome.rowsBefore} -> ${outcome.rowsAfter} rows, ${outcome.placeDaysBefore} -> ${outcome.placeDaysAfter} place-days, green")
     for (p in outcome.added) println("  added: ${p.label} (${p.days.size} days; columns from ${p.family})")
     for (l in outcome.leftOut) println("  left out: ${l.label}: ${l.reason.lineSequence().first()}")
+    for (d in outcome.demoted) println("  demoted (ruling R185): ${d.target} in ${d.gate}: ${d.reason}")
 }
 
 private fun fail(problem: String): Nothing {

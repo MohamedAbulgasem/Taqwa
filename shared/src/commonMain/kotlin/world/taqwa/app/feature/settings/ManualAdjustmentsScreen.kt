@@ -216,10 +216,14 @@ private fun confirmBody(ask: PendingAsk, source: TimetableName, margin: Int?): S
     }
     // Where mosques differ Taqwa's time is the latest timetable's, so that is what the margin is measured from.
     val reference = if (source.source == SourceKind.CAUTIOUS) stringResource(Res.string.timetable_source_latest) else sourceTime(source)
+    // The margin only decides when to warn: it is the own points' limit, and About's measured worst (with
+    // the reach) can be larger, so the warning names no "at most" figure and says the move may, not does,
+    // put the time before the reference (owner's answer (a), 16 November, ruling R289). Nor does it say Taqwa's time is
+    // never before the reference (ruling R320, 18 November): at Tromsø a Fajr IRN puts after sunrise is not followed, and
+    // a cautious far-north Maghrib can be before a member's rule-held one.
     return stringResource(
         if (maghrib) Res.string.adjust_strong_body_maghrib else Res.string.adjust_strong_body,
         localizedPrayerName(ask.prayer),
-        pluralStringResource(Res.plurals.minutes_count, margin, LocalPlatformFormat.current.localizedDigits(margin)),
         reference,
         formatOffset(ask.minutes),
     )

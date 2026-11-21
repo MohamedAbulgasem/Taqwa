@@ -1,7 +1,7 @@
 {
   "entry": "jo.awqaf",
   "class": "A",
-  "engineHash": "61f948df1829177e",
+  "engineHash": "a194e131a04f54ea",
   "broken": 0,
   "places": 1,
   "first": "2021-01-08",
@@ -18,120 +18,130 @@
   },
   "placeDays": 171,
   "heldOutDays": 121,
+  "tables": 3,
   "ramadanDays": 2,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 171,
+      "checked": 4104,
       "early": 0,
       "late": {
-        "0": 159,
-        "1": 12,
-        "2": 0,
+        "0": 2640,
+        "1": 1410,
+        "2": 54,
         "3+": 0
       },
-      "exactShare": 0.9298,
-      "worstLate": 1,
-      "lateLimit": 1,
-      "lateLimitFrom": "class A",
+      "exactShare": 0.6433,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "unit jo.awqaf.amman",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 171,
+      "checked": 4104,
       "lateEnd": 0,
       "late": {
-        "0": 125,
-        "1": 46,
-        "2": 0,
+        "0": 2179,
+        "1": 1855,
+        "2": 70,
         "3+": 0
       },
-      "exactShare": 0.731,
-      "worstLate": 1,
-      "lateLimit": 1,
-      "lateLimitFrom": "class A",
+      "exactShare": 0.5309,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "unit jo.awqaf.amman",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 171,
+      "checked": 4104,
       "early": 0,
       "late": {
-        "0": 155,
-        "1": 16,
-        "2": 0,
+        "0": 2731,
+        "1": 1367,
+        "2": 6,
         "3+": 0
       },
-      "exactShare": 0.9064,
-      "worstLate": 1,
-      "lateLimit": 1,
-      "lateLimitFrom": "class A",
+      "exactShare": 0.6654,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "unit jo.awqaf.amman",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 171,
+      "checked": 4104,
       "early": 0,
       "late": {
-        "0": 141,
-        "1": 30,
-        "2": 0,
+        "0": 2334,
+        "1": 1691,
+        "2": 79,
         "3+": 0
       },
-      "exactShare": 0.8246,
-      "worstLate": 1,
-      "lateLimit": 1,
-      "lateLimitFrom": "class A",
+      "exactShare": 0.5687,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "unit jo.awqaf.amman",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 171,
+      "checked": 4104,
       "early": 0,
       "late": {
-        "0": 137,
-        "1": 34,
-        "2": 0,
+        "0": 2203,
+        "1": 1797,
+        "2": 104,
         "3+": 0
       },
-      "exactShare": 0.8012,
-      "worstLate": 1,
-      "lateLimit": 1,
-      "lateLimitFrom": "class A",
+      "exactShare": 0.5368,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "unit jo.awqaf.amman",
       "overLimit": 0
     },
     "isha": {
-      "checked": 171,
+      "checked": 4104,
       "early": 0,
       "late": {
-        "0": 133,
-        "1": 38,
-        "2": 0,
+        "0": 2194,
+        "1": 1829,
+        "2": 81,
         "3+": 0
       },
-      "exactShare": 0.7778,
-      "worstLate": 1,
-      "lateLimit": 1,
-      "lateLimitFrom": "class A",
+      "exactShare": 0.5346,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "unit jo.awqaf.amman",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 171,
+      "checked": 4104,
       "lateEnd": 0,
       "late": {
-        "0": 123,
-        "1": 48,
-        "2": 0,
+        "0": 2121,
+        "1": 1901,
+        "2": 82,
         "3+": 0
       },
-      "exactShare": 0.7193,
-      "worstLate": 1,
-      "lateLimit": 1,
-      "lateLimitFrom": "class A",
+      "exactShare": 0.5168,
+      "worstLate": 2,
+      "lateLimit": 2,
+      "lateLimitFrom": "unit jo.awqaf.amman",
       "overLimit": 0
     }
   },
   "heldOut": {
     "placeDays": 121,
     "ramadanDays": 0,
+    "checkedByEvent": {
+      "fajr": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+      "sunrise": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+      "dhuhr": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+      "asrStandard": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+      "maghrib": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+      "isha": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+      "endOfEating": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"]
+    },
     "events": {
       "fajr": {
         "checked": 121,
@@ -144,8 +154,8 @@
         },
         "exactShare": 0.9587,
         "worstLate": 1,
-        "lateLimit": 1,
-        "lateLimitFrom": "class A",
+        "lateLimit": 2,
+        "lateLimitFrom": "unit jo.awqaf.amman",
         "overLimit": 0
       },
       "sunrise": {
@@ -159,8 +169,8 @@
         },
         "exactShare": 0.7025,
         "worstLate": 1,
-        "lateLimit": 1,
-        "lateLimitFrom": "class A",
+        "lateLimit": 2,
+        "lateLimitFrom": "unit jo.awqaf.amman",
         "overLimit": 0
       },
       "dhuhr": {
@@ -174,8 +184,8 @@
         },
         "exactShare": 0.9339,
         "worstLate": 1,
-        "lateLimit": 1,
-        "lateLimitFrom": "class A",
+        "lateLimit": 2,
+        "lateLimitFrom": "unit jo.awqaf.amman",
         "overLimit": 0
       },
       "asrStandard": {
@@ -189,8 +199,8 @@
         },
         "exactShare": 0.8017,
         "worstLate": 1,
-        "lateLimit": 1,
-        "lateLimitFrom": "class A",
+        "lateLimit": 2,
+        "lateLimitFrom": "unit jo.awqaf.amman",
         "overLimit": 0
       },
       "maghrib": {
@@ -204,8 +214,8 @@
         },
         "exactShare": 0.7934,
         "worstLate": 1,
-        "lateLimit": 1,
-        "lateLimitFrom": "class A",
+        "lateLimit": 2,
+        "lateLimitFrom": "unit jo.awqaf.amman",
         "overLimit": 0
       },
       "isha": {
@@ -219,8 +229,8 @@
         },
         "exactShare": 0.7521,
         "worstLate": 1,
-        "lateLimit": 1,
-        "lateLimitFrom": "class A",
+        "lateLimit": 2,
+        "lateLimitFrom": "unit jo.awqaf.amman",
         "overLimit": 0
       },
       "endOfEating": {
@@ -234,15 +244,24 @@
         },
         "exactShare": 0.686,
         "worstLate": 1,
-        "lateLimit": 1,
-        "lateLimitFrom": "class A",
+        "lateLimit": 2,
+        "lateLimitFrom": "unit jo.awqaf.amman",
         "overLimit": 0
       }
     }
   },
+  "replays": {
+    "places": 23,
+    "placeDays": 3933
+  },
   "lateLimits": {
-    "class A: 1 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+    "unit jo.awqaf.amman: 2 min (asrStandard)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 2 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["fajr", "dhuhr", "asrStandard", "maghrib", "isha"]
+    },
+    "unit jo.awqaf.amman: 2 min (endOfEating)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 2 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["sunrise", "endOfEating"]
     }
   },
   "units": {
@@ -259,116 +278,130 @@
         "isha": ["2021-01-08", "2021-01-14", "2021-01-31", "2021-02-06", "2021-04-16", "2021-06-03", "2021-06-26", "2021-07-19", "2021-08-11", "2021-09-09", "2022-07-09", "2022-08-01", "2022-08-24", "2022-09-16", "2022-10-09", "2022-11-09", "2022-11-26", "2022-12-02", "2022-12-25", "2022-12-31", "2023-01-17", "2023-02-09", "2023-03-04", "2023-04-21", "2023-05-14", "2023-05-20", "2023-06-06", "2023-06-12", "2023-07-05", "2023-07-28", "2024-04-24..2024-05-03", "2024-12-08..2024-12-17", "2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
         "endOfEating": ["2021-01-08", "2021-01-14", "2021-01-31", "2021-02-06", "2021-04-16", "2021-06-03", "2021-06-26", "2021-07-19", "2021-08-11", "2021-09-09", "2022-07-09", "2022-08-01", "2022-08-24", "2022-09-16", "2022-10-09", "2022-11-09", "2022-11-26", "2022-12-02", "2022-12-25", "2022-12-31", "2023-01-17", "2023-02-09", "2023-03-04", "2023-04-21", "2023-05-14", "2023-05-20", "2023-06-06", "2023-06-12", "2023-07-05", "2023-07-28", "2024-04-24..2024-05-03", "2024-12-08..2024-12-17", "2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"]
       },
+      "heldOutByEvent": {
+        "fajr": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+        "sunrise": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+        "dhuhr": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+        "asrStandard": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+        "maghrib": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+        "isha": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"],
+        "endOfEating": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-10-02..2026-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
-        "class A: 1 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        "unit jo.awqaf.amman: 2 min (asrStandard)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 2 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["fajr", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "unit jo.awqaf.amman: 2 min (endOfEating)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 2 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["sunrise", "endOfEating"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 171,
+          "checked": 4104,
           "early": 0,
           "late": {
-            "0": 159,
-            "1": 12,
-            "2": 0,
+            "0": 2640,
+            "1": 1410,
+            "2": 54,
             "3+": 0
           },
-          "exactShare": 0.9298,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.6433,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit jo.awqaf.amman",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 171,
+          "checked": 4104,
           "lateEnd": 0,
           "late": {
-            "0": 125,
-            "1": 46,
-            "2": 0,
+            "0": 2179,
+            "1": 1855,
+            "2": 70,
             "3+": 0
           },
-          "exactShare": 0.731,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.5309,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit jo.awqaf.amman",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 171,
+          "checked": 4104,
           "early": 0,
           "late": {
-            "0": 155,
-            "1": 16,
-            "2": 0,
+            "0": 2731,
+            "1": 1367,
+            "2": 6,
             "3+": 0
           },
-          "exactShare": 0.9064,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.6654,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit jo.awqaf.amman",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 171,
+          "checked": 4104,
           "early": 0,
           "late": {
-            "0": 141,
-            "1": 30,
-            "2": 0,
+            "0": 2334,
+            "1": 1691,
+            "2": 79,
             "3+": 0
           },
-          "exactShare": 0.8246,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.5687,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit jo.awqaf.amman",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 171,
+          "checked": 4104,
           "early": 0,
           "late": {
-            "0": 137,
-            "1": 34,
-            "2": 0,
+            "0": 2203,
+            "1": 1797,
+            "2": 104,
             "3+": 0
           },
-          "exactShare": 0.8012,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.5368,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit jo.awqaf.amman",
           "overLimit": 0
         },
         "isha": {
-          "checked": 171,
+          "checked": 4104,
           "early": 0,
           "late": {
-            "0": 133,
-            "1": 38,
-            "2": 0,
+            "0": 2194,
+            "1": 1829,
+            "2": 81,
             "3+": 0
           },
-          "exactShare": 0.7778,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.5346,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit jo.awqaf.amman",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 171,
+          "checked": 4104,
           "lateEnd": 0,
           "late": {
-            "0": 123,
-            "1": 48,
-            "2": 0,
+            "0": 2121,
+            "1": 1901,
+            "2": 82,
             "3+": 0
           },
-          "exactShare": 0.7193,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.5168,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit jo.awqaf.amman",
           "overLimit": 0
         }
       }

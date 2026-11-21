@@ -29,6 +29,9 @@
 # monitor's capture of 2 Oct 2026 (2026-10-02/) refreshed nineteen of the cities (29 Sep – 1 Nov 2026 and all of
 # 2027, the same minutes as before on every day both hold): a row each, held out, at the same units; it adds
 # 30 October – 1 November 2026. The other eighteen were not refetched and add nothing.
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	tr.diyanet.europe	archive/tables/moral-auth-world/europe/*	F I E	north of 44.5 N each city's Fajr, Isha and end of eating follow curves derived from every row of its table held on 29 Sep 2026 (DiyanetEuropeCurves); the few cities south of it are named with them, the cautious side
+@fitted	tr.diyanet.europe	archive/tables/pinned/tr-diyanet-europe/2026-09-28/*	F I E	as the line above: the capture the curves were derived on; a weekly capture since prints the same days again at a new path, and is held out only on the days this one does not hold (by date: the review round of 14 Nov 2026)
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/europe/verify/dy-sarajevo.txt	tr.diyanet.europe/tr.diyanet.europe.sarajevo			Europe/Sarajevo	F+E S D A M I	daily	standard	fit	Sarajevo, its own point table
 archive/tables/moral-auth-world/europe/verify/dy-zurich.txt	tr.diyanet.europe/tr.diyanet.europe.zurich			Europe/Zurich	F+E S D A M I	daily	standard	fit	Zürich, its own point table

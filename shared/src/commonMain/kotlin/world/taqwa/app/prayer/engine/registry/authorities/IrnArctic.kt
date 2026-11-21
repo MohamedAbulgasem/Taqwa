@@ -11,6 +11,7 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.astro.AsrModel
+import world.taqwa.app.prayer.engine.astro.Side
 import world.taqwa.app.prayer.engine.astro.SolarMath
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
@@ -56,6 +57,10 @@ import kotlin.time.Instant
  * IRN's line would; read on winter time instead, that November would be as early as this is late if
  * IRN's dates do move a day earlier and its line is the wall clock's, as this rule's is. IRN's other
  * Arctic calendars (Bodø, Narvik, Alta …) are not held: the rule stays inside the Tromsø unit.
+ *
+ * Each crossing is read on the side of what reads it (the final review of 20 Nov 2026): Fajr, Maghrib, Isha and Asr as
+ * starts, the later of the iteration's step and the sun's own moment; the sunrise, the end of eating (IRN's Fajr as an
+ * end) and the sunset as ends, the earlier.
  *
  * A data class of plain values: the proof stamps fingerprint every constant, field by field.
  */
@@ -108,13 +113,13 @@ data class IrnArctic(
         fun latest(pick: (Shifted) -> ClockTime) =
             shifts.map(pick).let { all -> ClockTime(all.maxOf { it.epochSeconds }, all.any { it.estimated }) }
         val maghrib = latest { it.maghrib }
-        val realSunrise = here.altitudeTime(HORIZON, morning = true)
-        val irnSunrise = here.altitudeTime(if (lengthening(date)) sunriseHorizonLengthening else sunriseHorizonShortening, morning = true)
+        val realSunrise = here.crossing(HORIZON, morning = true)?.end
+        val irnSunrise = here.crossing(if (lengthening(date)) sunriseHorizonLengthening else sunriseHorizonShortening, morning = true)?.end
         val sunUpAtNoon = sunUpAtNoon(point.lat, noon)
         val sunrise = when {
             irnSunrise != null -> ClockTime(irnSunrise, estimated = false)
             realSunrise != null -> ClockTime(realSunrise, estimated = false) // IRN prints its lowest point; the sun rises
-            sunUpAtNoon -> ClockTime(crossing(makkahLatitude, point.lon, date, zone, HORIZON, morning = true), estimated = true)
+            sunUpAtNoon -> ClockTime(crossing(makkahLatitude, point.lon, date, zone, HORIZON, morning = true, Side.END), estimated = true)
             else -> ClockTime(noon, estimated = true) // IRN's own noon in the polar night
         }
         return ClockTimes(
@@ -125,15 +130,18 @@ data class IrnArctic(
             asrHanafi = latest { it.asrHanafi },
             maghrib = maghrib,
             isha = latest { it.isha },
-            // IRN prints no imsak: the fast begins at its Fajr, the earliest over the dates.
-            endOfEating = shifts.minOf { it.fajr.epochSeconds },
-            sunset = maghrib.epochSeconds - maghribAfterSunsetMinutes * 60.0,
-            noSunset = here.altitudeTime(HORIZON, morning = false) == null,
+            // IRN prints no imsak: the fast begins at its Fajr (read as an end), the earliest over the dates.
+            endOfEating = shifts.minOf { it.fajrEnd },
+            sunset = shifts.maxOf { it.maghribEnd } - maghribAfterSunsetMinutes * 60.0,
+            noSunset = here.crossing(HORIZON, morning = false) == null,
             notFollowed = if (irnSunrise == null && (realSunrise != null || sunUpAtNoon)) setOf(Prayer.SUNRISE) else emptySet(),
         )
     }
 
-    /** IRN's times that depend on its dates, with every date moved by [shift] days. */
+    /**
+     * IRN's times that depend on its dates, with every date moved by [shift] days; [fajrEnd] and [maghribEnd] are Fajr and
+     * Maghrib from their crossings read as ends (the end of eating, and the sunset five minutes before Maghrib).
+     */
     private class Shifted(
         val fajr: ClockTime,
         val dhuhr: ClockTime,
@@ -141,10 +149,12 @@ data class IrnArctic(
         val asrHanafi: ClockTime,
         val maghrib: ClockTime,
         val isha: ClockTime,
+        val fajrEnd: Double,
+        val maghribEnd: Double,
     )
 
     private fun shifted(date: LocalDate, point: GeoPoint, zone: TimeZone, here: SunClock, noon: Double, shift: Int): Shifted {
-        val maghrib = value(Event.MAGHRIB, date, point, zone, shift)
+        val maghrib = value(Event.MAGHRIB, date, point, zone, shift, Side.START)
         val mid = (noon + maghrib.epochSeconds - maghribAfterSunsetMinutes * 60.0) / 2
         fun asr(shadowFactor: Double): ClockTime {
             val shadow = here.asr(shadowFactor, AsrModel.EXACT_MOMENT)
@@ -154,17 +164,19 @@ data class IrnArctic(
         val hanafi = asr(2.0).let { if (it.epochSeconds > hanafiCap) ClockTime(hanafiCap, estimated = true) else it }
         val summer = date >= dhuhrSummer.from.inYear(date.year, shift) && date <= dhuhrSummer.to.inYear(date.year, shift)
         return Shifted(
-            fajr = value(Event.FAJR, date, point, zone, shift),
+            fajr = value(Event.FAJR, date, point, zone, shift, Side.START),
             dhuhr = ClockTime(noon + (if (summer) dhuhrSummerMinutes else dhuhrWinterMinutes) * 60.0, estimated = false),
             asrStandard = asr(1.0),
             asrHanafi = hanafi,
             maghrib = maghrib,
-            isha = value(Event.ISHA, date, point, zone, shift),
+            isha = value(Event.ISHA, date, point, zone, shift, Side.START),
+            fajrEnd = value(Event.FAJR, date, point, zone, shift, Side.END).epochSeconds,
+            maghribEnd = value(Event.MAGHRIB, date, point, zone, shift, Side.END).epochSeconds,
         )
     }
 
-    /** IRN's own time for [event] on [date]: the rule its windows hold there, or the line between two. */
-    private fun value(event: Event, date: LocalDate, point: GeoPoint, zone: TimeZone, shift: Int): ClockTime {
+    /** IRN's own time for [event] on [date], its crossings read on [side]: the rule its windows hold there, or the line between two. */
+    private fun value(event: Event, date: LocalDate, point: GeoPoint, zone: TimeZone, shift: Int, side: Side): ClockTime {
         for (window in windows.filter { event in it.events }) {
             // The window's occurrence that starts the year before (a window into the new year) or this year.
             for (startYear in listOf(date.year - 1, date.year)) {
@@ -174,53 +186,55 @@ data class IrnArctic(
                 val holdTo = window.holdTo.inYear(if (wraps) startYear + 1 else startYear, shift)
                 val blendTo = window.blendTo.inYear(if (wraps || window.blendTo.month < window.holdFrom.month) startYear + 1 else startYear, shift)
                 when {
-                    date > blendFrom && date < holdFrom -> return blend(event, date, blendFrom, fromOrdinary = true, holdFrom, point, zone)
-                    date >= holdFrom && date <= holdTo -> return ClockTime(makkah(event, date, point, zone), estimated = true)
-                    date > holdTo && date < blendTo -> return blend(event, date, holdTo, fromOrdinary = false, blendTo, point, zone)
+                    date > blendFrom && date < holdFrom -> return blend(event, date, blendFrom, fromOrdinary = true, holdFrom, point, zone, side)
+                    date >= holdFrom && date <= holdTo -> return ClockTime(makkah(event, date, point, zone, side), estimated = true)
+                    date > holdTo && date < blendTo -> return blend(event, date, holdTo, fromOrdinary = false, blendTo, point, zone, side)
                 }
             }
         }
-        return ordinary(event, date, point, zone)
+        return ordinary(event, date, point, zone, side)
     }
 
     /** The straight line on the wall clock from [from] (under its first rule) to [to] (under the other). */
-    private fun blend(event: Event, date: LocalDate, from: LocalDate, fromOrdinary: Boolean, to: LocalDate, point: GeoPoint, zone: TimeZone): ClockTime {
-        val a = if (fromOrdinary) ordinary(event, from, point, zone).epochSeconds else makkah(event, from, point, zone)
-        val b = if (fromOrdinary) makkah(event, to, point, zone) else ordinary(event, to, point, zone).epochSeconds
+    private fun blend(
+        event: Event, date: LocalDate, from: LocalDate, fromOrdinary: Boolean, to: LocalDate, point: GeoPoint, zone: TimeZone, side: Side,
+    ): ClockTime {
+        val a = if (fromOrdinary) ordinary(event, from, point, zone, side).epochSeconds else makkah(event, from, point, zone, side)
+        val b = if (fromOrdinary) makkah(event, to, point, zone, side) else ordinary(event, to, point, zone, side).epochSeconds
         val wallA = wallClock(a, zone)
         val wallB = wallClock(b, zone)
         val f = (date.toEpochDays() - from.toEpochDays()).toDouble() / (to.toEpochDays() - from.toEpochDays())
         return ClockTime(atWallClock(date, wallA + (wallB - wallA) * f, zone), estimated = true)
     }
 
-    private fun ordinary(event: Event, date: LocalDate, point: GeoPoint, zone: TimeZone): ClockTime {
+    private fun ordinary(event: Event, date: LocalDate, point: GeoPoint, zone: TimeZone, side: Side): ClockTime {
         val c = clock(point.lat, point.lon, date, zone)
         val noon = c.transit()
         val limit = nightLimitMinutes * 60.0
         return when (event) {
-            Event.FAJR -> c.altitudeTime(-fajrDepression, morning = true)
+            Event.FAJR -> c.crossing(-fajrDepression, morning = true)?.on(side)
                 ?.takeIf { it >= noon - limit }?.let { ClockTime(it, estimated = false) }
                 ?: ClockTime(noon - limit, estimated = true)
-            Event.ISHA -> c.altitudeTime(-ishaDepression, morning = false)
+            Event.ISHA -> c.crossing(-ishaDepression, morning = false)?.on(side)
                 ?.takeIf { it <= noon + limit }?.let { ClockTime(it, estimated = false) }
                 ?: ClockTime(noon + limit, estimated = true)
-            Event.MAGHRIB -> c.altitudeTime(if (lengthening(date)) sunsetHorizonLengthening else sunsetHorizonShortening, morning = false)
+            Event.MAGHRIB -> c.crossing(if (lengthening(date)) sunsetHorizonLengthening else sunsetHorizonShortening, morning = false)?.on(side)
                 ?.let { ClockTime(it + maghribAfterSunsetMinutes * 60.0, estimated = false) }
                 // Never on the ordinary rule's dates at Tromsø; elsewhere in the unit, Makkah's evening.
-                ?: ClockTime(makkah(Event.MAGHRIB, date, point, zone), estimated = true)
+                ?: ClockTime(makkah(Event.MAGHRIB, date, point, zone, side), estimated = true)
         }
     }
 
-    private fun makkah(event: Event, date: LocalDate, point: GeoPoint, zone: TimeZone): Double = when (event) {
-        Event.FAJR -> crossing(makkahLatitude, point.lon, date, zone, -makkahDepression, morning = true)
-        Event.ISHA -> crossing(makkahLatitude, point.lon, date, zone, -makkahDepression, morning = false)
-        Event.MAGHRIB -> crossing(makkahLatitude, point.lon, date, zone, HORIZON, morning = false) + maghribAfterSunsetMinutes * 60.0
+    private fun makkah(event: Event, date: LocalDate, point: GeoPoint, zone: TimeZone, side: Side): Double = when (event) {
+        Event.FAJR -> crossing(makkahLatitude, point.lon, date, zone, -makkahDepression, morning = true, side)
+        Event.ISHA -> crossing(makkahLatitude, point.lon, date, zone, -makkahDepression, morning = false, side)
+        Event.MAGHRIB -> crossing(makkahLatitude, point.lon, date, zone, HORIZON, morning = false, side) + maghribAfterSunsetMinutes * 60.0
     }
 
-    /** A crossing at a latitude the sun crosses every day of the year (Makkah's). */
-    private fun crossing(lat: Double, lon: Double, date: LocalDate, zone: TimeZone, altitudeDeg: Double, morning: Boolean): Double {
+    /** A crossing at a latitude the sun crosses every day of the year (Makkah's), read on [side]. */
+    private fun crossing(lat: Double, lon: Double, date: LocalDate, zone: TimeZone, altitudeDeg: Double, morning: Boolean, side: Side): Double {
         val c = clock(lat, lon, date, zone)
-        return c.altitudeTime(altitudeDeg, morning) ?: (c.transit() + if (morning) -HALF_DAY else HALF_DAY)
+        return c.crossing(altitudeDeg, morning)?.on(side) ?: (c.transit() + if (morning) -HALF_DAY else HALF_DAY)
     }
 
     /** While the days lengthen: after the winter solstice and before the summer one (21 December and 21 June). */

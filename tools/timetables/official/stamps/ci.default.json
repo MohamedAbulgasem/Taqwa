@@ -1,0 +1,262 @@
+{
+  "entry": "ci.default",
+  "class": "D (none)",
+  "engineHash": "8e326f1b6cf20ae1",
+  "broken": 0,
+  "places": 68,
+  "first": "2013-07-09",
+  "last": "2026-12-08",
+  "checked": ["2013-07-09..2013-08-08", "2015-06-18..2015-07-18", "2026-10-12..2026-12-08"],
+  "checkedByEvent": {
+    "fajr": ["2013-07-09..2013-08-08", "2015-06-18..2015-07-18", "2026-10-12..2026-12-08"],
+    "sunrise": ["2026-10-12..2026-12-08"],
+    "dhuhr": ["2026-10-12..2026-12-08"],
+    "asrStandard": ["2026-10-12..2026-12-08"],
+    "maghrib": ["2013-07-09..2013-08-08", "2015-06-18..2015-07-18", "2026-10-12..2026-12-08"],
+    "isha": ["2013-07-09..2013-08-08", "2015-06-18..2015-07-18", "2026-10-12..2026-12-08"],
+    "endOfEating": ["2013-07-09..2013-08-08", "2015-06-18..2015-07-18", "2026-10-12..2026-12-08"]
+  },
+  "placeDays": 8160,
+  "heldOutDays": 28,
+  "tables": 4,
+  "ramadanDays": 4216,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 8228,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 8228
+      },
+      "exactShare": 0,
+      "worstLate": 12,
+      "lateLimit": 13,
+      "lateLimitFrom": "entry ci.default",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 4012,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 4012
+      },
+      "exactShare": 0,
+      "worstLate": 12,
+      "lateLimit": 13,
+      "lateLimitFrom": "entry ci.default",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 4012,
+      "early": 0,
+      "late": {
+        "0": 4012,
+        "1": 0,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 1,
+      "worstLate": 0,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (none)",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 4012,
+      "early": 0,
+      "late": {
+        "0": 4012,
+        "1": 0,
+        "2": 0,
+        "3+": 0
+      },
+      "exactShare": 1,
+      "worstLate": 0,
+      "lateLimit": 3,
+      "lateLimitFrom": "class D (none)",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 8228,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 8228
+      },
+      "exactShare": 0,
+      "worstLate": 16,
+      "lateLimit": 17,
+      "lateLimitFrom": "entry ci.default",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 8228,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 8228
+      },
+      "exactShare": 0,
+      "worstLate": 27,
+      "lateLimit": 28,
+      "lateLimitFrom": "entry ci.default",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 12240,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 145,
+        "2": 2293,
+        "3+": 9802
+      },
+      "exactShare": 0,
+      "worstLate": 32,
+      "lateLimit": 33,
+      "lateLimitFrom": "entry ci.default",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 28,
+    "ramadanDays": 0,
+    "checkedByEvent": {
+      "fajr": ["2026-11-11..2026-12-08"],
+      "sunrise": ["2026-11-11..2026-12-08"],
+      "dhuhr": ["2026-11-11..2026-12-08"],
+      "asrStandard": ["2026-11-11..2026-12-08"],
+      "maghrib": ["2026-11-11..2026-12-08"],
+      "isha": ["2026-11-11..2026-12-08"]
+    },
+    "events": {
+      "fajr": {
+        "checked": 28,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 28
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 13,
+        "lateLimitFrom": "entry ci.default",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 28,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 28
+        },
+        "exactShare": 0,
+        "worstLate": 8,
+        "lateLimit": 13,
+        "lateLimitFrom": "entry ci.default",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 28,
+        "early": 0,
+        "late": {
+          "0": 28,
+          "1": 0,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 1,
+        "worstLate": 0,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (none)",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 28,
+        "early": 0,
+        "late": {
+          "0": 28,
+          "1": 0,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 1,
+        "worstLate": 0,
+        "lateLimit": 3,
+        "lateLimitFrom": "class D (none)",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 28,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 28
+        },
+        "exactShare": 0,
+        "worstLate": 8,
+        "lateLimit": 17,
+        "lateLimitFrom": "entry ci.default",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 28,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 28
+        },
+        "exactShare": 0,
+        "worstLate": 16,
+        "lateLimit": 28,
+        "lateLimitFrom": "entry ci.default",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "class D (none): 3 min": {
+      "events": ["dhuhr", "asrStandard"]
+    },
+    "entry ci.default: 13 min (fajr)": {
+      "reason": "Africa's 15° Fajr with the cushion against COSIM's Soubh, the same dawn: up to 5 min after it at Abidjan; COSIM moves its other towns by whole minutes, not by their sun, so where a town's own dawn comes later than that (Tengréla in November and December) the Fajr shown, from the town's own dawn, runs up to 12 min after it (safe defaults lane and the trust audit's F3, ci-default.tsv).",
+      "events": ["fajr"]
+    },
+    "entry ci.default: 13 min (sunrise)": {
+      "reason": "Africa's sunrise − 2 with the cushion, and never after Abidjan's plus the town's printed minutes: up to 10 min before COSIM's sunrise moved by them, where the town's own sun rises before it (Sassandra, Touba), and up to 12 at Seydougou and Koonan, whose points are only roughly known, so that the lowest figure printed near them bounds it (safe defaults lane and the trust audit's F3, ci-default.tsv).",
+      "events": ["sunrise"]
+    },
+    "entry ci.default: 17 min": {
+      "reason": "Africa's Maghrib + 3 with the cushion after the town's own sunset: at Abidjan up to 8 min after COSIM's Maghreb, and in the north in summer, where COSIM's Maghreb moved by the town's whole minutes comes up to 9 min before the town's own sunset (Tengréla), up to 16 (safe defaults lane, ci-default.tsv).",
+      "events": ["maghrib"]
+    },
+    "entry ci.default: 28 min": {
+      "reason": "Africa's 18° + 2 min Isha, the latest convention in the region, against COSIM's Icha at 15°: up to 17 min after it at Abidjan and up to 27 at the northern towns in summer, as Maghrib (safe defaults lane, ci-default.tsv).",
+      "events": ["isha"]
+    },
+    "entry ci.default: 33 min": {
+      "reason": "The fast begins 2 min before COSIM's imsak rule (its 1436 edition's Soubh − 25) taken from the 15° dawn, on every day, and never after Abidjan's plus the town's printed minutes: on the Soubh COSIM prints, at least 1 min before the rule everywhere, up to 3 at Abidjan and up to 7 at Seydougou, whose point is only roughly known, as the sunrise. Out of Ramadan COSIM prints no imsak, so its Soubh is the end the gate holds it to: up to 28 min after this one at Abidjan and up to 32 at Seydougou; in Ramadan, up to 13 min before the 1434 edition's imsak (Soubh − 15) at Abidjan and up to 24 at its towns (safe defaults lane, the trust audit's F3 and F36 and the lane's review of 14 Nov 2026, ci-default.tsv).",
+      "events": ["endOfEating"]
+    }
+  }
+}

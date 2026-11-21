@@ -22,6 +22,7 @@ import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.UnitSet
 import world.taqwa.app.prayer.engine.registry.atEdge
 import world.taqwa.app.prayer.engine.registry.beyondTable
+import world.taqwa.app.prayer.engine.registry.data.DiyanetBesideDistricts
 import world.taqwa.app.prayer.engine.registry.data.DiyanetEuropeCurves
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.lateReachKm
@@ -40,16 +41,32 @@ import world.taqwa.app.prayer.engine.registry.single
  * few kilometres east of their own ilçe's point, inside İstanbul's or Ankara's reach, stays on the
  * safe side: Fajr − 11 s, Dhuhr − 14 s, Asr − 12 s, Maghrib − 12 s, Isha − 14 s, sunrise and the end
  * of eating + 19 s (nearest rounding is ± 30 s; this model is within 8 s of Diyanet's own). Held
- * out on the other eight districts (3,168 days) and at nine more districts beyond every unit: never
- * early, the units at most a minute late. İstanbul's printed row for 26 Sep 2026 comes out a minute
- * late at Fajr, Asr and Isha (their moments fall 19–27 s past the minute, inside the safety).
+ * out on the other eight districts (3,168 days) and at nine more districts then beyond every unit:
+ * never early, the units at most a minute late. İstanbul's printed row for one day of its table comes
+ * out a minute late at Fajr, Asr and Isha (their moments fall seconds past the minute, inside the
+ * safety).
  *
  * Units are the analysed districts: the six at Diyanet's own published points
- * (vakit_kiyaslamalari.php) and seven at the app's coordinates, where the same rule held. İstanbul
- * and Ankara publish many more ilçe of their own, so their units reach only as far as their point,
- * riding beside the user's, stays within class A's minute east to west (ruling R40): about 21 km. A district
- * not analysed (class D there, spec §6.2 a) is Diyanet's method at the user's point with +60 s on
- * starts and −60 s on sunrise (brief): about 20 km of offset from its unknown district point.
+ * (vakit_kiyaslamalari.php) and sixteen at the app's coordinates, where the same rule held: the
+ * seven of Task 7b and, since the round of 12 November 2026 (ruling R140), the nine the edge
+ * had held out until then, İzmir, Bursa, Antalya, Konya, Gaziantep, Diyarbakır and İstanbul's
+ * Çatalca, Şile and Silivri, each at the app's point for the city, pure held-out rows of the fit,
+ * never early and at most a minute late (tr-diyanet.tsv). Since the round of 12–13 November 2026
+ * (ruling R200) the 62 other il centres are units too, each at the app's point and proven on its
+ * own 2026 table, held out: every il of Türkiye has its own unit, 84 units with İstanbul's three.
+ * İstanbul and Ankara publish many more ilçe of their own, so their units reach only as far as
+ * their point, riding beside the user's, stays within class A's minute east to west (ruling R40):
+ * about 21 km. Inside any unit's reach the neighbouring districts' tables ride too (rulings R171,
+ * R201 and R204, [besideDistricts], [rides]): each at a point fitted to its own 2026 table, wherever
+ * the user is near that point or nearer to it, or to the district's own town, than to the unit's
+ * point. No boundary is held, so this is a rule of points and distances, not of the districts'
+ * land. A unit's figure is proven across its reach, not at its point alone (ruling R255, 14 Nov
+ * 2026, tr-diyanet-reach.tsv): its own tables replayed there are never early, and run 2 min after
+ * toward the edge of a 15 km reach with no district near (the place's own sun rides beside the
+ * unit's point, and [lateReachKm] counts east and west alone), 3 and at Ankara 4 where a district's
+ * table rides too; each unit's limits are those measured figures. A district not analysed (class D there, spec §6.2 a) is Diyanet's method at the user's
+ * point with +60 s on starts and −60 s on sunrise (brief): about 20 km of offset from its unknown
+ * district point.
  */
 object Diyanet {
     private val temkin = EventOffsets(sunrise = -7, dhuhr = 5, asr = 4, maghrib = 7)
@@ -71,23 +88,215 @@ object Diyanet {
     private fun district(id: String, name: String, lat: Double, lon: Double, radiusKm: Double = 15.0) =
         AuthorityUnit(id, name, GeoPoint(lat, lon), radiusKm)
 
+    /**
+     * The minutes a place in this unit may run after a table it is checked on, as the gate measured them. Rulings R171,
+     * R201 and R204: where a district rides beside the unit, after that district's table. Ruling R255 (14 Nov 2026):
+     * and across the unit's reach after its own table (tr-diyanet-reach.tsv, each unit's own tables replayed at 21
+     * points of its reach on average), where the sun at the place itself and a neighbouring district's table ride
+     * beside it. One reason for both, since a unit's figure is the worst of the two and the cause is the same rule.
+     */
+    private fun AuthorityUnit.besides(limits: Map<Int, Set<TimedEvent>>) = copy(
+        lateLimits = limits.map { (minutes, events) ->
+            LateLimit(
+                minutes,
+                "Across $name's reach Taqwa keeps the later start and the earlier end of $name's table, of the sun at " +
+                    "the place itself and, near a neighbouring district's point or town, of that district's table " +
+                    "(Diyanet prints one for each district); toward the edge of the reach and beside such a district " +
+                    "this runs up to $minutes min after the table",
+                events,
+            )
+        },
+    )
+
+    private val declared = listOf(
+        district("9541", "İstanbul", 41.012, 28.974, radiusKm = lateReachKm(41.012, EntryClass.A)),
+        district("9206", "Ankara", 39.938, 32.848, radiusKm = lateReachKm(39.938, EntryClass.A)),
+        district("9879", "Tekirdağ", 40.973, 27.511),
+        district("9146", "Adana", 36.987, 35.326, radiusKm = 20.0),
+        district("20089", "Hatay", 36.2, 36.153),
+        district("9587", "Karaman", 37.181, 33.214),
+        district("9419", "Edirne", 41.67719, 26.55597),
+        district("9352", "Çanakkale", 40.15552, 26.41271),
+        district("9930", "Van", 38.49457, 43.38323),
+        district("9507", "Hakkâri", 37.57444, 43.74083),
+        district("9594", "Kars", 40.59825, 43.08548),
+        district("9522", "Iğdır", 39.92371, 44.045),
+        district("9451", "Erzurum", 39.90861, 41.27694),
+        // The nine of 12 November 2026 (ruling R140), at the app's point for each city.
+        district("9560", "İzmir", 38.41273, 27.13838),
+        district("9335", "Bursa", 40.19559, 29.06013),
+        district("9225", "Antalya", 36.90812, 30.69556),
+        district("9676", "Konya", 37.87135, 32.48464),
+        district("9479", "Gaziantep", 37.05944, 37.3825),
+        district("9402", "Diyarbakır", 37.91363, 40.21721),
+        district("9538", "Çatalca", 41.14073, 28.45967),
+        district("9547", "Şile", 41.17891, 29.61085),
+        district("9548", "Silivri", 41.07393, 28.24644),
+        // The 62 other il centres (ruling R200, the round of 12–13 November 2026), largest first, each at the app's point
+        // for the city (Kocaeli's is İzmit, Sakarya's Adapazarı): every il of Türkiye has its own unit now.
+        district("9620", "Kayseri", 38.73222, 35.48528),
+        district("9470", "Eskişehir", 39.77667, 30.52056),
+        district("9703", "Malatya", 38.35018, 38.31667),
+        district("9737", "Mersin", 36.81196, 34.63886),
+        district("9288", "Batman", 37.88738, 41.13221),
+        district("9831", "Şanlıurfa", 37.16708, 38.79392),
+        district("9432", "Elazığ", 38.67431, 39.22321),
+        district("9819", "Samsun", 41.27976, 36.3361),
+        district("9577", "Kahramanmaraş", 37.5847, 36.92641),
+        district("9919", "Uşak", 38.67351, 29.4058),
+        district("9193", "Aksaray", 38.37255, 34.02537),
+        district("9392", "Denizli", 37.77417, 29.0875),
+        district("9158", "Adıyaman", 37.76441, 38.27629),
+        district("9807", "Sakarya", 40.78056, 30.40333),
+        district("9370", "Çorum", 40.54889, 34.95333),
+        district("9868", "Sivas", 39.74833, 37.01611),
+        district("9167", "Afyonkarahisar", 38.75667, 30.54333),
+        district("9905", "Trabzon", 41.005, 39.72694),
+        district("9716", "Manisa", 38.61202, 27.42647),
+        district("9270", "Balıkesir", 39.64917, 27.88611),
+        district("9782", "Ordu", 40.97782, 37.89047),
+        district("9788", "Osmaniye", 37.07417, 36.24778),
+        district("9654", "Kocaeli", 40.76499, 29.92928),
+        district("9414", "Düzce", 40.83889, 31.16389),
+        district("9635", "Kırıkkale", 39.84528, 33.50639),
+        district("9689", "Kütahya", 39.42417, 29.98333),
+        district("9315", "Bolu", 40.73583, 31.60611),
+        district("9528", "Isparta", 37.76444, 30.55222),
+        district("9252", "Aydın", 37.84501, 27.83963),
+        district("9440", "Erzincan", 39.73919, 39.49015),
+        district("9646", "Kırşehir", 39.14583, 34.16389),
+        district("9726", "Mardin", 37.31309, 40.74357),
+        district("9887", "Tokat", 40.31389, 36.55444),
+        district("9303", "Bingöl", 38.88472, 40.49389),
+        district("9494", "Giresun", 40.91698, 38.38741),
+        district("9609", "Kastamonu", 41.37805, 33.77528),
+        district("9581", "Karabük", 41.20488, 32.62768),
+        district("9185", "Ağrı", 39.71467, 43.04015),
+        district("9799", "Rize", 41.02083, 40.52194),
+        district("9198", "Amasya", 40.65333, 35.83306),
+        district("9839", "Siirt", 37.9293, 41.94134),
+        district("9629", "Kilis", 36.71611, 37.115),
+        district("9955", "Zonguldak", 41.45139, 31.79305),
+        district("9327", "Burdur", 37.72028, 30.29083),
+        district("9747", "Muğla", 37.21807, 28.3665),
+        district("9766", "Niğde", 37.96583, 34.67935),
+        district("9359", "Çankırı", 40.59995, 33.6153),
+        district("9949", "Yozgat", 39.82, 34.80444),
+        district("9755", "Muş", 38.73163, 41.48482),
+        district("9285", "Bartın", 41.63583, 32.3375),
+        district("9760", "Nevşehir", 38.625, 34.71222),
+        district("9297", "Bilecik", 40.14192, 29.97932),
+        district("9935", "Yalova", 40.65501, 29.27693),
+        district("9854", "Şırnak", 37.51393, 42.45432),
+        district("9638", "Kırklareli", 41.73508, 27.22521),
+        district("9311", "Bitlis", 38.40115, 42.10784),
+        district("9295", "Bayburt", 40.25631, 40.22289),
+        district("9501", "Gümüşhane", 40.46001, 39.47176),
+        district("9914", "Tunceli", 39.09921, 39.54351),
+        district("9847", "Sinop", 42.02683, 35.16253),
+        district("9246", "Artvin", 41.18161, 41.82172),
+        district("9238", "Ardahan", 41.10871, 42.70222),
+    )
+
+    /**
+     * Ruling R171 (the review of 12 November 2026), made the rule for every unit by ruling R201 (13 November 2026):
+     * Diyanet prints a table for every district of its list, and a user inside a unit's reach may live in a district that
+     * is no unit. So each such district rides beside the unit's point as R142's do ([rides] says where). Its point is
+     * [DiyanetBesideDistricts]'s: a point fitted to the district's 2026 table (no one point fits every day of a table, so
+     * it is the nearest fit, rounded west), not one Diyanet publishes. They are no units: a place beyond every reach
+     * keeps the edge as before. Where such a table runs before the unit's, the unit's own point still rides beside it,
+     * so the place shows the later start and the earlier end of the two: the units' recorded exceptions
+     * ([DiyanetBesideDistricts.late], each as the gate's rows measured it after the district's table and, since ruling
+     * R255, after the unit's own table across its reach).
+     *
+     * The list holds every district whose point lies within 15 km of the unit's reach, or whose own town lies inside the
+     * reach (R204: a place inside the reach can be nearer to such a town than to the unit's point).
+     */
+    private val beside: Map<String, List<AuthorityUnit>> = declared.associate { unit ->
+        unit.id to DiyanetBesideDistricts.districts.mapNotNull { d ->
+            val km = distanceKm(unit.point, d.point)
+            // The disc: out to 15 km, but never within 2 km of the unit's own point, which is the merkez's own town;
+            // a district that shares that town rides across it (Konya's Selçuklu, Meram and Karatay, whose points lie
+            // within 5 km of Konya's, and Malatya's Yeşilyurt, R204).
+            val radiusKm = if (sharesTown(unit.id, d.id, km)) BESIDE_KM else minOf(BESIDE_KM, km - BESIDE_CLEAR_KM)
+            // Beside the unit: its point within the reach plus 15 km, or its own town inside the reach (R204).
+            val near = km <= unit.radiusKm + BESIDE_KM || (d.town != null && distanceKm(unit.point, d.town) <= unit.radiusKm)
+            if (near) AuthorityUnit(d.id, d.name, d.point, radiusKm) else null
+        }
+    }
+
+    /** R204: a riding district's own town where it is known and lies away from the district's fitted point. */
+    private val besideTowns: Map<String, GeoPoint> =
+        DiyanetBesideDistricts.districts.mapNotNull { d -> d.town?.let { d.id to it } }.toMap()
+
+    /** R171, R204: the district shares the unit's own town, by its point's distance or by name ([DiyanetBesideDistricts.sharedTown]). */
+    private fun sharesTown(unitId: String, districtId: String, km: Double): Boolean =
+        km <= BESIDE_SHARED_KM || districtId in DiyanetBesideDistricts.sharedTown[unitId].orEmpty()
+
+    private val districts = declared.map { unit -> DiyanetBesideDistricts.late[unit.id]?.let { unit.besides(it) } ?: unit }
+
+    /** The districts that may ride beside unit [unitId] (R171, R201); [rides] says where each does. */
+    fun besideDistricts(unitId: String): List<AuthorityUnit> = beside[unitId].orEmpty()
+
+    /**
+     * Where [district] (one of [besideDistricts] of [unit]) rides beside [unit] for a [user] inside the unit's reach.
+     * R171 and R201: within the district's disc, 15 km of its point but stopping 2 km short of the unit's own point.
+     * Ruling R204 (the review of 13 November 2026): also wherever the user is within 15 km of the district's point and
+     * nearer to it than to the unit's (the disc, trimmed on every side, left the district's far side and flanks on the
+     * unit's table alone, a minute before the district's on some days), and the same around the district's own town,
+     * where that town is known and lies away from the fitted point (Samsun's Atakum is fitted 21 km from Samsun and
+     * 16 km from its own town). Never in the unit's own town (R203, [clearOf]). No boundary is held: a district's land
+     * nearer to the unit's point than to its own point and town, and outside its disc, still follows the unit's table
+     * alone.
+     */
+    fun rides(user: GeoPoint, unit: AuthorityUnit, district: AuthorityUnit): Boolean {
+        if (clearOf(user, unit, district)) return false
+        val toDistrict = distanceKm(user, district.point)
+        if (toDistrict <= district.radiusKm) return true
+        val toUnit = distanceKm(user, unit.point)
+        if (toDistrict <= BESIDE_KM && toDistrict < toUnit) return true
+        val toTown = distanceKm(user, besideTowns[district.id] ?: return false)
+        return toTown <= BESIDE_KM && toTown < toUnit
+    }
+
+    /**
+     * Ruling R203 (13 November 2026): six units stand at the point Diyanet computes the table at, not at the app's own
+     * point for the city (İstanbul's is 2 km west of it, Ankara's 2 km south). R171 keeps a district's table 2 km short
+     * of the unit's point because that is the merkez's own town; the place a user picks by the city's name is the same
+     * town, so the same 2 km are kept clear around it: there the unit's table rides alone, as at its own point. Without
+     * it Başakşehir's table, which stops 2 km short of İstanbul's point, reached the app's İstanbul to the metre and
+     * the city itself ran a minute after its own table on nearly every day.
+     */
+    val towns: Map<String, GeoPoint> = mapOf(
+        "9541" to GeoPoint(41.01384, 28.94966),
+        "9206" to GeoPoint(39.91987, 32.85427),
+        "9879" to GeoPoint(40.9781, 27.51101),
+        "9146" to GeoPoint(36.98615, 35.32531),
+        "20089" to GeoPoint(36.20655, 36.15722),
+        "9587" to GeoPoint(37.18111, 33.215),
+    )
+
+    /** R203: [user] is in [unit]'s own town as the app places it, where a district that only neighbours it does not ride. */
+    private fun clearOf(user: GeoPoint, unit: AuthorityUnit, district: AuthorityUnit): Boolean {
+        val town = towns[unit.id] ?: return false
+        return distanceKm(user, town) <= BESIDE_CLEAR_KM && !sharesTown(unit.id, district.id, distanceKm(unit.point, district.point))
+    }
+
+    /**
+     * Ruling R142: where two districts' reaches overlap (Çatalca's and Silivri's points are 19 km apart), the nearer
+     * holds the place (its name and figure, [UnitSet.nearest]), and the other's point rides beside it
+     * ([TimetableMethod.envelopePoints]): a user there may live in either ilçe, so every start is the later and every
+     * end the earlier of the two tables, the owner's "rather late, never early" (the city-point round of 11 Oct 2026).
+     * The districts of R171 and R201 ride beside their unit the same way, where [rides] says.
+     */
     val units = UnitSet(
         "tr.diyanet",
-        listOf(
-            district("9541", "İstanbul", 41.012, 28.974, radiusKm = lateReachKm(41.012, EntryClass.A)),
-            district("9206", "Ankara", 39.938, 32.848, radiusKm = lateReachKm(39.938, EntryClass.A)),
-            district("9879", "Tekirdağ", 40.973, 27.511),
-            district("9146", "Adana", 36.987, 35.326, radiusKm = 20.0),
-            district("20089", "Hatay", 36.2, 36.153),
-            district("9587", "Karaman", 37.181, 33.214),
-            district("9419", "Edirne", 41.67719, 26.55597),
-            district("9352", "Çanakkale", 40.15552, 26.41271),
-            district("9930", "Van", 38.49457, 43.38323),
-            district("9507", "Hakkâri", 37.57444, 43.74083),
-            district("9594", "Kars", 40.59825, 43.08548),
-            district("9522", "Iğdır", 39.92371, 44.045),
-            district("9451", "Erzurum", 39.90861, 41.27694),
-        ),
+        districts,
+        around = { user, unit, placed ->
+            val others = districts.filter { it.id != unit.id && distanceKm(user, it.point) <= it.radiusKm }.map { it.point } +
+                besideDistricts(unit.id).filter { rides(user, unit, it) }.map { it.point }
+            if (others.isEmpty()) placed else placed.copy(envelopePoints = (placed.envelopePoints + others).distinct())
+        },
     ) { outside }
 
     val entry: RegistryEntry = single(
@@ -401,4 +610,13 @@ object Diyanet {
     internal const val TURKEY_ASR_EXTRA = 35
 
     val entries = listOf(entry, europe, other)
+
+    /** R171, R201: how far a district's disc reaches from its own point, and how far beyond a unit's reach its point may lie. */
+    private const val BESIDE_KM = 15.0
+
+    /** R171: a district whose point lies within this of its unit's shares the unit's town (Konya's three); R204 names one more. */
+    private const val BESIDE_SHARED_KM = 5.0
+
+    /** R171: how far short of its unit's own point a district's disc stops. */
+    private const val BESIDE_CLEAR_KM = 2.0
 }

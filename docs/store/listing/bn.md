@@ -55,8 +55,11 @@ enforces them. Copy each block into the console as it is.
 (Plan 5 Task 10's cut, which makes room for the wrist paragraph within Play's 4,000 characters, for Mohamed's approval: the website and support lines are left out, since both stores show them in their own fields, and so is the line of interface languages, which the App Store lists itself.)
 
 ### Release notes (500)
-1.6.0 সংস্করণে যা নতুন:
-• আপনার ঘড়িতে তাকওয়া: ওয়াচ ফেস, কমপ্লিকেশন ও টাইল, তাসবিহ ও কিবলা, Galaxy Watch-এর মতো Wear OS ঘড়িতে
+1.7.0 সংস্করণে যা নতুন:
+• নামাজের সময় এখন আরও অনেক জায়গায় প্রকাশিত সময়সূচির সঙ্গে মিলিয়ে দেখা হয়, যেমন তুরস্ক, মিশর, মরক্কো, আলজেরিয়া, মালয়েশিয়া, ইন্দোনেশিয়া, বাংলাদেশ ও পাকিস্তান
+• সীমান্তের কাছে, আপনার অবস্থান থেকে পাওয়া নামাজের সময় এখন দুই দেশের সময়সূচিই বিবেচনায় নিতে পারে
+• "আজকের আয়াত" উইজেটে এখন 365টি আয়াত আছে, বছরের প্রতিটি দিনের জন্য একটি
+• নামাজ স্ক্রিনের একটি কার্ড আপনার ঘড়িতে তাকওয়া সেট আপ করতে সাহায্য করে
 
 ## App Store
 
@@ -122,8 +125,10 @@ enforces them. Copy each block into the console as it is.
 (Its own text since 1.6.0, as each store names only its own watch (App Store Review Guideline 2.3.10): the Play full description above, with the Apple Watch paragraph in place of the Wear OS one, and Apple in place of Google in the bullet after the location one.)
 
 ### What's new (4000)
-1.6.0 সংস্করণে যা নতুন:
-• আপনার Apple Watch-এ তাকওয়া: কমপ্লিকেশনে পরবর্তী নামাজ, Digital Crown দিয়ে তাসবিহ, আর কিবলা
+1.7.0 সংস্করণে যা নতুন:
+• নামাজের সময় এখন আরও অনেক জায়গায় প্রকাশিত সময়সূচির সঙ্গে মিলিয়ে দেখা হয়, যেমন তুরস্ক, মিশর, মরক্কো, আলজেরিয়া, মালয়েশিয়া, ইন্দোনেশিয়া, বাংলাদেশ ও পাকিস্তান
+• সীমান্তের কাছে, আপনার অবস্থান থেকে পাওয়া নামাজের সময় এখন দুই দেশের সময়সূচিই বিবেচনায় নিতে পারে
+• "আজকের আয়াত" উইজেটে এখন 365টি আয়াত আছে, বছরের প্রতিটি দিনের জন্য একটি
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. আপনার জায়গার নামাজের সময়

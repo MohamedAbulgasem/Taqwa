@@ -43,6 +43,10 @@ import kotlin.time.Instant
  *
  * The sample days are every fourth day of 2026 and the solstices and equinoxes; `CityUnitsTest` checks every day of
  * the year at the reach's edge for a large sample of units.
+ *
+ * The reach is a place's own, measured with the place alone (`alone = true`): since the owner's ruling of 13 Nov
+ * 2026 a user inside several reaches waits for every such place's table (ruling R249), and that wait is no part of
+ * how far one place's table carries (ruling R250), so the reaches stand as they were measured on 9 Oct 2026.
  */
 object QmdbReach {
     const val LIMIT_MINUTES = 3
@@ -88,7 +92,7 @@ object QmdbReach {
 
     /** The unit's own day on each of [days]: a user at its own point. */
     fun unitDays(unit: AuthorityUnit, days: List<LocalDate> = dates): Map<LocalDate, PrayerDay> {
-        val method = Registry.methodInUnit(entry.id, entry.method!!, unit, unit.point)
+        val method = Registry.methodInUnit(entry.id, entry.method!!, unit, unit.point, alone = true)
         return days.associateWith { day(method, unit.point, it) }
     }
 
@@ -103,7 +107,7 @@ object QmdbReach {
         days: List<LocalDate> = dates,
         also: Map<LocalDate, PrayerDay>? = null,
     ): Extra {
-        val inUnit = Registry.methodInUnit(entry.id, entry.method!!, unit, at)
+        val inUnit = Registry.methodInUnit(entry.id, entry.method!!, unit, at, alone = true)
         val alone = Registry.methodAlone(entry.id, entry.method!!, at)
         val extra = IntArray(events.size)
         val broken = mutableListOf<String>()
@@ -188,8 +192,8 @@ object QmdbReach {
             val point = GeoPoint(lat, lon)
             val unit = AuthorityUnit("probe", "probe", point, lateReachKm(lat, EntryClass.D_AUTHORITY), method = CentralAsia.kazakhstanAt(point), named = false)
             val user = GeoPoint(lat + PROBE_STEP_LAT, lon + PROBE_STEP_LON)
-            val ownMethod = Registry.methodInUnit(entry.id, entry.method!!, unit, point)
-            val inUnit = Registry.methodInUnit(entry.id, entry.method!!, unit, user)
+            val ownMethod = Registry.methodInUnit(entry.id, entry.method!!, unit, point, alone = true)
+            val inUnit = Registry.methodInUnit(entry.id, entry.method!!, unit, user, alone = true)
             val alone = Registry.methodAlone(entry.id, entry.method!!, user)
             text.append("\nprobe ").append(Math.round(lat * 1000)).append(',').append(Math.round(lon * 1000))
             for (date in PROBE_DAYS) {

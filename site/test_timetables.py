@@ -218,7 +218,7 @@ def made_up_document(months: list, today: str) -> dict:
             "checkedThrough": "Checked against Made-up Authority’s published timetable through 31 December 2026.",
             "whoPublishes": "Who publishes them", "whoPublishesBody": "Made-up Authority publishes the prayer times used in Made-up City.",
             "howReproduces": "How Taqwa reproduces them", "methodIntro": "The way Made-up Authority calculates.",
-            "howChecked": "How it was checked", "statDaysValue": "365", "statDays": "days at 1 places",
+            "howChecked": "How it was checked", "statDaysValue": "365", "statDays": "days at one place",
             "statNever": "starts before Made-up Authority’s", "statNeverAny": "", "statMinutes": "2 min", "statAtMost": "at most after",
             "cautiousBody": "", "maghribGuard": "", "maghribGuardTemplate": "", "maghribNoSunsetTemplate": "", "whichDecides": "Which timetable decides each time today",
             "matchMosque": "Match my mosque", "setByRule": "Set by rule", "polarLine": "The sun does not rise or set here today.",
@@ -251,6 +251,97 @@ def live(body: str) -> dict:
 
 
 REL = f"prayer-times/{SLUG}/index.html"
+
+
+class RepublishedCopyTest(unittest.TestCase):
+    """A timetable whose tables were read from a republisher's copy says whose copy wherever the
+    page says it was checked (finding F26 of the audit of 12 Nov 2026); one read at its source
+    never names a copy."""
+
+    LANGS = ("en", "ar", "bn", "fr", "id", "tr", "ur")
+    COPY = "Made-up Mirror"
+
+    def document(self, republisher) -> dict:
+        document = made_up_document([NOVEMBER], "2026-11-13")
+        city = document["cities"][0]
+        city["republisher"] = republisher
+        city["languages"] = list(self.LANGS)
+        city["pages"] = {lang: city["pages"]["en"] for lang in self.LANGS}
+        names = {lang: "Made-up Authority" for lang in self.LANGS}
+        document["proof"] = {
+            "entries": 1, "placeDays": 365, "heldOutDays": 0, "ramadanDays": 30, "earlyStarts": 0, "lateEnds": 0,
+            "brokenStamps": 0, "tables": 12, "surveyCalendars": 0,
+            "published": [{"entry": "made.up", "class": "B", "republisher": republisher, "placeDays": 365, "places": 1,
+                           "first": "2026-01-01", "through": "2026-12-31", "atMost": 2, "names": names,
+                           "throughText": {lang: "31 December 2026" for lang in self.LANGS}}],
+            "republished": [{"entry": "made.up", "republisher": republisher, "names": names}] if republisher else [],
+        }
+        return document
+
+    def pages(self, republisher) -> dict:
+        """Per language: the city's body, its description as the page's head carries it, and the checks page."""
+        langs = {lang: language(lang) for lang in self.LANGS}
+        data = timetables.Timetables(langs, self.document(republisher))
+        out = {}
+        for lang in self.LANGS:
+            written = {}
+            data.build_city(data.cities[0], lang, "", lambda *a, **k: written.update(k), {l: "" for l in self.LANGS})
+            out[lang] = (data.city_body(data.cities[0], lang), written["meta"]["description"], data.checks_body(lang))
+        return out
+
+    def test_every_language_names_the_copy_wherever_it_says_checked(self):
+        for lang, (body, description, checks) in self.pages(self.COPY).items():
+            t = language(lang)["timetable"]
+            self.assertIn(self.COPY, description, lang)
+            self.assertIn(timetables.fill(t["replays_copy"], authority="Made-up Authority", republisher=self.COPY), body, lang)
+            self.assertIn(timetables.fill(t["reproduced_copy"], republisher=self.COPY), body, lang)
+            self.assertNotIn(timetables.fill(t["replays"], authority="Made-up Authority"), body, lang)
+            self.assertNotIn(f'· {timetables.esc(t["reproduced"])} ·', body, lang)
+            self.assertIn(timetables.fill(t["checks_copy_note"], republisher=self.COPY), checks, lang)
+            self.assertIn(timetables.fill(t["checks_gate_copy"], authority="Made-up Authority", republisher=self.COPY), checks, lang)
+
+    def test_a_timetable_read_at_its_source_names_no_copy(self):
+        for lang, (body, description, checks) in self.pages(None).items():
+            t = language(lang)["timetable"]
+            for text in (body, description, checks):
+                self.assertNotIn(self.COPY, text, lang)
+            self.assertIn(timetables.fill(t["replays"], authority="Made-up Authority"), body, lang)
+            self.assertIn(f'· {timetables.esc(t["reproduced"])} ·', body, lang)
+
+    def test_every_copy_sentence_names_the_republisher_in_every_language(self):
+        for lang in self.LANGS:
+            t = language(lang)["timetable"]
+            for key in ("replays_copy", "description_checked_copy", "reproduced_copy", "checks_copy_note", "checks_gate_copy"):
+                self.assertIn("{republisher}", t[key], f"{lang} {key}")
+
+
+class PartlyRepublishedCopyTest(RepublishedCopyTest):
+    """Ruling R276 (the second audit's G7): where only some of a place's tables were a republisher's copy, the rest the
+    authority's own (JAKIM's mirrored years), every sentence that says it was checked says "partly" and names whose."""
+
+    def document(self, partly) -> dict:
+        document = super().document(None)
+        document["cities"][0]["partlyRepublisher"] = partly
+        document["proof"]["published"][0]["partlyRepublisher"] = partly
+        document["proof"]["partlyRepublished"] = [{"entry": "made.up", "republisher": partly,
+                                                   "names": document["proof"]["published"][0]["names"]}] if partly else []
+        return document
+
+    def test_every_language_names_the_copy_wherever_it_says_checked(self):
+        for lang, (body, description, checks) in self.pages(self.COPY).items():
+            t = language(lang)["timetable"]
+            self.assertIn(self.COPY, description, lang)
+            self.assertIn(timetables.fill(t["replays_part"], authority="Made-up Authority", republisher=self.COPY), body, lang)
+            self.assertIn(timetables.fill(t["reproduced_part"], republisher=self.COPY), body, lang)
+            self.assertNotIn(timetables.fill(t["replays"], authority="Made-up Authority"), body, lang)
+            self.assertIn(timetables.fill(t["checks_part_note"], republisher=self.COPY), checks, lang)
+            self.assertIn(timetables.fill(t["checks_gate_part"], authority="Made-up Authority", republisher=self.COPY), checks, lang)
+
+    def test_every_copy_sentence_names_the_republisher_in_every_language(self):
+        for lang in self.LANGS:
+            t = language(lang)["timetable"]
+            for key in ("replays_part", "description_checked_part", "reproduced_part", "checks_part_note", "checks_gate_part"):
+                self.assertIn("{republisher}", t[key], f"{lang} {key}")
 
 
 class OneMonthPageTest(unittest.TestCase):

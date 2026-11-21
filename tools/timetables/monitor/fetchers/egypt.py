@@ -1,8 +1,13 @@
-"""Egypt, the General Authority for Survey (ESA), as Dar al-Ifta republishes it town by town
-("according to the calculations of the Egyptian General Authority for Survey"): each town's
-current-month table from Dar al-Ifta's own GetPrayer endpoint, and ESA's daily all-cities page (one
-row a day per city). Both feed one growing table per town (the gate's units, eg-esa.tsv). The fast
-begins at the printed Fajr (F+E). Restricted: archive only."""
+"""Egypt, the General Authority for Survey (ESA): for the 30 towns Dar al-Ifta republishes ("according to the
+calculations of the Egyptian General Authority for Survey"), each town's current-month table from Dar
+al-Ifta's own GetPrayer endpoint; and for every city ESA's own daily all-cities page prints, those 30 and
+the 48 it alone prints (ESA_CITIES, units since ruling R163), that page's row of the day. Both feed one
+growing table per town (the gate's units, eg-esa.tsv): a town of the 30 grows a month at a time, a city of
+the 48 by the one day each run reads, since the page is asked for plainly and shows today alone (its other
+days sit behind the page's own date form, which the monitor never drives). A town of the 30's month becomes
+gate rows (recipes.tsv); a city of the 48's days are a sample, six in seven never read, so the monitor's own
+check reads each at the town's point and none becomes a gate row or counts as its month being watched. The
+fast begins at the printed Fajr (F+E). Restricted: archive only."""
 import html
 import re
 import urllib.parse
@@ -26,6 +31,24 @@ TOWNS = [
 ]
 ALIASES = {"الأسكندرية": "alexandria", "أسوان": "aswan", "الأقصر": "luxor", "أدفو": "edfu", "الضبعة": "el-dabaa",
            "رفح": "rafah", "سانت كاترين": "saint-catherine", "الداخلة": "mut", "موط": "mut", "موط (الداخلة)": "mut", "رأس غارب": "ras-gharib"}
+# unit id (eg-esa.tsv), ESA's printed name: the 48 cities ESA's daily page prints and Dar al-Ifta does not
+# republish, units since 12 Nov 2026 (ruling R163). The list of the archive's code/manual/eg-esa/esa_cities.py,
+# which read their 2026 tables by hand; kept apart from TOWNS, which drives a Dar al-Ifta request per town.
+ESA_CITIES = [
+    ("tanta", "طنطا"), ("mansoura", "المنصورة"), ("el-mahalla-el-kubra", "المحلة الكبرى"), ("zagazig", "الزقازيق"),
+    ("asyut", "أسيوط"), ("faiyum", "الفيوم"), ("esna", "اسنا"), ("ismailia", "الإسماعيلية"), ("6th-of-october", "6أكتـوبر"),
+    ("damanhur", "دمنهور"), ("new-cairo", "القاهرة الجديدة"), ("minya", "المنيا"), ("beni-suef", "بنى سويف"), ("sohag", "سوهاج"),
+    ("qena", "قنا"), ("10th-of-ramadan", "العاشر من رمضان"), ("kafr-el-sheikh", "كفر الشيخ"), ("obour", "العبور"),
+    ("delengat", "الدلنجات"), ("nag-hammadi", "نجع حمادى"), ("safaga", "سفاجة"), ("el-hamul", "الحامول"), ("baltim", "بلطيم"),
+    ("sadat-city", "السادات"), ("badr", "بدر"), ("el-hammam", "الحمام"), ("new-salhia", "الصالحية الجديدة"),
+    ("ras-sudr", "راس سدر"), ("abu-zenima", "ابوزنيمة"), ("berenice", "برنيس"), ("marsa-alam", "مرسى علم"),
+    ("el-alamein", "العلمين"), ("baris", "باريس"), ("toshka", "توشكى"), ("15th-of-may", "مدينة 15 مايو"),
+    ("new-administrative-capital", "العاصمة الادارية الجديدة"), ("new-fashn", "الفشن الجديدة"),
+    ("new-mansoura", "المنصورة الجديدة"), ("new-nubaria", "النوبارية الجديدة"), ("new-beni-mazar", "بنى مزار الجديدة"),
+    ("new-port-said", "بورسعيد الجديدة سلام"), ("new-bir-al-abd", "بئر العبد الجديدة"), ("new-toshka", "توشكى الجديدة"),
+    ("capital-gardens", "حدائق العاصمة"), ("new-rashid", "رشيد الجديدة"), ("new-sphinx", "سفنكس الجديدة"),
+    ("east-owainat", "شرق العوينات"), ("west-nubaria", "غرب النوبارية"),
+]
 T = r"(\d{1,2}:\d{1,2}) ([صم])"
 ROW = re.compile(r"(\d{2}) (\S+) (\d{4}) م " + " ".join([T] * 6))
 
@@ -100,13 +123,26 @@ def esa_day(page):
     return out
 
 
+def esa_units():
+    """ESA's printed city name (folded, `norm_city`) -> unit id, for every city of its daily page the gate
+    holds a unit for: the 30 towns under Dar al-Ifta's spelling and ESA's own (ALIASES), and the 48 ESA alone
+    prints."""
+    by_name = {norm_city(n): u for u, n in TOWNS}
+    by_name.update({norm_city(k): v for k, v in ALIASES.items()})
+    by_name.update({norm_city(n): u for u, n in ESA_CITIES})
+    return by_name
+
+
 def fetch(ctx):
     tables = {}
+    esa_only = {u for u, _ in ESA_CITIES}
 
     def table(unit):
         if unit not in tables:
+            line = (f"Egypt, ESA's own daily all-cities page {ESA} (the row of the day each run reads)" if unit in esa_only else
+                    f"Egypt, ESA as Dar al-Ifta republishes it: {DARIFTA}<town> (the month table) and ESA's daily page {ESA}")
             tables[unit] = Table(unit, unit.replace("-", " ").title(), None, None, "Africa/Cairo", "EG", "F+E S D A M I", entry=f"eg.esa/{unit}",
-                                 source_line=f"Egypt, ESA as Dar al-Ifta republishes it: {DARIFTA}<town> (the month table) and ESA's daily page {ESA}")
+                                 source_line=line)
         return tables[unit]
 
     for unit, name in TOWNS:
@@ -123,14 +159,14 @@ def fetch(ctx):
         t = table(unit)
         add_all(ctx, t, rows, unit)
         t.raw.append((f"darifta-{unit}.html", page))
-    by_name = {norm_city(n): u for u, n in TOWNS}
-    by_name.update({norm_city(k): v for k, v in ALIASES.items()})
+    by_name = esa_units()
     try:
         page = ctx.http.text(ESA)
         rows = esa_day(page)
         if not rows:
             ctx.error("ESA's daily page: no rows read")
         unmapped = []
+        read = set()
         for city, date, times in rows:
             unit = by_name.get(norm_city(city))
             if unit is None:
@@ -139,10 +175,17 @@ def fetch(ctx):
             t = table(unit)
             if not add_all(ctx, t, [(date, times)], f"ESA {unit}"):
                 continue
+            read.add(unit)
             if not any(n.startswith("esa-") for n, _ in t.raw):
                 t.raw.append((f"esa-{date}.html", page))
+        # The page is the only reading of the 48: one of them it did not print today is said, not passed over.
+        silent = sorted(esa_only - read) if rows else []
+        if silent:
+            ctx.error(f"ESA's daily page printed no row for {len(silent)} of its own cities: {', '.join(silent)}")
         if unmapped:
-            ctx.note(f"ESA's page lists {len(unmapped)} cities the gate has no unit for (not kept): {', '.join(unmapped[:8])} …")
+            # A city with no unit is a new city on ESA's page (every one it printed in 2026 is a unit): its row
+            # is not kept, and the run's message names every one for the owner to see.
+            ctx.note(f"ESA's page lists {len(unmapped)} cities the gate has no unit for (not kept): {', '.join(unmapped)}")
     except FetchError as e:
         ctx.error(f"ESA's daily page: {e}")
     return [t for t in tables.values() if t.rows]

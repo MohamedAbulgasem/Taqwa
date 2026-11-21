@@ -248,6 +248,13 @@ else
 fi
 
 # 3. Check.
+heap_note() {
+    # Ruling R280 (the second audit's G17): a check whose JVM ran out of heap says so in the failure itself, not only
+    # in the log, with where the heaps are set.
+    if grep -q 'OutOfMemoryError' "$1" 2>/dev/null; then
+        printf '%s' "; the JVM ran out of heap (java.lang.OutOfMemoryError; the heaps are set in tools/timetables/build.gradle.kts, ruling R280)"
+    fi
+}
 rm -f "$MONITOR/last-run.json"
 say "monitor: checking (the tables whose signature changed, the gate, the surveys, the horizons)"
 STEP="check"
@@ -260,7 +267,7 @@ GRADLE_EXIT=$?
 STEP="report"
 if [ ! -f "$MONITOR/last-run.json" ]; then
     tail -30 "$LOG" >&2
-    failed "the check step wrote no result (Gradle exit $GRADLE_EXIT, see $LOG)"
+    failed "the check step wrote no result (Gradle exit $GRADLE_EXIT, see $LOG)$(heap_note "$LOG")"
 fi
 RECORDED=1
 

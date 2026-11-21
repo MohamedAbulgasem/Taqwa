@@ -2,6 +2,8 @@ package world.taqwa.timetables
 
 import kotlinx.datetime.LocalDate
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.prayer.engine.registry.Registry
+import world.taqwa.timetables.units.ReachRows
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -45,7 +47,7 @@ class DocumentTest {
     private val lupt = stamps.getValue("gb.london.lupt")
     private val luptAtMost = lupt.worstStarts(lupt.unitEvents("gb.london.lupt")!!)
     private val strings = AppStrings(TestPaths.appResources)
-    private val document = Document(strings, stamps, official)
+    private val document = Document(strings, stamps, official, ruled = AcceptedReach.ALL)
     private val friday = Instant.parse("2026-09-25T00:07:00Z")
 
     @Suppress("UNCHECKED_CAST")
@@ -209,15 +211,32 @@ class DocumentTest {
 
     @Test
     fun theChecksTablesAtMostIsThePublishedCitiesOwnFigure() {
-        // Kazan's own unit runs at most 2 minutes after DUM RT's starts; the entry-wide worst is
-        // Yelabuga's, which no page shows (final review I1).
+        // A city's own unit's figure (its own point and its reach, ruling R270), never the entry-wide worst, which another
+        // place's reach holds and no page shows (final review I1). Algiers' seat, since Kazan's page is held while its
+        // reach's figure awaits the owner (below).
+        val algiers = city(
+            "algiers-algeria", "DZ", 36.73225, 3.08746, "Africa/Algiers", linkedMapOf("en" to "Algiers"), admin1 = "Algiers", id = 2507480,
+        )
+        val built = document.build(listOf(algiers), friday)
+        val row = built.map("proof").list("published").single()
+        val stamp = stamps.getValue("dz.marw")
+        val own = stamp.worstStarts(stamp.unitEvents("16")!!)!!
+        assertEquals("dz.marw", row["entry"])
+        assertEquals(own, row["atMost"])
+        assertEquals(own, built.list("cities").single().map("proof")["atMost"])
+        assertTrue(stamp.worstStarts(stamp.events)!! > own)
+    }
+
+    @Test
+    fun aCityWhoseUnitReadsOverTheCeilingHasItsPageOnceTheOwnerRuled() {
+        // Ruling R270: a unit whose reach was measured over ReachRows.CEILING has no page until the owner rules on it, as a
+        // release has none. Kazan's reach meets a white-night onset (DUM RT, Fajr about 135 min); ruling R291 (16 Nov 2026)
+        // accepted its figures, so its page is back. ProvenTest holds the rule both ways, by the map it is given.
         val kazan = city("kazan-russia", "RU", 55.78874, 49.12214, "Europe/Moscow", linkedMapOf("en" to "Kazan"), admin1 = "Tatarstan Republic")
         val built = document.build(listOf(kazan), friday)
-        val row = built.map("proof").list("published").single()
-        assertEquals("ru.dumrt", row["entry"])
-        assertEquals(2, row["atMost"])
-        assertEquals(2, built.list("cities").single().map("proof")["atMost"])
-        assertTrue(stamps.getValue("ru.dumrt").worstStarts(stamps.getValue("ru.dumrt").events)!! > 2)
+        assertTrue(ReachRows.unruled("ru.dumrt", "kazan").isEmpty(), ReachRows.unruled("ru.dumrt", "kazan").toString())
+        assertEquals(1, built.list("cities").size)
+        assertTrue(built.list("held").isEmpty(), built.list("held").toString())
     }
 
     @Test
@@ -233,7 +252,7 @@ class DocumentTest {
         unit["checked"] = listOf("2026-01-01..2026-10-31", "2027-01-01..2027-12-31")
         units["gb.london.lupt"] = unit
         root["units"] = units
-        val holed = Document(strings, mapOf("gb.london.lupt" to Stamp(root)), official)
+        val holed = Document(strings, mapOf("gb.london.lupt" to Stamp(root)), official, ruled = AcceptedReach.ALL)
         val city = holed.city(london, friday)
         assertEquals("2026-10-31", city.map("proof")["through"])
         assertEquals(
@@ -254,7 +273,7 @@ class DocumentTest {
         // says why. Türkiye keeps one clock all year, so no page mentions a change. The stamps are that
         // morning's (StampsAsOf), so the case stands however far the monitor has proven Diyanet since.
         val october = Instant.parse("2026-10-01T06:07:00Z")
-        val built = Document(strings, StampsAsOf.firstOctober(official, stamps), official).build(listOf(istanbul, london), october)
+        val built = Document(strings, StampsAsOf.firstOctober(official, stamps), official, ruled = AcceptedReach.ALL).build(listOf(istanbul, london), october)
         assertEquals(emptyList<Map<String, Any?>>(), built.list("held"))
         val city = built.list("cities").first { it["slug"] == "istanbul-turkiye" }
         assertEquals(listOf(linkedMapOf<String, Any?>("year" to 2026, "month" to 10, "days" to 31)), city.list("months"))
@@ -331,6 +350,47 @@ class DocumentTest {
     }
 
     @Test
+    fun aTimetableReadFromARepublishersCopySaysWhoseCopyItWasCheckedAgainst() {
+        // Finding F26 of the audit of 12 Nov 2026: Kemenag's kab/kota tables were read from the myQuran API, not from
+        // Kemenag's own pages, and the page says so in the app's own sentence; a timetable read at its source does not.
+        val jakarta = city("jakarta-indonesia", "ID", -6.21462, 106.84513, "Asia/Jakarta", linkedMapOf("en" to "Jakarta", "id" to "Jakarta"), id = 1642911)
+        val pages = Document(strings, Stamp.load(official.resolve("stamps")), official).city(jakarta, friday).map("pages")
+        for (language in listOf("en", "id")) {
+            val sentence = pages.map(language).map("strings")["checkedThrough"] as String
+            val through = sentence.substringAfterLast(if (language == "en") "through " else "hingga ").removeSuffix(".")
+            assertEquals(strings.format(language, "about_checked_through_copy", "Kemenag", through, "myQuran"), sentence)
+            assertTrue("myQuran" in sentence, sentence)
+        }
+        assertFalse("myQuran" in page(london, "en").map("strings")["checkedThrough"] as String)
+    }
+
+    @Test
+    fun everySentenceOfARepublishedTimetablesPageThatNamesTheComparisonSaysWhoseCopy() {
+        // The tile under the nought ("starts before Kemenag's") names the same comparison as the sentence above, and
+        // the document carries the republisher for the site's own sentences (the description, "replays", the checks page).
+        val jakarta = city("jakarta-indonesia", "ID", -6.21462, 106.84513, "Asia/Jakarta", linkedMapOf("en" to "Jakarta", "id" to "Jakarta"), id = 1642911)
+        val document = Document(strings, Stamp.load(official.resolve("stamps")), official, ruled = AcceptedReach.ALL)
+        val city = document.city(jakarta, friday)
+        assertEquals("myQuran", city["republisher"])
+        for (language in listOf("en", "id")) {
+            val never = city.map("pages").map(language).map("strings")["statNever"] as String
+            assertEquals(strings.format(language, "about_stat_never_before_copy", "Kemenag", "myQuran"), never)
+            assertTrue("myQuran" in never, never)
+        }
+        val elsewhere = document.city(london, friday)
+        assertNull(elsewhere["republisher"])
+        assertFalse("myQuran" in elsewhere.map("pages").map("en").map("strings")["statNever"] as String)
+        for (language in SITE_LANGUAGES) {
+            for (key in listOf("about_stat_never_before_copy", "about_checked_so_far_with_data_copy", "about_checked_through_copy")) {
+                val filled = strings.format(language, key, "A", "B", "C", "myQuran")
+                assertTrue("myQuran" in filled || key != "about_checked_so_far_with_data_copy", "$language $key: $filled")
+            }
+            assertTrue("myQuran" in strings.format(language, "about_stat_never_before_copy", "Kemenag", "myQuran"), language)
+            assertTrue("myQuran" in strings.format(language, "about_checked_so_far_with_data_copy", "1", "Kemenag", "2", "myQuran"), language)
+        }
+    }
+
+    @Test
     fun thePageStringsAreTheAppsSentencesFilledForTheCity() {
         val page = page(london, "en")
         assertEquals("Standard", page["otherSchool"])
@@ -346,7 +406,8 @@ class DocumentTest {
         assertTrue(intro.startsWith("The way London Unified calculates: dawn (Fajr) at a twilight angle") && intro.endsWith("down)."), intro)
         assertEquals("How it was checked", s["howChecked"])
         assertEquals(lupt.placeDays.toString(), s["statDaysValue"]) // the app's localizedDigits: no thousands grouping ("4015")
-        assertEquals("days at ${lupt.places} places", s["statDays"])
+        // "one place" where the stamp holds one (the second audit's G11), as the app's tile says it.
+        assertEquals(if (lupt.places == 1) "days at one place" else "days at ${lupt.places} places", s["statDays"])
         assertEquals("starts before London Unified’s", s["statNever"])
         assertEquals("$luptAtMost min", s["statMinutes"])
         assertEquals("at most after", s["statAtMost"])
@@ -385,7 +446,7 @@ class DocumentTest {
         assertEquals("", s["statMinutes"])
         assertEquals("", s["statAtMost"])
         assertEquals("", s["statNever"])
-        assertEquals("days at ${stamp.places} places", s["statDays"])
+        assertEquals(if (stamp.places == 1) "days at one place" else "days at ${stamp.places} places", s["statDays"])
         assertEquals(stamp.placeDays.toString(), s["statDaysValue"])
         assertEquals(
             "Mosques in Toronto follow different timetables in good faith, and none is followed by most. " +
@@ -477,13 +538,15 @@ class DocumentTest {
         val built = document.build(listOf(toronto, tripoli, london), friday)
         val proof = built.map("proof")
         assertEquals(stamps.size, proof["entries"])
-        assertEquals(stamps.values.sumOf { it.placeDays }, proof["placeDays"])
+        // Each printed day once across the entries, each published table at one entry (the review round of 14 Nov 2026).
+        assertEquals(stamps.values.sumOf { it.placeDays - it.sharedDays }, proof["placeDays"])
         assertEquals(stamps.values.sumOf { it.heldOutDays }, proof["heldOutDays"])
         assertEquals(stamps.values.sumOf { it.ramadanDays }, proof["ramadanDays"])
         assertEquals(stamps.values.sumOf { it.early() }, proof["earlyStarts"])
         assertEquals(stamps.values.sumOf { it.lateEnds() }, proof["lateEnds"])
         assertEquals(stamps.values.count { it.broken != 0 }, proof["brokenStamps"])
-        assertEquals(ProofTotals.gateRows(official), proof["tables"])
+        assertEquals(stamps.values.sumOf { it.tables }, proof["tables"])
+        assertTrue((proof["tables"] as Int) <= ProofTotals.gateTables(official), "never more than the publications the gate reads")
         assertEquals(ProofTotals.surveyCalendars(official), proof["surveyCalendars"])
         val published = proof.list("published")
         assertEquals(listOf("ca.toronto", "gb.london.lupt"), published.map { it["entry"] })
@@ -509,5 +572,16 @@ class DocumentTest {
         assertEquals("31 December 2026", toronto.map("throughText")["en"])
         assertEquals(Formats.forLanguage("ar").longDate(LocalDate(2026, 12, 31)), toronto.map("throughText")["ar"])
         assertEquals(1, built.list("held").size)
+        // The checks page counts every timetable in the gate's figures, so it says which of them were read from a
+        // republisher's copy, with or without a page; a row on the page carries its republisher too (finding F26).
+        val republished = Registry.entries.filter { it.republisher != null && it.id in stamps }
+        assertEquals(republished.map { it.id }, proof.list("republished").map { it["entry"] })
+        assertEquals(republished.map { it.republisher }, proof.list("republished").map { it["republisher"] })
+        for (row in proof.list("republished")) assertEquals(SITE_LANGUAGES.toSet(), row.map("names").keys)
+        assertTrue(published.all { it["republisher"] == Registry.byId(it["entry"] as String)?.republisher })
+        val jakarta = city("jakarta-indonesia", "ID", -6.21462, 106.84513, "Asia/Jakarta", linkedMapOf("en" to "Jakarta", "id" to "Jakarta"), id = 1642911)
+        val row = document.build(listOf(jakarta), friday).map("proof").list("published").single()
+        assertEquals("id.kemenag", row["entry"])
+        assertEquals(Registry.byId("id.kemenag")?.republisher, row["republisher"])
     }
 }

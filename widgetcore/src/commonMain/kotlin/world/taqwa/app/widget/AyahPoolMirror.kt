@@ -89,8 +89,9 @@ data class AyahPoolMirror(
          * [AyahPoolMirror.translationRtl], `0`/`1` for [AyahPoolMirror.arabicIndicDigits])
          * followed by one block per entry (`surah`, `ayah`,
          * `surahLatin`, `surahArabic`, `arabic`, `translation`, `followedBy`), joined with [ENTRY_SEP]; fields
-         * within a block are joined with [FIELD_SEP]. About 60 KB for the full hundred-ayah pool, of which
-         * `followedBy` is about 22 KB.
+         * within a block are joined with [FIELD_SEP]. About 230 KB of UTF-8 for the full 365-ayah pool
+         * with Saheeh International and about 310 KB with the Arabic tafsir, the longest, of which
+         * `followedBy` is about 90 KB (about 60 KB and 22 KB when the pool was a hundred).
          */
         fun serialize(m: AyahPoolMirror): String {
             val header = listOf(

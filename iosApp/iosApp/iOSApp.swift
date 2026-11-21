@@ -185,8 +185,15 @@ struct iOSApp: App {
 
 	/// `refreshWidgets()` is `expect`/`actual` in shared code, but `WidgetCenter` is Swift-only, so
 	/// the iOS actual is a hook the app fills in here — the one place that can actually make the
-	/// call. `PrayerViewModel.refresh()` runs once a second, so the hook does the de-duplication
-	/// Kotlin cannot: it reloads only when the serialised snapshot has genuinely changed.
+	/// call. The Prayer screen's one-second tick (`PrayerViewModel.refresh()`) calls it only when
+	/// the widget snapshot it writes has changed: each time its countdown passes a whole minute or
+	/// its ring one of the 120 steps it takes from one prayer to the next, mostly at different
+	/// moments (`WidgetMirrorWriter`), so while that screen shows, once to twice a minute with the
+	/// prayers two hours apart or more, and more often when they are closer (about 2.7 times a
+	/// minute at 70 minutes). Every other caller calls it after its own write whether or not the
+	/// value changed — the ayah pool mirror at every app start, settings and language changes, the
+	/// background refresh — so the hook still de-duplicates: it reloads only when something a
+	/// widget reads has changed (`reloadWidgets()`).
 	static func installWidgetRefreshHook() {
 		WidgetRefreshBridge.shared.onRefresh = { reloadWidgets() }
 	}
@@ -248,7 +255,7 @@ struct iOSApp: App {
 
 	/// `reloadWidgets()` is reached from a Kotlin-invoked closure (`PrayerViewModel.refresh()` runs
 	/// on whatever dispatcher it is collected on) and from the background-task queue in
-	/// `handleAppRefresh`, so neither the `lastSnapshot` dedupe nor `WidgetCenter` can assume the
+	/// `handleAppRefresh`, so neither the `lastMirrorKey` dedupe nor `WidgetCenter` can assume the
 	/// main thread. Everything below therefore runs on it: inline when it already is, and
 	/// synchronously otherwise so callers that sequence work after a reload — `handleAppRefresh`
 	/// calls `task.setTaskCompleted` next — still see it finished. `sync` cannot deadlock here
@@ -267,13 +274,19 @@ struct iOSApp: App {
 			let defaults = UserDefaults(suiteName: taqwaAppGroupId)
 			let snapshot = defaults?.string(forKey: taqwaSnapshotKey)
 			let background = defaults?.string(forKey: taqwaBackgroundKey)
-			// The ayah pool mirror is ~30 KB, so it is folded in by hash and length rather than
-			// concatenated whole — this key is rebuilt once a second by `PrayerViewModel.refresh()`.
+			// The ayah pool mirror is ~230-310 KB, so it is folded in by hash and length rather than
+			// concatenated whole. The key is rebuilt on every call, on the main thread: while the
+			// Prayer screen shows, at each change of the snapshot, whose countdown and ring move at
+			// different moments (once to twice a minute with the prayers two hours apart or more,
+			// more often when they are closer), and once for each other refresh (see
+			// `installWidgetRefreshHook`).
+			// The length is `utf16.count`, the bridged string's own length, which costs nothing;
+			// `count` walked the whole mirror for its graphemes, more than the hash itself.
 			// `hashValue` is per-process seeded, which is fine: `lastMirrorKey` never outlives the
 			// process either, and a fresh process reloading once more is the harmless direction.
 			let ayah = defaults?.string(forKey: AyahPoolMirror.companion.KEY) ?? ""
 			let key = (snapshot ?? "") + "|" + (background ?? "")
-				+ "|" + String(ayah.hashValue) + "|" + String(ayah.count)
+				+ "|" + String(ayah.hashValue) + "|" + String(ayah.utf16.count)
 			guard key != lastMirrorKey else { return }
 			lastMirrorKey = key
 			WidgetCenter.shared.reloadAllTimelines()

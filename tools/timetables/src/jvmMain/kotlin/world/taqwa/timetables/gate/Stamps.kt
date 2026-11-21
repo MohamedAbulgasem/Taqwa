@@ -46,7 +46,13 @@ object Stamps {
         "engineHash" to engineHash(coreHash, s.fingerprints),
         // Early starts, late ends, cells over the late limit and days out of order: 0 when green.
         "broken" to s.broken,
-        "places" to s.places.size,
+        // Ruling R185: the monitor's standing demotions (the gate files' @demoted lines), written only where there is one:
+        // of the entry as a whole (no unit), or unit by unit.
+        "demoted" to s.demoted.takeIf { it.isNotEmpty() }?.map { d ->
+            linkedMapOf("unit" to d.unit, "since" to d.since.toString(), "reason" to d.reason).filterValues { it != null }
+        },
+        // Ruling R214: the points the published tables' own days were read at; a replay's point is counted under `replays`.
+        "places" to s.tablePlaces.size,
         "first" to s.first?.toString(),
         "last" to s.last?.toString(),
         // The days any row compared, as runs: the envelope first..last may have holes (ruling R115).
@@ -54,11 +60,22 @@ object Stamps {
         // And by event (ruling R148): a Ramadan is proven only where the unit's Fajr, end of eating and
         // Maghrib were each checked on every day of it, and a table may print some columns and not others.
         "checkedByEvent" to checkedByEvent(s.events),
-        "placeDays" to s.placeDayCount,
+        // Ruling R214: the published tables' own place-days, each table's days once, and those of them no fitted table holds.
+        "placeDays" to s.tableDayCount,
         "heldOutDays" to s.testDays,
+        // The review round of 14 Nov 2026 (AcrossEntries): of `placeDays`, the days an entry before this one counts too
+        // (it reads the same publication on the same date), and the published tables counted here, each once across
+        // the entries. The checks page sums `placeDays - sharedDays` and `tables`.
+        "sharedDays" to s.sharedDayCount.takeIf { it > 0 },
+        "tables" to s.tables,
+        // Ruling R246: the entry shows an imsak (at its units below, where it has any), so the Ramadan guard asks for it.
+        "showsImsak" to s.showsImsak.takeIf { it },
         // Place-days in Ramadan by Umm al-Qura's own dates.
         "ramadanDays" to s.ramadanDays,
         "outOfOrderDays" to s.outOfOrder,
+        // Ruling R302: the place-days whose Isha shows no end on a night the real sun makes too short for one, and their
+        // dates. Written only where there are some; declared, never broken.
+        "shortNights" to if (s.shortNights == 0) null else linkedMapOf("days" to s.shortNights, "dates" to dateRanges(s.shortNightDates)),
         // Lines the reader could not take (skipped), and lines repeating a date (each checked).
         "unreadableLines" to s.unreadable,
         "repeatedLines" to s.duplicates,
@@ -67,8 +84,12 @@ object Stamps {
         "heldOut" to linkedMapOf(
             "placeDays" to s.testDays,
             "ramadanDays" to s.testRamadanDays,
+            "checkedByEvent" to checkedByEvent(s.heldOut).takeIf { it.isNotEmpty() },
             "events" to events(s.heldOut),
-        ),
+        ).filterValues { it != null },
+        // Ruling R214: the same tables replayed at other points (a unit's reach, the app's own point, the towns one
+        // national table serves): checked like any row and broken by an early start as anywhere, in no figure above.
+        "replays" to if (s.replayDayCount == 0) null else linkedMapOf("places" to s.places.size - s.tablePlaces.size, "placeDays" to s.replayDayCount),
         // Ruling R156, a cautious entry's far-north guard: each member whose printed Maghrib was not the bar on some
         // days (its far-north or winter rule set it, or the real sun did not set there): those days, how many were
         // checked against its Maghrib from the sun, and the shown Maghrib less its printed one, in minutes (below
@@ -106,13 +127,16 @@ object Stamps {
         "units" to if (s.units.isEmpty()) null else s.units.entries.associate { (id, u) ->
             id to linkedMapOf<String, Any?>(
                 "name" to u.name,
+                "showsImsak" to u.showsImsak.takeIf { it },
                 "placeDays" to u.placeDays.size,
                 "checked" to dateRanges(u.placeDays),
                 "checkedByEvent" to checkedByEvent(u.events),
+                // Ruling R214: by event, the days a held-out cell of the unit was compared on (the Ramadan guard's reading).
+                "heldOutByEvent" to u.heldOutDates.mapValues { dateRanges(it.value) }.takeIf { it.isNotEmpty() },
                 "broken" to u.broken,
                 "lateLimits" to limits(u.events),
                 "events" to events(u.events),
-            )
+            ).filterValues { it != null }
         },
     ).filterValues { it != null }
 
@@ -206,8 +230,28 @@ object Stamps {
      * What decided a row's days: the class, the points and each method, the same on every run and every
      * machine ([Canonical]: no double printed, so neither `Double.toString` nor a maths routine's last bit
      * can move it).
+     *
+     * The gate keeps one of these for each distinct row setting of an entry until its stamp is written, so
+     * the words are held whole only up to [WHOLE_WORDS] characters; longer ones are held as their SHA-256
+     * and length (ruling R253). Only Kazakhstan's are longer (ruling R249: up to 45 other places' methods ride beside a
+     * place, each written in full, 495,627 characters at the longest and 508 million over the entry's
+     * 3,720 settings, which a 2 GB gate ran out of memory on); every other entry's longest is 34,966
+     * (ca.cautious, 14 November 2026), so no other stamp's hash moved with this. The digest is written in
+     * letters alone (a to p for each half byte), so that nothing in it reads as a double.
      */
-    fun fingerprint(resolution: Resolution): String = buildString {
+    fun fingerprint(resolution: Resolution): String {
+        val words = words(resolution)
+        if (words.length <= WHOLE_WORDS) return words
+        val digest = MessageDigest.getInstance("SHA-256").digest(words.toByteArray())
+        val letters = digest.joinToString("") { b -> "${'a' + ((b.toInt() shr 4) and 0xF)}${'a' + (b.toInt() and 0xF)}" }
+        return "${resolution.entry.id} ${words.length} characters sha256 $letters"
+    }
+
+    /** The longest fingerprint kept in its own words: above every entry's but Kazakhstan's, with room. */
+    const val WHOLE_WORDS = 65_536
+
+    /** [fingerprint]'s own words, however long. */
+    fun words(resolution: Resolution): String = buildString {
         append(resolution.entry.id).append(' ').append(resolution.entryClass).append(' ').append(resolution.entry.school)
         append(" at ").append(Canonical.of(resolution.point))
         append(" unit ").append(Canonical.of(resolution.unitName)).append(' ').append(Canonical.of(resolution.unitPoint))

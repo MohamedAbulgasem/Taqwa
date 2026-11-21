@@ -6,5 +6,19 @@ path	entry	lat	lon	zone	columns	format	school	split	note
 open/SG-MUIS/off-muis-singapore-2024.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	fit	2024, data.gov.sg consolidated set
 open/SG-MUIS/off-muis-singapore-2025.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	fit	2025, data.gov.sg consolidated set
 open/SG-MUIS/off-muis-singapore-2026.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	test	2026, the same as the MUIS website's own file
+# The printed imsak (12 Nov 2026, before the Ramadan 1448 release, spec §7, O11): MUIS's Imsakiah Ramadan 1447/2026, the one table
+# of its own that prints an imsak (data.gov.sg and the website's file do not), fetched once from muis.gov.sg's Islamic Calendar
+# page and transcribed (archive/tables/manual/sg-muis/2026-11-12/). Imsak = Subuh - 10 on all 30 days, and its Subuh..Isyak equal
+# the 2026 open table above on every day, so only the imsak is read here (Im, an end: never after it). Held out.
+archive/tables/manual/sg-muis/2026-11-12/imsakiah-1447.txt	sg.muis			Asia/Singapore	Im - - - - - -	daily	standard	test	Imsakiah Ramadan 1447 (19 Feb - 20 Mar 2026), its imsak
+# 2027 (13 Nov 2026, ruling R185): MUIS's own Prayer Times for Singapore, Year 2027, the PDF its Islamic Calendar page links, held since
+# 12 Nov 2026 and read from its text layer (archive/code/manual/sg-muis/timetable_2027.py; two independent readings equal on all 365
+# days). data.gov.sg's set did not hold 2027 yet, so the monitor had nothing to prove it from: with this row Ramadan 1448's days are
+# checked outright, not waited for. Held out. What that does not cover: the imsak. The Imsakiah 1448 was not on the page on
+# 13 Nov 2026, so there is no imsak row for 2027: Singapore's imsak for Ramadan 1448 rests on the 30 days of the one Imsakiah
+# above (1447), and no monitor source fetches an Imsakiah, so the 1448 one is a capture by hand when MUIS puts it up (sources.tsv's
+# sg-muis-imsakiah, due January 2027; the step is in docs/MONITOR.md, Work by hand). On 16 Nov 2026 the monitor's capture of
+# MUIS's website held 2027 too, the same as this PDF on all 365 days, and prove gated it (the last row): a second witness.
+archive/tables/manual/sg-muis/2026-11-12/prayer-timetable-2027.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	test	2027, MUIS's own PDF timetable (held out)
 # prove, 2026-11-16: the monitor's captures pinned as they were under archive/tables/pinned/{sg-muis}/2026-11-16/, each row as its recipe (official/monitor/recipes.tsv) and family say, added with the whole gate green
 archive/tables/pinned/sg-muis/2026-11-16/website-2027.txt	sg.muis			Asia/Singapore	F+E S D A M I	daily	standard	test	MUIS website 2027, the monitor capture of 16 Nov 2026 (prove)

@@ -1,0 +1,30 @@
+# Engine wave W5 (18 Oct 2026, rulings R136–R138): the regional safe default for the Balkans and their neighbours
+# (`default.safe.balkans`, Generic.kt; spec §6.2 c), gated for the first time, as a stress test only: no table is
+# held for any country it serves (North Macedonia, Serbia outside Sandžak, Croatia, Slovenia, Bulgaria, Greece,
+# Romania, Cyprus, Moldova), so it is checked against the four Balkan authorities whose tables are held, each of
+# which has its own entry and is never routed here: IZ BiH's Sarajevo 2026 (vaktija), BIK's 2026 Takvimi at its
+# own base point (the imsak table and the Sabah column), KMSH's Tirana 2026 and IZCG's Podgorica September 2026,
+# each at the point its own gate file uses. Every row is held out. What the rows show is the cost of the region's
+# design (its late limits, Generic.kt, balkansLateLimits): Fajr 10 to 26 min after the dawn Bosnia, Albania and
+# Montenegro print (this region's Fajr is Kosovo's Sabah, 19° + 20 min, the latest in the region) and up to 7 min
+# after BIK's own Sabah, Isha 6 to 33 min after their 17° to 18° one (this region's is the 18.5° + 2 min), the end
+# of eating 7 to 16 min before Bosnia's and Albania's Fajr (the 19° dawn − 2 min), and the floors (Diyanet's
+# temkin, Montenegro's Maghrib + 9) plus the cushion on the rest (Dhuhr up to 9 min after, Maghrib up to 8, Asr
+# up to 7, sunrise up to 6 before).
+#
+# Masked cells, each a limit of the fallback for the owner (BUILD-LOG, W5), never an exception added quietly:
+# - BIK's Asr is not checked. BIK prints its Asr 2 to 11 min after the first shadow (Balkans.kt), its own
+#   convention, up to 7 min after this region's floor (Diyanet's + 4 with the cushion) on 165 days of 2026 at
+#   the base table's own point (154 at Prishtina on the first pass): a start before BIK's. Kosovo is never served by this region (xk.bik
+#   holds the table); taking BIK's Asr as the region's floor is a §6.2 c change for the owner.
+# - BIK's imsak and sunrise are not checked. Its imsak lies between 18.5° and 19.7° by month (Balkans.kt), so on
+#   3 days of 2026 this region's end of eating (the 19° dawn − 2 min) comes a minute after it, and its sunrise
+#   carries per-month steps deeper than Diyanet's − 7 on 5 days, a minute before this region's: late ends by a
+#   minute against Kosovo's own perpetual table, the same §6.2 c question. Its Dhuhr, Maghrib and Isha are
+#   checked, and the Sabah column (the Fajr shown in Kosovo) is checked as this region's Fajr.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/europe/verify/vk-sarajevo-2026.txt	default.safe.balkans	43.84864	18.35644	Europe/Sarajevo	F+E S D A M I	daily	standard	test	Bosnia (IZ BiH, Sarajevo) 2026, stress test
+archive/tables/moral-auth-world/europe/verify/bik-imsak.txt	default.safe.balkans	42.5	21.0	Europe/Belgrade	- - D - M I	daily	standard	test	Kosovo (BIK, the base table at its own point) 2026, stress test; imsak, sunrise and Asr not checked (see header)
+archive/tables/moral-auth-world/europe/verify/bik-sabah.txt	default.safe.balkans	42.5	21.0	Europe/Belgrade	F - - - - -	daily	-	test	Kosovo (BIK, the base table's Sabah column) 2026, stress test
+archive/tables/moral-auth-world/europe/verify/kmsh-tirana.txt	default.safe.balkans	41.32744	19.81866	Europe/Tirane	F+E S D A M I	daily	standard	test	Albania (KMSH, Tirana) 2026, stress test
+archive/code/moral-auth-world/europe/balkans/me-podgorica-2026-09.csv	default.safe.balkans	42.44124	19.26309	Europe/Podgorica	F+E S D A M I	csv	standard	test	Montenegro (IZCG, Podgorica) September 2026, stress test

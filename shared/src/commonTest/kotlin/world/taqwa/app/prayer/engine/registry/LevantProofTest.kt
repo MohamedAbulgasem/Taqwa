@@ -17,6 +17,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 /**
  * Task 7e's proof for the Levant, Iraq and Yemen (docs/research/2026-09-prayer-times/proof/7e-levant.md).
@@ -111,6 +112,9 @@ class LevantProofTest {
         // The authority's own construction: a town's times are al-Aqsa's plus its printed figure, one for every
         // time. So wherever al-Aqsa's day is never early (the gate's proof), every town's is, and an end never
         // later: Qalqilya's minute and a half is + 2 on a start (never before the half minute) and + 1 on an end.
+        // Two starts wait for more than the table (rulings R180 and R265): a town's Dhuhr and Asr are never before the
+        // first whole minute after the real transit and shadow-1 Asr at the town itself, where the figure printed for it
+        // falls short of that; and its sunrise is never after the real sunrise there.
         val entry = requireNotNull(Registry.byId("ps.iftaa"))
         val printed = mapOf(
             "Jerusalem" to (0 to 0), "Ramallah" to (0 to 0), "Bethlehem" to (0 to 0), "Jenin" to (0 to 0), "Nablus" to (0 to 0),
@@ -129,11 +133,14 @@ class LevantProofTest {
                 val (starts, ends) = requireNotNull(printed[town.name]) { town.name }
                 val label = "${town.name} $date"
                 assertEquals(aqsa.fajr + starts.minutes, here.fajr, "$label fajr")
-                assertEquals(aqsa.dhuhr + starts.minutes, here.dhuhr, "$label dhuhr")
-                assertEquals(aqsa.asr + starts.minutes, here.asr, "$label asr")
+                assertEquals(onRealTransit(aqsaTableDhuhr(zone, date) + starts.minutes, town.point, date, zone), here.dhuhr, "$label dhuhr")
+                assertTrue(here.dhuhr - (aqsaTableDhuhr(zone, date) + starts.minutes) <= 2.minutes, "$label dhuhr waits for the sun by minutes, not more")
+                val table = aqsaTable(zone, date)
+                assertEquals(onRealShadow(table.asr + starts.minutes, town.point, date, zone), here.asr, "$label asr")
+                assertTrue(here.asr - (table.asr + starts.minutes) <= 5.minutes, "$label asr waits for the shadow by minutes, not more")
                 assertEquals(aqsa.maghrib + starts.minutes, here.maghrib, "$label maghrib")
                 assertEquals(aqsa.isha + starts.minutes, here.isha, "$label isha")
-                assertEquals(aqsa.sunrise + ends.minutes, here.sunrise, "$label sunrise")
+                assertEquals(underRealSunrise(table.sunrise + ends.minutes, town.point, date, zone), here.sunrise, "$label sunrise")
                 assertEquals(aqsa.endOfEating + ends.minutes, here.endOfEating, "$label end of eating")
                 assertTrue(here.endOfEating <= here.fajr, "$label end of eating never after Fajr")
             }
@@ -163,6 +170,34 @@ class LevantProofTest {
         }
     }
 
+    /** Al-Aqsa's Dhuhr as the table gives it, before the real sun's floor at al-Aqsa itself (ruling R180). */
+    private fun aqsaTableDhuhr(zone: String, date: LocalDate): Instant = aqsaTable(zone, date).dhuhr
+
+    /** Al-Aqsa's table day, before the real sun at al-Aqsa's own point floors or caps it (rulings R180 and R265). */
+    private fun aqsaTable(zone: String, date: LocalDate) = DayPipeline.beforeRealSun(
+        Registry.resolveEntry(requireNotNull(Registry.byId("ps.iftaa")), Place(Levant.aqsa.lat, Levant.aqsa.lon, zone, "PS")),
+        date,
+        TimeZone.of(zone),
+    )
+
+    /** Ruling R265: [table], or the first whole minute after the real shadow-1 Asr at [point] where that is later. */
+    private fun onRealShadow(table: Instant, point: GeoPoint, date: LocalDate, zone: String): Instant {
+        val asr = requireNotNull(DayPipeline.realAsr(point, date, TimeZone.of(zone), AsrSchool.STANDARD))
+        return maxOf(table, Instant.fromEpochSeconds(asr.epochSeconds.floorDiv(60L) * 60 + 60))
+    }
+
+    /** Ruling R265: [table], or the minute of the real sunrise at [point] where that is earlier. */
+    private fun underRealSunrise(table: Instant, point: GeoPoint, date: LocalDate, zone: String): Instant {
+        val sunrise = requireNotNull(DayPipeline.realSunrise(point, date, TimeZone.of(zone)))
+        return minOf(table, Instant.fromEpochSeconds(sunrise.epochSeconds.floorDiv(60L) * 60))
+    }
+
+    /** Ruling R180: [table], or the first whole minute after the real transit at [point] where that is later. */
+    private fun onRealTransit(table: Instant, point: GeoPoint, date: LocalDate, zone: String): Instant {
+        val transit = DayPipeline.realTransit(point, date, TimeZone.of(zone))
+        return maxOf(table, Instant.fromEpochSeconds(transit.epochSeconds.floorDiv(60L) * 60 + 60))
+    }
+
     private fun zoneOf(town: Levant.PaTown) = when {
         town.country == "IL" -> "Asia/Jerusalem"
         town.point.lon < 34.6 -> "Asia/Gaza"
@@ -173,7 +208,8 @@ class LevantProofTest {
     fun `west bank villages by the green line take the nearest printed town's figure through the app's engine`() {
         // Review r2 of R118: these villages' nearest printed town is one of the list's towns in Israel. Through the
         // app's own pipeline, with the PA's table chosen and on Automatic, each shows that town's table: al-Aqsa's day
-        // plus its figure (Lydd's minute and a half as + 2 on a start, + 1 on an end).
+        // plus its figure (Lydd's minute and a half as + 2 on a start, + 1 on an end), and a Dhuhr never before the
+        // first whole minute after the real transit at the village itself (ruling R180).
         val entry = requireNotNull(Registry.byId("ps.iftaa"))
         val villages = listOf(
             Triple("Ni'lin", GeoPoint(31.951, 35.021), "Lydd"), Triple("Qibya", GeoPoint(31.976, 35.009), "Lydd"),
@@ -195,11 +231,13 @@ class LevantProofTest {
                 for (shown in listOf(viaApp.day, automatic.day)) {
                     val label = "$name $date"
                     assertEquals(aqsa.fajr + town.startMinutes.minutes, shown.fajr, "$label fajr")
-                    assertEquals(aqsa.dhuhr + town.startMinutes.minutes, shown.dhuhr, "$label dhuhr")
-                    assertEquals(aqsa.asr + town.startMinutes.minutes, shown.asr, "$label asr")
+                    val tableDhuhr = aqsaTableDhuhr("Asia/Hebron", date) + town.startMinutes.minutes
+                    assertEquals(onRealTransit(tableDhuhr, point, date, "Asia/Hebron"), shown.dhuhr, "$label dhuhr")
+                    val table = aqsaTable("Asia/Hebron", date)
+                    assertEquals(onRealShadow(table.asr + town.startMinutes.minutes, point, date, "Asia/Hebron"), shown.asr, "$label asr")
                     assertEquals(aqsa.maghrib + town.startMinutes.minutes, shown.maghrib, "$label maghrib")
                     assertEquals(aqsa.isha + town.startMinutes.minutes, shown.isha, "$label isha")
-                    assertEquals(aqsa.sunrise + town.endMinutes.minutes, shown.sunrise, "$label sunrise")
+                    assertEquals(underRealSunrise(table.sunrise + town.endMinutes.minutes, point, date, "Asia/Hebron"), shown.sunrise, "$label sunrise")
                     assertEquals(aqsa.endOfEating + town.endMinutes.minutes, shown.endOfEating, "$label end of eating")
                 }
                 date = date.plus(29, DateTimeUnit.DAY)

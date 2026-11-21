@@ -1,6 +1,6 @@
 # Politique de confidentialité de Taqwa
 
-_Dernière mise à jour le 9 novembre 2026. S’applique à Taqwa 1.0.0 et aux versions ultérieures sur Android et iOS._
+_Dernière mise à jour le 19 novembre 2026. S’applique à Taqwa 1.0.0 et aux versions ultérieures sur Android et iOS._
 
 Taqwa est une application islamique gratuite, sans compte, sans publicité et sans outil d’analyse. Elle
 fonctionne hors ligne. Elle utilise Internet pour télécharger les récitations du Coran, et uniquement
@@ -87,7 +87,7 @@ sur iPhone, les voix s’ajoutent dans l’app Réglages.
 Taqwa n’utilise pas la sauvegarde d’applications d’Android : votre position et vos paramètres ne sont
 donc pas copiés chez Google. Sur iOS, vos paramètres, vos signets, vos compteurs et vos récitations
 téléchargées sont exclus de la sauvegarde iCloud ; les seuls fichiers propres à Taqwa qui soient
-sauvegardés sont les petits caches des widgets, les prochains horaires de prière et les cent versets
+sauvegardés sont les petits caches des widgets, les prochains horaires de prière et les 365 versets
 que le widget du verset du jour fait défiler, dont aucun ne contient votre position. Si vous ajoutez
 Taqwa à une Apple Watch, iOS conserve la dernière copie que votre iPhone lui a envoyée, qui indique
 votre ville, et cette copie peut figurer dans la sauvegarde de votre iPhone. Une sauvegarde iCloud est

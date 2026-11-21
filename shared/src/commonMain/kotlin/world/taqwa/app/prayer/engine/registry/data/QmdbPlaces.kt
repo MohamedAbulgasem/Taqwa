@@ -122,55 +122,105 @@ object QmdbPlaces {
         QmdbPlace(10460, "abay-turkistan", "Abay (Turkistan)", 41.346802, 68.950432),
     )
 
-    /** A measured place's own late limits across its reach, in minutes, where they pass the entry's ([reachLimits]). */
-    class ReachLimit(val key: String, val fajr: Int?, val isha: Int?, val endOfEating: Int?)
+    /**
+     * A measured place's own late limits across its reach, in minutes, each where it passes the entry's or class D's
+     * ([reachLimits]); null where the event keeps the entry's (Fajr 8, Isha 6, the end of eating 8) or class D's 3.
+     */
+    class ReachLimit(
+        val key: String,
+        val fajr: Int? = null,
+        val sunrise: Int? = null,
+        val dhuhr: Int? = null,
+        val asr: Int? = null,
+        val maghrib: Int? = null,
+        val isha: Int? = null,
+        val endOfEating: Int? = null,
+    )
 
     /**
      * The measured places whose own tables, replayed across their reach (official/gate/kz-qmdb-reach.tsv: a grid and
      * each event's worst point of a dense sweep; the reviews of 9 and 10 Oct 2026, "prove it across the unit"), pass the
-     * entry's Fajr 8, Isha
-     * 6 or end of eating 8: each one's limits for those events, the gate's worst there (ruling R41; the reasons are
-     * `CentralAsia`'s). The end of eating reaches 11 at eight units (the entry's 8 and the reach's 3), the owner's to
-     * accept. Dhuhr, Asr, Maghrib and sunrise stay within class D's 3 everywhere.
+     * entry's Fajr 8, Isha 6 or end of eating 8, or class D's 3 for sunrise, Dhuhr, Asr or Maghrib: each one's limits
+     * for those events, the gate's worst there (ruling R41; the reasons are `CentralAsia`'s).
+     *
+     * Since the owner's ruling of 13 Nov 2026 a place inside several reaches waits for every such place's table
+     * (ruling R249), and the rows were measured again with those tables riding (14 Nov 2026, ruling R252). The wait
+     * adds up to 3 min to what a place's own table and the user's own point already gave, so sunrise, Dhuhr, Asr and
+     * Maghrib, which had stayed within class D's 3 everywhere, reach 4 at many places and 5 at a few (Dhuhr 4 at most),
+     * Fajr 10 at three, Isha stays within the 8 it had, and the end of eating reaches 12 at ten places (the entry's 8,
+     * the reach's 3 and the wait), where it had reached 11: the owner's to accept, as the 11 was.
      */
     val reachLimits: List<ReachLimit> = listOf(
-        ReachLimit("astana", fajr = null, isha = 7, endOfEating = 11),
-        ReachLimit("kokshetau", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("kostanay", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("pavlodar", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("petropavl", fajr = 10, isha = 8, endOfEating = 10),
+        ReachLimit("almaty", dhuhr = 4, asr = 4, maghrib = 4),
+        ReachLimit("astana", asr = 4, maghrib = 4, isha = 7, endOfEating = 11),
+        ReachLimit("kokshetau", fajr = 9, sunrise = 4, asr = 4, maghrib = 4, isha = 8, endOfEating = 11),
+        ReachLimit("kostanay", fajr = 9, sunrise = 4, asr = 4, maghrib = 4, isha = 8, endOfEating = 12),
+        ReachLimit("pavlodar", fajr = 9, sunrise = 4, maghrib = 4, isha = 8, endOfEating = 11),
+        ReachLimit("petropavl", fajr = 10, sunrise = 4, asr = 4, maghrib = 4, isha = 8, endOfEating = 11),
         ReachLimit("isakovka", fajr = 9, isha = 8, endOfEating = 10),
         ReachLimit("krasny-yar", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("kulomzino", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("oral", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("aksay", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("aktobe", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("vagulino", fajr = null, isha = 7, endOfEating = 9),
+        ReachLimit("kulomzino", fajr = 10, isha = 8, endOfEating = 10),
+        ReachLimit("oral", fajr = 9, sunrise = 4, asr = 4, maghrib = 4, isha = 7, endOfEating = 11),
+        ReachLimit("aksay", sunrise = 4, asr = 4, maghrib = 4, isha = 7, endOfEating = 12),
+        ReachLimit("aktobe", sunrise = 4, asr = 4, maghrib = 4, isha = 7, endOfEating = 12),
+        ReachLimit("kyzylorda", sunrise = 4, dhuhr = 4, asr = 4, maghrib = 4),
+        ReachLimit("shymkent", dhuhr = 4, asr = 5, maghrib = 5),
+        ReachLimit("vagulino", fajr = 9, isha = 7, endOfEating = 10),
         ReachLimit("bugrovoe", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("pulemetovka", fajr = 10, isha = 7, endOfEating = 9),
-        ReachLimit("spasovka", fajr = null, isha = 7, endOfEating = 9),
-        ReachLimit("khromtau", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("arkalyk", fajr = null, isha = 7, endOfEating = 11),
-        ReachLimit("oskemen", fajr = null, isha = 7, endOfEating = 11),
-        ReachLimit("akkol", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("rudny", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("makinsk", fajr = 9, isha = 8, endOfEating = 11),
+        ReachLimit("pulemetovka", fajr = 10, isha = 7, endOfEating = 10),
+        ReachLimit("spasovka", fajr = 9, isha = 7, endOfEating = 10),
+        ReachLimit("khromtau", isha = 7, endOfEating = 12),
+        ReachLimit("arkalyk", sunrise = 4, isha = 7, endOfEating = 11),
+        ReachLimit("oskemen", asr = 4, maghrib = 4, isha = 7, endOfEating = 11),
+        ReachLimit("akkol", fajr = 9, sunrise = 4, maghrib = 4, isha = 8, endOfEating = 11),
+        ReachLimit("rudny", fajr = 9, sunrise = 4, asr = 4, maghrib = 4, isha = 8, endOfEating = 11),
+        ReachLimit("makinsk", fajr = 9, sunrise = 4, asr = 4, maghrib = 4, isha = 8, endOfEating = 11),
         ReachLimit("lisakovsk", fajr = 9, isha = 8, endOfEating = 11),
-        ReachLimit("stepnogorsk", fajr = null, isha = 8, endOfEating = 11),
-        ReachLimit("aksu-pavlodar", fajr = 9, isha = 8, endOfEating = 10),
-        ReachLimit("atbasar", fajr = 9, isha = 8, endOfEating = 10),
+        ReachLimit("stepnogorsk", asr = 4, isha = 8, endOfEating = 11),
+        ReachLimit("aksu-pavlodar", fajr = 9, sunrise = 4, isha = 8, endOfEating = 12),
+        ReachLimit("atbasar", fajr = 9, asr = 4, maghrib = 4, isha = 8, endOfEating = 12),
         ReachLimit("ekibastuz", fajr = 9, isha = 8, endOfEating = 11),
-        ReachLimit("shemonaikha", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("semey", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("ridder", fajr = null, isha = 7, endOfEating = 11),
-        ReachLimit("temirtau", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("karaganda", fajr = null, isha = null, endOfEating = 10),
-        ReachLimit("saran", fajr = null, isha = 7, endOfEating = 9),
-        ReachLimit("altay", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("shakhtinsk", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("kandyagash", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("kalbatau", fajr = null, isha = 7, endOfEating = 10),
-        ReachLimit("embi", fajr = null, isha = 7, endOfEating = 10),
+        ReachLimit("shemonaikha", sunrise = 4, asr = 4, maghrib = 4, isha = 7, endOfEating = 10),
+        ReachLimit("semey", sunrise = 4, maghrib = 4, isha = 7, endOfEating = 12),
+        ReachLimit("ridder", isha = 7, endOfEating = 11),
+        ReachLimit("temirtau", asr = 4, maghrib = 4, isha = 7, endOfEating = 11),
+        ReachLimit("karaganda", sunrise = 4, endOfEating = 12),
+        ReachLimit("saran", isha = 7, endOfEating = 11),
+        ReachLimit("altay", asr = 4, maghrib = 4, isha = 7, endOfEating = 10),
+        ReachLimit("shakhtinsk", isha = 7, endOfEating = 11),
+        ReachLimit("kandyagash", asr = 4, isha = 7, endOfEating = 12),
+        ReachLimit("kalbatau", sunrise = 4, isha = 7, endOfEating = 11),
+        ReachLimit("embi", sunrise = 4, asr = 4, maghrib = 4, isha = 7, endOfEating = 12),
+        ReachLimit("zaysan", asr = 4, maghrib = 4),
+        ReachLimit("aral", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("makanshy", asr = 4, maghrib = 4),
+        ReachLimit("zhosaly", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("sarkand", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("ushtobe", sunrise = 4),
+        ReachLimit("taldykorgan", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("tekeli", asr = 4, maghrib = 4),
+        ReachLimit("zharkent", asr = 5, maghrib = 4),
+        ReachLimit("shiyeli", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("zhanakorgan", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("konaev", sunrise = 4, dhuhr = 4, asr = 4, maghrib = 4),
+        ReachLimit("shu", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("shelek", sunrise = 4, dhuhr = 4, asr = 5, maghrib = 4),
+        ReachLimit("zhanatas", sunrise = 4, dhuhr = 4, asr = 5, maghrib = 4),
+        ReachLimit("kentau", sunrise = 4, dhuhr = 4, asr = 4, maghrib = 4),
+        ReachLimit("otegen-batyr", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("boralday", dhuhr = 4, asr = 5, maghrib = 4),
+        ReachLimit("turkistan", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("karatau", sunrise = 4, dhuhr = 4, asr = 4, maghrib = 4),
+        ReachLimit("sarykemer", sunrise = 4, dhuhr = 4, asr = 4, maghrib = 4),
+        ReachLimit("taraz", sunrise = 4, dhuhr = 4, asr = 5, maghrib = 4),
+        ReachLimit("merke", sunrise = 4, dhuhr = 4, asr = 4, maghrib = 4),
+        ReachLimit("turar-ryskulov", sunrise = 4, dhuhr = 4, asr = 4, maghrib = 4),
+        ReachLimit("arys", sunrise = 4, asr = 5, maghrib = 4, isha = 7),
+        ReachLimit("aksu-turkistan", sunrise = 4, asr = 4, maghrib = 4),
+        ReachLimit("lenger", sunrise = 4, dhuhr = 4, asr = 5, maghrib = 4),
+        ReachLimit("saryagash", sunrise = 5, dhuhr = 4, asr = 4, maghrib = 5),
+        ReachLimit("shardara", sunrise = 5),
+        ReachLimit("zhetysay", sunrise = 5, asr = 4, maghrib = 4),
     )
 
     /** An app city: the [key] of its QMDB place's unit, its id in the app's city list, and the point the app gives it. */

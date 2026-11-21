@@ -1,5 +1,8 @@
 package world.taqwa.app.feature.settings
 
+import world.taqwa.app.prayer.engine.registry.lateLimitFor
+import world.taqwa.app.prayer.engine.registry.TimedEvent
+import world.taqwa.app.prayer.engine.registry.Units
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.plus
@@ -11,6 +14,7 @@ import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.data.ProofStamp
 import world.taqwa.app.resources.Res
+import world.taqwa.app.resources.about_cautious_short_nights
 import world.taqwa.app.resources.about_not_followed_irn_tromso
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -90,8 +94,11 @@ class AboutTimesUiStateTest {
      * Rulings R100, R105, R111 and R112 (city-pages spec §10): a measured cautious place shows two
      * proof tiles — the stamp's place-days at its places, and the 0 starts before the timetable that
      * decides each of them — and a sentence with no date; the same figures the site's cautious page
-     * shows from the same stamp. Toronto's are the committed `ca.toronto` stamp's: on 2 October 2026
-     * 1,400 days at 6 places, at least that since (the weekly monitor's prove only adds rows).
+     * shows from the same stamp. Toronto's are the committed `ca.toronto` stamp's. Since ruling R214
+     * (13 Nov 2026) a table counts once: the three mosques' 2026 tables are read at one place, and the
+     * five other points they are replayed at are checks and no place or day of the figure, so the
+     * stamp that read 1,400 days at 6 places reads the year's days at one (350 on 13 November); at
+     * least that since (the weekly monitor's prove only adds rows).
      */
     @Test
     fun `a cautious place's proof is its stamp's place-days and places`() {
@@ -102,7 +109,7 @@ class AboutTimesUiStateTest {
         val stamp = requireNotNull(state.stamp) { "Toronto is stamped" }
         val proof = requireNotNull(cautiousProof(state.resolution, stamp)) { "Toronto is measured and stamped" }
         assertEquals(CautiousProof(placeDays = stamp.placeDays, places = stamp.places), proof)
-        assertTrue(proof.placeDays >= 1400 && proof.places >= 6, proof.toString())
+        assertTrue(proof.placeDays >= 350 && proof.places >= 1, proof.toString())
     }
 
     /**
@@ -206,31 +213,34 @@ class AboutTimesUiStateTest {
      */
     @Test
     fun `the checked tile's at-most figure is the worst start measured at the user's own unit`() {
-        // Review I3. The committed my.jakim stamp's entry-wide worst is 4, the end of eating (each
-        // zone's Subuh is printed for its latest point; the end-of-eating audit of 3 Oct 2026), and
-        // before it was 3, Perlis's PLS01 sunrise: ends either way. Kuala Lumpur's own zone (WLY01)
-        // measured every start within a minute on 12 October 2026; the weekly monitor's prove adds
-        // JAKIM's next year to the row, whose Subuh the refit of 4 Nov 2026 holds within its unit's
-        // recorded 3 minutes. Whatever the proof holds, the row's worst start is the figure its tile
-        // claims, and no start is later than a limit the stamp records for it.
+        // Review I3. The committed my.jakim stamp's entry-wide worst is a figure of another zone: once Perlis's
+        // PLS01 sunrise, then the end of eating at a far town of a wide zone (the zone round of 13 Nov 2026), and
+        // since its review round a start of a special zone on four days its neighbour printed later (R228 as
+        // revised). Which event and which zone is the stamp's to say, not this test's: the rule is only that the
+        // entry's worst is not Kuala Lumpur's. Its own zone (WLY01) measured every start within a minute on 12 October 2026;
+        // the weekly monitor's prove adds JAKIM's next year to the row, whose Subuh the refit of 4 Nov 2026
+        // holds within its unit's recorded 3 minutes. Whatever the proof holds, the row's worst start is the
+        // figure its tile claims, never the entry's, and no start is later than a limit the stamp records for it.
         val kualaLumpur = Place(3.1412, 101.68653, "Asia/Kuala_Lumpur", "MY")
         val state = stateFor(kualaLumpur)
         assertIs<AboutTimesUiState.AuthorityChecked>(state)
         assertEquals("my.jakim", state.resolution.entry.id)
         assertEquals("WLY01", state.resolution.unitId)
         val stamp = requireNotNull(state.stamp) { "my.jakim should carry a committed stamp" }
-        assertEquals(4, stamp.worstLateMinutes.values.max())
-        assertEquals(4, stamp.worstLateMinutes.getValue("endOfEating"))
+        val entryWorst = stamp.worstLateMinutes.values.max()
         val wly01Starts = stamp.worstLateByUnit.getValue("WLY01")
             .filterKeys { it in setOf("fajr", "dhuhr", "asrStandard", "maghrib", "isha") }.values.max()
         assertEquals(wly01Starts, checkedAtMostMinutes(state.resolution, kualaLumpur, stamp))
-        // The rule itself, not whatever limits the stamp holds for any zone: class B's 2 minutes for
-        // every start, and 3 for Kuala Lumpur's Fajr alone, the refit of 4 Nov 2026 (831aff9d).
-        // A later limit recorded for another zone must not loosen Kuala Lumpur's tile.
-        val ceilings = mapOf("fajr" to 3, "dhuhr" to 2, "asrStandard" to 2, "maghrib" to 2, "isha" to 2)
+        assertTrue(wly01Starts < entryWorst, "the tile would claim the entry's worst ($entryWorst min), another zone's")
+        // The rule itself, not whatever limits the stamp holds for any zone: each start within Kuala Lumpur's own limit
+        // (class B's 2 minutes, its recorded exceptions, and since ruling R270 what its own reach was measured at).
+        // A limit recorded for another zone must not loosen Kuala Lumpur's tile.
+        val unit = Units.of("my.jakim")!!.units.single { it.id == "WLY01" }
+        val events = mapOf("fajr" to TimedEvent.FAJR, "dhuhr" to TimedEvent.DHUHR, "asrStandard" to TimedEvent.ASR, "maghrib" to TimedEvent.MAGHRIB, "isha" to TimedEvent.ISHA)
         val wly01 = stamp.worstLateByUnit.getValue("WLY01")
-        for ((event, ceiling) in ceilings) {
+        for ((event, timed) in events) {
             val worst = wly01.getValue(event)
+            val ceiling = lateLimitFor(timed, unit, state.resolution.entry)?.minutes ?: 2
             assertTrue(worst <= ceiling, "WLY01's $event: $worst min, over its $ceiling")
         }
     }
@@ -249,7 +259,11 @@ class AboutTimesUiStateTest {
         val kazanStarts = stamp.worstLateByUnit.getValue("kazan")
             .filterKeys { it != "sunrise" && it != "endOfEating" && it != "imsak" }.values.max()
         assertEquals(kazanStarts, checkedAtMostMinutes(state.resolution, kazan, stamp))
-        assertTrue(kazanStarts <= 2)
+        // Since ruling R270 Kazan's figure is its reach's too, a white night's included; never past its own limits.
+        val unit = Units.of("ru.dumrt")!!.units.single { it.id == "kazan" }
+        val limit = listOf(TimedEvent.FAJR, TimedEvent.DHUHR, TimedEvent.ASR, TimedEvent.MAGHRIB, TimedEvent.ISHA)
+            .maxOf { lateLimitFor(it, unit, state.resolution.entry)?.minutes ?: 2 }
+        assertTrue(kazanStarts <= limit, "$kazanStarts over $limit")
     }
 
     @Test
@@ -319,6 +333,7 @@ class AboutTimesUiStateTest {
         assertEquals(ownRuns.maxOf { it.second }.toString(), stamp.lastChecked)
         for ((i, run) in ownRuns.withIndex()) {
             val (start, end) = run
+            if (start == end) continue // a lone day extends nothing "through" (G13), held below
             assertEquals(end.toString(), checkedThrough(istanbul.resolution, stamp, start), "in the run from $start")
             assertEquals(end.toString(), checkedThrough(istanbul.resolution, stamp, end), "on the run's last day $end")
             val next = ownRuns.getOrNull(i + 1)?.first ?: continue
@@ -327,14 +342,34 @@ class AboutTimesUiStateTest {
                 assertEquals(end.toString(), checkedThrough(istanbul.resolution, stamp, inHole), "in the hole after $end")
             }
         }
-        // A run of one day, a hole, a day past every run, and a day before every run.
-        val runs = listOf("2026-01-01..2026-03-31", "2026-04-02", "2026-05-01..2026-05-31")
+        // A run of one day (passed over: G13), a hole, a day past every run, and a day before every run; runs that
+        // touch are one.
+        val runs = listOf("2026-01-01..2026-03-31", "2026-04-02", "2026-05-01..2026-05-31", "2026-06-01..2026-06-10")
         assertEquals("2026-03-31", checkedRunEnd(runs, LocalDate(2026, 3, 31)))
         assertEquals("2026-03-31", checkedRunEnd(runs, LocalDate(2026, 4, 1)))
-        assertEquals("2026-04-02", checkedRunEnd(runs, LocalDate(2026, 4, 2)))
-        assertEquals("2026-04-02", checkedRunEnd(runs, LocalDate(2026, 4, 30)))
-        assertEquals("2026-05-31", checkedRunEnd(runs, LocalDate(2026, 7, 1)))
+        assertEquals("2026-03-31", checkedRunEnd(runs, LocalDate(2026, 4, 2)))
+        assertEquals("2026-03-31", checkedRunEnd(runs, LocalDate(2026, 4, 30)))
+        assertEquals("2026-06-10", checkedRunEnd(runs, LocalDate(2026, 5, 15)))
+        assertEquals("2026-06-10", checkedRunEnd(runs, LocalDate(2026, 7, 1)))
         assertNull(checkedRunEnd(runs, LocalDate(2025, 12, 31)))
+    }
+
+    @Test
+    fun `oman's sampled days never make the checked-through date pass a year no table was read for`() {
+        // The second audit's G13: Oman's 2029 tables are read on the 1st and 15th of each month only, and 2028 not at
+        // all, so in 2029 About keeps the end of the last run of whole days, read off the committed stamp's own runs.
+        val muscat = stateFor(Place(23.5880, 58.3829, "Asia/Muscat", "OM"))
+        assertIs<AboutTimesUiState.AuthorityChecked>(muscat)
+        val stamp = requireNotNull(muscat.stamp)
+        val runs = muscat.resolution.unitId?.takeIf { stamp.worstLateByUnit.isNotEmpty() }?.let { stamp.checkedByUnit[it] } ?: stamp.checked
+        val lone = runs.filter { ".." !in it }.map { LocalDate.parse(it) }
+        assertTrue(lone.isNotEmpty(), "Oman's stamp keeps its sampled days")
+        val whole = runs.filter { ".." in it }.map { LocalDate.parse(it.substringAfter("..")) }
+        for (day in lone) {
+            val lastWholeBefore = whole.filter { it < day }.maxOrNull()?.toString()
+            assertEquals(lastWholeBefore, checkedThrough(muscat.resolution, stamp, day), "on the sampled day $day")
+            assertEquals(lastWholeBefore, checkedThrough(muscat.resolution, stamp, day.plus(1, DateTimeUnit.DAY)), "the day after $day")
+        }
     }
 
     @Test
@@ -375,7 +410,8 @@ class AboutTimesUiStateTest {
         assertIs<AboutTimesUiState.AuthorityUnchecked>(almaty)
         assertEquals(uncheckedWorstMinutes(almaty.resolution, almaty.stamp), uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
         // Almaty's own figure across its reach (its own tables replayed there, the review of 9 Oct 2026): its row's worst
-        // start, 4 on 12 October 2026, moving only as the weekly monitor's prove holds QMDB's next years.
+        // start, 4 on 12 October 2026 and 5 since the other places' tables ride there (ruling R249, 14 November 2026),
+        // moving only as the weekly monitor's prove holds QMDB's next years.
         val almatyStarts = requireNotNull(suburb.stamp).worstLateByUnit.getValue("almaty")
             .filterKeys { it in setOf("fajr", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha") }.values.max()
         assertEquals(almatyStarts, uncheckedWorstMinutes(suburb.resolution, suburb.stamp))
@@ -411,10 +447,12 @@ class AboutTimesUiStateTest {
 
     @Test
     fun `the unchecked template claims no figure for an unmeasured unit`() {
-        // Review I2 (spec §3.5): Ipoh lies beyond JAKIM's measured zones, so JAKIM is class D there
-        // and unmeasured; its stamp holds figures for other zones, none of them Ipoh's.
-        val ipoh = Place(4.5975, 101.0901, "Asia/Kuala_Lumpur", "MY")
-        val state = stateFor(ipoh)
+        // Review I2 (spec §3.5): Bandar Tun Razak in Pahang lies beyond JAKIM's measured zones (no zone's list of
+        // districts names it and no listed town is within reach; Ipoh, here until the zone round of 13 Nov 2026,
+        // is PRK02's own point now), so JAKIM is class D there and unmeasured; its stamp holds figures for the
+        // zones, none of them this place's.
+        val beyond = Place(2.9029, 102.8877, "Asia/Kuala_Lumpur", "MY")
+        val state = stateFor(beyond)
         assertIs<AboutTimesUiState.AuthorityUnchecked>(state)
         assertEquals("my.jakim", state.resolution.entry.id)
         assertFalse(state.resolution.measured)
@@ -432,6 +470,20 @@ class AboutTimesUiStateTest {
         val trondheim = Registry.resolveEntry(Registry.byId("no.irn")!!, Place(63.43049, 10.39506, "Europe/Oslo", "NO"))
         assertNull(notFollowedNoteRes(trondheim))
         assertNull(notFollowedNoteRes(stateFor(Place(59.91273, 10.74609, "Europe/Oslo", "NO")).resolution)) // Oslo, cautious
+    }
+
+    @Test
+    fun `norway's cautious times say what is shown on the short nights only where IRN's tromso rule is a member`() {
+        // Ruling R314: R302's nights too short for Isha meet Norway's Cautious times where its IRN member follows the
+        // Tromsø calendar under its clock rule (resolved there by id: Automatic follows IRN alone within that reach).
+        val cautious = Registry.byId("no.cautious")!!
+        val tromso = Registry.resolveEntry(cautious, Place(69.6492, 18.9553, "Europe/Oslo", "NO"))
+        assertEquals(Res.string.about_cautious_short_nights, cautiousNoteRes(tromso))
+        val oslo = stateFor(Place(59.91273, 10.74609, "Europe/Oslo", "NO"))
+        assertIs<AboutTimesUiState.Cautious>(oslo)
+        assertNull(cautiousNoteRes(oslo.resolution))
+        assertNull(cautiousNoteRes(Registry.resolveEntry(cautious, bodo)))
+        assertNull(cautiousNoteRes(Registry.resolveEntry(Registry.byId("no.irn")!!, Place(69.6492, 18.9553, "Europe/Oslo", "NO"))))
     }
 
     private val trondheim = Place(63.43049, 10.39506, "Europe/Oslo", "NO")

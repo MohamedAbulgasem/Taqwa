@@ -624,12 +624,23 @@ time; the real `scripts/release.sh` is the Lead's alone.
   | The Apple Watch bundles: ids, one version, no location or network, the app group, sizes | `scripts/check-watch-bundle.sh` | `scripts/ios-build.sh` (every build, CI too); `--release` in `ios-release.sh check` (the archive) and `export-check` (the IPA) |
   | The bundle check's Release signal and each signature's keys | `scripts/test-watch-bundle-signing.sh` | `scripts/ios-build.sh` |
   | The archive: the watch inside, every bundle at V (C) | `scripts/ios-release.sh check` | `ios-release.sh archive`'s report |
-- **Prayer-time stamps**: `scripts/release.sh` and `scripts/ios-release.sh` both run
-  `./gradlew -p tools/timetables checkStamps` first and refuse to build on a stale or red stamp
-  (spec §5, ruling R86). The Ramadan build runs them as `TAQWA_RAMADAN=1448 scripts/release.sh`
+- **Prayer-time stamps**: `scripts/release.sh` (in its step 1, after `scripts/check-versions.sh`) and
+  `scripts/ios-release.sh` both run `./gradlew -p tools/timetables checkStamps -Prelease=true` before
+  any build, and refuse to build on a stale or red stamp (spec §5, ruling R86), and while a reach
+  proof is owed: a unit left out of its reach rows
+  or a group still pending in `GenerateReachRows.kt`, whose figure in About is lower than its reach
+  was measured (never early), an entry whose measured units have no reach spec, a figure claimed across an
+  area (a region's shape, a country) that no area sweep reads (ruling R297), or a reach limit over 4
+  minutes the owner has not ruled on (`docs/MONITOR.md`, "A reach proof owed holds a release"; ruling R270,
+  14 November 2026). Both scripts then run `checkEnvelopeRows` and refuse to build while an envelope file is
+  stale (the second trust audit's G24). The Ramadan build runs them as `TAQWA_RAMADAN=1448 scripts/release.sh`
   (and `ios-release.sh`): they then also refuse an A/B timetable with a unit whose Fajr, end of eating
   and Maghrib were not each checked on every day of Ramadan 1448 and a day each side (7 February to
-  10 March 2027), unless the gate has demoted it (rulings R146 and R148).
+  10 March 2027), unless the gate has demoted it (rulings R146 and R148) or it is published month by
+  month and the check reports it `covered under O4` (ruling R185: that part reads the archive's
+  checkout, `TAQWA_OFFICIAL` or the `archive` link under `tools/timetables/official`, and without
+  it nothing is covered). Every build also refuses an entry the monitor has demoted by itself (a
+  `@demoted` line in its gate file) until its failing days are proven or its class lowered.
 - **Manifest**: `MY_PACKAGE_REPLACED` re-arms prayer alarms after every update; `USE_EXACT_ALARM`
   removed, `SCHEDULE_EXACT_ALARM` kept with an in-app route to "Alarms & reminders"; location and
   compass hardware optional; `localeConfig` lists the seven languages; backup opted out twice
@@ -656,8 +667,10 @@ time; the real `scripts/release.sh` is the Lead's alone.
 - Android: with the 5-minute reminder on and the phone in deep Doze, the adhan can arrive up to
   4 minutes late (one allow-while-idle alarm per 9 minutes); `setAlarmClock()` for the prayer
   entries would fix it at the cost of an alarm icon in the status bar.
-- iOS: the widget timeline is reloaded about once a minute while the Prayer screen is open
-  (the countdown minute is part of the change key); WidgetKit may throttle.
+- iOS: the widget timeline is reloaded while the Prayer screen is open, once to twice a minute
+  with the prayers two hours apart or more and more often when they are closer (the countdown's
+  minute and the ring's 120 steps are in the change key; about 2.7 times a minute at 70 minutes);
+  WidgetKit may throttle.
 - iOS: a `CLLocationManager` is retained per Qibla visit (small leak); notification categories
   and actions are not registered (no "snooze"); the whole-Quran download's 6-hour daily data-sync
   budget on Android 15+ has not been exercised on a slow connection.

@@ -98,7 +98,10 @@ private fun readStamp(file: File): ReadStamp {
     val checked = runsOf(root["checked"])
     val checkedByUnit = (root["units"] as? Map<String, Any?> ?: emptyMap()).entries.mapNotNull { (unit, stats) ->
         val runs = runsOf((stats as Map<String, Any?>)["checked"])
-        (unit to runs).takeIf { runs.isNotEmpty() && runs != checked }
+        // A unit with no runs of its own is written so (an empty list), never left out: a unit left out reads the
+        // entry's runs (CheckedDays, checkedThrough), and the site's Proven reads a unit's empty runs as unchecked, so
+        // leaving it out would show a place as checked on days its page is held (the review of ruling R275).
+        (unit to runs).takeIf { runs != checked }
     }.toMap()
     val lateLimitsRaw = root["lateLimits"] as? Map<String, Any?> ?: emptyMap()
     // A trailing " (event)" disambiguates two limits that share a source and minutes but differ

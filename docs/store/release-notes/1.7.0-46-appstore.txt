@@ -1,0 +1,44 @@
+App Store "What's New" for 1.7.0 (46): one block per localization, iPhone and Apple Watch items only, no other platform named.
+Each block is the Play set's as its native readers checked it on 21 November 2026, less the line on the Prayer screen's watch card.
+
+=== English (UK) ===
+What's new in 1.7.0:
+• Prayer times are now compared with the published timetable in many more places, including Türkiye, Egypt, Morocco, Algeria, Malaysia, Indonesia, Bangladesh and Pakistan
+• Near a border, times found from your location can now take both countries' timetables into account
+• The Ayah of the day widget now has 365 ayahs, one for each day of a year
+
+=== Arabic ===
+الجديد في الإصدار 1.7.0:
+• تُقارَن مواقيت الصلاة الآن بالجدول المنشور في أماكن أكثر بكثير، منها تركيا ومصر والمغرب والجزائر وماليزيا وإندونيسيا وبنغلاديش وباكستان
+• قرب الحدود، عند استخدام موقعك، يمكن الآن أن تراعي المواقيت جداول البلدين كليهما
+• أداة «آية اليوم» فيها الآن 365 آية، آية لكل يوم من أيام السنة
+
+=== French ===
+Nouveautés de la 1.7.0 :
+• Les horaires de prière sont comparés au calendrier publié dans bien plus d’endroits, dont la Turquie, l’Égypte, le Maroc, l’Algérie, la Malaisie, l’Indonésie, le Bangladesh et le Pakistan
+• Près d’une frontière, les horaires basés sur votre position peuvent maintenant tenir compte des calendriers des deux pays
+• Le widget « Verset du jour » compte désormais 365 versets, un par jour de l’année
+
+=== Turkish ===
+1.7.0 sürümündeki yenilikler:
+• Namaz vakitleri artık yayımlanan takvimle çok daha fazla yerde karşılaştırılıyor; aralarında Türkiye, Mısır, Fas, Cezayir, Malezya, Endonezya, Bangladeş ve Pakistan var
+• Sınıra yakın yerlerde, konumunuza göre belirlenen vakitler artık iki ülkenin takvimini de dikkate alabiliyor
+• “Günün ayeti” widget’ında artık 365 ayet var, yılın her günü için bir tane
+
+=== Indonesian ===
+Yang baru di versi 1.7.0:
+• Waktu salat kini dicocokkan dengan jadwal terbitannya di jauh lebih banyak tempat, termasuk Turki, Mesir, Maroko, Aljazair, Malaysia, Indonesia, Bangladesh, dan Pakistan
+• Di dekat perbatasan, waktu salat yang ditentukan berdasarkan lokasi Anda kini dapat memperhitungkan jadwal kedua negara
+• Widget “Ayat hari ini” kini berisi 365 ayat, satu untuk setiap hari dalam setahun
+
+=== Urdu ===
+1.7.0 میں نیا کیا ہے:
+• نماز کے اوقات اب کہیں زیادہ جگہوں پر شائع شدہ نقشۂ اوقات سے ملا کر دیکھے جاتے ہیں، جن میں ترکیہ، مصر، مراکش، الجزائر، ملائیشیا، انڈونیشیا، بنگلہ دیش اور پاکستان شامل ہیں
+• سرحد کے قریب، فون کے مقام سے اوقات نکالتے ہوئے تقویٰ اب دونوں ملکوں کے نقشۂ اوقات کو مدِ نظر رکھ سکتا ہے
+• "آج کی آیت" ویجٹ میں اب 365 آیات ہیں، سال کے ہر دن کے لیے ایک
+
+=== Bengali ===
+1.7.0 সংস্করণে যা নতুন:
+• নামাজের সময় এখন আরও অনেক জায়গায় প্রকাশিত সময়সূচির সঙ্গে মিলিয়ে দেখা হয়, যেমন তুরস্ক, মিশর, মরক্কো, আলজেরিয়া, মালয়েশিয়া, ইন্দোনেশিয়া, বাংলাদেশ ও পাকিস্তান
+• সীমান্তের কাছে, আপনার অবস্থান থেকে পাওয়া নামাজের সময় এখন দুই দেশের সময়সূচিই বিবেচনায় নিতে পারে
+• "আজকের আয়াত" উইজেটে এখন 365টি আয়াত আছে, বছরের প্রতিটি দিনের জন্য একটি

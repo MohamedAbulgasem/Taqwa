@@ -56,10 +56,11 @@ class DeclaredCellsGateTest {
     }
 
     @Test
-    fun `without a declaration the early fajr and the late sunrise break the gate`() {
+    fun `without a declaration the early fajr breaks the gate and the real sun caps the sunrise`() {
         val s = Gate(roots, broken(null)).evaluate(muis).entries.getValue("sg.muis")
         assertEquals(5, s.event(Event.FAJR).early)
-        assertEquals(5, s.event(Event.SUNRISE).lateEnd)
+        // The sunrise moved two minutes later is capped at the real sunrise at the place (ruling R265): no late end.
+        assertEquals(0, s.event(Event.SUNRISE).lateEnd)
         assertEquals(0, s.event(Event.FAJR).declared)
     }
 
@@ -82,6 +83,31 @@ class DeclaredCellsGateTest {
         assertTrue("fajr: 5 cells declared not followed (2026-02-14..2026-02-18)" in result.report(), result.report())
     }
 
+    /**
+     * Ruling R294 (the review of 17 Nov 2026): a declared Isha is only ever moved later (point 9, the minute after a
+     * Maghrib past the authority's Isha), so a declared Isha shown before the printed one is early, declared or not.
+     * Here Isha's margin two hours early puts the engine's Isha before its Maghrib under a method that declares it:
+     * the Isha shown is the minute after Maghrib, over an hour before MUIS's printed Isha.
+     */
+    @Test
+    fun `a declared isha shown before the printed one is early`() {
+        val ishaFirst: (TimetableMethod) -> TimetableMethod = { m ->
+            m.copy(declaresIshaBeforeMaghrib = true, margins = m.margins.copy(isha = m.margins.isha - 7200))
+        }
+        val result = Gate(roots, ishaFirst).evaluate(muis)
+        val isha = result.entries.getValue("sg.muis").event(Event.ISHA)
+        assertEquals(5, isha.declared)
+        assertEquals(0, isha.checked)
+        assertEquals(5, isha.early)
+        assertTrue(result.violations().any { "sg.muis isha: 5 early" in it }, result.report())
+        assertTrue(isha.broken.all { "declared not followed" in it }, isha.broken.toString())
+
+        // The same Isha margin without the declaration: point 9 leaves the day for the repair, and the gate still names it.
+        val undeclared = Gate(roots, { m -> m.copy(margins = m.margins.copy(isha = m.margins.isha - 7200)) }).evaluate(muis)
+        assertEquals(0, undeclared.entries.getValue("sg.muis").event(Event.ISHA).declared)
+        assertTrue(undeclared.violations().isNotEmpty(), undeclared.report())
+    }
+
     @Test
     fun `a stamp carries the declared cells and their dates and none where nothing is declared`() {
         val declared = Gate(roots, broken(LateFajr)).evaluate(muis).entries.getValue("sg.muis")
@@ -94,6 +120,55 @@ class DeclaredCellsGateTest {
         val plain = Gate(roots).evaluate(muis).entries.getValue("sg.muis")
         val json = world.taqwa.timetables.Json.pretty(Stamps.stamp(plain, "core"))
         assertFalse("declared" in json, json)
+    }
+
+    /**
+     * Ruling R302: a day whose Isha shows no end is declared, never out of order, only where the real sun at the row's
+     * point makes the night too short for one (the gate recomputes that and passes it in); on any other night, and on a
+     * repaired day whatever the night, it is out of order as before; and only for an entry a ruling names (IRN, R302, and
+     * Norway's Cautious times, R314). Made-up
+     * days with no ends at all.
+     */
+    @Test
+    fun `a day without its isha end is declared on a night too short for one and out of order on any other`() {
+        val s = EntryStats(requireNotNull(world.taqwa.app.prayer.engine.registry.Registry.byId("no.irn")))
+        val t = kotlin.time.Instant.fromEpochSeconds(1_800_000_000)
+        fun day(d: Int) = world.taqwa.app.prayer.engine.day.PrayerDay(LocalDate(2026, 5, d), t, t, t, t, t, t, t, t, t, null, methodId = "made-up")
+        s.placeDay("g", LocalDate(2026, 5, 16), Split.TEST, false, day(16), null, shortNight = { true })
+        s.placeDay("g", LocalDate(2026, 5, 17), Split.TEST, false, day(17), null, shortNight = { false })
+        s.placeDay("g", LocalDate(2026, 5, 18), Split.TEST, false, day(18).copy(repaired = true), null, shortNight = { true })
+        s.promiseDay("p", LocalDate(2026, 5, 19), day(19)) { true }
+        s.promiseDay("p", LocalDate(2026, 5, 20), day(20)) { false }
+        assertEquals(2, s.shortNights)
+        assertEquals(listOf("2026-05-16", "2026-05-19"), s.shortNightDates.map { it.toString() })
+        assertEquals(3, s.outOfOrder)
+        @Suppress("UNCHECKED_CAST")
+        val stamped = Stamps.stamp(s, "core")["shortNights"] as Map<String, Any?>
+        assertEquals(2, stamped["days"])
+        assertEquals(listOf("2026-05-16", "2026-05-19"), stamped["dates"])
+        // A day with its Isha end is neither, whatever the sun.
+        val ended = EntryStats(s.entry)
+        ended.placeDay("g", LocalDate(2026, 5, 16), Split.TEST, false, day(16).copy(ends = mapOf(Prayer.ISHA to t)), null, shortNight = { true })
+        assertEquals(0, ended.shortNights + ended.outOfOrder)
+        assertFalse("shortNights" in Stamps.stamp(ended, "core"))
+        // The rulings name IRN (R302) and Norway's Cautious times, IRN a member (R314): it declares the same night too.
+        assertEquals(setOf("no.irn", "no.cautious"), EntryStats.SHORT_NIGHT_ENTRIES)
+        val cautious = EntryStats(requireNotNull(world.taqwa.app.prayer.engine.registry.Registry.byId("no.cautious")))
+        cautious.placeDay("g", LocalDate(2026, 5, 16), Split.TEST, false, day(16), null, shortNight = { true })
+        cautious.promiseDay("p", LocalDate(2026, 5, 19), day(19)) { true }
+        cautious.placeDay("g", LocalDate(2026, 5, 17), Split.TEST, false, day(17), null, shortNight = { false })
+        assertEquals(2, cautious.shortNights)
+        assertEquals(1, cautious.outOfOrder)
+        assertTrue("shortNights" in Stamps.stamp(cautious, "core"))
+        // An entry no ruling names declares nothing on the same night: its short night is out of order, own or promise-only.
+        val other = requireNotNull(world.taqwa.app.prayer.engine.registry.Registry.byId("tr.diyanet.europe"))
+        assertFalse(other.id in EntryStats.SHORT_NIGHT_ENTRIES)
+        val undeclared = EntryStats(other)
+        undeclared.placeDay("g", LocalDate(2026, 5, 16), Split.TEST, false, day(16), null, shortNight = { true })
+        undeclared.promiseDay("p", LocalDate(2026, 5, 19), day(19)) { true }
+        assertEquals(0, undeclared.shortNights)
+        assertEquals(2, undeclared.outOfOrder)
+        assertFalse("shortNights" in Stamps.stamp(undeclared, "core"))
     }
 
     @Test

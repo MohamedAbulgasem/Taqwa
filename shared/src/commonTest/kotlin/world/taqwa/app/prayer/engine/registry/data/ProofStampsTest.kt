@@ -20,26 +20,32 @@ class ProofStampsTest {
         val stamp = ProofStamps.of("sa.ummalqura")
         assertTrue(stamp != null, "sa.ummalqura should have a generated row")
         assertEquals("sa.ummalqura", stamp.entryId)
-        // KACST's 173 places, the app's own points for 94 Saudi cities (the city-points round of 9 Oct 2026) and
-        // each place's own tables across its reach (sa-ummalqura-reach.tsv, the reviews of 9 and 10 Oct 2026).
-        assertEquals(3242, stamp.places)
-        // At least the place-days of 9 October 2026: the weekly monitor's prove adds held-out rows as new captures
-        // arrive (docs/MONITOR.md, "Prove"), so the proof only grows; a regeneration that drops rows shows here.
-        assertTrue(stamp.placeDays >= 2493800, "sa.ummalqura placeDays ${stamp.placeDays}")
+        // KACST's places, each table counted once where it is printed for (ruling R214, 13 Nov 2026): the app's own
+        // points for the Saudi cities and each place's tables replayed across its reach (sa-ummalqura-reach.tsv) are
+        // checks, and no place or place-day of the figure shown (they made it 3,242 places before). The rule, not the
+        // day's figure (the review of 14 Nov 2026): a place is one that has its own row of worsts, and the places only
+        // grow from the 173 of 13 November 2026 as the monitor holds more of KACST's.
+        assertEquals(stamp.worstLateByUnit.size, stamp.places, "sa.ummalqura counts a place that has no table of its own")
+        assertTrue(stamp.places >= 173, "sa.ummalqura places ${stamp.places}")
+        // At least the tables' own place-days of 13 November 2026: the weekly monitor's prove adds held-out rows as new
+        // captures arrive (docs/MONITOR.md, "Prove"), so the proof only grows; a regeneration that drops rows shows here.
+        assertTrue(stamp.placeDays >= 132866, "sa.ummalqura placeDays ${stamp.placeDays}")
         assertTrue(stamp.lastChecked!! >= "2030-12-31", "sa.ummalqura lastChecked ${stamp.lastChecked}")
         // Dhuhr's worst, 2 on 9 October 2026 (the reach's minute, ruling R40), may grow to Tayma's own limit of 3 as prove
         // holds Tayma's next tables, never past it; a regeneration that loses it shows here.
         assertTrue(stamp.worstLateMinutes.getValue("dhuhr") in 2..3, "sa.ummalqura Dhuhr ${stamp.worstLateMinutes["dhuhr"]}")
         assertEquals(stamp.worstLateMinutes["dhuhr"], stamp.worstLateByUnit.values.mapNotNull { it["dhuhr"] }.max())
-        // One row per KACST place, each its own: Makkah's Fajr is not Tayma's (a table computed a degree north of it).
-        assertEquals(173, stamp.worstLateByUnit.size)
+        // One row per KACST place, each its own: Makkah's Fajr is not Tayma's (a table computed a degree north of the
+        // town, read across the town's disc as well since ruling R300, where the user's own dawn comes later than it).
         assertEquals(2, stamp.worstLateByUnit.getValue("makkah")["fajr"])
-        assertEquals(5, stamp.worstLateByUnit.getValue("tayma")["fajr"])
+        assertTrue(stamp.worstLateByUnit.getValue("tayma").getValue("fajr") > stamp.worstLateByUnit.getValue("makkah").getValue("fajr"))
         assertEquals(stamp.worstLateMinutes["fajr"], stamp.worstLateByUnit.values.mapNotNull { it["fajr"] }.max())
         val lagLimit = stamp.lateLimits.first { "fajr" in it.events && it.reason?.contains("repeats the previous day") == true }
         assertEquals(2, lagLimit.minutes)
         assertEquals(listOf("fajr"), lagLimit.events)
-        val ends = stamp.lateLimits.first { "endOfEating" in it.events }
+        // The entry's own ends limit (the lag dates' earlier sunrise and end of eating), not a unit's (Tayma's own 3, whose
+        // sunrise a measured reach limit overrides since ruling R300, now lists the end of eating without it).
+        val ends = stamp.lateLimits.first { "endOfEating" in it.events && it.reason?.contains("on the lag dates") == true }
         assertEquals(3, ends.minutes)
         assertTrue("sunrise" in ends.events)
     }
@@ -54,7 +60,8 @@ class ProofStampsTest {
         for ((event, worst) in stamp.worstLateMinutes) {
             assertEquals(worst, stamp.worstLateByUnit.values.mapNotNull { it[event] }.max(), event)
         }
-        assertTrue(stamp.worstLateByUnit.getValue("kazan").getValue("endOfEating") < stamp.worstLateMinutes.getValue("endOfEating"))
+        // Since ruling R270 every town's reach meets a white night, so the towns' figures stand close; still each is its own.
+        assertTrue(stamp.worstLateByUnit.values.any { it.getValue("endOfEating") < stamp.worstLateMinutes.getValue("endOfEating") })
         // Review M7: the class's own limit (B, 2 min) is a row with a null reason.
         assertTrue(stamp.lateLimits.any { it.reason == null && it.minutes == 2 })
         // An entry gated without units has none.

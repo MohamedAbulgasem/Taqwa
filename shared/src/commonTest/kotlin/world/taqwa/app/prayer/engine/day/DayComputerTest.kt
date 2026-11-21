@@ -14,6 +14,7 @@ import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.astro.AsrModel
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.astro.altitudeTime
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.DayRule
 import world.taqwa.app.prayer.engine.method.EndOfEating
@@ -22,6 +23,7 @@ import world.taqwa.app.prayer.engine.method.FixedPointMode
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.Harmonics
 import world.taqwa.app.prayer.engine.method.HighLatRule
+import world.taqwa.app.prayer.engine.method.ImsakFrom
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.RamadanRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
@@ -650,6 +652,66 @@ class DayComputerTest {
     }
 
     @Test
+    fun `a fixed asr holds both schools to its minute when the sun's asr is earlier and lets a later one stand`() {
+        // COSIM's conventional 16:00 at Abidjan (the safe defaults lane, 12 Nov 2026): the first shadow comes about
+        // 15:20 in October, the second about 16:20.
+        val fixed = plain("test.fixed").copy(fixedAsrLocalMinutes = 16 * 60)
+        val free = plain("test.free")
+        val abidjan = GeoPoint(5.35444, -4.00167)
+        val zone = TimeZone.of("Africa/Abidjan")
+        val date = LocalDate(2026, 10, 20)
+        val sun = compute(free, abidjan, date, zone)
+        val held = compute(fixed, abidjan, date, zone)
+        assertTrue(sun.asr < local(date, "16:00", zone), "the first shadow ${sun.asr.clock(zone)}")
+        assertEquals("16:00", held.asr.clock(zone))
+        assertTrue(sun.asrOther > local(date, "16:00", zone), "the second shadow ${sun.asrOther.clock(zone)}")
+        assertEquals(sun.asrOther, held.asrOther)
+        assertEquals(sun.dhuhr, held.dhuhr)
+        assertEquals(sun.maghrib, held.maghrib)
+    }
+
+    @Test
+    fun `a fixed asr does not move dhuhr's end which stays at the standard asr the sky gives`() {
+        // The trust audit's F2 (13 Nov 2026): read after the clock, Dhuhr's end stood at 16:00, long after the first
+        // shadow that ends it. In either school, on a day the first shadow comes before the clock and the second after.
+        val fixed = plain("test.fixed").copy(fixedAsrLocalMinutes = 16 * 60)
+        val free = plain("test.free")
+        val abidjan = GeoPoint(5.35444, -4.00167)
+        val zone = TimeZone.of("Africa/Abidjan")
+        val date = LocalDate(2026, 10, 20)
+        for (school in AsrSchool.entries) {
+            val sun = compute(free, abidjan, date, zone, school = school)
+            val held = compute(fixed, abidjan, date, zone, school = school)
+            val firstShadow = if (school == AsrSchool.STANDARD) sun.asr else sun.asrOther
+            // An end, rounded down (ruling R265): the minute of the first shadow, never after it.
+            val end = held.ends.getValue(Prayer.DHUHR)
+            assertTrue(end <= firstShadow && firstShadow - end <= 1.minutes, "$school: the first shadow's own minute")
+            assertTrue(held.ends.getValue(Prayer.DHUHR) < local(date, "16:00", zone), "$school")
+            assertEquals(sun.ends.getValue(Prayer.DHUHR), held.ends.getValue(Prayer.DHUHR), "$school")
+            assertTrue(held.asr >= local(date, "16:00", zone) && held.asrOther >= local(date, "16:00", zone), "$school")
+        }
+    }
+
+    @Test
+    fun `an every-date isha floor holds isha to maghrib plus its minutes off ramadan too and the angle wins when later`() {
+        // Tajikistan's Council of Ulama prints Khufton at Shom + 90 on every day of November 2026 at Dushanbe, where
+        // 16° comes about 75 min after the sunset then; in June 16° comes later than the sunset + 90.
+        val floor = plain("test.floor").copy(isha = IshaRule.Angle(16.0), ishaFloorMinutesAfterMaghrib = 90)
+        val free = plain("test.free").copy(isha = IshaRule.Angle(16.0))
+        val dushanbe = GeoPoint(38.53575, 68.77905)
+        val zone = TimeZone.of("Asia/Dushanbe")
+        val november = LocalDate(2026, 11, 12)
+        val winter = compute(floor, dushanbe, november, zone)
+        assertTrue(compute(free, dushanbe, november, zone).isha < winter.maghrib + 90.minutes)
+        assertEquals(winter.maghrib + 90.minutes, winter.isha)
+        val june = LocalDate(2027, 6, 21)
+        val angle = compute(free, dushanbe, june, zone)
+        assertTrue(angle.isha > angle.maghrib + 90.minutes, "16° at ${angle.isha.clock(zone)}")
+        assertEquals(angle.isha, compute(floor, dushanbe, june, zone).isha)
+        assertFailsWith<IllegalArgumentException> { plain("test.bad").copy(isha = IshaRule.AfterMaghrib(90), ishaFloorMinutesAfterMaghrib = 90) }
+    }
+
+    @Test
     fun `jamiatul ulama suhoor ends five minutes before fajr`() {
         val jamiat = TimetableMethod(
             id = "test.jamiat",
@@ -837,6 +899,70 @@ class DayComputerTest {
         assertEquals(null, compute(plain("test.none"), makkah, date, riyadhZone).imsak)
     }
 
+    // ImsakFrom.PrintedFajr: the JAKIM imsak round of 12 Nov 2026 (e-solat prints its Subuh, for the zone's latest point, less 10).
+
+    private val printedImsak = plain("test.printed").copy(
+        authorityMinutes = EventOffsets(fajr = 2),
+        margins = EventOffsets(fajr = 148),
+        endOfEatingMarginSeconds = -30,
+        imsakMinutesBeforeFajr = 10,
+        imsakFrom = ImsakFrom.PrintedFajr(40),
+        // A start point half a degree west: its dawn about two minutes after the table point's.
+        startPoints = listOf(GeoPoint(21.426666, 39.331666)),
+    )
+
+    @Test
+    fun `a printed fajr imsak counts back from the latest start point's fajr rounded up with its own margin`() {
+        val date = LocalDate(2026, 9, 20)
+        val day = compute(printedImsak, makkah, date, riyadhZone)
+        fun dawn(p: GeoPoint) = SunClock(p.lat, p.lon, date, 3 * 3600, SunModel.EXACT).altitudeTime(-18.0, morning = true)!!
+        val latest = maxOf(dawn(makkah), dawn(printedImsak.startPoints.single()))
+        assertTrue(latest > dawn(makkah) + 60, "the start point must be the later one for this test to bite")
+        // The authority's Fajr (its dawn and its 2 min), the imsak's own 40 s, rounded up as a start; then less 10 min.
+        assertEquals(ceil((latest + 120 + 40) / 60).toLong() * 60 - 600, day.imsak?.epochSeconds)
+        // Not hung off the Fajr shown, whose 148 s start margin can carry it a minute past the print.
+        assertEquals(ceil((latest + 120 + 148) / 60).toLong() * 60, day.fajr.epochSeconds)
+        assertTrue(day.imsak!! <= day.fajr - 10.minutes)
+    }
+
+    @Test
+    fun `a printed fajr imsak leaves the end of eating where the dawn puts it`() {
+        val date = LocalDate(2026, 9, 20)
+        val printed = compute(printedImsak, makkah, date, riyadhZone)
+        val dawn = compute(printedImsak.copy(imsakFrom = ImsakFrom.Dawn), makkah, date, riyadhZone)
+        assertEquals(dawn.endOfEating, printed.endOfEating)
+        assertEquals(dawn.fajr, printed.fajr)
+        // The dawn's imsak hangs off the table point's own dawn, minutes before the start point's Fajr.
+        assertEquals(dawn.endOfEating - 10.minutes, dawn.imsak)
+        assertTrue(printed.imsak!! - dawn.imsak!! >= 2.minutes, "${printed.imsak} against ${dawn.imsak}")
+    }
+
+    @Test
+    fun `a printed fajr imsak moves only with its own margin`() {
+        val date = LocalDate(2026, 9, 20)
+        val base = compute(printedImsak, makkah, date, riyadhZone)
+        val later = compute(printedImsak.copy(imsakFrom = ImsakFrom.PrintedFajr(40 + 60)), makkah, date, riyadhZone)
+        val laterStart = compute(printedImsak.copy(margins = EventOffsets(fajr = 148 + 60)), makkah, date, riyadhZone)
+        assertEquals(base.imsak!! + 1.minutes, later.imsak)
+        assertEquals(base.imsak, laterStart.imsak)
+        assertEquals(base.fajr + 1.minutes, laterStart.fajr)
+    }
+
+    @Test
+    fun `a printed fajr imsak beside a fixed point is never after the table point's own`() {
+        val date = LocalDate(2026, 9, 20)
+        // The user half a degree west of the table point would show a Fajr, and an imsak, two minutes later.
+        val atTable = compute(printedImsak.copy(startPoints = emptyList()), makkah, date, riyadhZone)
+        val beside = compute(printedImsak.copy(startPoints = emptyList(), fixedPoint = makkah), GeoPoint(21.426666, 39.33), date, riyadhZone)
+        assertTrue(beside.fajr > atTable.fajr, "the user's own later Fajr is the start shown")
+        assertEquals(atTable.imsak, beside.imsak)
+    }
+
+    @Test
+    fun `an imsak rule needs the imsak minutes`() {
+        assertFailsWith<IllegalArgumentException> { plain("bad").copy(imsakFrom = ImsakFrom.PrintedFajr(0)) }
+    }
+
     @Test
     fun `isha after maghrib counts from the authority maghrib without our margin`() {
         val method = TimetableMethod(
@@ -954,8 +1080,11 @@ class DayComputerTest {
         val b = compute(monthly, makkah, september, riyadhZone)
         assertEquals(a.asr + 2.minutes, b.asr)
         assertEquals(a.asrOther + 2.minutes, b.asrOther)
-        // Dhuhr ends at the (Standard) Asr, so its end moves with it.
-        assertEquals(a.copy(asr = b.asr, asrOther = b.asrOther, ends = a.ends + (Prayer.DHUHR to b.asr)), b)
+        // Dhuhr ends at the (Standard) Asr the sky gives, read as an end (ruling R265): minutes that put the authority's
+        // Asr later do not carry its end later with it.
+        assertEquals(a.copy(asr = b.asr, asrOther = b.asrOther), b)
+        val earlier = compute(plain("test.monthly").copy(monthlyOffsets = mapOf(Prayer.ASR to IntArray(12) { if (it == 8) -120 else 0 })), makkah, september, riyadhZone)
+        assertEquals(a.ends.getValue(Prayer.DHUHR) - 2.minutes, earlier.ends.getValue(Prayer.DHUHR), "minutes that put it earlier carry its end with it")
         val october = LocalDate(2026, 10, 20)
         assertEquals(
             compute(plain("test.monthly"), makkah, october, riyadhZone),

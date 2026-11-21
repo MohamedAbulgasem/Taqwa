@@ -49,6 +49,10 @@ internal object SettingsKeys {
     // engine picks an authority's unit by it where the units are regions (Algeria's wilayas,
     // ruling R32). Cleared with the rest of the location's city facts.
     val LOCATION_REGION = stringPreferencesKey("location_region")
+    // A GPS fix's second country and that country's region, where the device zone says the place may be across a
+    // border from its nearest city (rulings R256 and R259): the engine holds the day to both. Cleared with the rest.
+    val LOCATION_ALSO_COUNTRY = stringPreferencesKey("location_also_country")
+    val LOCATION_ALSO_REGION = stringPreferencesKey("location_also_region")
     // The Prayer screen's one-time backfill of the stored location's city facts has run, so it is
     // not run again for a city the list gives no region (Singapore, Hong Kong …). Cleared with
     // every new location.
@@ -77,6 +81,8 @@ internal object SettingsKeys {
     // Whether the once-only Sunni/cautious-times cards (spec §2.1) have already been shown.
     val PRAYER_CARD_SUNNI_SEEN = booleanPreferencesKey("prayer_card_sunni_seen")
     val PRAYER_CARD_CAUTIOUS_SEEN = booleanPreferencesKey("prayer_card_cautious_seen")
+    // Home's watch card, retired by its x for every watch, for good; Settings › Watch never reads it.
+    val PRAYER_CARD_WATCH_DISMISSED = booleanPreferencesKey("prayer_card_watch_dismissed")
     // Gates SettingsRepository.migrateIfNeeded so the spec §8 migration runs at most once per
     // install; bump PRAYER_SETTINGS_SCHEMA_VERSION when the derivation changes.
     val PRAYER_SETTINGS_SCHEMA = intPreferencesKey("prayer_settings_schema")

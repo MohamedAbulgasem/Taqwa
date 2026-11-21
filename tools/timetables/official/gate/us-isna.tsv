@@ -6,6 +6,8 @@
 # about 17° with Maghrib + 10, another table), the Diyanet mosques (Diyanet), the Islamic Center of Washington
 # (19.5°), Masjid Yaseen (18°/18°), Al-Farooq (MWL), the Chicago 18° block (us.chicago) and one-day captures
 # with no stated method.
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	us.isna	archive/tables/moral-auth-world/namerica/us-sw/king-fahad-culver-city.txt	M	its Maghrib (sunset + 5) was early on 19 days, and Maghrib was widened to it, the whole fit (proof 7g)
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/namerica/us-east/adams-sterling.txt	us.isna	39.037	-77.383	America/New_York	F+E S D A M I	daily	standard	fit	All Dulles Area Muslim Society (ADAMS Center), Sterling, VA
 archive/tables/moral-auth-world/namerica/us-east/dar-al-hijrah-falls-church.txt	us.isna	38.8614	-77.1467	America/New_York	F+E S D A M I	daily	standard	fit	Dar Al-Hijrah Islamic Center, Falls Church, VA

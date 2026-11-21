@@ -4,6 +4,7 @@ import world.taqwa.app.prayer.engine.registry.authorities.Americas
 import world.taqwa.timetables.TestPaths
 import world.taqwa.timetables.gate.GateManifest
 import java.util.Locale
+import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -19,6 +20,11 @@ import kotlin.test.assertTrue
  *   preset rides one of the table's plausible points are exactly the places its rows are read at. Wollongong (59 km from
  *   the nearest point) is one; Newcastle (117 km) and Canberra (about 250 km) are not. Riding Sydney's table there would be
  *   a decision of its own (the owner's question 1 met question 4 here), so this fails until it is taken on purpose.
+ * - A run is a pure function of what it reads (the audit of 13 Nov 2026): rendered twice, the files are the same text
+ *   in the same order, and `behind` (the `checkEnvelopeRows` task) names nothing for files a run just wrote, a changed
+ *   file with its rows to add and drop, a file not written yet and a promise-only file no table writes now. That the
+ *   committed files are current is that task's to say and not a test's: `prove` appends a capture's rows and runs these
+ *   tests before any run replays them.
  */
 class EnvelopeCoverageTest {
     private val gate = TestPaths.repoRoot.resolve("tools/timetables/official/gate")
@@ -39,6 +45,35 @@ class EnvelopeCoverageTest {
             assertTrue(committed.isFile, "$name is not committed: run generateEnvelopeRows")
             val missing = places(name, file.text) - places(name, committed.readText())
             assertTrue(missing.isEmpty(), "$name misses ${missing.size} places the engine rides now, ${missing.take(5)}: run generateEnvelopeRows")
+        }
+    }
+
+    @Test
+    fun `a second run writes what the first did and the check names only what a run would change`() {
+        val first = EnvelopeRows.render(gate, cities)
+        val second = EnvelopeRows.render(gate, cities)
+        assertEquals(first.keys.toList(), second.keys.toList())
+        for ((name, file) in first) assertEquals(file.text, second.getValue(name).text, "$name differs between two runs")
+
+        val dir = createTempDirectory("envelope-check").toFile()
+        try {
+            for ((name, file) in first) dir.resolve(name).writeText(file.text)
+            assertEquals(emptyList(), EnvelopeRows.behind(dir, second))
+
+            val (name, file) = first.entries.first { it.value.rows > 1 }
+            val lines = file.text.lines()
+            val row = lines.indexOfLast { it.isNotBlank() && !it.startsWith("#") }
+            dir.resolve(name).writeText(lines.filterIndexed { i, _ -> i != row }.joinToString("\n"))
+            assertEquals(listOf("$name would change: 1 rows to add, 0 to drop"), EnvelopeRows.behind(dir, second))
+
+            dir.resolve(name).delete()
+            dir.resolve("zz-nobody-envelope.tsv").writeText("# left behind\n")
+            assertEquals(
+                listOf("$name is not written yet (${file.rows} rows)", "zz-nobody-envelope.tsv would be removed: no table writes it now"),
+                EnvelopeRows.behind(dir, second),
+            )
+        } finally {
+            dir.deleteRecursively()
         }
     }
 

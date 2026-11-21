@@ -116,23 +116,9 @@ internal fun WatchSection(
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(source, offer, follow, hold, lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            coroutineScope {
-                // The end of each hold, read as any other change.
-                val holdEnds = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-                // Listening starts as the rows are read, so a change heard meanwhile is read after them,
-                // and Android's says one change once its listener is in place, for one that came before.
-                val changed = watchRowsChanged(source, offer, taps, follow, holdEnds).produceIn(this)
-                appleOffered = offer.available()
-                targets = withContext(Dispatchers.Default) { loadWatchTargets(source) }
-                reading += 1
-                // A new hold at each coming to the front, whose reading above takes no row as it comes.
-                val held = InstallHold(hold, this) { holdEnds.tryEmit(Unit) }
-                for (change in changed) {
-                    val shown = targets
-                    appleOffered = offer.available()
-                    val read = withContext(Dispatchers.Default) { loadWatchTargets(source, otherwise = shown) }
-                    targets = held.rows(shown, read)
-                }
+            readWatchRows(source, offer, taps, follow, hold, shown = { targets }, offered = { appleOffered = it }) { rows, resumed ->
+                targets = rows
+                if (resumed) reading += 1
             }
         }
     }
@@ -355,9 +341,10 @@ internal data class TapFollow(val every: Duration, val lasting: Duration) {
  *
  * The rows cannot tell why no row came, so a watch without Taqwa that leaves while its install row
  * is shown keeps that row for the hold too. Each coming to the front makes a new hold
- * ([WatchSection]), and the resume's own reading takes no row as it comes. [rows] is called, and
- * the hold runs, on [scope]'s dispatcher alone, Settings' main thread in the app, so nothing here
- * needs a lock.
+ * ([WatchSection]), and Settings' resume's own reading takes no row as it comes; Home's card, kept
+ * from Home's last visit, is held from its resume's reading on ([readWatchRows]' keepOnResume).
+ * [rows] is called, and the hold runs, on [scope]'s dispatcher alone, Settings' main thread in the
+ * app, so nothing here needs a lock.
  */
 internal class InstallHold(
     private val lasting: Duration,
@@ -431,3 +418,52 @@ internal fun watchRowsChanged(
     launch { follow.after(taps).collect { send(Unit) } }
     launch { holdEnds.collect { send(Unit) } }
 }.conflate()
+
+/**
+ * One stay in front for the watch rows, Settings' and Home's: the rows read as the screen comes to
+ * the front, then again in place each time [watchRowsChanged] says so, an install row held for
+ * [hold] ([InstallHold]). [offered] is told [WatchFaceOffer.available] before each reading and [show]
+ * each reading's rows, `resumed` for the first; [shown] is what the last reading left on screen, which
+ * a reading that fails keeps and the hold compares with. The reads and the listening run [on], off
+ * the main thread in the app; [show] is called on the caller's own. Runs until cancelled.
+ *
+ * The first reading, Settings', takes its rows as they come, no row and a failure included: the
+ * section is built afresh. With [keepOnResume], Home's, for a card kept from Home's last visit, it is
+ * taken as a reading in place is: a failure keeps what [shown] says, and an install row is held
+ * through no row (the review of 20 November).
+ */
+internal suspend fun readWatchRows(
+    source: WatchTargetsSource,
+    offer: WatchFaceOffer,
+    taps: Flow<Unit>,
+    follow: TapFollow,
+    hold: Duration,
+    shown: () -> WatchTargets,
+    offered: (Boolean) -> Unit = {},
+    on: CoroutineDispatcher = Dispatchers.Default,
+    keepOnResume: Boolean = false,
+    show: (rows: WatchTargets, resumed: Boolean) -> Unit,
+): Unit = coroutineScope {
+    // The end of each hold, read as any other change.
+    val holdEnds = MutableSharedFlow<Unit>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    // Listening starts as the rows are read, so a change heard meanwhile is read after them,
+    // and Android's says one change once its listener is in place, for one that came before.
+    val changed = watchRowsChanged(source, offer, taps, follow, holdEnds, listenOn = on).produceIn(this)
+    // A new hold at each coming to the front, whose first reading below takes no row as it comes
+    // unless what is on screen is kept.
+    val held = InstallHold(hold, this) { holdEnds.tryEmit(Unit) }
+    offered(offer.available())
+    if (keepOnResume) {
+        val before = shown()
+        val read = withContext(on) { loadWatchTargets(source, otherwise = before) }
+        show(held.rows(before, read), true)
+    } else {
+        show(withContext(on) { loadWatchTargets(source) }, true)
+    }
+    for (change in changed) {
+        val before = shown()
+        offered(offer.available())
+        val read = withContext(on) { loadWatchTargets(source, otherwise = before) }
+        show(held.rows(before, read), false)
+    }
+}

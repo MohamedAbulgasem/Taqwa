@@ -176,7 +176,7 @@ superseded where an offset is printed (Gaza's is: + 3) and stands everywhere els
   mapped onto 2027 (darifta.ps had no 2027 calendar on 2 October 2026), the imsakiya's six dates, and
   every town's table on 2026 and 2027 (and on 2012 at Nablus, Hebron and Gaza): nothing is fitted at a
   town. Fitted on 2012 and 2026, 2027 was 1 min early on a few days of Fajr, sunrise, Maghrib and Isha
-  at al-Aqsa (1, 11, 1 and 2 days) and its end of eating 1 min late on 7 days of April. This is a
+  at al-Aqsa (1, 11, 1 and 2 days) and its end of eating 1 min late on 7 days. This is a
   perpetual table drifting against the leap cycle. Those margins are widened to the bound over all
   three years, never silently.
 - **Margins (seconds), al-Aqsa's, carried to every town:**
@@ -185,7 +185,7 @@ superseded where an offset is printed (Gaza's is: + 3) and stands everywhere els
   |---|---|---|---|---|---|---|
   | +1 | +191 | −37 | −21 | −2 | +59 | −116 |
 
-  The end of eating's fit on 2012 and 2026 gave −96; the three years' bound is −116.
+  The end of eating's bound over the three years is −116.
 - **Gate** (69 rows: al-Aqsa on 2012, 2026 and 2027 plus the imsakiya, and every town on 2026 and 2027;
   29 places, 22,634 place-days, 21,903 held out): 0 early, 0 late ends (sunrise and end of eating), none
   over its limit, nothing out of order. Worst minutes late, the same at every unit: Fajr 3, sunrise 3,
@@ -237,9 +237,9 @@ superseded where an offset is printed (Gaza's is: + 3) and stands everywhere els
 - **Margins fitted:** Fajr +12, sunrise +59, Dhuhr −8, Asr −54, Maghrib −45 (on top of the existing
   +3 min authority offset), Isha −34. Nothing held out — six days from one five-year-old month is too
   thin for a real split.
-- **Gate table** (6 place-days, all fit): fajr 3/3 at +0/+1, sunrise 6/0, dhuhr 2/4, asr 6/0,
-  maghrib 5/1, isha 2/4 — never early, worst 1 min late. Stays D_AUTHORITY (spec §6.2 a): six days
-  proves nothing about the other 359 days of the year, let alone other years.
+- **Gate table** (6 place-days, all fit): never early, at most 1 min late on every event. Stays
+  D_AUTHORITY (spec §6.2 a): six days proves nothing about the other 359 days of the year, let alone
+  other years.
 
 ### Lebanon, Dar al-Fatwa, `lb.fatwa` — class D_AUTHORITY (with two late-limit exceptions)
 
@@ -252,13 +252,13 @@ superseded where an offset is printed (Gaza's is: + 3) and stands everywhere els
 - **The perpetual table's clock, found by fitting:** the first fit (with `clock` defaulting to the
   real Asia/Beirut zone) gave a sunrise margin of about **−61 minutes**, decided by a day in late
   June — a single-day-driven number so large it could not be right. Isolating the fit month by month
-  showed February normal (+32 s) and every month from March (the DST transition) through June
-  clustering tightly around −57 to −61 minutes, growing smoothly through the season on top of that
-  base. That is the signature of a table printed on a **fixed non-DST clock**, exactly like the PA's
-  al-Aqsa table: confirmed by re-fitting June alone with `clock=UTC+02:00`, which brought sunrise
-  back to a normal −29 s. The gate tsv's `clock` column now carries this for the perpetual file; the
-  dated captures (a different, real-time source) keep `clock` at the real Asia/Beirut zone, with two
-  exceptions below.
+  showed February normal (well within a minute) and every month from March (the DST transition)
+  through June clustering tightly around −57 to −61 minutes, growing smoothly through the season on
+  top of that base. That is the signature of a table printed on a **fixed non-DST clock**, exactly
+  like the PA's al-Aqsa table: confirmed by re-fitting June alone with `clock=UTC+02:00`, which brought
+  sunrise back to a normal margin, well within a minute. The gate tsv's `clock` column now carries
+  this for the perpetual file; the dated captures (a different, real-time source) keep `clock` at the
+  real Asia/Beirut zone, with two exceptions below.
 - **Three dated captures re-examined; one included, two stay excluded** (a review caught that the
   first pass had excluded all three as "the same widget bug" without checking each on its own merits):
   - `2023-01-25`: every printed time is a uniform ~55-65 min later than the neighbouring captures
@@ -274,14 +274,14 @@ superseded where an offset is printed (Gaza's is: + 3) and stands everywhere els
   - `2024-03-28`: checked the same way, its six printed times match the real DST (UTC+03:00) clock
     within 1-14 min on fajr/dhuhr/asr/maghrib/isha — the widget running a few days ahead of Lebanon's
     real 2024 transition (31 March, per the tz database), not the same bug as 25 January. But read on
-    that same UTC+03:00 clock, its sunrise would be 10 min LATE — and a sunrise (an end) may never be
-    late by any amount; no `LateLimit` exception can excuse it, only a start's lateness. Admitting
-    this one date would need widening the sunrise margin by the 10 min excess plus 5 s safety, making
-    every other one of the 384 measured days' shown sunrise 11 min earlier than the data otherwise
+    that same UTC+03:00 clock, its sunrise would be about 10 min LATE — and a sunrise (an end) may never
+    be late by any amount; no `LateLimit` exception can excuse it, only a start's lateness. Admitting
+    this one date would need widening the sunrise margin by that excess plus 5 s safety, making every
+    other one of the 384 measured days' shown sunrise about 11 min earlier than the data otherwise
     supports — not a fair price for one capture. **Stays excluded**, for this precise reason, not
     "the same bug" as 25 January (its Dhuhr misread by a naive search of the raw page, as a morning
     time, was also checked and is a push-notification countdown string, not the printed time; the
-    true printed Dhuhr, shortly after half past noon, is what was fitted against and excluded on the
+    true printed Dhuhr, in the early afternoon, is what was fitted against and excluded on the
     sunrise question above, not a parsing error).
 - **Margins fitted, then widened:** Fajr −369, sunrise −61, Dhuhr −12, Asr +47, Maghrib +392,
   Isha −4 from the 365-day fit. Two of the 19 held-out dated captures were early by exactly 1 min
@@ -319,34 +319,31 @@ superseded where an offset is printed (Gaza's is: + 3) and stands everywhere els
   33.5116N 36.3064E, test). The one Wayback capture held for the ministry's own site
   (`archive/raw/moral-auth-mena/levant/sy/wb/20210121052509.html`) is a menu of links to per-city
   pages; none of those pages were themselves captured, so it has no table to read.
-- **Margins fitted, then widened:** Fajr −47, sunrise −7, Dhuhr −97, Asr −16, Maghrib −46, Isha −10
-  from the one fit date. The held-out date was early by 2 min on Dhuhr and 1 min on Asr and Maghrib;
-  widened by +125 s (Dhuhr, to +28) and +65 s (Asr to +49, Maghrib to +19).
-- **Gate table** (2 place-days): every event never early, worst 1-2 min late on the held-out date
-  (fajr/isha exact, sunrise/dhuhr/asr/maghrib 1 min). Two dates, two points, cannot prove a class
-  above D_AUTHORITY (spec §6.2 a); the "2 min tamkin officially since 28 Feb 2025" claim (SANA) is
-  unchanged from the prior draft, carried in `authorityMinutes`, not something this task's two dates
-  could confirm or refute on their own.
+- **Margins fitted on the one fit date, then widened** on Dhuhr, Asr and Maghrib, never silently.
+- **Gate table** (2 place-days): every event never early, at most 2 min late on the held-out date.
+  Two dates, two points, cannot prove a class above D_AUTHORITY (spec §6.2 a); the "2 min tamkin
+  officially since 28 Feb 2025" claim (SANA) is unchanged from the prior draft, carried in
+  `authorityMinutes`, not something this task's two dates could confirm or refute on their own.
 
 ### Iraq, Sunni Endowment, `iq.sunni` — class D_AUTHORITY
 
 - **Data:** `iq-sunni-baghdad-official.txt`, the one dated official sample the earlier research found
-  (4 Dec 2025, Baghdad 33.341N 44.401E), fit. Nothing held out.
+  (Baghdad 33.341N 44.401E), fit. Nothing held out.
 - **A third-party site's month, normalised, then excluded.** `iq-sunni-baghdad-waqtazan.txt` (30
   dates, 19 Sep–19 Oct 2026, from `waqtazan.com`, which states it publishes the Sunni Endowment's
   Baghdad table) was normalised and gated as a test row. Checked against the margins the one official
-  date implies, every one of its 30 days is early: Dhuhr by 6 min, Asr by 15-16, Maghrib by 24-25,
-  Isha by 26-27 — one-sided (never late) and far larger than a plausible seasonal drift between
-  4 December and September/October (Fajr and sunrise, which do vary most with season, were the ONLY
-  two events that were fine, both running late). That pattern — morning events consistent, every
-  afternoon/evening event off by tens of minutes in one direction — is not what a correct but
-  differently-dated table looks like. Given no way to independently confirm `waqtazan.com`'s
+  date implies, every one of its 30 days is early: Dhuhr by about 6 min, Asr by 15-16, Maghrib by
+  24-25, Isha by 26-27 — one-sided (never late) and far larger than a plausible seasonal drift between
+  the official date in December and September/October (Fajr and sunrise, which do vary most with
+  season, were the ONLY two events that were fine, both running late). That pattern — morning events
+  consistent, every afternoon/evening event off by tens of minutes in one direction — is not what a
+  correct but differently-dated table looks like. Given no way to independently confirm `waqtazan.com`'s
   reliability, it is excluded from the gate rather than accepted as ground truth or used to force the
   margins wider than the one official date needs (see `iq-sunni.tsv`'s own note; the file stays
   normalised on disk with this recorded as its reason).
-- **Margins fitted:** Fajr −26, sunrise +18, Dhuhr +268, Asr +125, Maghrib +154, Isha −29. Gate table
-  (1 place-day): every event exact (0 min) against its own fit date, by construction. One date proves
-  nothing beyond itself: D_AUTHORITY, unchanged in substance from the prior draft (spec §6.2 a).
+- **Margins fitted** on that one date (`Levant.iraqMethod`'s). Gate table (1 place-day): never early
+  against its own fit date, by construction, and within a minute. One date proves nothing beyond
+  itself: D_AUTHORITY, unchanged in substance from the prior draft (spec §6.2 a).
 - **Kurdistan** (`archive/raw/moral-auth-mena/levant/iq/krd.html`) was read but is the Kurdistan
   ministry's page, not the Sunni Endowment's; out of scope for `iq.sunni` and not otherwise part of
   this brief.
@@ -374,14 +371,14 @@ every entry here but `ps.iftaa` (another track's). Whole gate, nothing else move
 | `jo.awqaf` | 171 | 0 | 1 | 1 |
 | `lb.fatwa` | 384 | 0 | 8 (176 days at 3 or more) | 8, recorded |
 | `sy.awqaf` | 2 | 0 | 1 | 3 (class D) |
-| `iq.sunni` | 1 | 0 | 1 | 3 (class D) |
+| `iq.sunni` | 1 | 0 | at most 1 (its one day) | 3 (class D) |
 | `ps.gaza.awqaf` | 6 | 0 | 2 | 3 (class D) |
 
 **Lebanon.** The end of eating keeps the spec's 20° dawn (no printed end to fit it to); Dar
 al-Fatwa's own dawn runs 19.1° to 20.0°, so on the shallowest days the end comes up to 8 min before
 the printed Fajr: recorded as a third exception (8 min, the end of eating alone). Never after it on
-any of the 384 days; the fitter's bound on the perpetual table, with its 5 s safety, is −5 s
-(decided by its 9 September row), so `endOfEatingMarginSeconds` is now −5: the end moves 5 s
+any of the 384 days; the fitter's bound on the perpetual table, with its 5 s safety, is −5 s,
+so `endOfEatingMarginSeconds` is now −5: the end moves 5 s
 earlier. The golden vector's Beirut seed moved on 7 of its days, the end of eating alone, 1 min
 earlier each.
 
@@ -415,7 +412,7 @@ earlier each.
   in the relevant gate tsv's note column, and here, with the actual numbers that led to exclusion, so
   a later researcher can re-check the reasoning rather than re-discover it. The two Lebanon
   exclusions are for two different reasons (25 Jan 2023 a genuine widget bug; 28 Mar 2024 a real
-  reading that would still cost every other day 11 min of earlier sunrise to admit) — worth keeping
+  reading that would still cost every other day about 11 min of earlier sunrise to admit) — worth keeping
   distinct if either is ever revisited.
 - **The "fixed perpetual clock" pattern (found independently for Palestine's al-Aqsa table and now
   Lebanon's Masjidi feed) may be worth checking for other MENA sources still to be gated** in other

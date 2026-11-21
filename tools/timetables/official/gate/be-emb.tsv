@@ -16,6 +16,8 @@
 # pinned Brussels capture of 2 Oct 2026 also holds, sliced from the held table (split-7g/emb-2026-q4-late.txt), at EMB's
 # point. EMB's days after 1 November wait for Diyanet's: a cautious start is measured against the latest member's printed
 # time, and with EMB's table alone its later member (Diyanet's Dhuhr and Asr) reads as lateness over class C's limit.
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	be.emb	archive/tables/moral-auth-world/europe/split-7g/emb-2026-h2.txt	*	July to December came up early at Isha, and with the new Isha rule the margins were widened to the whole year's (proof 7g)
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/europe/split-7g/emb-2026-h1.txt	be.emb/be.emb			Europe/Brussels	F+E S D A M I	daily	standard	fit	EMB January-June 2026
 archive/tables/moral-auth-world/europe/split-7g/emb-2026-h2.txt	be.emb/be.emb			Europe/Brussels	F+E S D A M I	daily	standard	test	EMB July-December 2026

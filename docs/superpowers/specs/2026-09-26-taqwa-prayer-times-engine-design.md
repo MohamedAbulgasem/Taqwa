@@ -38,6 +38,7 @@ landscape, and the widgets and notifications (they show the new times). One time
 | **Set by rule** | Where a high-latitude rule set a time (§3.8) | The outlined pill Jumuʿah uses, inline after the prayer's name; no extra height. On a polar day, one line under the list instead: today's translated sentence ("The sun does not rise or set here today…"), opening About. (Decision §10.6.) |
 | **Sunni times card** | Once, in the registry's Shia-regions list (Iran, Iraq, Bahrain, Azerbaijan, Lebanon, Kuwait, Saudi Arabia's Eastern Province, northern Yemen, Gilgit-Baltistan, Kurram, Hazarajat) | "These are Sunni prayer times. In Shia (Ja'fari) practice, Maghrib and iftar are later." Below the prayer list, then gone. The site uses the same list. |
 | **Cautious-times card** | Once, in cautious-times places (§10.9) | "Mosques here follow different timetables. Taqwa shows each prayer once they have all begun it." Actions "Match my mosque" and "OK". Below the prayer list; if the Sunni card also applies, this one comes first and the other waits for the next launch. |
+| **Watch card** (1.7.0) | Android, while Settings › Watch offers "Install on your watch" or "Add the Taqwa face", until its x | In the one-time cards' slot below the prayer list, with their gaps, so it pushes the Qibla card down (the owner's call, 19 Nov 2026). One card per launch: a once-only card goes first and the watch card waits for a later launch. Put in only if the watch's reading comes before the first touch or scroll on Home, so the Qibla card never moves under a thumb. Watch spec §5. |
 | **Clock line** | Only when the phone's zone data or hand-set clock disagrees with a change the app knows (§3.9) | One line above the ring, "Prayer times may be an hour off ›", opening a sheet with the fix. Landscape: top of the right pane. |
 | **Other Asr** | When "Show both Asr times" is on | "Standard {time}" under Asr. |
 | **Where timetables differ** | When that switch is on, in cautious-times places | Under the current prayer, before the earliest next start: "Islamic Foundation's Isha begins at {its time}"; after it: "Islamic Foundation's Isha has begun · Taqwa shows it from {Taqwa's time}", about 20 min later in Toronto in October. |
@@ -138,7 +139,7 @@ place-days.
 | `asrOther`, `ishaOther` | The other school's time. |
 | `earliestStart` | Per prayer, the earliest member's start (cautious places), for "Show where timetables differ". |
 | `endOfEating` | The authority's printed column where it has one (Kosovo imsak, Tatarstan end of suhoor, Bangladesh sehri, Jamiatul Ulama's Fajr − 5), otherwise its dawn without its start margin at the earliest point of its zone; never after `fajr`. In About now; on the Prayer screen from the Ramadan release. |
-| `imsak` | The authority's printed precaution, for the Ramadan release and the site. |
+| `imsak` | The authority's printed precaution, for the Ramadan release and the site. Only where the authority prints it (ruling R188): Tunisia's INM prints none in anything held, and the Singapore method outside Singapore has no table that prints one, so none is shown there and the end of eating stands alone. Brunei's MORA prints one (Suboh − 10, its page and its Taqwim), so it stays and the gate reads it. |
 | `ends` | For the screen's highlight (Fajr and Asr only, §2.1), About and the site: Fajr at sunrise, Dhuhr at the Standard Asr, Asr at sunset, Maghrib at the earlier of the earliest Isha in play and red twilight (17°), Isha at `endOfEating`. |
 | flags, provenance | Set by rule (which), Ramadan rule, adjustment; registry entry, version, class and the timetables that decided each time. |
 
@@ -396,7 +397,24 @@ support@taqwa.world.
   without a Suhoor column proves no end of eating, and a proven Fajr does not bound an end counted back from
   it); the check is `checkStamps -Pramadan=1448`, opted into for that build as
   `TAQWA_RAMADAN=1448 scripts/release.sh` and the same for `ios-release.sh` (ruling R146), and from eight
-  weeks before the month a plain `checkStamps` says so.
+  weeks before the month a plain `checkStamps` says so. A timetable whose Ramadan days
+  are not in the gate yet counts as covered (ruling R185, the owner's O4 of 12 November 2026) when all three
+  are read from the files, never taken on trust, however its authority publishes: (a) its method is proven
+  on the months held, a Ramadan among them (a green stamp; at every unit short of the month at least 28
+  days of each of the three events inside the twelve months before, and at least 10 of each in one of the
+  five Ramadans before; and of the entry at least 10 Ramadan place-days held out of the fit); (b) the
+  monitor fetches the authority's own publication on its cadence and every day fetched is in the gate (an
+  automatic source whose captures of the authority's own site, never a mirror's, the recipes turn into the
+  entry's own gate rows; no fetched day waiting outside the gate, no unchecked day already printed in a
+  capture held, and the source's newest fetch on record ended well, within 8 days for a weekly source and
+  32 for a monthly one, bringing current days) — a check on the monitor's cadence, weekly at most, not on
+  the day of publication;
+  (c) the monitor demotes the entry by itself on the first failing day of the authority's own capture — prove writes a `@demoted` line
+  into the gate file, the stamp carries it, the unit's city pages are held, the cover is lost and every
+  release is refused until a person has proven the days or lowered the entry's class. The guard says of
+  each entry short of the month `covered under O4` or names it with the conditions it fails
+  (`docs/MONITOR.md`, "Prove"). An installed app's label is the registry's class and changes only with a
+  new build.
 - **The monitor** (slice 2): a scheduled local job, not public CI, that fetches each entry's newest
   published table (and Tripoli's daily from api.ifta.ly) and runs the gate on it; a failure opens a task,
   and a registry-only release follows within days.
@@ -784,9 +802,9 @@ R155–R157 R130–R132.)
 - **R159** (not the owner's; found by the November round's scratch gate of 25 Oct 2026): Kharga's Dhuhr
   margin is +48 s, not +40. ESA prints Kharga's table from a point about 0.29° west of the town, so its noon there
   runs 68 to 70 s after the town's every day, and ESA's own sun (an almanac formula) puts noon up to 4 s after this
-  core's on 2–4 November each year. Fitted on Kharga's 45 held days, none of them in early November, Dhuhr +40 was
-  a minute before ESA's printed Dhuhr on 2–4 November 2026. ESA's rule asks up to 43 s over 2026–2028; +48 adds the
-  Conventions' 5 s. Nothing else moves. `GulfEgyptProofTest` holds every day of 2026–2028 at or after the town's
+  core's in early November each year. Fitted on Kharga's 45 held days, none of them in early November, Dhuhr +40 came
+  before ESA's printed Dhuhr in early November 2026. ESA's rule asks up to 43 s over 2026–2028; +48 adds
+  the Conventions' 5 s. Nothing else moves. `GulfEgyptProofTest` holds every day of 2026–2028 at or after the town's
   noon plus 74 s to the nearest minute, with no printed time (R69). The follow-ups ESA's 2026 page leaves (Rafah's
   Fajr, Sidi Barrani's Isha and end of eating, Kharga's other starts, Taba) and their deadlines are in the build log.
 - **R160** (not the owner's; the gate, as R159; the owner said yes to ESA's tables for the two towns on 25 Oct 2026):
@@ -795,7 +813,7 @@ R155–R157 R130–R132.)
   served), prints the same minutes as Dar al-Ifta's pinned September and October at all 29 towns, and shows these two
   towns' tables computed off the town: Rafah's from about 0.06° south and west, Sidi Barrani's from about 0.16°
   north. With the national margins Rafah's Fajr was a minute early on 2 days in June and Sidi Barrani's Isha on 14
-  days and its end of eating a minute late on 20, from 28 April to early August 2026; their rows had held 52 Wayback
+  days and its end of eating a minute late on 20, from late April to early August 2026; their rows had held 52 Wayback
   days and September to November. Fitted on each town's whole year with the Conventions' 5 s (needs 6, 10 and −15);
   nothing else moves. ESA's rule at the fitted points, with its own almanac sun, asks no more in 2027 and 2028 than
   in 2026. `GulfEgyptProofTest` holds every day of 2026–2028 against the sun at ESA's point with its allowance (5 s

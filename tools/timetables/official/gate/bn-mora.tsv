@@ -6,8 +6,12 @@
 # September rows by up to a minute on a few days (site noise), which is exactly why it is kept
 # separate rather than folded into the fit. Belait, Tutong and Temburong's own minutes are
 # documented (mora.gov.bn), not checked against a table: they stay unmeasured (Muis.kt).
-# End of eating (audit of 3 Oct 2026, before Ramadan 1448): MORA's imsak (Subuh - 10) is a precaution these files do not hold;
-# the fast begins at Subuh, so the Fajr column is also checked as the end of eating (F+E).
+# End of eating (audit of 3 Oct 2026, before Ramadan 1448): the fast begins at Subuh, so the Fajr column is also checked as the end
+# of eating (F+E). Imsak (12 Nov 2026 ruling R188, corrected 13 Nov): the ministry does print an imsak, Suboh - 10, as the first column
+# of its page's table and of its printed Taqwim 2026 ("Waktu Sembahyang dan Imsak, Daerah Brunei/Muara dan Temburong"), on all 365 days;
+# the web-list files above were saved without that column, which is why it was once taken for unprinted. So the app keeps Brunei's imsak
+# and the Taqwim's row checks it (Im, an end: never after the printed imsak), with the year's other columns as a second, printed witness
+# held out from the fit (its Doha column is not an event of ours). The print and the web list differ by a minute on a handful of days.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/sea/off-bn-2026-clean.txt	bn.mora/brunei-muara			Asia/Brunei	F+E S D A M I	daily	standard	fit	BSB, 356 days deduped
 archive/tables/moral-auth-world/sea/off-bn-2026-09.txt	bn.mora/brunei-muara			Asia/Brunei	F+E S D A M I	daily	standard	test	BSB, September re-capture
@@ -17,5 +21,8 @@ archive/tables/moral-auth-world/sea/off-bn-2026-09.txt	bn.mora/brunei-muara			As
 # both neighbouring days' and before the sun's noon that day (a Dhuhr before the zenith is no Dhuhr), while its other
 # five columns run on from their neighbours by a minute or less. That one day's row, held out, checks those five
 # columns (Fajr also as the end of eating) and leaves Dhuhr unchecked; Taqwa's Dhuhr that day is after the sun's noon,
-# so it is not before even the misprinted minute. Without it R116 holds all of December at Bandar Seri Begawan.
+# so it is not before even the misprinted minute. Without it R116 held all of December at Bandar Seri Begawan until the
+# printed Taqwim 2026 (the next row, 13 Nov 2026) was gated, which prints 14 December's Dhuhr in line with both
+# neighbouring days': that day is now checked there whole, and this row is a second witness to its five columns.
 archive/tables/moral-auth-world/sea/off-bn-2026-12-14.txt	bn.mora/brunei-muara			Asia/Brunei	F+E S - A M I	daily	standard	test	BSB, 14 December 2026, its five columns MORA printed right (Dhuhr misprinted, R162)
+archive/tables/manual/bn-mora/2026-11-13/taqwim-2026.txt	bn.mora/brunei-muara			Asia/Brunei	Im F+E S - D A M I	daily	standard	test	BSB, the printed Taqwim 2026, 365 days with imsak

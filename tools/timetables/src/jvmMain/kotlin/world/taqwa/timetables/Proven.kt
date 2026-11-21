@@ -10,9 +10,13 @@ import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.Member
 import world.taqwa.app.prayer.engine.registry.Place
 import world.taqwa.app.prayer.engine.registry.Resolution
+import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.Units
+import world.taqwa.app.prayer.engine.registry.data.ReachLimits
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.timetables.gate.ExcuseKind
+import world.taqwa.timetables.gate.GateManifest
+import world.taqwa.timetables.units.ReachRows
 import world.taqwa.app.prayer.engine.registry.lateReachKm
 import java.io.File
 import java.time.format.DateTimeFormatter
@@ -122,6 +126,10 @@ class Stamp(private val root: Map<String, Any?>) {
     val places = (root["places"] as Long).toInt()
     val placeDays = (root["placeDays"] as Long).toInt()
     val heldOutDays = (root["heldOutDays"] as? Long ?: 0L).toInt()
+
+    /** Of [placeDays], the days another entry's stamp counts too, and the published tables counted here (AcrossEntries). */
+    val sharedDays = (root["sharedDays"] as? Long ?: 0L).toInt()
+    val tables = (root["tables"] as? Long ?: 0L).toInt()
     val ramadanDays = (root["ramadanDays"] as? Long ?: 0L).toInt()
     val first: LocalDate = LocalDate.parse(root["first"] as String)
     val last: LocalDate = LocalDate.parse(root["last"] as String)
@@ -129,6 +137,13 @@ class Stamp(private val root: Map<String, Any?>) {
 
     /** The days any row of the entry compared, at any place (ruling R115); nothing on a stamp from before the runs were written. */
     val checked: Checked = Checked.parse(root["checked"])
+
+    /**
+     * The monitor's standing demotions (ruling R185: a capture of the authority's own site broke a promise), unit to
+     * the day it was found; the key is null for the entry as a whole. Empty on most.
+     */
+    val demoted: Map<String?, String> = (root["demoted"] as? List<*>).orEmpty().filterIsInstance<Map<*, *>>()
+        .associate { (it["unit"] as? String) to (it["since"] as? String).orEmpty() }
 
     /** The per-unit rows where the gate checks the entry by unit; null where it checks it whole (as the app's `worstLateByUnit.isEmpty()`). */
     val units: Map<String, Any?>? = (root["units"] as? Map<String, Any?>)?.takeIf { it.isNotEmpty() }
@@ -267,17 +282,42 @@ object Proven {
      * the current first. The verdict shows a month only after every one before it: whole months,
      * in order.
      */
-    fun verdict(resolution: Resolution, place: Place, stamps: Map<String, Stamp>, months: List<ClosedRange<LocalDate>>): Verdict {
+    fun verdict(
+        resolution: Resolution,
+        place: Place,
+        stamps: Map<String, Stamp>,
+        months: List<ClosedRange<LocalDate>>,
+        ruled: Map<String, Map<TimedEvent, Int>> = ReachRows.RULED,
+        minutes: Map<String, Map<String, Map<TimedEvent, Int>>> = ReachLimits.MINUTES,
+    ): Verdict {
         require(months.isNotEmpty()) { "a page shows at least its current month" }
-        val cls = resolution.entryClass
+        // A checked authority the app shows as its published method on a day no table was compared on (ruling R275) is
+        // judged as checked here, so the held reason names that day, as it did before the app said so too.
+        val cls = resolution.checkedClass ?: resolution.entryClass
         if (cls != EntryClass.A && cls != EntryClass.B && cls != EntryClass.C) return Verdict.Held("class ${cls.name} is not proven")
         if (!resolution.measured) return Verdict.Held("not measured at this place")
         val stamp = stamps[resolution.entry.id] ?: return Verdict.Held("no stamp for ${resolution.entry.id}")
         if (stamp.broken != 0) return Verdict.Held("${stamp.entry}'s stamp is red")
+        // Ruling R185: a checked timetable the monitor demoted has no page until its failing days are proven.
+        stamp.demoted[null]?.let { return Verdict.Held("${stamp.entry} was demoted by the monitor on $it") }
         val unitId = if (stamp.units != null) {
             resolution.unitId ?: return Verdict.Held("${stamp.entry} is checked by unit and this place is in none")
         } else {
             null
+        }
+        // ... and a unit it demoted likewise (wherever the stamp's units stand, the place's own unit is the one meant).
+        (unitId ?: resolution.unitId)?.let { u -> stamp.demoted[u]?.let { return Verdict.Held("${stamp.entry}'s unit $u was demoted by the monitor on $it") } }
+        // Ruling R270: a unit whose reach was measured over the 4-min ceiling has no page until the owner rules on the
+        // figure ([ruled], ReachRows.RULED), as a release has none: the page would say "at most" a figure no ruling accepted.
+        // An entry with no units (MUIS's) holds its area's figure under its own id (ruling R298).
+        (unitId ?: resolution.unitId ?: stamp.entry.takeIf { Units.of(it) == null })?.let { u ->
+            ReachRows.unruled(stamp.entry, u, minutes, ruled).takeIf { it.isNotEmpty() }?.let { over ->
+                val who = if (Units.of(stamp.entry) == null) "${stamp.entry} (no units)" else "${stamp.entry}'s unit $u"
+                return Verdict.Held(
+                    "$who reads " + over.entries.joinToString(", ") { (e, m) -> "${e.name.lowercase()} $m min" } +
+                        " across its reach, over the ${ReachRows.CEILING}-min ceiling, until the owner rules (R270)",
+                )
+            }
         }
         val events = if (unitId != null) {
             val unit = stamp.unitEvents(unitId) ?: return Verdict.Held("unit $unitId is not in ${stamp.entry}'s stamp")
@@ -422,6 +462,55 @@ object ProofTotals {
     /** The gate's rows: every `.tsv` under `gate`, read as `GateManifest.parse` reads it — `#` lines, `@` directives (ruling R117's `@excuse`) and blank lines skipped, the first other line the header. */
     fun gateRows(official: File): Int = (official.resolve("gate").listFiles { f -> f.isFile && f.extension == "tsv" } ?: emptyArray())
         .sumOf { file -> rows(file) }
+
+    /**
+     * The published tables the gate holds: the distinct tables its rows read ([tableKey] of each `path`), each counted
+     * once however many rows replay it. A reach or envelope row replays a table the gate already reads, at a point of
+     * the unit's reach or under another setting, so it adds place-days and no table: "{tables} published tables" on the
+     * "How Taqwa checks" page is at most this figure ([publishedTables]), never the row count (the review of 13 Nov 2026: with Egypt's reach rows
+     * the rows were 55,143 and the table files 3,632). Nor is it the count of files (the audit of 13 Nov 2026, finding
+     * F32, ruling R214): a table the monitor captured again on a later date, the two halves a year's table was cut into
+     * for the fit, and the side file that holds a table's imsak column are files of one publication, and counted as
+     * files they made the figure some 330 more than the publications held (4,385 files, 4,052 tables on 13 November).
+     * A file that prints several towns is one table here, and two publications whose files differ only by a capture
+     * date are one: the figure can understate, never overstate. A table only promise-only rows read is not counted
+     * (ruling R247): an envelope row replays a table an ordinary row reads already, and a hand-kept promise file's
+     * table (a calculator's own, which no place is known to follow) is no published timetable.
+     */
+    fun gateTables(official: File): Int = gateTables(GateManifest.load(official.resolve("gate")))
+
+    /**
+     * The page's own two figures (the review round of 14 Nov 2026, AcrossEntries), read off the stamps: the published
+     * tables, each counted at one entry and none the archive worked out, and the place-days less those two entries
+     * both count. Never more than [gateTables] and the plain sum.
+     */
+    fun publishedTables(stamps: Collection<Stamp>): Int = stamps.sumOf { it.tables }
+    fun placeDays(stamps: Collection<Stamp>): Int = stamps.sumOf { it.placeDays - it.sharedDays }
+
+    /** [gateTables] of a manifest already read. */
+    fun gateTables(manifest: GateManifest): Int = manifest.rows.filter { !it.promiseOnly }.mapNotNull { tableKey(it.path) }.distinct().size
+
+    /**
+     * The publication a gate row's table file belongs to, so that every file of one publication has one key; null for
+     * a side file that is no table of its own (ruling R214, finding F32). Read off the archive's own layout, and only
+     * ever merging: a directory named for a capture date (`…/2026-11-01/…`) and a capture date closing the file's name
+     * (`adiyaman-2026-11-12.txt`) are dropped, so a later capture of the same address is the same table; a closing
+     * `-h1` or `-h2` is dropped, so the two halves of a year cut in two for the fit are one; and a file under
+     * `archive/tables/imsak/` is the imsak column of a table held beside it, and none.
+     */
+    fun tableKey(path: String): String? {
+        if (path.startsWith(IMSAK_SIDE_FILES)) return null
+        val parts = path.split('/').filterNot { CAPTURE_DATE.matches(it) }
+        val name = parts.last()
+        val stem = name.substringBeforeLast('.', name).replace(CLOSING_DATE, "").replace(CLOSING_HALF, "")
+        val extension = if ('.' in name) "." + name.substringAfterLast('.') else ""
+        return (parts.dropLast(1) + (stem + extension)).joinToString("/")
+    }
+
+    private const val IMSAK_SIDE_FILES = "archive/tables/imsak/"
+    private val CAPTURE_DATE = Regex("""\d{4}-\d{2}-\d{2}""")
+    private val CLOSING_DATE = Regex("""-\d{4}-\d{2}-\d{2}$""")
+    private val CLOSING_HALF = Regex("""-h[12]$""")
 
     /** The surveyed mosque calendars: every `survey/<entry>/calendars.tsv`, read the same way. */
     fun surveyCalendars(official: File): Int = (official.resolve("survey").listFiles { f -> f.isDirectory } ?: emptyArray())

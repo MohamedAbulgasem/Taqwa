@@ -17,6 +17,9 @@
 # End of eating (audit of 3 Oct 2026, before Ramadan 1448): the MJC's Fajr is also the end of sehri (Radio 786), and the
 # community calendar prints no sehri column: both members' Fajr columns are now also checked as the end
 # of eating (F+E), as Jamiat's printed sehri column (E) was. An end never after any Cape Town table's.
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	za.voc	archive/tables/moral-auth-world/africaoceania/split-7g/wembley-S-2027.txt	*	2027 came up early at Dhuhr, Maghrib and Isha, and the margins were widened to the whole of both years (proof 7g)
+@fitted	za.voc	archive/tables/moral-auth-world/africaoceania/split-7g/wembley-H-2027.txt	*	as the line above, its Hanafi Asr
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/africaoceania/off-mjc-sep.txt	za.mjc/za.mjc			Africa/Johannesburg	F+E S D A M I	daily	standard	fit	MJC September 2026
 archive/tables/moral-auth-world/africaoceania/split-7g/wembley-S-2026.txt	za.voc/za.voc			Africa/Johannesburg	F+E S D A M I	daily	standard	fit	community calendar 2026, Shafi'i

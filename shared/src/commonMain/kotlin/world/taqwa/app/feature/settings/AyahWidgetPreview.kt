@@ -267,9 +267,15 @@ private fun AyahCardFooter(
  *
  *   ≤ 8 Arabic words → 22 sp; ≤ 16 → 20 sp; more → 18 sp.
  *
- * The three steps are what the longest ayahs in the pool need to stay inside the card: at a flat
- * 22 sp, 39:53 and 2:186 overran the footer and were clipped. 18 sp is still above the widgets' own
- * 17 sp floor, so nothing the preview shows is smaller than what the card can draw.
+ * The three steps keep the Arabic of every ayah in the pool inside the card: at a flat 22 sp, 39:53
+ * and 2:186 overran the footer and were clipped, and an estimate of this layout for all 365
+ * (StaticLayout with the app's Hafs face, 20 November 2026) finds every one's Arabic inside the box
+ * at each width the picture is laid out at. They do not make room for every translation as well:
+ * where the picture is narrowest, 312 dp (phones up to 384 dp wide), about a third of the first
+ * hundred and two in five of the rest are estimated taller than the box with Saheeh International,
+ * and the preview clips their last lines; laid out at 376 dp, none are (in the other translations,
+ * at most 6 of the 365, in the tafsir). 18 sp is still above the widgets' own 17 sp floor, so
+ * nothing the preview shows is smaller than what the card can draw.
  */
 private fun ayahArabicStyle(arabic: String): TextStyle {
     val words = arabic.split(' ').count { it.isNotBlank() }

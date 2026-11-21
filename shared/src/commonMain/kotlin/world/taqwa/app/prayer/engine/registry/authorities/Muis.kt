@@ -87,7 +87,8 @@ object Muis {
      * and Singapore is the one adhan2 preset that rounds Asr up rather than to the nearest minute,
      * which turns that sub-minute gap into a full minute early; the same allowance 7h gives mwl,
      * isna, karachi and moonsighting in `Generic.kt`, and flagged as needed here too since Muis.kt
-     * is not 7h's file to edit).
+     * is not 7h's file to edit). No imsak (ruling R188, the owner, 12 Nov 2026): the Subuh − 10 it carried is MUIS's
+     * own, printed in its Imsakiah for Singapore ([entry] keeps it), and no table prints it for this method elsewhere.
      */
     val other: RegistryEntry = single(
         id = "other.singapore", nameKey = "method_singapore", entryClass = EntryClass.D_AUTHORITY,
@@ -98,19 +99,28 @@ object Muis {
             authorityMinutes = EventOffsets(dhuhr = 1),
             margins = margins(start = SAFE_START, sunrise = SAFE_SUNRISE, asr = SAFE_START + ADHAN2_ASR_ALLOWANCE),
             endOfEatingMarginSeconds = SAFE_END,
-            imsakMinutesBeforeFajr = 10,
         ),
         school = AsrSchool.STANDARD, scope = Scope.GLOBAL,
     )
 
     /**
      * Brunei: the Ministry of Religious Affairs (Jabatan Mufti Kerajaan): 20°/18°, no precaution
-     * minutes, nearest rounding, Dhuhr about + 1, Shafi'i Asr; imsak Suboh − 10. One table, for
+     * minutes, nearest rounding, Dhuhr about + 1, Shafi'i Asr; imsak Suboh − 10, as the ministry prints it (its
+     * page's first column and its Taqwim 2026, "Waktu Sembahyang dan Imsak", on all 365 days: ruling R188 drops
+     * only an imsak the authority does not print, and this one is printed and checked). One table, for
      * Bandar Seri Begawan, and documented district minutes (mora.gov.bn: "Daerah Belait hendaklah
      * ditambah 3 minit dan Daerah Tutong … 1 minit"; none for Brunei-Muara and Temburong). So each
      * district is a unit computed at BSB's point beside the user's, with its minutes on every time.
      * A district is the place's region when known (ruling R32), else told by longitude, erring
-     * towards the larger minutes near a border (the nearest seat puts Liang, in Belait, in Tutong).
+     * towards the larger minutes near a border (the nearest seat puts Liang, in Belait, in Tutong);
+     * and only within that district's own 60 km circle (ruling R309, the owner's ruling of 17 Nov
+     * 2026): past it, the nearest district whose circle holds the place (none of the app's cities
+     * moves; a fix at sea north of Tutong, 63 km from Bandar Seri Begawan, was given Brunei-Muara by
+     * its nearest city's region, where no reach row could read it). The reach rows read Brunei-Muara,
+     * the one measured district, across its whole circle with its own region, wherever any of these
+     * rules could give it (`ReachRows.SPECS`). Beyond
+     * every circle the set's edge, as before: the ministry's method at the user's own point, no
+     * district minutes, its margins widened by four minutes (`atEdge`), a published method unmeasured.
      *
      * Task 7c: the ministry's own SharePoint list for BSB (the archive, not the public repo) is
      * checked, with its duplicate and typo rows dropped (one would put Fajr about 9 min early) —
@@ -171,7 +181,7 @@ object Muis {
                     // East of Brunei Bay and south of it, the Temburong exclave; else Brunei-Muara.
                     place.lon > 114.98 && place.lat < 4.85 -> temburong
                     else -> muara
-                }
+                }?.takeIf { distanceKm(here, it.point) <= it.radiusKm } // Ruling R309: past its circle, `unitFor`'s nearest.
             },
         ) { bruneiMethod.atEdge("bn.mora.edge", bruneiMethod.margins.widened(180 + 60)) }
     }

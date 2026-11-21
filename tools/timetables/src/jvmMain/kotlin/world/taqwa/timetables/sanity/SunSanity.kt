@@ -9,8 +9,11 @@ import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.DayPipeline
+import world.taqwa.app.prayer.engine.astro.AsrModel
+import world.taqwa.app.prayer.engine.astro.SolarMath
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.day.Invariants
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.GeoPoint
@@ -27,7 +30,9 @@ import java.io.File
 import java.util.Locale
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
 import kotlin.math.round
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 /**
@@ -39,8 +44,11 @@ import kotlin.time.Instant
  * real sunset reads it; the engine knows no place's elevation):
  *
  * - no Dhuhr before the sun's transit;
+ * - no Asr, in either school, before the real shadow time (ruling R265);
  * - no Maghrib before the real sunset;
  * - no Fajr, and no end of eating, after the real sunrise;
+ * - no sunrise shown, and no Fajr's end, after the real sunrise (ruling R265);
+ * - no Dhuhr's end after the real shadow-1 Asr (ruling R265);
  * - no Isha at or before Maghrib.
  *
  * A breach on a day the engine itself marks ([Excuse]: an authority time it declares it does not show, ruling R82; a
@@ -52,6 +60,23 @@ import kotlin.time.Instant
  * end of eating (or Maghrib), and is counted as such. Days
  * [Invariants][world.taqwa.app.prayer.engine.day.Invariants] had to repair are counted too.
  *
+ * Since ruling R180 the first two are a rule of the engine itself ([DayPipeline.onRealSun]: the real sun at the
+ * user's own point is the floor of Dhuhr and of Maghrib), so the pass can find neither and neither is listed any
+ * more; it still checks both against its own [sky], from outside the pipeline but with the same sun model as the
+ * floor (`SunClock`, `SunModel.EXACT`, the same sea-level horizon): what it proves on every run is that no path
+ * leaves the pipeline around the floor, not the astronomy, which `RealSunModelTest` in the app holds against a sun
+ * written out separately. What the floor costs is counted instead ([Result.raised]): the place-days whose Dhuhr or
+ * Maghrib it moved later, per entry, and by how many minutes at worst, against the day the tables and methods alone
+ * give ([DayPipeline.beforeRealSun]); and the place-days where that raise moved another time along with it through
+ * the repair ([Result.cascaded]).
+ *
+ * Ruling R265 carries the floor to Asr (both schools) and caps the ends the sun gives: the sunrise shown and Fajr's end,
+ * and Dhuhr's end ([FLOORED_UNLESS_EXCUSED]). Unexcused, a breach of any of the three is a broken engine; the floor
+ * itself stands aside where a rule sets the day's Asr (a high-latitude or clock rule, a polar day) and where the sunrise
+ * cap would reach the Fajr shown, and those days are excused groups, listed with their ceilings like any other. What
+ * the floor and the caps moved is counted with R180's ([Result.raised]: Asr later in each school, the sunrise earlier),
+ * and Dhuhr's end the cap moved earlier or took away apart ([Result.dhuhrEndCapped]).
+ *
  * Automatic is what most users follow, so every app city is checked under it; the entries Settings offers are checked
  * too ([points], [Kind.CHOSEN]): each one at a spread sample of the app cities where it applies and Automatic follows
  * another entry, every Other method (`other.*`) among them, at the engine's default high-latitude setting.
@@ -60,9 +85,12 @@ object SunSanity {
 
     enum class Check(val key: String, val words: String) {
         DHUHR("dhuhr-before-transit", "Dhuhr before the sun's transit"),
+        ASR("asr-before-shadow", "Asr (either school) before the real shadow time"),
         MAGHRIB("maghrib-before-sunset", "Maghrib before the real sunset"),
         FAJR("fajr-after-sunrise", "Fajr after the real sunrise"),
         END_OF_EATING("end-of-eating-after-sunrise", "end of eating after the real sunrise"),
+        SUNRISE("sunrise-after-real-sunrise", "the sunrise shown or Fajr's end after the real sunrise"),
+        DHUHR_END("dhuhr-end-after-shadow", "Dhuhr's end after the real shadow-1 Asr"),
         ISHA("isha-not-after-maghrib", "Isha at or before Maghrib"),
         ;
 
@@ -70,6 +98,19 @@ object SunSanity {
             fun byKey(key: String): Check = entries.firstOrNull { it.key == key } ?: error("no check $key")
         }
     }
+
+    /**
+     * The checks the engine's own floor makes impossible (ruling R180, [DayPipeline.onRealSun]): found once, either
+     * is a broken engine, never a finding to list ([problems]).
+     */
+    val FLOORED: Set<Check> = setOf(Check.DHUHR, Check.MAGHRIB)
+
+    /**
+     * The checks ruling R265's floor and caps make impossible on every day they apply to ([DayPipeline.onRealSun]): found
+     * with no excuse in the day, any is a broken engine, never a finding to list ([problems]); found on a day the day
+     * itself excuses (a rule sets its Asr, a polar day, a Fajr declared not shown), an excused group like any other.
+     */
+    val FLOORED_UNLESS_EXCUSED: Set<Check> = setOf(Check.ASR, Check.SUNRISE, Check.DHUHR_END)
 
     /** What the engine's own day says about a breach: an excuse with its rule, never a silent one. */
     enum class Excuse(val key: String, val words: String) {
@@ -83,25 +124,49 @@ object SunSanity {
         }
     }
 
-    /** The real sun at a point on a date, in UTC epoch seconds: its transit, and its rise and set where it has them. */
-    class Sky(val transit: Double, val sunrise: Double?, val sunset: Double?)
+    /**
+     * The real sun at a point on a date, in UTC epoch seconds: its transit, its rise and set where it has them, and the
+     * moments of the Standard (shadow-1) and Hanafi (shadow-2) Asr where it casts those shadows.
+     */
+    class Sky(
+        val transit: Double,
+        val sunrise: Double?,
+        val sunset: Double?,
+        val asrStandard: Double? = null,
+        val asrHanafi: Double? = null,
+    ) {
+        fun asr(school: AsrSchool): Double? = if (school == AsrSchool.HANAFI) asrHanafi else asrStandard
+    }
 
-    /** The real sun at [point] on [date] in [zone]: the exact model, the zone's offset at local noon, as `PrayerEngine.sky`. */
+    /**
+     * The real sun at [point] on [date] in [zone]: the exact model, the zone's offset at local noon, as
+     * `PrayerEngine.sky`. It is the engine's own model and horizon ([DayPipeline.REAL_HORIZON_DEG]), read here apart
+     * from the pipeline: a second reading of the same sun, not a second sun. The sunset is read as a start and the sunrise
+     * as an end, as the pipeline's floor and cap read them ([DayPipeline.realSunset], [DayPipeline.realSunrise]).
+     */
     fun sky(point: GeoPoint, date: LocalDate, zone: TimeZone): Sky {
         val noonOffset = zone.offsetAt(date.atTime(12, 0).toInstant(zone)).totalSeconds
         val clock = SunClock(point.lat, point.lon, date, noonOffset, SunModel.EXACT)
+        val transit = clock.transit()
+        // A shadow only where the sun is above the horizon at noon (the formula answers in the polar night too).
+        val shadows = abs(point.lat - SolarMath.sun(SolarMath.julianDay(transit)).declinationDeg) < 90.0
         return Sky(
-            transit = clock.transit(),
-            sunrise = clock.altitudeTime(DayPipeline.REAL_HORIZON_DEG, morning = true),
-            sunset = clock.altitudeTime(DayPipeline.REAL_HORIZON_DEG, morning = false),
+            transit = transit,
+            sunrise = clock.endTime(DayPipeline.REAL_HORIZON_DEG, morning = true),
+            sunset = clock.startTime(DayPipeline.REAL_HORIZON_DEG, morning = false),
+            asrStandard = if (shadows) clock.asr(AsrSchool.STANDARD.shadowFactor, AsrModel.NOON_SHADOW) else null,
+            asrHanafi = if (shadows) clock.asr(AsrSchool.HANAFI.shadowFactor, AsrModel.NOON_SHADOW) else null,
         )
     }
 
     /** One check failed on one day, by [seconds] on the wrong side, with the engine's own [excuse] for it or none. */
     class Breach(val check: Check, val seconds: Double, val excuse: Excuse?)
 
-    /** Every check [day] fails against [sky]; a Dhuhr before transit is never excused. */
-    fun breaches(day: PrayerDay, sky: Sky): List<Breach> {
+    /**
+     * Every check [day] (computed in [school]: its `asr` is that school's, its `asrOther` the other's) fails against
+     * [sky]; a Dhuhr before transit is never excused.
+     */
+    fun breaches(day: PrayerDay, sky: Sky, school: AsrSchool = AsrSchool.STANDARD): List<Breach> {
         val out = ArrayList<Breach>(0)
         fun excuse(prayer: Prayer): Excuse? = when {
             prayer in day.notFollowed -> Excuse.DECLARED
@@ -111,6 +176,15 @@ object SunSanity {
         }
         val dhuhr = seconds(day.dhuhr)
         if (dhuhr < sky.transit) out += Breach(Check.DHUHR, sky.transit - dhuhr, excuse = null)
+        // Asr (R265): the worse of the two schools, each against its own shadow; Dhuhr's end against the first shadow.
+        val asrShort = listOfNotNull(
+            sky.asr(school)?.let { it - seconds(day.asr) },
+            sky.asr(school.other)?.let { it - seconds(day.asrOther) },
+        ).filter { it > 0 }.maxOrNull()
+        if (asrShort != null) out += Breach(Check.ASR, asrShort, excuse(Prayer.ASR))
+        sky.asrStandard?.let { first ->
+            day.ends[Prayer.DHUHR]?.let { end -> if (seconds(end) > first) out += Breach(Check.DHUHR_END, seconds(end) - first, excuse(Prayer.ASR)) }
+        }
         sky.sunset?.let { sunset ->
             val maghrib = seconds(day.maghrib)
             if (maghrib < sunset) out += Breach(Check.MAGHRIB, sunset - maghrib, excuse(Prayer.MAGHRIB))
@@ -120,6 +194,10 @@ object SunSanity {
             if (fajr > sunrise) out += Breach(Check.FAJR, fajr - sunrise, excuse(Prayer.FAJR))
             val end = seconds(day.endOfEating)
             if (end > sunrise) out += Breach(Check.END_OF_EATING, end - sunrise, excuse(Prayer.FAJR))
+            // R265's cap: the sunrise shown and Fajr's end. It stands aside only where it would reach the Fajr shown
+            // (a Fajr at or after the sun, which the day declares it does not show), so that day's excuse is Fajr's.
+            val late = listOfNotNull(seconds(day.sunrise), day.ends[Prayer.FAJR]?.let(::seconds)).max() - sunrise
+            if (late > 0) out += Breach(Check.SUNRISE, late, excuse(Prayer.SUNRISE) ?: excuse(Prayer.FAJR))
         }
         if (day.isha <= day.maghrib) {
             out += Breach(Check.ISHA, seconds(day.maghrib) - seconds(day.isha), excuse(Prayer.ISHA))
@@ -128,6 +206,9 @@ object SunSanity {
     }
 
     private fun seconds(instant: Instant): Double = instant.epochSeconds.toDouble()
+
+    /** [epochSeconds] rounded down to its whole minute: the minute an end the sun gives is shown in. */
+    private fun floorMinute(epochSeconds: Double): Double = kotlin.math.floor(epochSeconds / 60.0) * 60.0
 
     // ---- the points ----
 
@@ -244,9 +325,12 @@ object SunSanity {
         var last: LocalDate? = null
         var worst = 0.0
         var worstDate: LocalDate? = null
+        /** The days of [days] past one minute (what the floor moved by two minutes or more, [Result.raised]). */
+        var daysPastAMinute = 0
 
         fun add(date: LocalDate, school: AsrSchool, seconds: Double) {
             days++
+            if (seconds > 60) daysPastAMinute++
             schools += school.name.lowercase()
             if (first == null || date < first!!) first = date
             if (last == null || date > last!!) last = date
@@ -269,6 +353,24 @@ object SunSanity {
         val noSunset = sortedMapOf<String, Int>()
         /** Days per entry the invariants repaired (a start moved later, or an end earlier). */
         val repaired = sortedMapOf<String, Int>()
+        /**
+         * What the real sun's floor moved (ruling R180), per entry and prayer (Dhuhr or Maghrib): each point's
+         * place-days whose start the floor put later than the tables and methods alone give, and by how many
+         * seconds at worst (whole minutes: both are shown minutes).
+         */
+        val raised = LinkedHashMap<Pair<String, Prayer>, MutableList<PointTally>>()
+        /**
+         * Place-days per entry on which the floor's raise moved another time too: any of Fajr, sunrise, Asr, Isha or
+         * the end of eating differs from the same day repaired without the floor (`Invariants.repair` of
+         * [DayPipeline.beforeRealSun]). Empty where the floor moved Dhuhr and Maghrib alone.
+         */
+        val cascaded = sortedMapOf<String, Int>()
+        /**
+         * What the cap on Dhuhr's end moved (ruling R265, G33's cap), per entry: each point's place-days whose Dhuhr's
+         * end the cap put earlier than the day before it ([DayPipeline.beforeRealSun], which already reads the end from
+         * the ends' points), or took away, and by how many seconds at worst.
+         */
+        val dhuhrEndCapped = sortedMapOf<String, MutableList<PointTally>>()
 
         val findings: Map<Key, List<PointTally>> get() = groups.filterKeys { it.excuse == null }
         val excused: Map<Key, List<PointTally>> get() = groups.filterKeys { it.excuse != null }
@@ -300,6 +402,9 @@ object SunSanity {
                 if (local.noSunrise > 0) result.noSunrise.merge(local.entryId, local.noSunrise, Int::plus)
                 if (local.noSunset > 0) result.noSunset.merge(local.entryId, local.noSunset, Int::plus)
                 if (local.repaired > 0) result.repaired.merge(local.entryId, local.repaired, Int::plus)
+                for ((prayer, tally) in local.raised) result.raised.getOrPut(local.entryId to prayer) { mutableListOf() } += tally
+                if (local.cascaded > 0) result.cascaded.merge(local.entryId, local.cascaded, Int::plus)
+                local.dhuhrEndCapped?.let { result.dhuhrEndCapped.getOrPut(local.entryId) { mutableListOf() } += it }
             }
         } finally {
             pool.shutdown()
@@ -314,6 +419,9 @@ object SunSanity {
         var noSunrise = 0
         var noSunset = 0
         var repaired = 0
+        val raised = LinkedHashMap<Prayer, PointTally>()
+        var cascaded = 0
+        var dhuhrEndCapped: PointTally? = null
     }
 
     /** The resolution [point] is computed with: its entry's at the place, or Automatic's. */
@@ -334,7 +442,52 @@ object SunSanity {
                 val day = DayPipeline.unended(resolution, date, zone, school)
                 local.placeDays++
                 if (day.repaired) local.repaired++
-                for (b in breaches(day, sky)) {
+                // The floor's cost (R180, R265). A start the floor raised stands on the first whole minute after its
+                // event, a sunrise the cap lowered on the minute of the real sunrise (or, far north, on the minute after
+                // the Fajr shown), and a Dhuhr's end the cap lowered on the minute of the real shadow-1 Asr (or taken
+                // away), so only such a day needs the day before the floor computed beside it. Each school is its own
+                // place-day, so the Asr of both schools is counted, each in its own.
+                val onTransit = seconds(day.dhuhr) - sky.transit <= 60
+                val onSunset = sky.sunset != null && seconds(day.maghrib) - sky.sunset <= 60
+                val shadow = sky.asr(school)
+                val onShadow = shadow != null && seconds(day.asr) - shadow in 0.0..60.0
+                val onSunrise = sky.sunrise != null &&
+                    (seconds(day.sunrise) == floorMinute(sky.sunrise) || (day.sunrise == day.fajr + 1.minutes && seconds(day.sunrise) > sky.sunrise))
+                val shadow1 = sky.asr(AsrSchool.STANDARD)
+                val dhuhrEnd = day.ends[Prayer.DHUHR]
+                val onShadow1 = shadow1 != null && (dhuhrEnd == null || seconds(dhuhrEnd) == floorMinute(shadow1))
+                if (onTransit || onSunset || onShadow || onSunrise || onShadow1) {
+                    val before = DayPipeline.beforeRealSun(resolution, date, zone, school)
+                    fun count(prayer: Prayer, shown: Instant, given: Instant) {
+                        if (given != shown) {
+                            local.raised.getOrPut(prayer) { PointTally(point.label, resolution.unitId) }
+                                .add(date, school, kotlin.math.abs(seconds(shown) - seconds(given)))
+                        }
+                    }
+                    val dhuhrMoved = onTransit && before.dhuhr < day.dhuhr
+                    val maghribMoved = onSunset && before.maghrib < day.maghrib
+                    val asrMoved = onShadow && before.asr < day.asr
+                    val sunriseMoved = onSunrise && before.sunrise > day.sunrise
+                    if (dhuhrMoved) count(Prayer.DHUHR, day.dhuhr, before.dhuhr)
+                    if (asrMoved) count(Prayer.ASR, day.asr, before.asr)
+                    if (maghribMoved) count(Prayer.MAGHRIB, day.maghrib, before.maghrib)
+                    if (sunriseMoved) count(Prayer.SUNRISE, day.sunrise, before.sunrise)
+                    val endBefore = before.ends[Prayer.DHUHR]
+                    if (onShadow1 && endBefore != null && (dhuhrEnd == null || endBefore > dhuhrEnd)) {
+                        val by = seconds(endBefore) - (dhuhrEnd?.let(::seconds) ?: floorMinute(shadow1!!))
+                        (local.dhuhrEndCapped ?: PointTally(point.label, resolution.unitId).also { local.dhuhrEndCapped = it })
+                            .add(date, school, by)
+                    }
+                    if (dhuhrMoved || maghribMoved || asrMoved || sunriseMoved) {
+                        // Another time the floor's raise carried with it through the repair: one the floor did not set.
+                        val unfloored = Invariants.repair(before)
+                        val moved = unfloored.fajr != day.fajr || unfloored.isha != day.isha || unfloored.endOfEating != day.endOfEating ||
+                            (!sunriseMoved && unfloored.sunrise != day.sunrise) || (!asrMoved && unfloored.asr != day.asr) ||
+                            (!maghribMoved && unfloored.maghrib != day.maghrib) || (!dhuhrMoved && unfloored.dhuhr != day.dhuhr)
+                        if (moved) local.cascaded++
+                    }
+                }
+                for (b in breaches(day, sky, school)) {
                     local.tallies.getOrPut(Key(resolution.entry.id, b.check, b.excuse)) { PointTally(point.label, resolution.unitId) }
                         .add(date, school, b.seconds)
                 }
@@ -387,13 +540,31 @@ object SunSanity {
 
     /**
      * What fails the pass, one line each: a finding not in [open], an excused group not in [excused], and a listed
-     * group past either ceiling (worse than its worst seconds, or at more points).
+     * group past either ceiling (worse than its worst seconds, or at more points). A Dhuhr before transit or a
+     * Maghrib before sunset ([FLOORED]) fails it outright, found or merely listed: the engine's own floor forbids
+     * both (ruling R180), so neither has a ceiling to stay under, and no list may give it one.
      */
     fun problems(result: Result, open: List<Listed>, excused: List<Listed>): List<String> {
         val listed = (open + excused).associateBy { it.key }
         val out = mutableListOf<String>()
+        for (l in open + excused) {
+            if (l.check in FLOORED) out += "${l.entryId} ${l.check.key}: listed, and the real sun's floor (ruling R180) leaves nothing to list"
+        }
+        for (l in open) {
+            if (l.check in FLOORED_UNLESS_EXCUSED) out += "${l.entryId} ${l.check.key}: listed as open, and the real sun's floor (ruling R265) leaves nothing open to list"
+        }
         for ((key, tallies) in result.groups) {
             val words = "${key.entryId} ${key.check.key}" + (key.excuse?.let { " (${it.key})" } ?: "")
+            if (key.check in FLOORED) {
+                out += "$words: found at ${tallies.size} points, worst ${String.format(Locale.ROOT, "%.1f", tallies.maxOf { it.worst })} s: " +
+                    "the real sun's floor (ruling R180) is broken"
+                continue
+            }
+            if (key.check in FLOORED_UNLESS_EXCUSED && key.excuse == null) {
+                out += "$words: found at ${tallies.size} points, worst ${String.format(Locale.ROOT, "%.1f", tallies.maxOf { it.worst })} s, " +
+                    "with nothing in the day to excuse it: the real sun's floor (ruling R265) is broken"
+                continue
+            }
             val l = listed[key]
             if (l == null) {
                 out += "$words: not listed in ${if (key.excuse == null) "open-findings.tsv" else "excused.tsv"}"
@@ -416,7 +587,10 @@ object SunSanity {
                 "), ${result.from}..${result.to}, both Asr schools: ${fmt(result.placeDays)} place-days.",
         )
         appendLine("Held to the real sun at the point (exact model, sea level, standard refraction -0.8333°): Dhuhr not before transit,")
-        appendLine("Maghrib not before sunset, Fajr and the end of eating not after sunrise, Isha after Maghrib.")
+        appendLine("Maghrib not before sunset (both the engine's own floor since ruling R180, checked here outside the pipeline with the")
+        appendLine("same sun model), Asr in each school not before its real shadow time, the sunrise shown and Fajr's end not after the")
+        appendLine("real sunrise, Dhuhr's end not after the real shadow-1 Asr (ruling R265's floor and caps, where the day's Asr is the")
+        appendLine("sun's), Fajr and the end of eating not after sunrise, Isha after Maghrib.")
         appendLine()
         val findings = result.findings
         appendLine("Findings (nothing in the day excuses them): ${findings.size}")
@@ -438,6 +612,40 @@ object SunSanity {
         for ((entry, n) in result.noSunset) appendLine("  $entry: ${fmt(n.toLong())}")
         appendLine("Days the invariants repaired (Invariants.repair moved a start later or an end earlier), place-days in both schools:")
         for ((entry, n) in result.repaired) appendLine("  $entry: ${fmt(n.toLong())}")
+        appendLine(
+            "Times the real sun's floor and caps moved (rulings R180 and R265: Dhuhr, Asr and Maghrib never before the minute after the real",
+        )
+        appendLine("transit, shadow time or sunset at the point, later; the sunrise never after the real sunrise, earlier), against the day the")
+        appendLine("tables and methods alone give, place-days in both schools: ${result.raised.size} groups")
+        for ((key, tallies) in result.raised.entries.sortedWith(compareBy({ it.key.first }, { it.key.second }))) {
+            val worst = tallies.maxBy { it.worst }
+            val way = if (key.second == Prayer.SUNRISE) "earlier" else "later"
+            appendLine(
+                "  ${key.first} ${key.second.name.lowercase()}: ${fmt(tallies.size.toLong())} points, ${fmt(tallies.sumOf { it.days }.toLong())} place-days, " +
+                    "worst ${String.format(Locale.ROOT, "%.0f", worst.worst / 60)} min $way at ${worst.label}" +
+                    (worst.unit?.let { " [unit $it]" } ?: "") + " on ${worst.worstDate}" +
+                    tallies.sumOf { it.daysPastAMinute }.let { n ->
+                        if (n == 0) "" else "; ${fmt(n.toLong())} place-days at ${fmt(tallies.count { it.daysPastAMinute > 0 }.toLong())} points by more than 1 min"
+                    },
+            )
+        }
+        appendLine(
+            "Days the floor's raise moved another time too (one it did not set itself, against the same day repaired " +
+                "without the floor), place-days in both schools: ${fmt(result.cascaded.values.sumOf { it.toLong() })}",
+        )
+        for ((entry, n) in result.cascaded) appendLine("  $entry: ${fmt(n.toLong())}")
+        appendLine(
+            "Dhuhr's ends the real sun's cap moved earlier or took away (ruling R265: never after the real shadow-1 Asr at the " +
+                "point), place-days in both schools: ${fmt(result.dhuhrEndCapped.values.flatten().sumOf { it.days }.toLong())}",
+        )
+        for ((entry, tallies) in result.dhuhrEndCapped) {
+            val worst = tallies.maxBy { it.worst }
+            appendLine(
+                "  $entry: ${fmt(tallies.size.toLong())} points, ${fmt(tallies.sumOf { it.days }.toLong())} place-days, " +
+                    "worst ${String.format(Locale.ROOT, "%.0f", worst.worst / 60)} min earlier at ${worst.label}" +
+                    (worst.unit?.let { " [unit $it]" } ?: "") + " on ${worst.worstDate}",
+            )
+        }
         val problems = problems(result, open, excusedListed)
         val fixed = fixed(result, open + excusedListed)
         appendLine()

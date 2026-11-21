@@ -1,7 +1,7 @@
 {
   "entry": "default.safe",
   "class": "D (none)",
-  "engineHash": "62a2c3f98f034f38",
+  "engineHash": "0dc240c91512a9b1",
   "broken": 0,
   "places": 15,
   "first": "2026-01-01",
@@ -19,6 +19,8 @@
   },
   "placeDays": 2054,
   "heldOutDays": 2054,
+  "sharedDays": 1132,
+  "tables": 4,
   "ramadanDays": 149,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
@@ -148,6 +150,16 @@
   "heldOut": {
     "placeDays": 2054,
     "ramadanDays": 149,
+    "checkedByEvent": {
+      "fajr": ["2026-01-01..2027-12-31"],
+      "sunrise": ["2026-01-01..2026-12-31"],
+      "dhuhr": ["2026-01-01..2026-12-31"],
+      "asrStandard": ["2026-01-01..2026-12-31"],
+      "asrHanafi": ["2026-01-01..2026-12-31"],
+      "maghrib": ["2026-01-01..2026-12-31"],
+      "isha": ["2026-01-01..2026-12-31"],
+      "endOfEating": ["2026-09-01..2026-10-31", "2027-01-01..2027-12-31"]
+    },
     "events": {
       "fajr": {
         "checked": 1689,

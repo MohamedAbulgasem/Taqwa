@@ -553,7 +553,11 @@ class WatchSectionTest {
         val offer = Offer(offered = false)
         val front = Front()
         setContent { Section(source, offer, front) }
-        waitUntil("listening", timeoutMillis = 5_000) { source.listening == 1 && offer.listening == 1 }
+        // The first reading is waited for too: left before it is dispatched, it is cancelled unread, and
+        // coming back would then make the second reading the first.
+        waitUntil("listening and read", timeoutMillis = 5_000) {
+            source.listening == 1 && offer.listening == 1 && source.asked == 1
+        }
         front.leave()
         waitUntil("no longer listening", timeoutMillis = 5_000) { source.listening == 0 && offer.listening == 0 }
         front.come()

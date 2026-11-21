@@ -6,6 +6,8 @@
 # fitted on FIDS's one month, Maghrib was a minute early on five days of 2027 and sunrise a minute late on nine; the
 # unit now takes Diyanet Zürich's own method and margins (Europe.kt). Fit, not held out: Diyanet's margins were fitted
 # (subtask 7b) on its Zürich table of the same days (dy-zurich.txt, tr-diyanet-europe.tsv).
+# The weekly captures below print the days of the 2 Oct capture again, each at a new path: they are held out only on the days
+# that one does not hold (ruling R214, by date: the review round of 14 Nov 2026; until then 399 days of each event read as held out).
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/europe/verify/fids-zh.txt	ch.fids/ch.fids			Europe/Zurich	F+E S D A M I	daily	standard	fit	FIDS Zürich, September-October 2026
 archive/tables/pinned/tr-diyanet-europe/2026-10-02/zurich.txt	ch.fids/ch.fids			Europe/Zurich	F+E S D A M I	daily	standard	fit	Diyanet Zürich, which FIDS prints (Europe.kt), the monitor capture of 2 Oct 2026

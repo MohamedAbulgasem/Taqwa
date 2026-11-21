@@ -14,6 +14,7 @@ import world.taqwa.app.prayer.engine.astro.AsrModel
 import world.taqwa.app.prayer.engine.astro.SolarMath
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.astro.altitudeTime
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.HighLatRule

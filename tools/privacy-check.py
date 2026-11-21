@@ -445,27 +445,30 @@ ROWS = [Row(*r) for r in [
     # of Taqwa's own that are backed up are the widgets' small caches, ...", which now ends at "your
     # location". The clause after it, that the backup "is encrypted by Apple and never visible to us",
     # is the old text, since the sentences after it say how a backup is encrypted.
+    # 19 November 2026: the ayah widget's pool became 365, one ayah for each day of a 365-day round
+    # (Mohamed's decision; the ayah widget spec's §3, "Amended 19 November 2026"), so the number in
+    # this sentence went from a hundred to 365 in every language. Nothing else in it changed.
     ('3-4d-policy-backups-caches', APPROVED, 'PRIVACY.md', 'en',
      'and that backup is encrypted by Apple and never visible to us',
-     "the only files of Taqwa's own that are backed up are the widgets' small caches, the upcoming prayer times and the hundred ayahs the daily-ayah widget rotates through, neither of which contains your location."),
+     "the only files of Taqwa's own that are backed up are the widgets' small caches, the upcoming prayer times and the 365 ayahs the daily-ayah widget rotates through, neither of which contains your location."),
     ('3-4d-policy-backups-caches', APPROVED, 'PRIVACY.ar.md', 'ar',
      'وذلك النسخ مشفّر لدى Apple ولا نطّلع عليه أبدًا',
-     'وكل ما يُنسخ احتياطيًا من ملفات تقوى نفسه هو ذاكرتا الأدوات الصغيرتان: مواقيت الصلاة القادمة، والآيات المئة التي تتناوب عليها أداة «آية اليوم»، وليس في أيٍّ منهما موقعك.'),
+     'وكل ما يُنسخ احتياطيًا من ملفات تقوى نفسه هو ذاكرتا الأدوات الصغيرتان: مواقيت الصلاة القادمة، والآيات الـ365 التي تتناوب عليها أداة «آية اليوم»، وليس في أيٍّ منهما موقعك.'),
     ('3-4d-policy-backups-caches', APPROVED, 'PRIVACY.fr.md', 'fr',
      'et cette sauvegarde est chiffrée par Apple et ne nous est jamais visible',
-     'les seuls fichiers propres à Taqwa qui soient sauvegardés sont les petits caches des widgets, les prochains horaires de prière et les cent versets que le widget du verset du jour fait défiler, dont aucun ne contient votre position.'),
+     'les seuls fichiers propres à Taqwa qui soient sauvegardés sont les petits caches des widgets, les prochains horaires de prière et les 365 versets que le widget du verset du jour fait défiler, dont aucun ne contient votre position.'),
     ('3-4d-policy-backups-caches', APPROVED, 'PRIVACY.tr.md', 'tr',
      'o yedekleme de Apple tarafından şifrelenir ve bize hiçbir zaman görünmez',
-     "Taqwa'nın kendi dosyalarından yedeklenen tek şey widget'ların küçük önbellekleri, yani yaklaşan namaz vakitleri ile günün ayeti widget'ının sırayla gösterdiği yüz ayettir. Bunların hiçbiri konumunuzu içermez."),
+     "Taqwa'nın kendi dosyalarından yedeklenen tek şey widget'ların küçük önbellekleri, yani yaklaşan namaz vakitleri ile günün ayeti widget'ının sırayla gösterdiği 365 ayettir. Bunların hiçbiri konumunuzu içermez."),
     ('3-4d-policy-backups-caches', APPROVED, 'PRIVACY.id.md', 'id',
      'cadangan itu pun dienkripsi oleh Apple dan tidak pernah terlihat oleh kami',
-     'berkas milik Taqwa sendiri yang dicadangkan hanyalah cache kecil milik widget, yaitu waktu salat yang akan datang dan seratus ayat yang diputar bergiliran oleh widget ayat harian, dan keduanya tidak memuat lokasi Anda.'),
+     'berkas milik Taqwa sendiri yang dicadangkan hanyalah cache kecil milik widget, yaitu waktu salat yang akan datang dan 365 ayat yang diputar bergiliran oleh widget ayat harian, dan keduanya tidak memuat lokasi Anda.'),
     ('3-4d-policy-backups-caches', APPROVED, 'PRIVACY.ur.md', 'ur',
      'اور وہ بیک اپ Apple کی طرف سے خفیہ کاری شدہ ہے اور ہمیں کبھی نظر نہیں آتا',
-     'تقویٰ کی اپنی فائلوں میں سے صرف وہ بیک اپ ہوتی ہیں جو ویجٹ کے چھوٹے ذخیرے ہیں — آنے والی نمازوں کے اوقات اور وہ سو آیات جن میں سے روزانہ کی آیت کا ویجٹ باری باری دکھاتا ہے — اور ان میں سے کسی میں آپ کا مقام نہیں ہوتا۔'),
+     'تقویٰ کی اپنی فائلوں میں سے صرف وہ بیک اپ ہوتی ہیں جو ویجٹ کے چھوٹے ذخیرے ہیں — آنے والی نمازوں کے اوقات اور وہ 365 آیات جن میں سے روزانہ کی آیت کا ویجٹ باری باری دکھاتا ہے — اور ان میں سے کسی میں آپ کا مقام نہیں ہوتا۔'),
     ('3-4d-policy-backups-caches', APPROVED, 'PRIVACY.bn.md', 'bn',
      'সেই ব্যাকআপ Apple এনক্রিপ্ট করে রাখে এবং তা আমাদের কাছে কখনো দৃশ্যমান হয় না',
-     'তাকওয়ার নিজের ফাইলের মধ্যে যা ব্যাকআপ হয় তা কেবল উইজেটের ছোট ক্যাশ — সামনের নামাজের সময় আর আজকের-আয়াত উইজেট যে একশো আয়াত ঘুরিয়ে দেখায় সেগুলো — আর এর কোনোটিতেই আপনার অবস্থান থাকে না।'),
+     'তাকওয়ার নিজের ফাইলের মধ্যে যা ব্যাকআপ হয় তা কেবল উইজেটের ছোট ক্যাশ — সামনের নামাজের সময় আর আজকের-আয়াত উইজেট যে ৩৬৫টি আয়াত ঘুরিয়ে দেখায় সেগুলো — আর এর কোনোটিতেই আপনার অবস্থান থাকে না।'),
     # 4e: the support page's "Everything Taqwa knows".
     ('3-4e-support-first', APPROVED, 'site/pages/en/support.html', 'en',
      'Everything Taqwa knows lives on your phone:',
@@ -959,7 +962,8 @@ KNOWN = [
     ("records: shipped release notes", r"docs/store/release-notes/[^/]+\.txt", r"\boffline\b"),
     ("records: a smoke test's step", r"docs/store/smoke-tests/[^/]+\.md",
      r"No surah stays on its Verifying chip|^- \*\*S23:\*\* uninstall the Play version first: this APK is signed with the upload key, not Play's"
-     r"|^- \*\*S23:\*\* before uninstalling, screenshot Mushaf pages 1, 351 and 411 in 1\.5\.0 for section 10\. Then uninstall the$"),
+     r"|^- \*\*S23:\*\* before uninstalling, screenshot Mushaf pages 1, 351 and 411 in 1\.5\.0 for section 10\. Then uninstall the$"
+     r"|^- \[ \] Uninstall Taqwa from the watch, open Prayer: \"Taqwa for your watch\" with \"Install on your watch\"\. "),
     ("credits", r"docs/licences/.+", r""),
     ("credits", r"docs/ATTRIBUTION\.md", r""),
     ("credits", r"CONTRIBUTING\.md", r"^Third-party material \(text, audio, fonts, data\)"),
@@ -1000,11 +1004,12 @@ KNOWN = [
      r"open_taqwa_on_phone"),
     # Plan 5 Task 10: the support page's watch answer quotes the watch's own message, and the Wear
     # OS track's notes say the watch app needs the phone's, which sends it the times (the plan's
-    # own English).
+    # own English); 1.7.0's says the same in other words, where the watch's times come from.
     ("the watch's own words, quoted: a message, not a promise", r"site/pages/en/support\.html",
      r"If the watch says “Open Taqwa on your phone”, it has no times yet"),
     ("the watch's own words: the phone app the watch needs, not a promise",
-     r"docs/store/release-notes/[^/]+-wear\.txt", r"^Needs Taqwa on your phone, which sends the prayer times\.$|\. Needs Taqwa on your phone, which sends the prayer times\.$"),
+     r"docs/store/release-notes/[^/]+-wear\.txt", r"^Needs Taqwa on your phone, which sends the prayer times\.$|\. Needs Taqwa on your phone, which sends the prayer times\.$"
+     r"|^The prayer times on your watch come from Taqwa on your phone, which now compares them with the published timetable in many more places\.$"),
     # Ruling 69 item 2 (plan 5 Task 11): the App Review notes say what the Apple Watch shows until
     # the iPhone app has run once with it nearby, quoting the watch's own message.
     ("the watch's own words, quoted: a message, not a promise",

@@ -1,0 +1,268 @@
+{
+  "entry": "default.safe.seasia",
+  "class": "D (none)",
+  "engineHash": "89b64b59eda596f2",
+  "broken": 0,
+  "places": 4,
+  "first": "2026-01-01",
+  "last": "2026-12-31",
+  "checked": ["2026-01-01..2026-12-31"],
+  "checkedByEvent": {
+    "fajr": ["2026-01-01..2026-12-31"],
+    "sunrise": ["2026-01-01..2026-12-31"],
+    "dhuhr": ["2026-01-01..2026-12-31"],
+    "asrStandard": ["2026-01-01..2026-12-31"],
+    "maghrib": ["2026-01-01..2026-12-31"],
+    "isha": ["2026-01-01..2026-12-31"],
+    "endOfEating": ["2026-01-01..2026-12-31"]
+  },
+  "placeDays": 1450,
+  "heldOutDays": 1450,
+  "sharedDays": 1450,
+  "tables": 0,
+  "ramadanDays": 119,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 1450,
+      "early": 0,
+      "late": {
+        "0": 20,
+        "1": 130,
+        "2": 190,
+        "3+": 1110
+      },
+      "exactShare": 0.0138,
+      "worstLate": 13,
+      "lateLimit": 14,
+      "lateLimitFrom": "entry default.safe.seasia",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 1450,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 242,
+        "3+": 1208
+      },
+      "exactShare": 0,
+      "worstLate": 7,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.seasia",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 1450,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 20,
+        "2": 443,
+        "3+": 987
+      },
+      "exactShare": 0,
+      "worstLate": 5,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.seasia",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 1450,
+      "early": 0,
+      "late": {
+        "0": 234,
+        "1": 376,
+        "2": 383,
+        "3+": 457
+      },
+      "exactShare": 0.1614,
+      "worstLate": 4,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.seasia",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 1450,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 1,
+        "2": 284,
+        "3+": 1165
+      },
+      "exactShare": 0,
+      "worstLate": 6,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.seasia",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 1450,
+      "early": 0,
+      "late": {
+        "0": 258,
+        "1": 379,
+        "2": 369,
+        "3+": 444
+      },
+      "exactShare": 0.1779,
+      "worstLate": 4,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.seasia",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 1450,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 195,
+        "3+": 1255
+      },
+      "exactShare": 0,
+      "worstLate": 14,
+      "lateLimit": 15,
+      "lateLimitFrom": "entry default.safe.seasia",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 1450,
+    "ramadanDays": 119,
+    "checkedByEvent": {
+      "fajr": ["2026-01-01..2026-12-31"],
+      "sunrise": ["2026-01-01..2026-12-31"],
+      "dhuhr": ["2026-01-01..2026-12-31"],
+      "asrStandard": ["2026-01-01..2026-12-31"],
+      "maghrib": ["2026-01-01..2026-12-31"],
+      "isha": ["2026-01-01..2026-12-31"],
+      "endOfEating": ["2026-01-01..2026-12-31"]
+    },
+    "events": {
+      "fajr": {
+        "checked": 1450,
+        "early": 0,
+        "late": {
+          "0": 20,
+          "1": 130,
+          "2": 190,
+          "3+": 1110
+        },
+        "exactShare": 0.0138,
+        "worstLate": 13,
+        "lateLimit": 14,
+        "lateLimitFrom": "entry default.safe.seasia",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 1450,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 242,
+          "3+": 1208
+        },
+        "exactShare": 0,
+        "worstLate": 7,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.seasia",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 1450,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 20,
+          "2": 443,
+          "3+": 987
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.seasia",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 1450,
+        "early": 0,
+        "late": {
+          "0": 234,
+          "1": 376,
+          "2": 383,
+          "3+": 457
+        },
+        "exactShare": 0.1614,
+        "worstLate": 4,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.seasia",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 1450,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 1,
+          "2": 284,
+          "3+": 1165
+        },
+        "exactShare": 0,
+        "worstLate": 6,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.seasia",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 1450,
+        "early": 0,
+        "late": {
+          "0": 258,
+          "1": 379,
+          "2": 369,
+          "3+": 444
+        },
+        "exactShare": 0.1779,
+        "worstLate": 4,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.seasia",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 1450,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 195,
+          "3+": 1255
+        },
+        "exactShare": 0,
+        "worstLate": 14,
+        "lateLimit": 15,
+        "lateLimitFrom": "entry default.safe.seasia",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "entry default.safe.seasia: 8 min": {
+      "reason": "The 1986 floors (sunrise − 2, Dhuhr, Asr, Maghrib and Isha + 2) with the safety cushion on top, against tables that print the sun's own times: sunrise up to 7 min before, Maghrib up to 6 min after, Dhuhr up to 5, Asr and Isha up to 4 (engine wave W5, safe-default-seasia.tsv).",
+      "events": ["sunrise", "dhuhr", "asrStandard", "maghrib", "isha"]
+    },
+    "entry default.safe.seasia: 14 min": {
+      "reason": "This region's Fajr is JAKIM's 18° Subuh, the latest in South-east Asia; MUIS, Kemenag and Brunei print a 20° one, 9 to 13 min earlier (engine wave W5, safe-default-seasia.tsv).",
+      "events": ["fajr"]
+    },
+    "entry default.safe.seasia: 15 min": {
+      "reason": "The fast begins 2 min before the 20° dawn: 4 to 6 min before Kemenag's and MUIS's Fajr, and up to 14 min before JAKIM's Subuh, which it prints for its zone's latest point, rounded up (engine wave W5, safe-default-seasia.tsv).",
+      "events": ["endOfEating"]
+    }
+  }
+}

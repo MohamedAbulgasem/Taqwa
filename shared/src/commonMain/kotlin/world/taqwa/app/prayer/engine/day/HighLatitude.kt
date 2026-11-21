@@ -8,6 +8,8 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.offsetAt
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
+import world.taqwa.app.prayer.engine.astro.Crossing
+import world.taqwa.app.prayer.engine.astro.Side
 import world.taqwa.app.prayer.engine.astro.SolarMath
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.method.GeoPoint
@@ -32,6 +34,12 @@ import kotlin.math.abs
  *    - [HighLatRule.NightFraction]: the authority's own fractions.
  *    - [HighLatRule.Legacy]: half the night (`middle`), a seventh (`seventh`) or the angle's
  *      sixtieth (`angle`).
+ *
+ * Each sign is read on a [Side] (the final review of 20 Nov 2026): a start's (Fajr, Isha) takes each crossing's later
+ * moment and an end's (the end of eating) its earlier ([world.taqwa.app.prayer.engine.astro.Crossing]), the real sign's
+ * and the night's alike, so an estimate for a start never comes before the one from the steps kept, nor one for an end
+ * after it. The proportion's fraction reads the reference's sign on the same side and its night on the other, which
+ * moves it the same way.
  */
 object HighLatitude {
     /** The MWL's reference latitude for the proportion. */
@@ -47,14 +55,14 @@ object HighLatitude {
     private const val MAX_DECLINATION_DEG = 23.5
 
     /**
-     * The [twilight] sign on [date] under [sky]: the real crossing when the sun reaches it, else
+     * The [twilight] sign on [date] under [sky], read on [side]: the real crossing when the sun reaches it, else
      * [rule]'s estimate. Null only when [date] itself has no sunset (for an evening sign) or no
-     * sunrise (for a morning one) and the sign does not occur.
+     * sunrise (for a morning one) and the sign does not occur. Whether it is estimated does not depend on [side].
      */
-    internal fun sign(sky: Sky, rule: HighLatRule, twilight: Twilight, date: LocalDate): Sign? {
-        real(sky, twilight, date)?.let { return Sign(it, estimated = false) }
-        val (dusk, dawn) = night(sky, twilight, date) ?: return null
-        val part = fraction(sky, rule, twilight, date) * (dawn - dusk)
+    internal fun sign(sky: Sky, rule: HighLatRule, twilight: Twilight, date: LocalDate, side: Side): Sign? {
+        real(sky, twilight, date, side)?.let { return Sign(it, estimated = false) }
+        val (dusk, dawn) = night(sky, twilight, date, side) ?: return null
+        val part = fraction(sky, rule, twilight, date, side) * (dawn - dusk)
         return Sign(if (twilight.morning) dawn - part else dusk + part, estimated = true)
     }
 
@@ -86,41 +94,45 @@ object HighLatitude {
         return deepest >= twilight.degreesOn(date) + SURELY_REACHED_MARGIN_DEG
     }
 
-    private fun real(sky: Sky, twilight: Twilight, date: LocalDate): Double? =
-        sky.altitudeTime(date, -twilight.degreesOn(date), twilight.morning, twilight.biasOn(date))
+    private fun real(sky: Sky, twilight: Twilight, date: LocalDate, side: Side): Double? =
+        sky.crossing(date, -twilight.degreesOn(date), twilight.morning, twilight.biasOn(date))?.on(side)
 
     /**
-     * The sunset and the sunrise of the night a sign belongs to. The sign's own day must have its
+     * The sunset and the sunrise of the night a sign belongs to, each read on [side]. The sign's own day must have its
      * edge (sunrise for a morning sign, sunset for an evening one); a neighbour without one borrows
      * the day's own, a day away (ruling R18). Null when the day's own edge is missing.
      */
-    private fun night(sky: Sky, twilight: Twilight, date: LocalDate): Pair<Double, Double>? =
+    private fun night(sky: Sky, twilight: Twilight, date: LocalDate, side: Side): Pair<Double, Double>? =
         if (twilight.morning) {
-            val sunrise = sky.sunrise(date) ?: return null
-            val sunset = sky.sunset(date.minus(1, DateTimeUnit.DAY))
-                ?: sky.sunset(date)?.minus(SolarMath.SECONDS_PER_DAY)
+            val sunrise = sky.sunrise(date)?.on(side) ?: return null
+            val sunset = sky.sunset(date.minus(1, DateTimeUnit.DAY))?.on(side)
+                ?: sky.sunset(date)?.on(side)?.minus(SolarMath.SECONDS_PER_DAY)
                 ?: return null
             sunset to sunrise
         } else {
-            val sunset = sky.sunset(date) ?: return null
-            val sunrise = sky.sunrise(date.plus(1, DateTimeUnit.DAY))
-                ?: sky.sunrise(date)?.plus(SolarMath.SECONDS_PER_DAY)
+            val sunset = sky.sunset(date)?.on(side) ?: return null
+            val sunrise = sky.sunrise(date.plus(1, DateTimeUnit.DAY))?.on(side)
+                ?: sky.sunrise(date)?.on(side)?.plus(SolarMath.SECONDS_PER_DAY)
                 ?: return null
             sunset to sunrise
         }
 
-    /** How far the real sign lies into its night from the nearer edge (sunrise for a morning sign). */
-    private fun realFraction(sky: Sky, twilight: Twilight, date: LocalDate): Double? {
-        val sign = real(sky, twilight, date) ?: return null
-        val (dusk, dawn) = night(sky, twilight, date) ?: return null
+    /**
+     * How far the real sign lies into its night from the nearer edge (sunrise for a morning sign): the sign read on [side]
+     * and its night on the other, so the fraction moves an estimate for a start later and one for an end earlier (a
+     * morning start's estimate falls with the fraction, an evening start's rises with it).
+     */
+    private fun realFraction(sky: Sky, twilight: Twilight, date: LocalDate, side: Side): Double? {
+        val sign = real(sky, twilight, date, side) ?: return null
+        val (dusk, dawn) = night(sky, twilight, date, side.other) ?: return null
         val part = if (twilight.morning) dawn - sign else sign - dusk
         return part / (dawn - dusk)
     }
 
-    private fun fraction(sky: Sky, rule: HighLatRule, twilight: Twilight, date: LocalDate): Double =
+    private fun fraction(sky: Sky, rule: HighLatRule, twilight: Twilight, date: LocalDate, side: Side): Double =
         when (rule) {
             HighLatRule.Standard, is HighLatRule.DumRtSummer ->
-                realFraction(sky.reference, twilight, date) ?: UNREACHED_AT_REFERENCE
+                realFraction(sky.reference, twilight, date, side) ?: UNREACHED_AT_REFERENCE
             is HighLatRule.NightFraction -> if (twilight.morning) rule.fajrFraction else rule.ishaFraction
             is HighLatRule.Legacy -> when (rule.kind) {
                 HighLatRule.Legacy.MIDDLE -> 0.5
@@ -146,25 +158,23 @@ internal class Sign(val epochSeconds: Double, val estimated: Boolean)
  * life of the sky (one place's computation, across the days the rate limit reads back).
  */
 internal class Sky(private val method: TimetableMethod, val point: GeoPoint, private val zone: TimeZone) {
-    private data class Crossing(val epochDay: Long, val altitudeDeg: Double, val morning: Boolean, val biasDeg: Double)
+    private data class Key(val epochDay: Long, val altitudeDeg: Double, val morning: Boolean, val biasDeg: Double)
 
-    private val crossings = HashMap<Crossing, Double>()
+    private val crossings = HashMap<Key, Crossing>()
 
     fun clock(date: LocalDate): SunClock =
         SunClock(point.lat, point.lon, date, noonOffsetSeconds(date), method.sunModel, method.phaseYear)
 
-    /** [SunClock.altitudeTime] on [date], remembered. */
-    fun altitudeTime(date: LocalDate, altitudeDeg: Double, morning: Boolean, biasDeg: Double = 0.0): Double? {
-        val key = Crossing(date.toEpochDays(), altitudeDeg, morning, biasDeg)
-        val time = crossings.getOrPut(key) {
-            clock(date).altitudeTime(altitudeDeg, morning, biasDeg) ?: Double.NaN
-        }
-        return time.takeUnless { it.isNaN() }
+    /** [SunClock.crossing] on [date], remembered: each time read from it takes its own [Side]. */
+    fun crossing(date: LocalDate, altitudeDeg: Double, morning: Boolean, biasDeg: Double = 0.0): Crossing? {
+        val key = Key(date.toEpochDays(), altitudeDeg, morning, biasDeg)
+        val crossing = crossings.getOrPut(key) { clock(date).crossing(altitudeDeg, morning, biasDeg) ?: NONE }
+        return crossing.takeUnless { it === NONE }
     }
 
-    fun sunrise(date: LocalDate): Double? = altitudeTime(date, method.horizonDeg, morning = true)
+    fun sunrise(date: LocalDate): Crossing? = crossing(date, method.horizonDeg, morning = true)
 
-    fun sunset(date: LocalDate): Double? = altitudeTime(date, method.horizonDeg, morning = false)
+    fun sunset(date: LocalDate): Crossing? = crossing(date, method.horizonDeg, morning = false)
 
     /** The sun's declination near local noon of [date]. */
     fun declinationDeg(date: LocalDate): Double {
@@ -182,4 +192,9 @@ internal class Sky(private val method: TimetableMethod, val point: GeoPoint, pri
 
     private fun noonOffsetSeconds(date: LocalDate): Int =
         zone.offsetAt(date.atTime(12, 0).toInstant(zone)).totalSeconds
+
+    private companion object {
+        /** A crossing the sun does not make, remembered as one. */
+        val NONE = Crossing(Double.NaN, Double.NaN)
+    }
 }

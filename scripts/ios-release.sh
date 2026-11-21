@@ -67,11 +67,24 @@ APPEX_LIMIT_MB=15
 archive() {
     # Spec §5 / ruling R86: refuse to build on a stale or red prayer-time stamp. The Ramadan build
     # (ruling R146) runs as TAQWA_RAMADAN=<Hijri year> scripts/ios-release.sh, e.g. 1448: it then also
-    # refuses an A/B unit whose Fajr, end of eating and Maghrib were not each checked on every day of
-    # that Ramadan (ruling R148), unless the gate has demoted it.
-    if ! ./gradlew -q -p tools/timetables checkStamps ${TAQWA_RAMADAN:+-Pramadan="$TAQWA_RAMADAN"}; then
-        echo "A prayer-time stamp is stale or red, or its Ramadan is not proven (see above). Refresh it first: " \
+    # refuses an A/B unit whose Fajr, end of eating and Maghrib (and its imsak where a table prints one)
+    # were not each held out and checked on every day of that Ramadan (rulings R148 and R246), unless
+    # the gate has demoted it, or the entry is covered under O4
+    # (ruling R185; see scripts/release.sh). Any build refuses an entry
+    # the monitor has demoted (a "@demoted" gate line) until it is looked at, and (-Prelease=true)
+    # any build is refused while a reach proof is owed (ReachRows.outstanding; see scripts/release.sh).
+    if ! ./gradlew -q -p tools/timetables checkStamps -Prelease=true ${TAQWA_RAMADAN:+-Pramadan="$TAQWA_RAMADAN"} ${TAQWA_OFFICIAL:+-Pofficial="$TAQWA_OFFICIAL"}; then
+        echo "A prayer-time stamp is stale, red or demoted, its Ramadan is not proven, or a reach proof is owed (see above). " \
+            "For a stamp, refresh it first: " \
             "./gradlew -p tools/timetables gate, then ./gradlew -p tools/timetables generateProofStamps." >&2
+        exit 1
+    fi
+    # The second trust audit's G24 (14 Nov 2026): the envelope's promise-only rows are a pure function of the gate's
+    # group files, and fall behind when prove appends a year to a group file with units; a release ships only stamps
+    # whose envelope rows are current (see scripts/release.sh).
+    if ! ./gradlew -q -p tools/timetables checkEnvelopeRows; then
+        echo "An envelope file is not what generateEnvelopeRows would write (see above): run ./gradlew -p tools/timetables " \
+            "generateEnvelopeRows, then the gate, and commit." >&2
         exit 1
     fi
 

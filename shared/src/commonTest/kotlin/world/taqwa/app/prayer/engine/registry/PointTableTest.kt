@@ -84,10 +84,10 @@ class PointTableTest {
             assertNull(r.unitName, id)
             assertTrue(r.method!!.endOfEatingMarginSeconds <= SAFE_END, "$id: ${r.method!!.endOfEatingMarginSeconds}")
         }
-        // Habous's edge moves its end like its sunrise (3 km west of Imilchil).
-        val imilchil = Registry.resolve(Place(32.155, -5.666, "Africa/Casablanca", "MA"))
-        assertNull(imilchil.unitName)
-        assertEquals(-40, imilchil.method!!.endOfEatingMarginSeconds)
+        // Habous's edge takes no fitted end either (Amizmiz, beyond every place Habous prints for): SAFE_END or lower.
+        val amizmiz = Registry.resolve(Place(31.21673, -8.23184, "Africa/Casablanca", "MA"))
+        assertNull(amizmiz.unitName)
+        assertTrue(amizmiz.method!!.endOfEatingMarginSeconds <= SAFE_END, "ma.habous: ${amizmiz.method!!.endOfEatingMarginSeconds}")
     }
 
     @Test
@@ -168,7 +168,10 @@ class PointTableTest {
                 var date = LocalDate(2026, 1, 1)
                 while (date.year <= 2030) {
                     val shown = DayPipeline.unended(r, date, zone)
-                    val table = own.getOrPut(date) { DayPipeline.unended(atTable, date, zone) }
+                    // The table's own sunrise, before the real sun at the table's point caps it (ruling R265).
+                    val table = own.getOrPut(date) {
+                        DayPipeline.unended(atTable, date, zone).copy(sunrise = DayPipeline.beforeRealSun(atTable, date, zone).sunrise)
+                    }
                     assertTrue(shown.endOfEating <= table.endOfEating, "$name $date: the end of eating ${shown.endOfEating - table.endOfEating} after the table's")
                     assertTrue(shown.sunrise <= table.sunrise, "$name $date: sunrise ${shown.sunrise - table.sunrise} after the table's")
                     table.imsak?.let { assertTrue(shown.imsak!! <= it, "$name $date: imsak ${shown.imsak!! - it} after the table's") }
@@ -180,7 +183,7 @@ class PointTableTest {
 
     /**
      * DayComputer's point 7 (the city-point audit of 10–11 Oct 2026): only a table printed for its own point that rides
-     * beside a method computed at the user's own point (tablesAtTheirPoints: the Kyrgyz Muftiate's Bishkek, ISNA's
+     * beside a method computed at the user's own point (tablesAtTheirPoints: the Muslim Board's Tashkent, ISNA's
      * mosques …) also holds the ends to the user's point alone, as the app showed them before. An authority's own unit
      * keeps its table's ends: 9 km north-east of DUM RT's Kazan point, on the days its white nights begin and end, the
      * user's point alone has no 18° dawn while the city's point has one, and bounding the end there by the user's point
@@ -188,9 +191,9 @@ class PointTableTest {
      */
     @Test
     fun `only a table at its own point holds the ends to the user's point alone`() {
-        val bishkekSuburb = at("kg.default", 42.8746, 74.6900, "Asia/Bishkek")
-        assertEquals("bishkek", bishkekSuburb.unitId)
-        assertTrue(bishkekSuburb.method!!.endsBoundAtUserPoint)
+        val tashkentSuburb = at("uz.board", 41.2995, 69.3500, "Asia/Tashkent")
+        assertEquals("tashkent", tashkentSuburb.unitId)
+        assertTrue(tashkentSuburb.method!!.endsBoundAtUserPoint)
         val kazanTable = Registry.resolveEntry(Registry.byId("ru.dumrt")!!, Place(55.78874, 49.12214, "Europe/Moscow", "RU"))
         val kazanSuburb = Registry.resolveEntry(Registry.byId("ru.dumrt")!!, Place(55.859454, 49.198336, "Europe/Moscow", "RU"))
         assertEquals("kazan", kazanSuburb.unitId)

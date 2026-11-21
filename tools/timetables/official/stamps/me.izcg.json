@@ -1,7 +1,7 @@
 {
   "entry": "me.izcg",
   "class": "D (authority)",
-  "engineHash": "a26e62b5b2cbecbf",
+  "engineHash": "23f8eb53126372d4",
   "broken": 0,
   "places": 1,
   "first": "2026-09-01",
@@ -18,6 +18,7 @@
   },
   "placeDays": 30,
   "heldOutDays": 30,
+  "tables": 1,
   "ramadanDays": 0,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
@@ -132,6 +133,15 @@
   "heldOut": {
     "placeDays": 30,
     "ramadanDays": 0,
+    "checkedByEvent": {
+      "fajr": ["2026-09-01..2026-09-30"],
+      "sunrise": ["2026-09-01..2026-09-30"],
+      "dhuhr": ["2026-09-01..2026-09-30"],
+      "asrStandard": ["2026-09-01..2026-09-30"],
+      "maghrib": ["2026-09-01..2026-09-30"],
+      "isha": ["2026-09-01..2026-09-30"],
+      "endOfEating": ["2026-09-01..2026-09-30"]
+    },
     "events": {
       "fajr": {
         "checked": 30,

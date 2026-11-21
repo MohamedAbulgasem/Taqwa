@@ -8,6 +8,8 @@
 # Not rows: mr_ndb_1444.txt (its Maghrib column is the printed sunset), mr_nkc_1445_magh.txt,
 # mr_nkc_1445_rows.txt, off-nkc-1445.txt and agentB/mr_1445.txt (the same days), agentB/mr1.txt (two
 # Fajr times a reporter derived from an imsak, and one home-page day dated only to its month).
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	mr.ministry	archive/tables/moral-auth-mena/maghreb/mr_nkc_1445_full.txt	F D A	the 1444 fit was early at Nouakchott on Fajr, Dhuhr and Asr, and those margins were widened to this page (Maghreb.kt, proof 7d)
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-mena/maghreb/mr_ndb_1444_magh.txt	mr.ministry	20.931	-17.0347	Africa/Nouakchott	F+E S D A M I	daily	standard	fit	Nouadhibou, Ramadan 1444 (2023), eight days
 archive/tables/moral-auth-mena/maghreb/mr_nkc_1445_full.txt	mr.ministry	18.0858	-15.9785	Africa/Nouakchott	Im F+E S D A - M I	daily	standard	test	Nouakchott, Ramadan 1445 (2024)

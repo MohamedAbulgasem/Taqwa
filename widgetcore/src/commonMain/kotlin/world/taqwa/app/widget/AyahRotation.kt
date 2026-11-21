@@ -5,10 +5,12 @@ package world.taqwa.app.widget
  *
  * Every "round" of `size` consecutive epoch days sees each pool index exactly once (a
  * permutation of `0 until size`), and the boundary between two rounds never repeats an index —
- * so an install never sees the same ayah two days running, and never repeats any ayah until all
- * hundred have shown. Nothing is persisted beyond a per-install `seed`: the order for any day is
- * recomputed from (`epochDay`, `seed`, `size`) alone, so a change to the pool's size (adding or
- * removing ayahs) is handled without migrating stored state.
+ * so at a given pool size an install never sees the same ayah two days running, and no ayah
+ * repeats within a round. Only the boundary's next day is guarded: an ayah shown late in one
+ * round can come back early in the next, two days apart at the least. Nothing is persisted
+ * beyond a per-install `seed`: the order for any day is recomputed from (`epochDay`, `seed`,
+ * `size`) alone, so a change to the pool's size (adding or removing ayahs) is handled without
+ * migrating stored state.
  *
  * Pure Kotlin stdlib only — no `kotlinx-datetime`, no `java.*` — so this compiles into the iOS
  * WidgetKit extension's tight memory ceiling alongside the Android widget.

@@ -130,7 +130,7 @@ eras were folded into one fit set (20 place-days), per the widening rule; nothin
 
 **Margins (fitted, seconds):** fajr −7, sunrise −246, dhuhr +274, asr −30, maghrib −26, isha −69.
 Sunrise and Dhuhr are this wide specifically to also clear the older rule (its own Dhuhr + 5 min,
-and an earlier sunrise on at least one capture, 19 Jul 2026).
+and an earlier sunrise on at least one of its captures).
 
 **Gate (all 20 place-days):** 0 early, 0 late ends. Sunrise (worst 5, an early end — the safe
 side), Dhuhr (worst 6) and Isha (worst 4) exceed the plain 3 min limit; each carries a `LateLimit`
@@ -166,7 +166,7 @@ again on 6 Oct 2026 (*North of Petropavl, the west and the south*, below): asr �
 (later), the others unchanged; from 46° to 48° N the end of eating carries −150 s, and the curves are
 read at each place's own latitude as well as on the 0.1° grid.
 
-**Gate (all 730 place-days, two cities):** 0 early, 0 late ends. Fajr (worst 5, mid-May, Astana)
+**Gate (all 730 place-days, two cities):** 0 early, 0 late ends. Fajr (worst 5, in spring, Astana)
 and Isha (worst 4, mid-July, Astana) exceed 3 min: both carry a `LateLimit` exception, since the
 residual is the AngleBased curve's own (already fitted as tightly as a flat margin allows; a
 further reduction would need a change inside `TwilightCurves`' `kz.qmdb` section itself, which
@@ -185,19 +185,19 @@ and 2027 (below), from 43.2° N to 54.9° N. Since 6 Oct 2026, 29 are, from QMDB
 confidence: no API, and only one region-wide homepage JSON fetch (115 localities) was ever
 archived.
 
-**Evidence (`kg-default.tsv`):** that one fetch's Bishkek entry, 26 Sep 2026. Its JSON prints both
+**Evidence (`kg-default.tsv`):** that one fetch's Bishkek entry, a single day. Its JSON prints both
 `sunset` and a separate, later `maghrib`, about 7 min apart — the Muftiate's own addition, matching
 the wider research's fit.
 
 **Fit/held-out.** One day, one place: fit only, nothing held out (as RU-DUMRT's single-town table).
-Margins (fitted, seconds): fajr −64, sunrise −10, dhuhr −62, asr +47, maghrib +397, isha −45. The
-large Maghrib margin is the Muftiate's own + 7 min, not a loose fit.
+Margins fitted on that day alone; the large Maghrib margin is the Muftiate's own + 7 min, not a loose
+fit.
 
-**Gate:** 0 early, 0 late ends, 0 over the limit (the sole day fits exactly, worst 0/1 min per
-event). No exceptions.
+**Gate:** 0 early, 0 late ends, 0 over the limit (the sole day within a minute on every event). No
+exceptions.
 
 **Not proven — deliberately not upgraded.** One day cannot stand for a season: even though every
-event is exact on its single measured day, the entry stays class D and `measured = false`. Only
+event is within a minute on its single measured day, the entry stays class D and `measured = false`. Only
 Bishkek is measured, of 115 localities; regional spread across Kyrgyzstan is not checked at all.
 
 ## The end of eating, audited (3 Oct 2026, before Ramadan 1448)
@@ -211,15 +211,15 @@ now also the end of eating (`F+E`). Whole gate, no start moved:
 | --- | --- | --- | --- | --- |
 | `kz.qmdb` | 730 | 0 (29 before the fix) | 8 (364 days at 3 or more) | 8, recorded |
 | `uz.board` | 20 | 0 | 1 | 3 (class D) |
-| `kg.default` | 1 | 0 | 0 | 3 (class D) |
+| `kg.default` | 1 | 0 | at most 1 (its one day) | 3 (class D) |
 | `in.karachi` | 30 | 0 | 3 | 3 (class D) |
 | `pk.karachi` (with Dawat-e-Islami's Karachi row) | 121 | 0 | 2 | 3 (class D) |
 
 **Kazakhstan: the one late end found.** At Astana the end of eating came after QMDB's printed Fajr on
-29 days of 2026, the first 12 May, by up to 4 min: the mirror of the Fajr residual above (QMDB's
-AngleBased Fajr runs up to 5 min before the model's in mid-May, and the end of eating was the model's
-plain dawn). Fixed the existing way: the fitter's end-of-eating bound over the whole year is −221 s,
-decided at Astana on 14 May; fitted on Almaty's rows alone it is +18 s. So the end of eating at and
+29 days of 2026, by up to 4 min: the mirror of the Fajr residual above (QMDB's AngleBased Fajr runs
+up to 5 min before the model's in spring, and the end of eating was the model's plain dawn). Fixed
+the existing way: the fitter's end-of-eating bound over the whole year is −221 s,
+decided at Astana; fitted on Almaty's rows alone it is +18 s. So the end of eating at and
 above 48° N carries −221 s (`CentralAsia.variants`, beside QMDB's ± 5 min there), and Almaty's
 stays 0: an end only ever moves earlier, and there it needs nothing.
 
@@ -231,9 +231,9 @@ from the same API for Astana and for its own Kokshetau (53.3° N), Kostanay (53.
 (52.3° N) and Petropavl (54.9° N) — the Astana 2026 table came back identical to the archived one —
 and checked in a scratch gate run (the tables are not yet in the archive, so they have no rows in
 `kz-qmdb.tsv`). At −221 s the end of eating came after QMDB's printed Fajr on 123 of 3,650 days (among
-the gate's samples: Petropavl from 30 April 2026, 2 min, and Astana itself on 17 May 2027, 1 min);
+the gate's samples, Petropavl from late April 2026 and Astana itself in May 2027, by a minute or two);
 the refit needed 153 s more than Astana's 2026 bound. Refitted the same way on all fourteen tables (Almaty's, Astana's archived 2026 and the ten
-new ones), the fitter's bound is −374 s, decided at the north on 6 May 2027. With it there is no late
+new ones), the fitter's bound is −374 s, decided in the north. With it there is no late
 end on any of the 4,015 place-days of that run, and the whole gate is green. The cost is on the safe
 side: on most days the end at and above 48° N now comes 3 or more minutes before the printed Fajr,
 up to 8 min, recorded as the third exception (8 min, the end of eating alone; it was 5). The golden
@@ -245,9 +245,9 @@ extrapolation, and for an end that is the unsafe side. And the northern tables m
 archive and get their rows (`F+E S D A M I`, fit) before Ramadan 1448 (from about 8 February 2027):
 the monitor now fetches them each month (source `kz-qmdb`, `fetchers/qmdb.py`), and the gate will
 then hold the margin to account. The same scratch run found the starts there short too, which this
-end-of-eating round could not touch (no start may move): Fajr 1 min early on 7 days at Astana in July
+end-of-eating round could not touch (no start may move): Fajr 1 min early on 7 days at Astana in
 2027 and up to 7 min late at Petropavl (over the 5 min limit on 92 days), Isha 1 min early on 4 days
-at Petropavl, Kokshetau and Pavlodar in August and up to 5 min late (over its 4 on 29 days). The
+at Petropavl, Kokshetau and Pavlodar and up to 5 min late (over its 4 on 29 days). The
 fitter asks for Fajr −2 → +8 s and Isha −3 → +11 s (first written here as + 14 s, a misreading of
 the fitter's output); those starts got their own fix round the same day (*The starts north of
 Astana*, below), and the northern rows are now in the gate. North of Petropavl was held to account on
@@ -271,18 +271,18 @@ place-days at six places, 2026-01-01 to 2027-12-31, 354 of them in Ramadan.
 and Petropavl over both years (11 rows, 3,285 place-days); they had already decided the end of
 eating's −374 s. Held out: Almaty 2027 and Kostanay (53.2° N, the farthest west and its own zone,
 `Asia/Qostanay`) over both years, 1,095 place-days. At the 2026-only margins the fit rows had Fajr
-1 min early on 7 July days at Astana in 2027 and Isha 1 min early on 4 August days at Petropavl,
+1 min early on 7 days at Astana in 2027 and Isha 1 min early on 4 days at Petropavl,
 Kokshetau and Pavlodar, and the held-out rows one more Fajr. The fitter (safety 5 s):
 
-| event | fitted (s) | was | decided by |
-| --- | --- | --- | --- |
-| fajr | +8 | −2 | 19 Jul 2027 |
-| sunrise | +14 | +19 | 30 Nov 2026 |
-| dhuhr | −22 | −22 | 14 Mar 2026 |
-| asr (Hanafi) | −8 | −11 | 22 Aug 2027 |
-| maghrib | −15 | −17 | 7 Aug 2027 |
-| isha | +11 | −3 | 15 Aug 2027 |
-| end of eating (≥ 48° N) | −374 | −374 | 6 May 2027 |
+| event | fitted (s) | was |
+| --- | --- | --- |
+| fajr | +8 | −2 |
+| sunrise | +14 | +19 |
+| dhuhr | −22 | −22 |
+| asr (Hanafi) | −8 | −11 |
+| maghrib | −15 | −17 |
+| isha | +11 | −3 |
+| end of eating (≥ 48° N) | −374 | −374 |
 
 All taken as fitted: every start later, sunrise earlier (it had 0 s of safety left at + 19 s, Asr
 2 s, Maghrib 3 s). The margins stay one set for both variants, so Almaty's starts move by the same
@@ -301,7 +301,7 @@ round's table below):**
 | Petropavl | 54.9 | 8 | 5 | 1 | 7 |
 
 The residual is the AngleBased curve's, as at Astana, and it deepens to the north: Fajr from late
-April to early June (deepest in early to mid May; 8 min only at Petropavl, on 5 days of 2027), Isha
+April to early June (8 min only at Petropavl, on 5 days of 2027), Isha
 from July to mid-August. A flat margin cannot take it out without making the other days early, so
 both are recorded (R41): Fajr 8 min (was 5) and Isha 5 min (was 4), each with its reason in
 `CentralAsia.kt`. Neither comes near 10 min. Sunrise, Dhuhr, Asr and Maghrib stay within 1 min.
@@ -369,13 +369,13 @@ at Bugrovoe and Spasovka. Any point just short of a step in the north was in the
    earlier dawn of the two (`TwilightCurves.kt`, the qmdb rule's `ownLatitude`; no other entry's curves
    change). Across a step the probes are now green on both sides.
 2. From 46° to 48° N, an end-of-eating margin of −150 s (`CentralAsia.kt`): the fitter's bound at the
-   band's top, Oteshqali Atambayev and Ayagoz, decided on 30 May 2027. Below 46° N the rule never binds
+   band's top, Oteshqali Atambayev and Ayagoz. Below 46° N the rule never binds
    and the margin stays 0.
 3. The fitter over the fit rows (Isakovka and Krasny Yar at the edge, Oteshqali Atambayev and Ayagoz at
-   the band's top, and the eleven of 3 Oct) moved Asr from −8 to −6 s (decided at Krasny Yar, 1 Sep
-   2027) and Maghrib from −15 to −14 s (Isakovka, 13 Jan 2027), both later. Fajr (fitted −4 s) and Isha
-   (+11 s) stay at +8 and +11, Dhuhr at −22, sunrise at +14. At and above 48° N the end of eating's
-   −374 s stands: with the curve change the fitter asks −366 s (Isakovka, 3 May 2027).
+   the band's top, and the eleven of 3 Oct) moved Asr from −8 to −6 s (decided at Krasny Yar) and
+   Maghrib from −15 to −14 s (Isakovka), both later. Fajr (fitted
+   −4 s) and Isha (+11 s) stay at +8 and +11, Dhuhr at −22, sunrise at +14. At and above 48° N the end
+   of eating's −374 s stands: with the curve change the fitter asks −366 s (Isakovka).
 4. Isha's limit goes from 5 to 6 min (R41), with its reason; Fajr's 8 and the end of eating's 8 stand,
    their reasons now naming the band and Isakovka.
 

@@ -59,3 +59,7 @@ archive/tables/moral-auth-world/africaoceania/masjids-johannesburg-H.txt	za.jami
 # Jamiat's system is perpetual, as the CSVs' 2025-2029 mappings above), held out at the Pretoria unit.
 archive/tables/moral-auth-world/africaoceania/di-pta-H-2027.txt	za.jamiat/pretoria			Africa/Johannesburg	F S D A M I	daily	hanafi	test	Darul Ihsan Pretoria, assigned to 2027, Hanafi columns
 archive/tables/moral-auth-world/africaoceania/di-pta-S-2027.txt	za.jamiat/pretoria			Africa/Johannesburg	- - - A - -	daily	standard	test	Darul Ihsan Pretoria, assigned to 2027, the Standard Asr
+# The review round of 14 Nov 2026 (ruling R214): a derived table is held out only where what it was made from is.
+@fitted	za.jamiat	archive/tables/round/data-wide-band/jamiat-7g/jamiat-jhb-2029.txt	*	Johannesburg's perpetual table, which the margins were fitted on over 2025-2028, mapped onto 2029 (derived): the same printed month-day times against another year's sun
+@fitted	za.jamiat	archive/tables/round/data-wide-band/jamiat-7g/jamiat-cpt-2029.txt	*	Cape Town's perpetual table, which the margins were fitted on over 2025-2028, mapped onto 2029 (derived): the same printed month-day times against another year's sun
+@fitted	za.jamiat	archive/tables/round/data-wide-band/jamiat-7g/jamiat-dbn-2029.txt	*	Durban's perpetual table, which the margins were fitted on over 2025-2028, mapped onto 2029 (derived): the same printed month-day times against another year's sun

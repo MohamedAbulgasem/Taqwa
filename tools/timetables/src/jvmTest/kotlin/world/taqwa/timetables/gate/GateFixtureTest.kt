@@ -3,8 +3,12 @@ package world.taqwa.timetables.gate
 import kotlinx.datetime.LocalDate
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.TimetableMethod
+import world.taqwa.app.prayer.engine.registry.AboutTemplate
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.LateLimit
+import world.taqwa.app.prayer.engine.registry.lateLimitFor
+import world.taqwa.app.prayer.engine.registry.ownLateLimitFor
+import world.taqwa.app.prayer.engine.registry.reachLateLimit
 import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.TimedEvent
@@ -13,10 +17,12 @@ import world.taqwa.timetables.Json
 import world.taqwa.timetables.TestPaths
 import java.io.File
 import java.nio.file.Files
-import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.test.Test
 
 /**
  * The gate end to end on ten days of MUIS's open table (`src/jvmTest/resources/gate-fixture`);
@@ -76,14 +82,49 @@ class GateFixtureTest {
     }
 
     @Test
-    fun `a start moved two minutes earlier is early and a sunrise moved later is a late end`() {
+    fun `a row reading ends alone adds no place-day and must fall on a day a row reading a start holds`() {
+        // Held out and read first, the ends-only row neither makes the fit days held out nor counts a day of its own.
+        val result = Gate(roots, PINNED).evaluate(
+            manifest(
+                "open/SG-MUIS/muis-2026-02-a.txt\tsg.muis\t\t\tAsia/Singapore\tE - - - - -\tdaily\tstandard\ttest\t",
+                "open/SG-MUIS/muis-2026-02-a.txt\tsg.muis\t\t\tAsia/Singapore\tF S D A M I\tdaily\tstandard\tfit\t",
+            ),
+        )
+        val s = result.entries.getValue("sg.muis")
+        assertEquals(5, s.placeDayCount)
+        assertEquals(0, s.testDays)
+        assertEquals(5, s.event(Event.END_OF_EATING).checked)
+        assertEquals(5, s.heldOut.getValue(Event.END_OF_EATING).checked)
+
+        // Alone, its days are no place-days of the entry's: a mistake in the gate file.
+        val error = assertFailsWith<GateError> {
+            Gate(roots, PINNED).evaluate(
+                manifest(
+                    "open/SG-MUIS/muis-2026-02-a.txt\tsg.muis\t\t\tAsia/Singapore\tF S D A M I\tdaily\tstandard\tfit\t",
+                    "open/SG-MUIS/muis-2026-02-b.txt\tsg.muis\t\t\tAsia/Singapore\tE - - - - -\tdaily\tstandard\ttest\t",
+                ),
+            )
+        }
+        assertTrue("t.tsv:3: reads ends alone on " in error.message!!, error.message)
+        assertTrue("which no row reading a start holds at its point" in error.message!!, error.message)
+        assertTrue("t.tsv:2" !in error.message!!, error.message)
+    }
+
+    @Test
+    fun `a start moved two minutes earlier is early and an end of eating moved later is a late end`() {
         val result = Gate(roots, change = { m -> m.copy(margins = m.margins.copy(fajr = m.margins.fajr - 120, sunrise = m.margins.sunrise + 120)) })
             .evaluate(muis)
         val s = result.entries.getValue("sg.muis")
         assertEquals(10, s.event(Event.FAJR).early)
-        assertEquals(10, s.event(Event.SUNRISE).lateEnd)
         assertTrue(result.violations().any { "sg.muis fajr: 10 early" in it }, result.report())
-        assertTrue(result.violations().any { "sg.muis sunrise: 10 late ends" in it }, result.report())
+        // A sunrise moved later no longer reaches the gate as a late end: the real sun at the place caps it (ruling R265).
+        assertEquals(0, s.event(Event.SUNRISE).lateEnd)
+        // The end of eating, which no sun caps, two minutes later (Fajr four, so that it may follow): ten late ends.
+        val late = Gate(roots, change = { m ->
+            m.copy(margins = m.margins.copy(fajr = m.margins.fajr + 240), endOfEatingMarginSeconds = m.endOfEatingMarginSeconds + 120)
+        }).evaluate(muis)
+        assertEquals(10, late.entries.getValue("sg.muis").event(Event.END_OF_EATING).lateEnd, late.report())
+        assertTrue(late.violations().any { "sg.muis endOfEating: 10 late ends" in it }, late.report())
     }
 
     @Test
@@ -130,17 +171,43 @@ class GateFixtureTest {
     }
 
     @Test
+    fun `an entry with no units reads its area's reach limits under its own id, and a variant of it does not`() {
+        // Ruling R298, as a rule over whatever ReachLimits.kt holds: for every event the registry's MUIS takes the larger of
+        // its own limit and its area's measured worst keyed by its id; a copy built under the same id (a fixture's) takes
+        // its own limits alone.
+        val muis = requireNotNull(Registry.byId("sg.muis"))
+        assertNull(Units.of("sg.muis"))
+        for (event in TimedEvent.entries) {
+            val own = ownLateLimitFor(event, null, muis)
+            val reach = reachLateLimit("sg.muis", "sg.muis", event)
+            val expected = if (reach == null || (own != null && own.minutes >= reach.minutes)) own else reach
+            assertEquals(expected, lateLimitFor(event, null, muis), "$event")
+            val variant = muis.copy(entryClass = EntryClass.A, about = AboutTemplate.AUTHORITY_CHECKED)
+            assertEquals(ownLateLimitFor(event, null, variant), lateLimitFor(event, null, variant), "$event")
+        }
+    }
+
+    @Test
     fun `a unit's late limit comes before its entry's for its own events`() {
-        val entry = Registry.byId("ru.dumrt")!!
-        val kazan = Units.of("ru.dumrt")!!.units.first { it.id == "kazan" }
-        assertEquals(Limit(2, "class B", null), Gate.lateLimit(Event.DHUHR, kazan, entry, EntryClass.B))
+        // Ben Guerdane: no reach limit of its own (ReachLimits.kt), so the unit's and the entry's alone decide.
+        val entry = Registry.byId("tn.inm")!!
+        val unit = Units.of("tn.inm")!!.units.first { it.id == "ben-guerdane" }
+        assertEquals(Limit(2, "class B", null), Gate.lateLimit(Event.DHUHR, unit, entry, EntryClass.B))
         val excepted = entry.copy(lateLimits = listOf(LateLimit(3, "the entry's", setOf(TimedEvent.DHUHR, TimedEvent.FAJR))))
-        val own = kazan.copy(lateLimits = listOf(LateLimit(14, "the printed 12:00 Zuhr", setOf(TimedEvent.DHUHR))))
-        assertEquals(Limit(14, "unit kazan", "the printed 12:00 Zuhr"), Gate.lateLimit(Event.DHUHR, own, excepted, EntryClass.B))
-        assertEquals(Limit(3, "entry ru.dumrt", "the entry's"), Gate.lateLimit(Event.FAJR, own, excepted, EntryClass.B))
+        val own = unit.copy(lateLimits = listOf(LateLimit(14, "the printed 12:00 Zuhr", setOf(TimedEvent.DHUHR))))
+        assertEquals(Limit(14, "unit ben-guerdane", "the printed 12:00 Zuhr"), Gate.lateLimit(Event.DHUHR, own, excepted, EntryClass.B))
+        assertEquals(Limit(3, "entry tn.inm", "the entry's"), Gate.lateLimit(Event.FAJR, own, excepted, EntryClass.B))
         assertEquals(Limit(2, "class B", null), Gate.lateLimit(Event.SUNRISE, own, excepted, EntryClass.B))
-        assertEquals(Limit(3, "entry ru.dumrt", "the entry's"), Gate.lateLimit(Event.DHUHR, null, excepted, EntryClass.D_AUTHORITY))
+        assertEquals(Limit(3, "entry tn.inm", "the entry's"), Gate.lateLimit(Event.DHUHR, null, excepted, EntryClass.D_AUTHORITY))
         assertEquals(Limit(3, "class D (authority)", null), Gate.lateLimit(Event.ISHA, null, excepted, EntryClass.D_AUTHORITY))
+        // Ruling R270: where a unit's reach was measured later than its own limit, the measured figure is the unit's limit,
+        // and a recorded limit of the unit's that is larger still stands (Yelabuga's Fajr was 126 before its reach read 132).
+        val dumRt = Registry.byId("ru.dumrt")!!
+        val kazan = Units.of("ru.dumrt")!!.units.first { it.id == "kazan" }
+        val reach = assertNotNull(reachLateLimit("ru.dumrt", "kazan", TimedEvent.FAJR))
+        assertEquals(Limit(reach.minutes, "unit kazan", reach.reason), Gate.lateLimit(Event.FAJR, kazan, dumRt, EntryClass.B))
+        val wider = kazan.copy(lateLimits = listOf(LateLimit(reach.minutes + 1, "a recorded one", setOf(TimedEvent.FAJR))))
+        assertEquals(Limit(reach.minutes + 1, "unit kazan", "a recorded one"), Gate.lateLimit(Event.FAJR, wider, dumRt, EntryClass.B))
     }
 
     @Test
@@ -374,7 +441,9 @@ class GateFixtureTest {
          */
         val EXPECTED_LATE = mapOf(
             "fajr" to listOf(0, 10, 0, 0),
-            "sunrise" to listOf(9, 1, 0, 0),
+            // The real sun's cap (ruling R265): MUIS prints its sunrise on or after the minute the sun rose in, so the
+            // sunrise shown is that minute, a minute before the print on these ten days.
+            "sunrise" to listOf(0, 10, 0, 0),
             "dhuhr" to listOf(7, 3, 0, 0),
             "asrStandard" to listOf(0, 7, 3, 0),
             "maghrib" to listOf(5, 4, 1, 0),

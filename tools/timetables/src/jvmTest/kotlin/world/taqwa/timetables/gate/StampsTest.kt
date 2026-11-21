@@ -52,4 +52,22 @@ class StampsTest {
             lateLimits["unit moscow: 5 min"],
         )
     }
+
+    @Test
+    fun `a standing demotion reaches the stamp with its unit, day and reason, and an entry without one has no such key`() {
+        // Ruling R185: the website, the Ramadan guard and the release check all read it from the stamp.
+        val stats = EntryStats(entry)
+        assertEquals(null, Stamps.stamp(stats, "hash")["demoted"])
+        stats.demoted = listOf(
+            Demotion("x.tsv", 7, "test.entry", null, kotlinx.datetime.LocalDate(2027, 1, 12), "fajr early on 3 place-days"),
+            Demotion("x.tsv", 9, "test.entry", "east", kotlinx.datetime.LocalDate(2027, 1, 19), "maghrib early on 1 place-days"),
+        )
+        assertEquals(
+            listOf(
+                mapOf("since" to "2027-01-12", "reason" to "fajr early on 3 place-days"),
+                mapOf("unit" to "east", "since" to "2027-01-19", "reason" to "maghrib early on 1 place-days"),
+            ),
+            Stamps.stamp(stats, "hash")["demoted"],
+        )
+    }
 }

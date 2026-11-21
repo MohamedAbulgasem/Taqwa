@@ -1,7 +1,7 @@
 {
   "entry": "ca.ift",
   "class": "D (authority)",
-  "engineHash": "5425be443aad500c",
+  "engineHash": "7ccb706574baf241",
   "broken": 0,
   "places": 1,
   "first": "2026-01-01",
@@ -17,232 +17,152 @@
     "endOfEating": ["2026-01-01..2026-03-07", "2026-03-13..2026-03-27", "2026-03-29..2026-10-31", "2026-11-07..2026-11-27", "2026-12-01..2026-12-31"]
   },
   "placeDays": 350,
-  "heldOutDays": 175,
+  "heldOutDays": 0,
+  "tables": 1,
   "ramadanDays": 25,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 433,
+      "checked": 10392,
       "early": 0,
       "late": {
-        "0": 80,
-        "1": 243,
-        "2": 110,
-        "3+": 0
+        "0": 955,
+        "1": 3169,
+        "2": 2681,
+        "3+": 3587
       },
-      "exactShare": 0.1848,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.0919,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "unit ca.ift",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 433,
+      "checked": 10392,
       "lateEnd": 0,
       "late": {
-        "0": 185,
-        "1": 224,
-        "2": 24,
-        "3+": 0
+        "0": 2439,
+        "1": 3875,
+        "2": 1918,
+        "3+": 2160
       },
-      "exactShare": 0.4273,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.2347,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "unit ca.ift",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 433,
+      "checked": 10392,
       "early": 0,
       "late": {
-        "0": 374,
-        "1": 59,
-        "2": 0,
-        "3+": 0
+        "0": 4862,
+        "1": 1770,
+        "2": 2022,
+        "3+": 1738
       },
-      "exactShare": 0.8637,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.4679,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit ca.ift",
       "overLimit": 0
     },
     "asrHanafi": {
-      "checked": 433,
+      "checked": 10392,
       "early": 0,
       "late": {
-        "0": 194,
-        "1": 230,
-        "2": 9,
-        "3+": 0
+        "0": 2260,
+        "1": 3570,
+        "2": 2095,
+        "3+": 2467
       },
-      "exactShare": 0.448,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.2175,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit ca.ift",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 433,
+      "checked": 10392,
       "early": 0,
       "late": {
-        "0": 81,
-        "1": 254,
-        "2": 98,
-        "3+": 0
+        "0": 935,
+        "1": 3430,
+        "2": 2490,
+        "3+": 3537
       },
-      "exactShare": 0.1871,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.09,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "unit ca.ift",
       "overLimit": 0
     },
     "isha": {
-      "checked": 433,
+      "checked": 10392,
       "early": 0,
       "late": {
-        "0": 102,
-        "1": 173,
-        "2": 150,
-        "3+": 8
+        "0": 1258,
+        "1": 2385,
+        "2": 3078,
+        "3+": 3671
       },
-      "exactShare": 0.2356,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.1211,
+      "worstLate": 7,
+      "lateLimit": 7,
+      "lateLimitFrom": "unit ca.ift",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 433,
+      "checked": 10392,
       "lateEnd": 0,
       "late": {
-        "0": 31,
-        "1": 259,
-        "2": 133,
-        "3+": 10
+        "0": 434,
+        "1": 4054,
+        "2": 3202,
+        "3+": 2702
       },
-      "exactShare": 0.0716,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.0418,
+      "worstLate": 8,
+      "lateLimit": 8,
+      "lateLimitFrom": "unit ca.ift",
       "overLimit": 0
     }
   },
   "heldOut": {
-    "placeDays": 175,
+    "placeDays": 0,
     "ramadanDays": 0,
-    "events": {
-      "fajr": {
-        "checked": 258,
-        "early": 0,
-        "late": {
-          "0": 18,
-          "1": 148,
-          "2": 92,
-          "3+": 0
-        },
-        "exactShare": 0.0698,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "sunrise": {
-        "checked": 258,
-        "lateEnd": 0,
-        "late": {
-          "0": 150,
-          "1": 107,
-          "2": 1,
-          "3+": 0
-        },
-        "exactShare": 0.5814,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "dhuhr": {
-        "checked": 258,
-        "early": 0,
-        "late": {
-          "0": 228,
-          "1": 30,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.8837,
-        "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "asrHanafi": {
-        "checked": 258,
-        "early": 0,
-        "late": {
-          "0": 148,
-          "1": 109,
-          "2": 1,
-          "3+": 0
-        },
-        "exactShare": 0.5736,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "maghrib": {
-        "checked": 258,
-        "early": 0,
-        "late": {
-          "0": 43,
-          "1": 180,
-          "2": 35,
-          "3+": 0
-        },
-        "exactShare": 0.1667,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "isha": {
-        "checked": 258,
-        "early": 0,
-        "late": {
-          "0": 96,
-          "1": 120,
-          "2": 42,
-          "3+": 0
-        },
-        "exactShare": 0.3721,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "endOfEating": {
-        "checked": 258,
-        "lateEnd": 0,
-        "late": {
-          "0": 30,
-          "1": 187,
-          "2": 41,
-          "3+": 0
-        },
-        "exactShare": 0.1163,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      }
-    }
+    "events": {}
+  },
+  "replays": {
+    "places": 23,
+    "placeDays": 8050
   },
   "lateLimits": {
-    "class D (authority): 3 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrHanafi", "maghrib", "isha", "endOfEating"]
+    "unit ca.ift: 4 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["dhuhr"]
+    },
+    "unit ca.ift: 5 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["asrHanafi"]
+    },
+    "unit ca.ift: 6 min (fajr)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["fajr", "maghrib"]
+    },
+    "unit ca.ift: 6 min (sunrise)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["sunrise"]
+    },
+    "unit ca.ift: 7 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 7 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["isha"]
+    },
+    "unit ca.ift: 8 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 8 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["endOfEating"]
     }
   },
   "units": {
@@ -261,114 +181,135 @@
       },
       "broken": 0,
       "lateLimits": {
-        "class D (authority): 3 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrHanafi", "maghrib", "isha", "endOfEating"]
+        "unit ca.ift: 4 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["dhuhr"]
+        },
+        "unit ca.ift: 5 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["asrHanafi"]
+        },
+        "unit ca.ift: 6 min (fajr)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["fajr", "maghrib"]
+        },
+        "unit ca.ift: 6 min (sunrise)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["sunrise"]
+        },
+        "unit ca.ift: 7 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 7 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["isha"]
+        },
+        "unit ca.ift: 8 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 8 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["endOfEating"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 433,
+          "checked": 10392,
           "early": 0,
           "late": {
-            "0": 80,
-            "1": 243,
-            "2": 110,
-            "3+": 0
+            "0": 955,
+            "1": 3169,
+            "2": 2681,
+            "3+": 3587
           },
-          "exactShare": 0.1848,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.0919,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "unit ca.ift",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 433,
+          "checked": 10392,
           "lateEnd": 0,
           "late": {
-            "0": 185,
-            "1": 224,
-            "2": 24,
-            "3+": 0
+            "0": 2439,
+            "1": 3875,
+            "2": 1918,
+            "3+": 2160
           },
-          "exactShare": 0.4273,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.2347,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "unit ca.ift",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 433,
+          "checked": 10392,
           "early": 0,
           "late": {
-            "0": 374,
-            "1": 59,
-            "2": 0,
-            "3+": 0
+            "0": 4862,
+            "1": 1770,
+            "2": 2022,
+            "3+": 1738
           },
-          "exactShare": 0.8637,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4679,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit ca.ift",
           "overLimit": 0
         },
         "asrHanafi": {
-          "checked": 433,
+          "checked": 10392,
           "early": 0,
           "late": {
-            "0": 194,
-            "1": 230,
-            "2": 9,
-            "3+": 0
+            "0": 2260,
+            "1": 3570,
+            "2": 2095,
+            "3+": 2467
           },
-          "exactShare": 0.448,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.2175,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit ca.ift",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 433,
+          "checked": 10392,
           "early": 0,
           "late": {
-            "0": 81,
-            "1": 254,
-            "2": 98,
-            "3+": 0
+            "0": 935,
+            "1": 3430,
+            "2": 2490,
+            "3+": 3537
           },
-          "exactShare": 0.1871,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.09,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "unit ca.ift",
           "overLimit": 0
         },
         "isha": {
-          "checked": 433,
+          "checked": 10392,
           "early": 0,
           "late": {
-            "0": 102,
-            "1": 173,
-            "2": 150,
-            "3+": 8
+            "0": 1258,
+            "1": 2385,
+            "2": 3078,
+            "3+": 3671
           },
-          "exactShare": 0.2356,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.1211,
+          "worstLate": 7,
+          "lateLimit": 7,
+          "lateLimitFrom": "unit ca.ift",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 433,
+          "checked": 10392,
           "lateEnd": 0,
           "late": {
-            "0": 31,
-            "1": 259,
-            "2": 133,
-            "3+": 10
+            "0": 434,
+            "1": 4054,
+            "2": 3202,
+            "3+": 2702
           },
-          "exactShare": 0.0716,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.0418,
+          "worstLate": 8,
+          "lateLimit": 8,
+          "lateLimitFrom": "unit ca.ift",
           "overLimit": 0
         }
       }

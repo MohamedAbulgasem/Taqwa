@@ -11,6 +11,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.astro.AsrModel
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.astro.altitudeTime
 import world.taqwa.app.prayer.engine.day.Invariants
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.AsrSchool
@@ -522,12 +523,19 @@ class EngineTest {
                 val base = day(place, date).day
                 for (size in sizes) {
                     val all = Prayer.entries.map { it to size }.toTypedArray()
-                    val adjusted = day(place, date, confirmed(place, *all)).day
+                    val computed = day(place, date, confirmed(place, *all))
+                    val adjusted = computed.day
                     val label = "$place $date $size"
                     assertTrue(Invariants.holds(adjusted), label)
                     assertTrue(adjusted.instants().all { it.isWholeMinute() }, label)
                     assertTrue(adjusted.sunrise <= base.sunrise && adjusted.endOfEating <= base.endOfEating, label)
                     ownSunset(place, date)?.let { assertTrue(adjusted.maghrib.epochSeconds >= minOf(base.maghrib.epochSeconds.toDouble(), it), label) }
+                    // Ruling R180: no adjustment, however early and confirmed, takes Dhuhr or Maghrib below the real sun
+                    // at the point the engine computes at.
+                    val zone = TimeZone.of(place.zoneId)
+                    val at = computed.effective.point
+                    assertTrue(adjusted.dhuhr > DayPipeline.realTransit(at, date, zone), "$label: Dhuhr before the real transit")
+                    DayPipeline.realSunset(at, date, zone)?.let { assertTrue(adjusted.maghrib > it, "$label: Maghrib before the real sunset") }
                     if (size > 0) {
                         // Later only: no start before its own unadjusted time.
                         assertTrue(adjusted.fajr >= base.fajr && adjusted.dhuhr >= base.dhuhr, label)

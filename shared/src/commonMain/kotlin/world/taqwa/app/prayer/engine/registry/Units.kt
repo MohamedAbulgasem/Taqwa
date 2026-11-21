@@ -1,5 +1,6 @@
 package world.taqwa.app.prayer.engine.registry
 
+import kotlinx.datetime.LocalDate
 import world.taqwa.app.prayer.engine.method.Alongside
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.FixedPointMode
@@ -7,10 +8,12 @@ import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.authorities.Americas
 import world.taqwa.app.prayer.engine.registry.authorities.Balkans
+import world.taqwa.app.prayer.engine.registry.authorities.Bangladesh
 import world.taqwa.app.prayer.engine.registry.authorities.CentralAsia
 import world.taqwa.app.prayer.engine.registry.authorities.Diyanet
 import world.taqwa.app.prayer.engine.registry.authorities.Egypt
 import world.taqwa.app.prayer.engine.registry.authorities.Europe
+import world.taqwa.app.prayer.engine.registry.authorities.Generic
 import world.taqwa.app.prayer.engine.registry.authorities.Gulf
 import world.taqwa.app.prayer.engine.registry.authorities.Jakim
 import world.taqwa.app.prayer.engine.registry.authorities.Kemenag
@@ -48,6 +51,14 @@ import kotlin.math.sqrt
  * [endsBoundAtUserPoint] is true for a table printed for its own point beside a method computed at the user's own
  * point ([tablesAtTheirPoints]): its method then carries [TimetableMethod.endsBoundAtUserPoint], so no end shown is
  * after the method at the user's point alone, as it was before the unit.
+ * [measuredThrough], when set, is the last date the unit's figure holds for: a unit whose margins are fitted on a
+ * calendar that ends (Algeria's fitted seats, ruling R231 as revised) is measured on the calendar's own dates and
+ * claims no figure on a later one ([Resolution.on]).
+ * [partlyRepublished] is true where some of the unit's own checked tables were read from its entry's
+ * [RegistryEntry.partlyRepublisher] (ruling R276), so the card and About say so of the place. [republishedYears], where
+ * known, are the years those copied tables are, every other checked year being the authority's own (JAKIM's mirrored
+ * zones): the Prayer screen's card, a sentence about one day, then names the copy in those years and the authority's own
+ * pages in the others (ruling R278). Empty where the copy and the own tables share years (Dhaka): "partly" every day.
  * (Not named `Unit`: that would shadow kotlin.Unit.)
  */
 data class AuthorityUnit(
@@ -62,9 +73,14 @@ data class AuthorityUnit(
     val named: Boolean = true,
     val cityId: Int? = null,
     val endsBoundAtUserPoint: Boolean = false,
+    val measuredThrough: LocalDate? = null,
+    val partlyRepublished: Boolean = false,
+    val republishedYears: Set<Int> = emptySet(),
 ) {
     init {
         requireEachEventOnce(lateLimits, id)
+        require(republishedYears.isEmpty() || partlyRepublished) { "$id: years of a copy only where some tables are one" }
+        require(measuredThrough == null || measured) { "$id: a unit not measured is measured through no date" }
     }
 }
 
@@ -80,7 +96,9 @@ data class AuthorityUnit(
  * [envelope], when set, is the [TableEnvelope] [around] and [outside] ride (the tools' envelope rows read from it which
  * tables ride where). [outsideAsMember], when set, is [outside] for the entry placed as a cautious entry's member, where
  * that differs from the entry chosen on its own (Manchester Central's Wifaqul table, whose ride past its bound holds the
- * entry chosen but not the UK's cautious member: Europe.wifaqulUnits).
+ * entry chosen but not the UK's cautious member: Europe.wifaqulUnits). [safeSideOf], when set, names the body whose own
+ * table rides beside a calculated day beyond every unit ([Resolution.safeSideOfTableKey], ruling R285: Habous's Sebta and
+ * Melilla tables beside Spain's safe default, Maghreb.spainUnits); null where none rides there.
  */
 class UnitSet(
     val entryId: String,
@@ -90,6 +108,7 @@ class UnitSet(
     val around: ((user: GeoPoint, unit: AuthorityUnit, method: TimetableMethod) -> TimetableMethod)? = null,
     val envelope: TableEnvelope? = null,
     val outsideAsMember: ((GeoPoint) -> TimetableMethod)? = null,
+    val safeSideOf: ((GeoPoint) -> String?)? = null,
     val outside: (GeoPoint) -> TimetableMethod,
 ) {
     init {
@@ -115,6 +134,9 @@ class UnitSet(
         }
         return best
     }
+
+    /** Every unit whose radius holds [point], the unit [unitFor] gives among them (QMDB's overlapping places, ruling R249). */
+    fun holding(point: GeoPoint): List<AuthorityUnit> = (index?.near(point) ?: units).filter { distanceKm(point, it.point) <= it.radiusKm }
 
     private val order: Map<String, Int> by lazy { units.withIndex().associate { (i, u) -> u.id to i } }
 
@@ -167,7 +189,7 @@ object Units {
     private val sets: Map<String, UnitSet> by lazy {
         listOf(
             Jakim.units, Kemenag.units, Kemenag.muhammadiyahUnits, Diyanet.units, Egypt.units, Gulf.dubaiUnits,
-            Gulf.awqafUnits, Gulf.qatarUnits, Gulf.omanUnits, Muis.bruneiUnits, Maghreb.libyaUnits, Maghreb.tunisiaUnits,
+            Gulf.awqafUnits, Gulf.qatarUnits, Gulf.omanUnits, Bangladesh.units, Muis.bruneiUnits, Maghreb.libyaUnits, Maghreb.tunisiaUnits,
             Maghreb.algeriaUnits, Maghreb.moroccoUnits, SouthAfrica.units, Russia.dumRtUnits, Russia.dumRfUnits,
             Balkans.bosniaUnits, Balkans.albaniaUnits, Europe.austriaUnits, Europe.switzerlandUnits, Americas.fianzUnits,
             UmmAlQura.units,
@@ -185,6 +207,14 @@ object Units {
             .plus(Americas.sydneyDiyanetUnits)
             // The owner's decision of 17 Oct 2026: Rabita's Helsinki calendar rides past its region, as a nearest table past its bound.
             .plus(Europe.rabitaRide)
+            // The safe defaults lane's review (12 Nov 2026): COSIM's town figures beside every place in Côte d'Ivoire.
+            .plus(Generic.coteDIvoireUnits)
+            // Ruling R247 (13 Nov 2026): the Moonsighting Committee's day beside the Americas' safe default from its far latitudes (Generic.AMERICAS_FAR_LATITUDE).
+            .plus(Generic.americasUnits)
+            // The trust audit's F16 (13 Nov 2026): the Council of Ulama's town figures beside every place in Tajikistan.
+            .plus(Generic.tajikistanUnits)
+            // Ruling R261 (14 Nov 2026): Habous's Sebta and Melilla tables beside Spain's safe default at Ceuta and Melilla.
+            .plus(Maghreb.spainUnits)
             .associateBy { it.entryId }
     }
 
@@ -352,16 +382,25 @@ internal fun tablesAtTheirPoints(
  * table for every city, which its preset computes at the user's own point) and Manchester Central's Wifaqul table placed as
  * the UK's cautious member (Europe.wifaqulUnits: its reach is the owner's question 2, accepted at the bound for now).
  * Beyond the ride, the method at the user's own point alone, as before.
+ *
+ * [cityBound] (ruling R191, 13 Nov 2026) names the tables whose publisher prints them for one city's own boundaries and no
+ * farther (Dawat-e-Islami's city cards, SouthAsia): such a table is bound to its own unit's radius and never rides past it,
+ * so it holds a user only where the user is within a minute's reach of its point, beside the nearer card whose unit that is.
  */
 class TableEnvelope internal constructor(
     private val units: List<AuthorityUnit>,
     private val bound: EntryClass,
     private val rideReaches: Double = 0.0,
+    private val cityBound: Set<String> = emptySet(),
 ) {
-    private val reachKm: Map<String, Double> = units.associate { it.id to lateReachKm(it.point.lat, bound) }
+    private val reachKm: Map<String, Double> =
+        units.associate { it.id to if (it.id in cityBound) it.radiusKm else lateReachKm(it.point.lat, bound) }
 
-    /** How far [unit]'s table rides as the nearest beyond its bound reach: [rideReaches] of its own reach. */
-    fun rideKm(unit: AuthorityUnit): Double = rideReaches * unit.radiusKm
+    /** How far [unit]'s table holds a user as round 2's envelope: its bound reach, a city-bound table's own radius. */
+    fun boundKm(unit: AuthorityUnit): Double = reachKm.getValue(unit.id)
+
+    /** How far [unit]'s table rides as the nearest beyond its bound reach: [rideReaches] of its own reach, a city-bound table's none. */
+    fun rideKm(unit: AuthorityUnit): Double = if (unit.id in cityBound) 0.0 else rideReaches * unit.radiusKm
 
     /** The tables whose bound reach holds [user], nearest first. */
     fun holding(user: GeoPoint): List<AuthorityUnit> =
@@ -481,6 +520,58 @@ internal fun TimetableMethod.followedBeyond(id: String, tablePoint: GeoPoint, ed
  */
 internal fun TimetableMethod.beyondEveryUnit(id: String): TimetableMethod =
     atEdge(id, margins.widened(BEYOND_REACH_SECONDS)).copy(fixedPoint = null)
+
+/**
+ * Ruling R260 (the second trust audit of 14 Nov 2026, findings G1, G2 and G3; the Lead's decision under the owner's
+ * standard, pending the owner's confirmation, and built as the never-early reading meanwhile): the units whose tables still ride beside the edge at [user], past every reach, ride and belt of an
+ * authority that prints by locality and draws no boundaries (the Kyrgyz Muftiate's localities, ESA's towns, the Omani
+ * ministry's localities). A unit's reach, ride or belt is this engine's line, not the authority's: just past it the
+ * place had come back to its own sun and the edge's allowances alone, and the edge stood a minute before the nearest
+ * locality's printed table on some days, or showed sunrise and the end of eating a minute or two after it (An-Najaylah,
+ * an app city 62 km from Marsa Matruh's point: the end of eating after Marsa Matruh's printed Fajr on every day of 2026,
+ * by 2 min on 78). So past every inner line the nearest unit's own day at its own point rides beside the place's own
+ * day ([Alongside]: every start the later, sunrise and every end the earlier), and with it every unit no more than
+ * [EDGE_NEAR_FACTOR] times as far as the nearest (a place about as near two printed localities may follow either:
+ * An-Najaylah stands 62 km from Marsa Matruh and 66 km from Sidi Barrani), each within [edgeRideKm] of its own point.
+ * Farther than that a table is more than five minutes of longitude from the place, and the place is the plain edge, as
+ * before. Five minutes of longitude is the owner's figure for how far a table printed for its own point still rides past
+ * its bound (his decision of 17 Oct 2026, [RIDE_REACHES]); carrying it to these three authorities' edges is the Lead's
+ * extension, put to the owner. No start gets earlier; only sunrise and the ends move, earlier. The place keeps its class
+ * (D), its label and its lack of a figure. Kyrgyzstan applies it on its edge (CentralAsia.kyrgyzstanUnits), Egypt and
+ * Oman beside their own inner rule wherever the nearest unit is missing from it ([withNearestBeyond], ruling R262).
+ */
+internal fun ridingBeyond(units: List<AuthorityUnit>, user: GeoPoint): List<AuthorityUnit> {
+    val within = units.map { it to distanceKm(user, it.point) }.filter { (unit, km) -> km <= edgeRideKm(unit) }
+    val nearest = within.minOfOrNull { it.second } ?: return emptyList()
+    return within.filter { it.second <= nearest * EDGE_NEAR_FACTOR }.sortedBy { it.second }.map { it.first }
+}
+
+/**
+ * Ruling R262 (the second review of the edges lane, 15 Nov 2026; the Lead's decision under the owner's standard, pending
+ * the owner's confirmation with R260): [inner], the units an authority's own rule rides beside the edge at [user] (ESA's
+ * belt, R213; Oman's ride, R210), and with them [ridingBeyond]'s nearest unit and any about as near, wherever that nearest
+ * unit is past its own line and so missing from [inner]. R260 rode the nearest only where [inner] was empty, so a place
+ * just past the nearest locality's belt or ride but inside a farther locality's bigger one got that farther table alone
+ * and was late against the nearest (3 km past Quriyat's 30 km ride, inside Muscat's 45 km: the end of eating a minute
+ * after Quriyat's printed Fajr on 24 days of 2027, Ramadan 1448 among them; half a kilometre past Tanta's belt, inside
+ * Cairo's). Where the nearest unit already rides, [inner] is kept as it is. A day alongside only makes a start later or
+ * an end earlier, so no start gets earlier.
+ */
+internal fun withNearestBeyond(inner: List<AuthorityUnit>, units: List<AuthorityUnit>, user: GeoPoint): List<AuthorityUnit> {
+    val beyond = ridingBeyond(units, user)
+    val nearest = beyond.firstOrNull() ?: return inner
+    if (inner.any { it.id == nearest.id }) return inner
+    return (inner + beyond.filter { b -> inner.none { it.id == b.id } }).sortedBy { distanceKm(user, it.point) }
+}
+
+/** How far past every reach [unit]'s table still rides beside the edge (ruling R260): five minutes of longitude at its point. */
+internal fun edgeRideKm(unit: AuthorityUnit): Double = RIDE_REACHES * lateReachKm(unit.point.lat, EntryClass.A)
+
+/**
+ * Ruling R260: past every reach a unit no more than this many times as far as the nearest one rides beside it, as a
+ * locality about as near as the nearest (An-Najaylah: Sidi Barrani's 66 km beside Marsa Matruh's 62).
+ */
+internal const val EDGE_NEAR_FACTOR = 1.25
 
 /** How many reaches a point table's point still bounds the ends beyond its reach (ruling R45). */
 internal const val ENDS_REACH_FACTOR = 3.0

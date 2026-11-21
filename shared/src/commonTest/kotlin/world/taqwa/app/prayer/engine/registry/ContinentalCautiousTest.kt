@@ -13,6 +13,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.astro.altitudeTime
 import world.taqwa.app.prayer.engine.day.Cautious
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.day.Ends
@@ -271,7 +272,8 @@ class ContinentalCautiousTest {
                 val day = DayPipeline.day(r, date, zone)
                 val label = "${place.lat} ${place.lon} $date"
                 val ownDay = DayPipeline.day(own, date, zone)
-                assertEquals(DayPipeline.unended(own, date, zone), members[emb], "$label the EMB member's day is EMB's own")
+                // A member is its table's own day; the real sun's floor (ruling R180) is the shown day's, not a member's.
+                assertEquals(DayPipeline.beforeRealSun(own, date, zone), members[emb], "$label the EMB member's day is EMB's own")
                 spreads += members[diyanet].maghrib - members[emb].maghrib
                 assertEquals(maxOf(members[emb].maghrib, members[diyanet].maghrib), day.maghrib, "$label Maghrib")
                 assertEquals(members[diyanet].maghrib, day.maghrib, "$label Maghrib is Diyanet's")

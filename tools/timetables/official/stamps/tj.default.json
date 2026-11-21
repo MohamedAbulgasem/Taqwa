@@ -1,0 +1,164 @@
+{
+  "entry": "tj.default",
+  "class": "D (none)",
+  "engineHash": "7be42fd3c7ce0028",
+  "broken": 0,
+  "places": 19,
+  "first": "2018-05-17",
+  "last": "2026-11-30",
+  "checked": ["2018-05-17..2018-06-15", "2019-05-06..2019-06-04", "2020-04-24..2020-05-23", "2021-04-13..2021-05-12", "2022-04-02..2022-05-01", "2023-03-23..2023-04-21", "2024-03-11..2024-04-09", "2025-03-01..2025-03-29", "2026-02-19..2026-03-20", "2026-11-01..2026-11-30"],
+  "checkedByEvent": {
+    "fajr": ["2018-05-17..2018-06-15", "2019-05-06..2019-06-04", "2020-04-24..2020-05-23", "2021-04-13..2021-05-12", "2022-04-02..2022-05-01", "2023-03-23..2023-04-21", "2024-03-11..2024-04-09", "2025-03-01..2025-03-29", "2026-02-19..2026-03-20", "2026-11-01..2026-11-30"],
+    "sunrise": ["2018-05-17..2018-06-15", "2019-05-06..2019-06-04", "2020-04-24..2020-05-23", "2021-04-13..2021-05-12", "2022-04-02..2022-05-01", "2023-03-23..2023-04-21", "2025-03-01..2025-03-29", "2026-11-01..2026-11-30"],
+    "dhuhr": ["2026-11-01..2026-11-30"],
+    "asrHanafi": ["2026-11-01..2026-11-30"],
+    "maghrib": ["2018-05-17..2018-06-15", "2019-05-06..2019-06-04", "2020-04-24..2020-05-23", "2021-04-13..2021-05-12", "2022-04-02..2022-05-01", "2023-03-23..2023-04-21", "2024-03-11..2024-04-09", "2025-03-01..2025-03-29", "2026-02-19..2026-03-20", "2026-11-01..2026-11-30"],
+    "isha": ["2026-11-01..2026-11-30"],
+    "endOfEating": ["2018-05-17..2018-06-15", "2019-05-06..2019-06-04", "2020-04-24..2020-05-23", "2021-04-13..2021-05-12", "2022-04-02..2022-05-01", "2023-03-23..2023-04-21", "2024-03-11..2024-04-09", "2025-03-01..2025-03-29", "2026-02-19..2026-03-20", "2026-11-01..2026-11-30"]
+  },
+  "placeDays": 3705,
+  "heldOutDays": 0,
+  "tables": 10,
+  "ramadanDays": 3117,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 3705,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 3705
+      },
+      "exactShare": 0,
+      "worstLate": 31,
+      "lateLimit": 32,
+      "lateLimitFrom": "entry tj.default",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 2775,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 13,
+        "3+": 2762
+      },
+      "exactShare": 0,
+      "worstLate": 21,
+      "lateLimit": 22,
+      "lateLimitFrom": "entry tj.default",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 570,
+      "early": 0,
+      "late": {
+        "0": 30,
+        "1": 60,
+        "2": 60,
+        "3+": 420
+      },
+      "exactShare": 0.0526,
+      "worstLate": 25,
+      "lateLimit": 26,
+      "lateLimitFrom": "entry tj.default",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 570,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 570
+      },
+      "exactShare": 0,
+      "worstLate": 11,
+      "lateLimit": 12,
+      "lateLimitFrom": "entry tj.default",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 3705,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 3705
+      },
+      "exactShare": 0,
+      "worstLate": 15,
+      "lateLimit": 16,
+      "lateLimitFrom": "entry tj.default",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 570,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 570
+      },
+      "exactShare": 0,
+      "worstLate": 10,
+      "lateLimit": 12,
+      "lateLimitFrom": "entry tj.default",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 3705,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 3705
+      },
+      "exactShare": 0,
+      "worstLate": 34,
+      "lateLimit": 35,
+      "lateLimitFrom": "entry tj.default",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 0,
+    "ramadanDays": 0,
+    "events": {}
+  },
+  "lateLimits": {
+    "entry tj.default: 12 min": {
+      "reason": "The Council's footnote moves a town by whole minutes, not by its sun, and each town is held to the latest figure printed for it: Asr up to 11 min after its own (about the second shadow less 3), Isha up to 10 after its Khufton, on the one month that prints them (safe defaults lane and the trust audit's F16, tj-default.tsv).",
+      "events": ["asrHanafi", "isha"]
+    },
+    "entry tj.default: 16 min": {
+      "reason": "Maghrib is 16 min after the sunset: the Council's Shom runs 7 to 13 min after it over the tables held, and a town is held to the latest figure either footnote prints: up to 10 min after Shom at Dushanbe, and up to 15 in Sughd, where the two footnotes lie 3 to 5 min apart and the Council's whole minutes run ahead of the town's own sunset in spring (trust audit F16, tj-default.tsv).",
+      "events": ["maghrib"]
+    },
+    "entry tj.default: 22 min": {
+      "reason": "Sunrise is shown 12 min before the sun's own, because the Council's 2021 calendar prints it up to 10 min before, and a town's is held to the earliest figure either footnote prints: up to 17 min before the sunrise its other calendars print at Dushanbe, and up to 21 at Ayni, whose two figures lie 4 min apart (trust audit F16, tj-default.tsv).",
+      "events": ["sunrise"]
+    },
+    "entry tj.default: 26 min": {
+      "reason": "Dhuhr is never before 12:45, the Council's fixed Peshin at Dushanbe plus Panjakent's + 5, the latest its footnote prints: up to 16 min after the Peshin of Khorugh and 25 after Murghob's, the towns printed farthest before Dushanbe; one month is held, so a town's own Peshin waits for a second (safe defaults lane and the trust audit's F16, tj-default.tsv).",
+      "events": ["dhuhr"]
+    },
+    "entry tj.default: 32 min": {
+      "reason": "Central Asia's 15° Fajr, the latest in the region, against the Council of Ulama's Bomdod, whose dawn sits between about 16° and 19.4° over the ten tables held, with each town held to the latest figure either of the Council's footnotes prints for it: up to 26 min after it at Dushanbe (its 2025 calendar) and up to 31 at the towns of Sughd (safe defaults lane and the trust audit's F16, tj-default.tsv).",
+      "events": ["fajr"]
+    },
+    "entry tj.default: 35 min": {
+      "reason": "The fast begins 2 min before the 19.5° dawn, so that it is never after the Bomdod of any calendar held (the 2025 one's dawn is about 19.4°); the 2018 calendar's dawn is about 16.2°, and a town is held to the earliest figure either footnote prints: up to 30 min before its Bomdod at Dushanbe and up to 34 at Asht (trust audit F16, tj-default.tsv).",
+      "events": ["endOfEating"]
+    }
+  }
+}

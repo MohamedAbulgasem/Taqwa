@@ -1,4 +1,5 @@
-# Malaysia, JAKIM e-solat: 13 fitted zones (SBH06 excluded, its 2026 table has internal breaks).
+# Malaysia, JAKIM e-solat: the first 13 fitted zones; the 37 of the zone round of 13 Nov 2026 and the ten of its review
+# round (SBH06 among them, read as printed with its broken run) follow below under their own comments: all sixty zones.
 # Fit on each zone's 2025 table (a public mirror of e-solat, api.waktusolat.app), test forward in
 # time on its own 2026 e-solat table (a better split than profiles-tested.md's "fit one year, test
 # the other, both directions", which let the held-out year decide the pad). Checked at each zone's
@@ -49,3 +50,287 @@ archive/tables/pinned/my-jakim/2026-11-02/KTN01-2027.txt	my.jakim/KTN01			Asia/K
 archive/tables/pinned/my-jakim/2026-11-11/PLS01-2027.txt	my.jakim/PLS01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kangar PLS01 2027 (mirror), the monitor capture of 11 Nov 2026 (prove)
 archive/tables/pinned/my-jakim/2026-11-11/PNG01-2027.txt	my.jakim/PNG01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	George Town PNG01 2027 (mirror), the monitor capture of 11 Nov 2026 (prove)
 archive/tables/pinned/my-jakim/2026-11-11/WLY01-2027.txt	my.jakim/WLY01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kuala Lumpur WLY01 2027 (mirror), the monitor capture of 11 Nov 2026 (prove)
+# The printed imsak (12 Nov 2026, before the Ramadan 1448 release, spec §7, O11): e-solat's own imsak, which the monitor's
+# fetcher and the rows above leave out, read back from the raw answers the monitor already holds by
+# archive/code/imsak/imsak_tables.py (no new fetch) into archive/tables/imsak/my-jakim/<capture>/<zone>-<year>.txt, two columns,
+# the printed Subuh (equal on every day to the gated table's Fajr above) and the imsak. Every zone prints imsak = Subuh - 10 on
+# every day held, and so does the app since the JAKIM imsak round of 12 Nov 2026: the zone's Subuh as e-solat prints it (for
+# its latest point, rounded up) less 10 (Jakim.kt, ImsakFrom.PrintedFajr, with an imsak margin of its own fitted as an end on
+# every Subuh above as Subuh - 10 and on these imsak columns), checked here as Im, an end: never after the printed imsak. It
+# was the reference point's dawn less 10, the dawn the end of eating keeps (up to 4 min before the Subuh), and so 3-4 min
+# before e-solat's imsak at eleven of these tables, held back until this round.
+# Perlis (PLS01) prints no precaution: its imsak is its Subuh in 2026, and a minute before it on 141 days of 2027 from
+# 8 March (the mirror's 2027 table, not seen on e-solat itself); the app shows no imsak there (JakimZones.kt, imsakMarginSeconds = null), so its
+# 2027 column is checked as the end of eating (E): the end shown never after the imsak Perlis prints. Its 2027 days are thus
+# counted twice in PLS01's end of eating (here and in the F+E row above), the price of the stricter check; its 2026 imsak is
+# the Subuh the F+E row already reads, so that row is left out (below). 2026 is e-solat's year table of 28 Sep 2026; 2027 the
+# mirror's (api.waktusolat.app, the copy of e-solat the monitor falls back on) of 1 Nov 2026 (Kota Bharu's and Kuala Lumpur's
+# of 2 Nov 2026, that capture being the one that holds all twelve months). Sandakan, Kota Kinabalu and Shah Alam's 2027 is not
+# held. These rows read ends alone, so they add no place-day (the gate counts a day by a row reading a start) and must fall on
+# days a row above holds. Split as the row above for the same zone and year; the other columns are not read ("-").
+# No holdout (review of 48ff2384): that split only follows the row above. Each zone's imsak margin is fitted over these
+# rows and every Subuh above, test rows included (the smaller fit, as JAKIM's other margins over both years, Jakim.kt), so
+# every imsak cell here is a fitted one (ruling R214, the @fitted line at the foot of this file; until 13 Nov 2026 the stamp
+# showed 6,935 in-sample imsak days as held out). A fit on the 2025 rows alone cannot stand: it asks a later margin than
+# 2027's Subuh allows (WLY01 +7 s against -125 s), after e-solat's imsak. So no imsak day of JAKIM's is a held-out day, and
+# the Ramadan guard (checkStamps -Pramadan, ruling R246) names it as checked in fitted rows only.
+archive/tables/imsak/my-jakim/2026-09-28/JHR01-2026.txt	my.jakim/JHR01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Pulau Aur JHR01 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-09-28/PHG01-2026.txt	my.jakim/PHG01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Pulau Tioman PHG01 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-09-28/PHG06-2026.txt	my.jakim/PHG06			Asia/Kuala_Lumpur	- Im	daily	standard	test	Cameron Highlands PHG06 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-09-28/PNG01-2026.txt	my.jakim/PNG01			Asia/Kuala_Lumpur	- Im	daily	standard	test	George Town PNG01 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-09-28/WLY02-2026.txt	my.jakim/WLY02			Asia/Kuching	- Im	daily	standard	test	Labuan WLY02 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-11-01/JHR01-2027.txt	my.jakim/JHR01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Pulau Aur JHR01 2027 (mirror), the mirror's imsak (capture of 1 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-01/PHG01-2027.txt	my.jakim/PHG01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Pulau Tioman PHG01 2027 (mirror), the mirror's imsak (capture of 1 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-01/PHG06-2027.txt	my.jakim/PHG06			Asia/Kuala_Lumpur	- Im	daily	standard	test	Cameron Highlands PHG06 2027 (mirror), the mirror's imsak (capture of 1 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-01/PLS01-2027.txt	my.jakim/PLS01			Asia/Kuala_Lumpur	- E	daily	standard	test	Kangar PLS01 2027 (mirror), the mirror's imsak for Perlis, read as the end of eating (capture of 1 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-02/WLY01-2027.txt	my.jakim/WLY01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kuala Lumpur WLY01 2027 (mirror), the mirror's imsak (capture of 2 Nov 2026)
+archive/tables/imsak/my-jakim/2026-09-28/SGR01-2026.txt	my.jakim/SGR01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Shah Alam SGR01 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-09-28/JHR02-2026.txt	my.jakim/JHR02			Asia/Kuala_Lumpur	- Im	daily	standard	test	Johor Bahru JHR02 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-09-28/KTN01-2026.txt	my.jakim/KTN01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kota Bharu KTN01 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-09-28/SBH01-2026.txt	my.jakim/SBH01			Asia/Kuching	- Im	daily	standard	test	Sandakan SBH01 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-09-28/SBH07-2026.txt	my.jakim/SBH07			Asia/Kuching	- Im	daily	standard	test	Kota Kinabalu SBH07 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-09-28/SWK08-2026.txt	my.jakim/SWK08			Asia/Kuching	- Im	daily	standard	test	Kuching SWK08 2026, e-solat's imsak (capture of 28 Sep 2026)
+archive/tables/imsak/my-jakim/2026-11-01/JHR02-2027.txt	my.jakim/JHR02			Asia/Kuala_Lumpur	- Im	daily	standard	test	Johor Bahru JHR02 2027 (mirror), the mirror's imsak (capture of 1 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-02/KTN01-2027.txt	my.jakim/KTN01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kota Bharu KTN01 2027 (mirror), the mirror's imsak (capture of 2 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-01/PNG01-2027.txt	my.jakim/PNG01			Asia/Kuala_Lumpur	- Im	daily	standard	test	George Town PNG01 2027 (mirror), the mirror's imsak (capture of 1 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-01/SWK08-2027.txt	my.jakim/SWK08			Asia/Kuching	- Im	daily	standard	test	Kuching SWK08 2027 (mirror), the mirror's imsak (capture of 1 Nov 2026)
+# Kuala Lumpur's 2026 imsak, held back on 12 Nov 2026 and put back on 13 Nov (ruling R187, the owner's approval): never
+# after e-solat's imsak but over class B's 2 min, 2 min before it on 251 days and 3 min on 114. The mirror's 2027 table
+# prints WLY01's Subuh 1-3 min before 2025's and 2026's at the same point (the cause of its Fajr's 3-min exception,
+# Jakim.kt), and the imsak margin is one for every year and an end, so it is fitted on 2027's:
+# 2025's alone asks +7 s, 132 s later than 2027's -125 s allows. So WLY01's imsak carries a 3-min exception like its
+# Fajr's (JakimZones.kt, imsakLateLimitMinutes), an earlier end and never a later one:
+archive/tables/imsak/my-jakim/2026-09-28/WLY01-2026.txt	my.jakim/WLY01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kuala Lumpur WLY01 2026, e-solat's imsak (capture of 28 Sep 2026)
+# Left out, over no limit: Labuan's 2027 imsak, as no WLY02 2027 table is gated (no row reading its starts holds those
+# days; it goes in with that table), and Kangar's 2026 imsak, equal on every day to the Subuh the F+E row above reads:
+#   archive/tables/imsak/my-jakim/2026-11-01/WLY02-2027.txt	my.jakim/WLY02			Asia/Kuching	- Im	daily	standard	test	Labuan WLY02 2027 (mirror), the mirror's imsak (capture of 1 Nov 2026)
+#   archive/tables/imsak/my-jakim/2026-09-28/PLS01-2026.txt	my.jakim/PLS01			Asia/Kuala_Lumpur	- E	daily	standard	test	Kangar PLS01 2026, e-solat's imsak for Perlis, read as the end of eating (capture of 28 Sep 2026)
+# The zone round of 13 Nov 2026 (rulings R225-R229): the 37 zones that hold a city of the app's list and were no unit yet,
+# each on its own e-solat year tables, the hand capture of 13 Nov 2026 with the requests the monitor's fetcher makes
+# (archive/code/manual/my-jakim/esolat_zones.py): a plain GET for 2026, and for 2027 an HTTP POST of e-solat's own
+# date-range form (datestart, dateend): 37 POSTs, 30 answered and 7 NO_RECORD! (each table's first line says GET or POST).
+# The 2026 table is the fit row and 2027 the test row (Ramadan 1448 in it), but the margins are over both: a fit on 2026
+# alone was EARLY on days of 2027 in five of the thirty zones with a 2027 table (KDH02, KDH04, KDH05, NGS02 and PRK02, one
+# to three days each), so every day sets the margins, as in the first thirteen zones. No day of a zone's own table is
+# therefore held out: these test rows are in-sample, and so are the towns' rows of my-jakim-cities.tsv, which read the
+# same tables at the towns' points and give the LATENESS there, not an independent test. Seven zones have no 2027 table
+# on e-solat yet (SBH03, SBH04, SBH05, SBH08, SBH09, SGR02, SGR03: NO_RECORD! to the POST): their 2026 table is held as two
+# local copies, January to September the fit row and October to December the test row, as Kemenag's Jakarta, the margins
+# over the whole year; with one year held (JakimZones.Zone.oneYear) every margin carries 15 s more to its safe side
+# (FORWARD_SECONDS) until 2027 is held and the zone refitted; the monitor asks for their 2027 weekly.
+# SBH09's fit copy holds 2026-03-28..31 AS PRINTED: four days e-solat's own table prints LATER than the days either side
+# (Subuh and Syuruk 10-11 min later, Zohor 6-7, Asar 19-20, Maghrib 3; Isyak in line). They are never left out (R228 as
+# its review round left it): the engine holds those four days' starts to the print, never before it (JakimZones.kt, PrintedLater), and its
+# sunrise, end of eating and imsak, which never move later, stand up to 13 min BEFORE the print on those days (SBH09's own
+# limit). Where SBH09's table rides beside another zone's the four days ride with it: at SWK09's unit (Kampung
+# Patarikan, by the border) a start stood up to 11 (Subuh), 8 (Zohor) and 20 (Asar) min AFTER SWK09's own print on those
+# four days (SWK09's own limits say so); on every other day at most 4. Read at each zone's own unit (lat/lon empty): its point the zone's first town in the app's list, its start
+# point a fitted effective point, not JAKIM's reference point (which is not held), and in KDH02-KDH06, SGR02 and NGS03
+# outside the zone (JakimZones.kt). The towns of every zone are read at their own points in my-jakim-cities.tsv; the
+# border places, the named places and the app's cities on no zone's list in my-jakim-envelope.tsv (generated).
+archive/tables/manual/my-jakim/2026-11-13/JHR03-2026.txt	my.jakim/JHR03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kluang JHR03, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/JHR03-2027.txt	my.jakim/JHR03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kluang JHR03, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/JHR04-2026.txt	my.jakim/JHR04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Muar JHR04, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/JHR04-2027.txt	my.jakim/JHR04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Muar JHR04, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH01-2026.txt	my.jakim/KDH01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Alor Setar KDH01, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH01-2027.txt	my.jakim/KDH01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Alor Setar KDH01, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH02-2026.txt	my.jakim/KDH02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kota Kuala Muda KDH02, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH02-2027.txt	my.jakim/KDH02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kota Kuala Muda KDH02, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH03-2026.txt	my.jakim/KDH03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Sik KDH03, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH03-2027.txt	my.jakim/KDH03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Sik KDH03, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH04-2026.txt	my.jakim/KDH04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kuala Ketil KDH04, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH04-2027.txt	my.jakim/KDH04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kuala Ketil KDH04, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH05-2026.txt	my.jakim/KDH05			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kulim KDH05, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH05-2027.txt	my.jakim/KDH05			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kulim KDH05, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH06-2026.txt	my.jakim/KDH06			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kuah KDH06, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH06-2027.txt	my.jakim/KDH06			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kuah KDH06, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KTN02-2026.txt	my.jakim/KTN02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Gua Musang KTN02, e-solat 2026 (capture of 13 Nov 2026) Kelantan 17 deg Isha
+archive/tables/manual/my-jakim/2026-11-13/KTN02-2027.txt	my.jakim/KTN02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Gua Musang KTN02, e-solat 2027 (capture of 13 Nov 2026) Kelantan 17 deg Isha
+archive/tables/manual/my-jakim/2026-11-13/MLK01-2026.txt	my.jakim/MLK01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Malacca MLK01, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/MLK01-2027.txt	my.jakim/MLK01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Malacca MLK01, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/NGS01-2026.txt	my.jakim/NGS01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Rompin NGS01, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/NGS01-2027.txt	my.jakim/NGS01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Rompin NGS01, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/NGS02-2026.txt	my.jakim/NGS02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Rembau NGS02, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/NGS02-2027.txt	my.jakim/NGS02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Rembau NGS02, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/NGS03-2026.txt	my.jakim/NGS03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Seremban NGS03, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/NGS03-2027.txt	my.jakim/NGS03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Seremban NGS03, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG02-2026.txt	my.jakim/PHG02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kuantan PHG02, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG02-2027.txt	my.jakim/PHG02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kuantan PHG02, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG03-2026.txt	my.jakim/PHG03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Maran PHG03, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG03-2027.txt	my.jakim/PHG03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Maran PHG03, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG04-2026.txt	my.jakim/PHG04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Bentong Town PHG04, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG04-2027.txt	my.jakim/PHG04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Bentong Town PHG04, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK01-2026.txt	my.jakim/PRK01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Tanjong Malim PRK01, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK01-2027.txt	my.jakim/PRK01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Tanjong Malim PRK01, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK02-2026.txt	my.jakim/PRK02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Ipoh PRK02, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK02-2027.txt	my.jakim/PRK02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Ipoh PRK02, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK03-2026.txt	my.jakim/PRK03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Gerik PRK03, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK03-2027.txt	my.jakim/PRK03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Gerik PRK03, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK05-2026.txt	my.jakim/PRK05			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Teluk Intan PRK05, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK05-2027.txt	my.jakim/PRK05			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Teluk Intan PRK05, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK06-2026.txt	my.jakim/PRK06			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Taiping PRK06, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK06-2027.txt	my.jakim/PRK06			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Taiping PRK06, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH03-2026-fit.txt	my.jakim/SBH03			Asia/Kuching	F+E S D A M I	daily	standard	fit	Lahad Datu SBH03, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH03-2026-test.txt	my.jakim/SBH03			Asia/Kuching	F+E S D A M I	daily	standard	test	Lahad Datu SBH03, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH04-2026-fit.txt	my.jakim/SBH04			Asia/Kuching	F+E S D A M I	daily	standard	fit	Tawau SBH04, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH04-2026-test.txt	my.jakim/SBH04			Asia/Kuching	F+E S D A M I	daily	standard	test	Tawau SBH04, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH05-2026-fit.txt	my.jakim/SBH05			Asia/Kuching	F+E S D A M I	daily	standard	fit	Kudat SBH05, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH05-2026-test.txt	my.jakim/SBH05			Asia/Kuching	F+E S D A M I	daily	standard	test	Kudat SBH05, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH08-2026-fit.txt	my.jakim/SBH08			Asia/Kuching	F+E S D A M I	daily	standard	fit	Keningau SBH08, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH08-2026-test.txt	my.jakim/SBH08			Asia/Kuching	F+E S D A M I	daily	standard	test	Keningau SBH08, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH09-2026-fit.txt	my.jakim/SBH09			Asia/Kuching	F+E S D A M I	daily	standard	fit	Sipitang SBH09, e-solat 2026, January to September with 28-31 March as printed (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH09-2026-test.txt	my.jakim/SBH09			Asia/Kuching	F+E S D A M I	daily	standard	test	Sipitang SBH09, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SGR02-2026-fit.txt	my.jakim/SGR02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Ijok SGR02, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SGR02-2026-test.txt	my.jakim/SGR02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Ijok SGR02, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SGR03-2026-fit.txt	my.jakim/SGR03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kapar SGR03, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SGR03-2026-test.txt	my.jakim/SGR03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kapar SGR03, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK01-2026.txt	my.jakim/SWK01			Asia/Kuching	F+E S D A M I	daily	standard	fit	Limbang SWK01, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK01-2027.txt	my.jakim/SWK01			Asia/Kuching	F+E S D A M I	daily	standard	test	Limbang SWK01, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK02-2026.txt	my.jakim/SWK02			Asia/Kuching	F+E S D A M I	daily	standard	fit	Miri SWK02, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK02-2027.txt	my.jakim/SWK02			Asia/Kuching	F+E S D A M I	daily	standard	test	Miri SWK02, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK03-2026.txt	my.jakim/SWK03			Asia/Kuching	F+E S D A M I	daily	standard	fit	Bintulu SWK03, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK03-2027.txt	my.jakim/SWK03			Asia/Kuching	F+E S D A M I	daily	standard	test	Bintulu SWK03, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK04-2026.txt	my.jakim/SWK04			Asia/Kuching	F+E S D A M I	daily	standard	fit	Sibu SWK04, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK04-2027.txt	my.jakim/SWK04			Asia/Kuching	F+E S D A M I	daily	standard	test	Sibu SWK04, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK05-2026.txt	my.jakim/SWK05			Asia/Kuching	F+E S D A M I	daily	standard	fit	Sarikei SWK05, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK05-2027.txt	my.jakim/SWK05			Asia/Kuching	F+E S D A M I	daily	standard	test	Sarikei SWK05, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK06-2026.txt	my.jakim/SWK06			Asia/Kuching	F+E S D A M I	daily	standard	fit	Sri Aman SWK06, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK06-2027.txt	my.jakim/SWK06			Asia/Kuching	F+E S D A M I	daily	standard	test	Sri Aman SWK06, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK07-2026.txt	my.jakim/SWK07			Asia/Kuching	F+E S D A M I	daily	standard	fit	Serian SWK07, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK07-2027.txt	my.jakim/SWK07			Asia/Kuching	F+E S D A M I	daily	standard	test	Serian SWK07, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/TRG01-2026.txt	my.jakim/TRG01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kuala Terengganu TRG01, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/TRG01-2027.txt	my.jakim/TRG01			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kuala Terengganu TRG01, e-solat 2027 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/TRG04-2026.txt	my.jakim/TRG04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Cukai TRG04, e-solat 2026 (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/TRG04-2027.txt	my.jakim/TRG04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Cukai TRG04, e-solat 2027 (capture of 13 Nov 2026)
+# The printed imsak of the same tables (e-solat's own column, Subuh - 10), each row split as its table above; ends alone,
+# so no place-day. SBH08's imsak of 2026-04-03 is a slip of e-solat's own and is not in the table.
+archive/tables/imsak/my-jakim/2026-11-13/JHR03-2026.txt	my.jakim/JHR03			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kluang JHR03 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/JHR03-2027.txt	my.jakim/JHR03			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kluang JHR03 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/JHR04-2026.txt	my.jakim/JHR04			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Muar JHR04 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/JHR04-2027.txt	my.jakim/JHR04			Asia/Kuala_Lumpur	- Im	daily	standard	test	Muar JHR04 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH01-2026.txt	my.jakim/KDH01			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Alor Setar KDH01 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH01-2027.txt	my.jakim/KDH01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Alor Setar KDH01 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH02-2026.txt	my.jakim/KDH02			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kota Kuala Muda KDH02 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH02-2027.txt	my.jakim/KDH02			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kota Kuala Muda KDH02 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH03-2026.txt	my.jakim/KDH03			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Sik KDH03 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH03-2027.txt	my.jakim/KDH03			Asia/Kuala_Lumpur	- Im	daily	standard	test	Sik KDH03 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH04-2026.txt	my.jakim/KDH04			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kuala Ketil KDH04 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH04-2027.txt	my.jakim/KDH04			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kuala Ketil KDH04 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH05-2026.txt	my.jakim/KDH05			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kulim KDH05 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH05-2027.txt	my.jakim/KDH05			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kulim KDH05 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH06-2026.txt	my.jakim/KDH06			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kuah KDH06 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH06-2027.txt	my.jakim/KDH06			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kuah KDH06 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KTN02-2026.txt	my.jakim/KTN02			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Gua Musang KTN02 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KTN02-2027.txt	my.jakim/KTN02			Asia/Kuala_Lumpur	- Im	daily	standard	test	Gua Musang KTN02 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/MLK01-2026.txt	my.jakim/MLK01			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Malacca MLK01 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/MLK01-2027.txt	my.jakim/MLK01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Malacca MLK01 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/NGS01-2026.txt	my.jakim/NGS01			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Rompin NGS01 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/NGS01-2027.txt	my.jakim/NGS01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Rompin NGS01 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/NGS02-2026.txt	my.jakim/NGS02			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Rembau NGS02 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/NGS02-2027.txt	my.jakim/NGS02			Asia/Kuala_Lumpur	- Im	daily	standard	test	Rembau NGS02 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/NGS03-2026.txt	my.jakim/NGS03			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Seremban NGS03 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/NGS03-2027.txt	my.jakim/NGS03			Asia/Kuala_Lumpur	- Im	daily	standard	test	Seremban NGS03 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG02-2026.txt	my.jakim/PHG02			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kuantan PHG02 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG02-2027.txt	my.jakim/PHG02			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kuantan PHG02 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG03-2026.txt	my.jakim/PHG03			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Maran PHG03 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG03-2027.txt	my.jakim/PHG03			Asia/Kuala_Lumpur	- Im	daily	standard	test	Maran PHG03 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG04-2026.txt	my.jakim/PHG04			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Bentong Town PHG04 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG04-2027.txt	my.jakim/PHG04			Asia/Kuala_Lumpur	- Im	daily	standard	test	Bentong Town PHG04 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK01-2026.txt	my.jakim/PRK01			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Tanjong Malim PRK01 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK01-2027.txt	my.jakim/PRK01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Tanjong Malim PRK01 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK02-2026.txt	my.jakim/PRK02			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Ipoh PRK02 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK02-2027.txt	my.jakim/PRK02			Asia/Kuala_Lumpur	- Im	daily	standard	test	Ipoh PRK02 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK03-2026.txt	my.jakim/PRK03			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Gerik PRK03 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK03-2027.txt	my.jakim/PRK03			Asia/Kuala_Lumpur	- Im	daily	standard	test	Gerik PRK03 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK05-2026.txt	my.jakim/PRK05			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Teluk Intan PRK05 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK05-2027.txt	my.jakim/PRK05			Asia/Kuala_Lumpur	- Im	daily	standard	test	Teluk Intan PRK05 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK06-2026.txt	my.jakim/PRK06			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Taiping PRK06 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK06-2027.txt	my.jakim/PRK06			Asia/Kuala_Lumpur	- Im	daily	standard	test	Taiping PRK06 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH03-2026-fit.txt	my.jakim/SBH03			Asia/Kuching	- Im	daily	standard	fit	Lahad Datu SBH03 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH03-2026-test.txt	my.jakim/SBH03			Asia/Kuching	- Im	daily	standard	test	Lahad Datu SBH03 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH04-2026-fit.txt	my.jakim/SBH04			Asia/Kuching	- Im	daily	standard	fit	Tawau SBH04 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH04-2026-test.txt	my.jakim/SBH04			Asia/Kuching	- Im	daily	standard	test	Tawau SBH04 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH05-2026-fit.txt	my.jakim/SBH05			Asia/Kuching	- Im	daily	standard	fit	Kudat SBH05 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH05-2026-test.txt	my.jakim/SBH05			Asia/Kuching	- Im	daily	standard	test	Kudat SBH05 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH08-2026-fit.txt	my.jakim/SBH08			Asia/Kuching	- Im	daily	standard	fit	Keningau SBH08 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH08-2026-test.txt	my.jakim/SBH08			Asia/Kuching	- Im	daily	standard	test	Keningau SBH08 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH09-2026-fit.txt	my.jakim/SBH09			Asia/Kuching	- Im	daily	standard	fit	Sipitang SBH09 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH09-2026-test.txt	my.jakim/SBH09			Asia/Kuching	- Im	daily	standard	test	Sipitang SBH09 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SGR02-2026-fit.txt	my.jakim/SGR02			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Ijok SGR02 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SGR02-2026-test.txt	my.jakim/SGR02			Asia/Kuala_Lumpur	- Im	daily	standard	test	Ijok SGR02 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SGR03-2026-fit.txt	my.jakim/SGR03			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kapar SGR03 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SGR03-2026-test.txt	my.jakim/SGR03			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kapar SGR03 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK01-2026.txt	my.jakim/SWK01			Asia/Kuching	- Im	daily	standard	fit	Limbang SWK01 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK01-2027.txt	my.jakim/SWK01			Asia/Kuching	- Im	daily	standard	test	Limbang SWK01 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK02-2026.txt	my.jakim/SWK02			Asia/Kuching	- Im	daily	standard	fit	Miri SWK02 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK02-2027.txt	my.jakim/SWK02			Asia/Kuching	- Im	daily	standard	test	Miri SWK02 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK03-2026.txt	my.jakim/SWK03			Asia/Kuching	- Im	daily	standard	fit	Bintulu SWK03 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK03-2027.txt	my.jakim/SWK03			Asia/Kuching	- Im	daily	standard	test	Bintulu SWK03 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK04-2026.txt	my.jakim/SWK04			Asia/Kuching	- Im	daily	standard	fit	Sibu SWK04 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK04-2027.txt	my.jakim/SWK04			Asia/Kuching	- Im	daily	standard	test	Sibu SWK04 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK05-2026.txt	my.jakim/SWK05			Asia/Kuching	- Im	daily	standard	fit	Sarikei SWK05 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK05-2027.txt	my.jakim/SWK05			Asia/Kuching	- Im	daily	standard	test	Sarikei SWK05 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK06-2026.txt	my.jakim/SWK06			Asia/Kuching	- Im	daily	standard	fit	Sri Aman SWK06 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK06-2027.txt	my.jakim/SWK06			Asia/Kuching	- Im	daily	standard	test	Sri Aman SWK06 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK07-2026.txt	my.jakim/SWK07			Asia/Kuching	- Im	daily	standard	fit	Serian SWK07 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK07-2027.txt	my.jakim/SWK07			Asia/Kuching	- Im	daily	standard	test	Serian SWK07 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/TRG01-2026.txt	my.jakim/TRG01			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kuala Terengganu TRG01 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/TRG01-2027.txt	my.jakim/TRG01			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kuala Terengganu TRG01 2027, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/TRG04-2026.txt	my.jakim/TRG04			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Cukai TRG04 2026, e-solat's imsak (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/TRG04-2027.txt	my.jakim/TRG04			Asia/Kuala_Lumpur	- Im	daily	standard	test	Cukai TRG04 2027, e-solat's imsak (capture of 13 Nov 2026)
+# The review round of 13 Nov 2026: the ten zones that hold no city of the app's list (KDH07, PHG05, PHG07, PRK04, PRK07,
+# SBH02, SBH06, SWK09, TRG02, TRG03), each on its own e-solat 2026 table: ten plain GETs of 13 Nov 2026, no POST (their
+# 2027 is the monitor's to ask for). A place in one of them took a neighbouring zone's table as its own before. One year
+# held, so split as the seven above, the margins over the whole year and FORWARD_SECONDS more; nothing is held out. Each
+# is read at the point of a place its list names (general geography, not a point of JAKIM's or of the app's list);
+# KDH07, PHG05, PRK07 and SBH06 are tables printed for a height, taken within 5 km of the named place only. SBH06 is read
+# as printed with its broken run (three days of March printed minutes after the days around them, a Maghrib that steps
+# back 8 min on 1 December): its margins hold its latest days, so the summit is up to 9 min late at Maghrib (its own
+# limits). SBH02's imsak of 2026-03-01..31 is printed 20 min before Subuh and is not in its imsak table (the archive's
+# rule for a gap over 15; archive/tables/manual/my-jakim/2026-11-13/notes.txt): an owner question, not a gated day.
+archive/tables/manual/my-jakim/2026-11-13/KDH07-2026-fit.txt	my.jakim/KDH07			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Gunung Jerai KDH07, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/KDH07-2026-test.txt	my.jakim/KDH07			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Gunung Jerai KDH07, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG05-2026-fit.txt	my.jakim/PHG05			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Bukit Tinggi PHG05, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG05-2026-test.txt	my.jakim/PHG05			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Bukit Tinggi PHG05, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG07-2026-fit.txt	my.jakim/PHG07			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kuala Rompin PHG07, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PHG07-2026-test.txt	my.jakim/PHG07			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kuala Rompin PHG07, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK04-2026-fit.txt	my.jakim/PRK04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Pulau Banding PRK04, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK04-2026-test.txt	my.jakim/PRK04			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Pulau Banding PRK04, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK07-2026-fit.txt	my.jakim/PRK07			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Bukit Larut PRK07, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/PRK07-2026-test.txt	my.jakim/PRK07			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Bukit Larut PRK07, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH02-2026-fit.txt	my.jakim/SBH02			Asia/Kuching	F+E S D A M I	daily	standard	fit	Beluran SBH02, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH02-2026-test.txt	my.jakim/SBH02			Asia/Kuching	F+E S D A M I	daily	standard	test	Beluran SBH02, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH06-2026-fit.txt	my.jakim/SBH06			Asia/Kuching	F+E S D A M I	daily	standard	fit	Gunung Kinabalu SBH06, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SBH06-2026-test.txt	my.jakim/SBH06			Asia/Kuching	F+E S D A M I	daily	standard	test	Gunung Kinabalu SBH06, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK09-2026-fit.txt	my.jakim/SWK09			Asia/Kuching	F+E S D A M I	daily	standard	fit	Kampung Patarikan SWK09, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/SWK09-2026-test.txt	my.jakim/SWK09			Asia/Kuching	F+E S D A M I	daily	standard	test	Kampung Patarikan SWK09, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/TRG02-2026-fit.txt	my.jakim/TRG02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Jerteh TRG02, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/TRG02-2026-test.txt	my.jakim/TRG02			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Jerteh TRG02, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/TRG03-2026-fit.txt	my.jakim/TRG03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	fit	Kuala Berang TRG03, e-solat 2026, January to September (capture of 13 Nov 2026)
+archive/tables/manual/my-jakim/2026-11-13/TRG03-2026-test.txt	my.jakim/TRG03			Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Kuala Berang TRG03, e-solat 2026, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH07-2026-fit.txt	my.jakim/KDH07			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Gunung Jerai KDH07 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/KDH07-2026-test.txt	my.jakim/KDH07			Asia/Kuala_Lumpur	- Im	daily	standard	test	Gunung Jerai KDH07 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG05-2026-fit.txt	my.jakim/PHG05			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Bukit Tinggi PHG05 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG05-2026-test.txt	my.jakim/PHG05			Asia/Kuala_Lumpur	- Im	daily	standard	test	Bukit Tinggi PHG05 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG07-2026-fit.txt	my.jakim/PHG07			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kuala Rompin PHG07 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PHG07-2026-test.txt	my.jakim/PHG07			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kuala Rompin PHG07 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK04-2026-fit.txt	my.jakim/PRK04			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Pulau Banding PRK04 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK04-2026-test.txt	my.jakim/PRK04			Asia/Kuala_Lumpur	- Im	daily	standard	test	Pulau Banding PRK04 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK07-2026-fit.txt	my.jakim/PRK07			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Bukit Larut PRK07 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/PRK07-2026-test.txt	my.jakim/PRK07			Asia/Kuala_Lumpur	- Im	daily	standard	test	Bukit Larut PRK07 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH02-2026-fit.txt	my.jakim/SBH02			Asia/Kuching	- Im	daily	standard	fit	Beluran SBH02 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH02-2026-test.txt	my.jakim/SBH02			Asia/Kuching	- Im	daily	standard	test	Beluran SBH02 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH06-2026-fit.txt	my.jakim/SBH06			Asia/Kuching	- Im	daily	standard	fit	Gunung Kinabalu SBH06 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SBH06-2026-test.txt	my.jakim/SBH06			Asia/Kuching	- Im	daily	standard	test	Gunung Kinabalu SBH06 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK09-2026-fit.txt	my.jakim/SWK09			Asia/Kuching	- Im	daily	standard	fit	Kampung Patarikan SWK09 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/SWK09-2026-test.txt	my.jakim/SWK09			Asia/Kuching	- Im	daily	standard	test	Kampung Patarikan SWK09 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/TRG02-2026-fit.txt	my.jakim/TRG02			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Jerteh TRG02 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/TRG02-2026-test.txt	my.jakim/TRG02			Asia/Kuala_Lumpur	- Im	daily	standard	test	Jerteh TRG02 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/TRG03-2026-fit.txt	my.jakim/TRG03			Asia/Kuala_Lumpur	- Im	daily	standard	fit	Kuala Berang TRG03 2026, e-solat's imsak, January to September (capture of 13 Nov 2026)
+archive/tables/imsak/my-jakim/2026-11-13/TRG03-2026-test.txt	my.jakim/TRG03			Asia/Kuala_Lumpur	- Im	daily	standard	test	Kuala Berang TRG03 2026, e-solat's imsak, October to December (capture of 13 Nov 2026)
+# Ruling R214 (the sweep of 13 Nov 2026, again after the zone round in the review round of 14 Nov): cells of the test rows above that a margin was set on are
+# fit cells in every figure shown; the rows stay test for what no margin was set on (the 2027 starts of JHR01, JHR02, KTN01, PHG01, PHG06 and SWK08).
+@fitted	my.jakim	archive/tables/round/data-wide-band/off-jakim-*	*	every margin of the first thirteen zones was fitted over the union of the zone's 2025 and 2026 tables, the row marked test among them (Jakim.kt, JakimZones.kt)
+@fitted	my.jakim	archive/tables/pinned/my-jakim/2026-11-11/*	*	WLY01, PLS01 and PNG01 were refitted on their 2025, 2026 and 2027 tables together on 4 Nov 2026 (JakimZones.kt)
+@fitted	my.jakim	archive/tables/imsak/my-jakim/*	Im E	each zone's imsak margin, and Perlis's end of eating, was fitted over every imsak column held, 2026 and 2027 (JakimZones.kt)
+@fitted	my.jakim	archive/tables/manual/my-jakim/2026-11-13/*	*	the zone round of 13 Nov 2026 (rulings R225-R229): every day of each of the 47 zones' 2026 and 2027 tables set its margins, the rows marked test among them

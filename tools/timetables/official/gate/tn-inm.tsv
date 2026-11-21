@@ -1,7 +1,8 @@
 # Tunisia, the Institut National de la Météorologie (meteo.tn), per delegation at INM's own
 # reference points, the units' points (profiles-tested.md, data-maghreb-libya). Africa/Tunis.
 # Standard Asr. Sunrise comes from INM's ephemeris endpoint every third day ('-' on the others). The
-# Fajr printed is when the fast begins (F+E); these tables print no imsak.
+# Fajr printed is when the fast begins (F+E); these tables print no imsak, and the app shows none for Tunisia
+# (ruling R188, the owner, 12 Nov 2026: no promise of an imsak INM does not print; the end of eating stands alone).
 # Split: fit on the four low delegations' 2026 (Tunis and Sfax every day, Tabarka and Ben Guerdane
 # every third day); held out, Tunis 2019–2026 (eight days a year, at INM's earlier point for Tunis)
 # and the elevated delegations Tataouine and Tala. Their dips (0.45°, 1.0°) and the dipped Fajr's
@@ -9,10 +10,12 @@
 # with the dips, not the dips themselves.
 # Not rows: tn_tunis_2026.txt, agentB/tunis_inm.txt, off-tunis.txt, tn_tunis1.txt and tn_tala.txt
 # repeat the same days.
-# The weekly monitor's capture of 28 Sep 2026 (the coming seven days, 28 Sep – 4 Oct, with INM's sunrise on
-# each), held out where it adds days: Tabarka, Ben Guerdane and Tala (29–30 Sep and 2–3 Oct). Tunis's, Sfax's
-# and Tataouine's repeat their rows' days (the same minutes; they add only INM's sunrise on four of them), so
-# they are not rows.
+# The weekly monitor's running captures (archive/tables/monitor/tn-inm/<delegation>.txt, begun 28 Sep 2026: each
+# fetch adds the coming seven days with INM's sunrise on each, and the gate reads the file as it stands), held out
+# where they add days: Tabarka, Ben Guerdane and Tala, whose yearly tables print every third day. Tunis's, Sfax's
+# and Tataouine's captures repeat their yearly rows' days through 2026 (the same minutes; they add only INM's
+# sunrise on the days between), so they are not rows yet: prove adds each as a row by itself (recipes.tsv, tn-inm)
+# on the first run whose capture prints a day the yearly row does not hold, which is January 2027.
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-maghreb-libya/off-inm-tunis.txt	tn.inm/tunis			Africa/Tunis	F+E S D A M I	daily	standard	fit	Tunis 2026
 archive/tables/round/data-maghreb-libya/off-inm-sfax.txt	tn.inm/sfax			Africa/Tunis	F+E S D A M I	daily	standard	fit	Sfax 2026
@@ -21,6 +24,6 @@ archive/tables/round/data-maghreb-libya/off-inm-benguerdane.txt	tn.inm/ben-guerd
 archive/tables/moral-auth-mena/maghreb/tn_tunis_multiyear.txt	tn.inm/tunis	36.798	10.172	Africa/Tunis	F+E - D A M I	daily	standard	test	Tunis 2019–2026, eight days a year
 archive/tables/round/data-maghreb-libya/off-inm-tataouine.txt	tn.inm/tataouine			Africa/Tunis	F+E S D A M I	daily	standard	test	Tataouine 2026 (dip 0.45°)
 archive/tables/round/data-maghreb-libya/off-inm-tala.txt	tn.inm/tala			Africa/Tunis	F+E S D A M I	daily	standard	test	Tala 2026, every third day (about 1,000 m, dip 1.0°)
-archive/tables/monitor/tn-inm/tabarka.txt	tn.inm/tabarka			Africa/Tunis	F+E S D A M I	daily	standard	test	Tabarka, 28 Sep – 4 Oct 2026, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tn-inm/ben-guerdane.txt	tn.inm/ben-guerdane			Africa/Tunis	F+E S D A M I	daily	standard	test	Ben Guerdane, 28 Sep – 4 Oct 2026, the monitor capture of 28 Sep 2026
-archive/tables/monitor/tn-inm/tala.txt	tn.inm/tala			Africa/Tunis	F+E S D A M I	daily	standard	test	Tala, 28 Sep – 4 Oct 2026, the monitor capture of 28 Sep 2026
+archive/tables/monitor/tn-inm/tabarka.txt	tn.inm/tabarka			Africa/Tunis	F+E S D A M I	daily	standard	test	Tabarka, the monitor's running capture, every day from 28 Sep 2026 on (the file grows at each weekly fetch)
+archive/tables/monitor/tn-inm/ben-guerdane.txt	tn.inm/ben-guerdane			Africa/Tunis	F+E S D A M I	daily	standard	test	Ben Guerdane, the monitor's running capture, every day from 28 Sep 2026 on (the file grows at each weekly fetch)
+archive/tables/monitor/tn-inm/tala.txt	tn.inm/tala			Africa/Tunis	F+E S D A M I	daily	standard	test	Tala, the monitor's running capture, every day from 28 Sep 2026 on (the file grows at each weekly fetch)

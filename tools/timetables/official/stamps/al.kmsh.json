@@ -1,7 +1,7 @@
 {
   "entry": "al.kmsh",
   "class": "A/D (authority)",
-  "engineHash": "b57e7649f1935bf8",
+  "engineHash": "582433da0bbbac7c",
   "broken": 0,
   "places": 3,
   "first": "2026-01-01",
@@ -18,234 +18,253 @@
   },
   "placeDays": 780,
   "heldOutDays": 415,
+  "tables": 4,
   "ramadanDays": 63,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 811,
+      "checked": 17553,
       "early": 0,
       "late": {
-        "0": 631,
-        "1": 178,
-        "2": 2,
+        "0": 10051,
+        "1": 6881,
+        "2": 621,
         "3+": 0
       },
-      "exactShare": 0.7781,
+      "exactShare": 0.5726,
       "worstLate": 2,
       "lateLimit": 3,
-      "lateLimitFrom": "class A, class D (authority)",
+      "lateLimitFrom": "class D (authority), unit tirana",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 811,
+      "checked": 17553,
       "lateEnd": 0,
       "late": {
-        "0": 646,
-        "1": 156,
-        "2": 9,
+        "0": 11373,
+        "1": 6011,
+        "2": 169,
         "3+": 0
       },
-      "exactShare": 0.7965,
+      "exactShare": 0.6479,
       "worstLate": 2,
       "lateLimit": 3,
-      "lateLimitFrom": "class A, class D (authority)",
+      "lateLimitFrom": "class D (authority), unit tirana",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 811,
+      "checked": 17553,
       "early": 0,
       "late": {
-        "0": 687,
-        "1": 119,
-        "2": 5,
+        "0": 11535,
+        "1": 5966,
+        "2": 52,
         "3+": 0
       },
-      "exactShare": 0.8471,
+      "exactShare": 0.6572,
       "worstLate": 2,
       "lateLimit": 3,
-      "lateLimitFrom": "class A, class D (authority)",
+      "lateLimitFrom": "class D (authority), unit tirana",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 811,
+      "checked": 17553,
       "early": 0,
       "late": {
-        "0": 659,
-        "1": 147,
-        "2": 5,
+        "0": 10595,
+        "1": 6801,
+        "2": 157,
         "3+": 0
       },
-      "exactShare": 0.8126,
+      "exactShare": 0.6036,
       "worstLate": 2,
       "lateLimit": 3,
-      "lateLimitFrom": "class A, class D (authority)",
+      "lateLimitFrom": "class D (authority), unit tirana",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 811,
+      "checked": 17553,
       "early": 0,
       "late": {
-        "0": 660,
-        "1": 147,
-        "2": 4,
+        "0": 10782,
+        "1": 6582,
+        "2": 189,
         "3+": 0
       },
-      "exactShare": 0.8138,
+      "exactShare": 0.6143,
       "worstLate": 2,
       "lateLimit": 3,
-      "lateLimitFrom": "class A, class D (authority)",
+      "lateLimitFrom": "class D (authority), unit tirana",
       "overLimit": 0
     },
     "isha": {
-      "checked": 811,
+      "checked": 17553,
       "early": 0,
       "late": {
-        "0": 657,
-        "1": 148,
-        "2": 6,
+        "0": 10503,
+        "1": 6738,
+        "2": 312,
         "3+": 0
       },
-      "exactShare": 0.8101,
+      "exactShare": 0.5984,
       "worstLate": 2,
       "lateLimit": 3,
-      "lateLimitFrom": "class A, class D (authority)",
+      "lateLimitFrom": "class D (authority), unit tirana",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 811,
+      "checked": 17553,
       "lateEnd": 0,
       "late": {
-        "0": 642,
-        "1": 160,
-        "2": 9,
+        "0": 10916,
+        "1": 6249,
+        "2": 388,
         "3+": 0
       },
-      "exactShare": 0.7916,
+      "exactShare": 0.6219,
       "worstLate": 2,
       "lateLimit": 3,
-      "lateLimitFrom": "class A, class D (authority)",
+      "lateLimitFrom": "class D (authority), unit tirana",
       "overLimit": 0
     }
   },
   "heldOut": {
     "placeDays": 415,
     "ramadanDays": 33,
+    "checkedByEvent": {
+      "fajr": ["2026-01-01", "2026-01-16", "2026-01-31", "2026-02-15", "2026-03-02", "2026-03-17", "2026-04-01", "2026-04-16", "2026-05-01", "2026-05-16", "2026-05-31", "2026-06-15", "2026-06-30", "2026-07-15", "2026-07-30", "2026-08-14", "2026-08-29", "2026-09-13", "2026-09-28", "2026-10-13", "2026-10-28", "2026-11-12", "2026-11-27", "2026-12-12", "2026-12-27", "2027-01-01..2027-12-31"],
+      "sunrise": ["2026-01-01", "2026-01-16", "2026-01-31", "2026-02-15", "2026-03-02", "2026-03-17", "2026-04-01", "2026-04-16", "2026-05-01", "2026-05-16", "2026-05-31", "2026-06-15", "2026-06-30", "2026-07-15", "2026-07-30", "2026-08-14", "2026-08-29", "2026-09-13", "2026-09-28", "2026-10-13", "2026-10-28", "2026-11-12", "2026-11-27", "2026-12-12", "2026-12-27", "2027-01-01..2027-12-31"],
+      "dhuhr": ["2026-01-01", "2026-01-16", "2026-01-31", "2026-02-15", "2026-03-02", "2026-03-17", "2026-04-01", "2026-04-16", "2026-05-01", "2026-05-16", "2026-05-31", "2026-06-15", "2026-06-30", "2026-07-15", "2026-07-30", "2026-08-14", "2026-08-29", "2026-09-13", "2026-09-28", "2026-10-13", "2026-10-28", "2026-11-12", "2026-11-27", "2026-12-12", "2026-12-27", "2027-01-01..2027-12-31"],
+      "asrStandard": ["2026-01-01", "2026-01-16", "2026-01-31", "2026-02-15", "2026-03-02", "2026-03-17", "2026-04-01", "2026-04-16", "2026-05-01", "2026-05-16", "2026-05-31", "2026-06-15", "2026-06-30", "2026-07-15", "2026-07-30", "2026-08-14", "2026-08-29", "2026-09-13", "2026-09-28", "2026-10-13", "2026-10-28", "2026-11-12", "2026-11-27", "2026-12-12", "2026-12-27", "2027-01-01..2027-12-31"],
+      "maghrib": ["2026-01-01", "2026-01-16", "2026-01-31", "2026-02-15", "2026-03-02", "2026-03-17", "2026-04-01", "2026-04-16", "2026-05-01", "2026-05-16", "2026-05-31", "2026-06-15", "2026-06-30", "2026-07-15", "2026-07-30", "2026-08-14", "2026-08-29", "2026-09-13", "2026-09-28", "2026-10-13", "2026-10-28", "2026-11-12", "2026-11-27", "2026-12-12", "2026-12-27", "2027-01-01..2027-12-31"],
+      "isha": ["2026-01-01", "2026-01-16", "2026-01-31", "2026-02-15", "2026-03-02", "2026-03-17", "2026-04-01", "2026-04-16", "2026-05-01", "2026-05-16", "2026-05-31", "2026-06-15", "2026-06-30", "2026-07-15", "2026-07-30", "2026-08-14", "2026-08-29", "2026-09-13", "2026-09-28", "2026-10-13", "2026-10-28", "2026-11-12", "2026-11-27", "2026-12-12", "2026-12-27", "2027-01-01..2027-12-31"],
+      "endOfEating": ["2026-01-01", "2026-01-16", "2026-01-31", "2026-02-15", "2026-03-02", "2026-03-17", "2026-04-01", "2026-04-16", "2026-05-01", "2026-05-16", "2026-05-31", "2026-06-15", "2026-06-30", "2026-07-15", "2026-07-30", "2026-08-14", "2026-08-29", "2026-09-13", "2026-09-28", "2026-10-13", "2026-10-28", "2026-11-12", "2026-11-27", "2026-12-12", "2026-12-27", "2027-01-01..2027-12-31"]
+    },
     "events": {
       "fajr": {
-        "checked": 446,
+        "checked": 415,
         "early": 0,
         "late": {
-          "0": 329,
-          "1": 115,
+          "0": 303,
+          "1": 110,
           "2": 2,
           "3+": 0
         },
-        "exactShare": 0.7377,
+        "exactShare": 0.7301,
         "worstLate": 2,
         "lateLimit": 3,
-        "lateLimitFrom": "class A, class D (authority)",
+        "lateLimitFrom": "class D (authority), unit tirana",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 446,
+        "checked": 415,
         "lateEnd": 0,
         "late": {
-          "0": 339,
-          "1": 98,
+          "0": 312,
+          "1": 94,
           "2": 9,
           "3+": 0
         },
-        "exactShare": 0.7601,
+        "exactShare": 0.7518,
         "worstLate": 2,
         "lateLimit": 3,
-        "lateLimitFrom": "class A, class D (authority)",
+        "lateLimitFrom": "class D (authority), unit tirana",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 446,
+        "checked": 415,
         "early": 0,
         "late": {
-          "0": 352,
-          "1": 89,
+          "0": 322,
+          "1": 88,
           "2": 5,
           "3+": 0
         },
-        "exactShare": 0.7892,
+        "exactShare": 0.7759,
         "worstLate": 2,
         "lateLimit": 3,
-        "lateLimitFrom": "class A, class D (authority)",
+        "lateLimitFrom": "class D (authority), unit tirana",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 446,
+        "checked": 415,
         "early": 0,
         "late": {
-          "0": 340,
-          "1": 101,
+          "0": 314,
+          "1": 96,
           "2": 5,
           "3+": 0
         },
-        "exactShare": 0.7623,
+        "exactShare": 0.7566,
         "worstLate": 2,
         "lateLimit": 3,
-        "lateLimitFrom": "class A, class D (authority)",
+        "lateLimitFrom": "class D (authority), unit tirana",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 446,
+        "checked": 415,
         "early": 0,
         "late": {
-          "0": 341,
-          "1": 101,
+          "0": 314,
+          "1": 97,
           "2": 4,
           "3+": 0
         },
-        "exactShare": 0.7646,
+        "exactShare": 0.7566,
         "worstLate": 2,
         "lateLimit": 3,
-        "lateLimitFrom": "class A, class D (authority)",
+        "lateLimitFrom": "class D (authority), unit tirana",
         "overLimit": 0
       },
       "isha": {
-        "checked": 446,
+        "checked": 415,
         "early": 0,
         "late": {
-          "0": 340,
-          "1": 100,
+          "0": 313,
+          "1": 96,
           "2": 6,
           "3+": 0
         },
-        "exactShare": 0.7623,
+        "exactShare": 0.7542,
         "worstLate": 2,
         "lateLimit": 3,
-        "lateLimitFrom": "class A, class D (authority)",
+        "lateLimitFrom": "class D (authority), unit tirana",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 446,
+        "checked": 415,
         "lateEnd": 0,
         "late": {
-          "0": 331,
-          "1": 106,
+          "0": 306,
+          "1": 100,
           "2": 9,
           "3+": 0
         },
-        "exactShare": 0.7422,
+        "exactShare": 0.7373,
         "worstLate": 2,
         "lateLimit": 3,
-        "lateLimitFrom": "class A, class D (authority)",
+        "lateLimitFrom": "class D (authority), unit tirana",
         "overLimit": 0
       }
     }
   },
+  "replays": {
+    "places": 22,
+    "placeDays": 16060
+  },
   "lateLimits": {
-    "class A: 1 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
-    },
     "class D (authority): 3 min": {
       "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+    },
+    "unit tirana: 2 min (asrStandard)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 2 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["fajr", "dhuhr", "asrStandard", "maghrib", "isha"]
+    },
+    "unit tirana: 2 min (endOfEating)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 2 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["sunrise", "endOfEating"]
     }
   },
   "units": {
@@ -262,116 +281,130 @@
         "isha": ["2026-01-01..2027-12-31"],
         "endOfEating": ["2026-01-01..2027-12-31"]
       },
+      "heldOutByEvent": {
+        "fajr": ["2027-01-01..2027-12-31"],
+        "sunrise": ["2027-01-01..2027-12-31"],
+        "dhuhr": ["2027-01-01..2027-12-31"],
+        "asrStandard": ["2027-01-01..2027-12-31"],
+        "maghrib": ["2027-01-01..2027-12-31"],
+        "isha": ["2027-01-01..2027-12-31"],
+        "endOfEating": ["2027-01-01..2027-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
-        "class A: 1 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        "unit tirana: 2 min (asrStandard)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 2 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["fajr", "dhuhr", "asrStandard", "maghrib", "isha"]
+        },
+        "unit tirana: 2 min (endOfEating)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 2 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["sunrise", "endOfEating"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 761,
+          "checked": 17503,
           "early": 0,
           "late": {
-            "0": 631,
-            "1": 130,
-            "2": 0,
+            "0": 10051,
+            "1": 6833,
+            "2": 619,
             "3+": 0
           },
-          "exactShare": 0.8292,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.5742,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit tirana",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 761,
+          "checked": 17503,
           "lateEnd": 0,
           "late": {
-            "0": 646,
-            "1": 115,
-            "2": 0,
+            "0": 11373,
+            "1": 5970,
+            "2": 160,
             "3+": 0
           },
-          "exactShare": 0.8489,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.6498,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit tirana",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 761,
+          "checked": 17503,
           "early": 0,
           "late": {
-            "0": 687,
-            "1": 74,
-            "2": 0,
+            "0": 11535,
+            "1": 5921,
+            "2": 47,
             "3+": 0
           },
-          "exactShare": 0.9028,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.659,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit tirana",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 761,
+          "checked": 17503,
           "early": 0,
           "late": {
-            "0": 659,
-            "1": 102,
-            "2": 0,
+            "0": 10595,
+            "1": 6756,
+            "2": 152,
             "3+": 0
           },
-          "exactShare": 0.866,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.6053,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit tirana",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 761,
+          "checked": 17503,
           "early": 0,
           "late": {
-            "0": 660,
-            "1": 101,
-            "2": 0,
+            "0": 10782,
+            "1": 6536,
+            "2": 185,
             "3+": 0
           },
-          "exactShare": 0.8673,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.616,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit tirana",
           "overLimit": 0
         },
         "isha": {
-          "checked": 761,
+          "checked": 17503,
           "early": 0,
           "late": {
-            "0": 657,
-            "1": 104,
-            "2": 0,
+            "0": 10503,
+            "1": 6694,
+            "2": 306,
             "3+": 0
           },
-          "exactShare": 0.8633,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.6001,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit tirana",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 761,
+          "checked": 17503,
           "lateEnd": 0,
           "late": {
-            "0": 642,
-            "1": 119,
-            "2": 0,
+            "0": 10916,
+            "1": 6208,
+            "2": 379,
             "3+": 0
           },
-          "exactShare": 0.8436,
-          "worstLate": 1,
-          "lateLimit": 1,
-          "lateLimitFrom": "class A",
+          "exactShare": 0.6237,
+          "worstLate": 2,
+          "lateLimit": 2,
+          "lateLimitFrom": "unit tirana",
           "overLimit": 0
         }
       }

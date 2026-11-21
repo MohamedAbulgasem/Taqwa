@@ -162,6 +162,44 @@ class ProveRecipesTest {
     }
 
     @Test
+    fun `an index line beside a clone line reads a unit new to its fetcher by its hand-read row and plans a cloned key once`() {
+        // Bergen: a table read by hand (no monitor capture to clone), then the fetcher's first capture with ten more days.
+        table("archive/tables/held/src-e/bergen-2026-09-01.txt", LocalDate(2026, 9, 1), 30)
+        table("archive/tables/monitor/src-e/bergen.txt", LocalDate(2026, 9, 1), 40)
+        // Paris: an earlier monitor capture, cloned by the first line; the index names the same unit.
+        table("archive/tables/pinned/src-e/2026-09-01/paris.txt", LocalDate(2026, 9, 1), 5)
+        table("archive/tables/monitor/src-e/paris.txt", LocalDate(2026, 9, 1), 12)
+        // Narvik: read by hand too, and the capture brings no day the gate does not hold.
+        table("archive/tables/held/src-e/narvik-2026-09-01.txt", LocalDate(2026, 9, 1), 30)
+        table("archive/tables/monitor/src-e/narvik.txt", LocalDate(2026, 9, 1), 30)
+        gateDir.resolve("x.tsv").writeText(
+            header6 +
+                "archive/tables/held/src-e/bergen-2026-09-01.txt\tx.e/u1\t\t\tEurope/Oslo\tF+E S D A M I\tdaily\tstandard\ttest\tBergen, read by hand\t\n" +
+                "archive/tables/pinned/src-e/2026-09-01/paris.txt\tx.e/u2\t\t\tEurope/Paris\tF+E S D A M I\tdaily\tstandard\ttest\tParis, the monitor capture of 1 Sep 2026\t\n" +
+                "archive/tables/held/src-e/narvik-2026-09-01.txt\tx.e/u3\t\t\tEurope/Oslo\tF+E S D A M I\tdaily\tstandard\ttest\tNarvik, read by hand\t\n",
+        )
+        val (planned, left) = plan(
+            recipes("src-e\t*\tx.tsv\tsame\t*\tsame\tall\t-", "src-e\t*\tx.tsv\tindex\t-\tindex\tall\t-"),
+            listOf(
+                capture("src-e", "bergen", columns = "F S D A M I", entry = "x.e/u1"),
+                capture("src-e", "paris", columns = "F S D A M I", entry = "x.e/u2"),
+                capture("src-e", "narvik", columns = "F S D A M I", entry = "x.e/u3"),
+            ),
+        )
+        assertEquals(listOf("bergen", "paris"), planned.map { it.path.substringAfterLast('/').removeSuffix(".txt") }.sorted())
+        val bergen = planned.single { it.entry == "x.e/u1" }
+        assertEquals("archive/tables/pinned/src-e/2026-10-05/bergen.txt", bergen.path)
+        assertEquals("x.e/u1", bergen.entry)
+        assertEquals("", bergen.cells["lat"])
+        // The hand-read row's columns, not the index's: its table prints the same on every day both hold.
+        assertEquals("F+E S D A M I", bergen.cells["columns"], bergen.family)
+        assertEquals("Europe/Oslo", bergen.cells["zone"])
+        assertEquals(40, bergen.days.size)
+        assertEquals(12, planned.single { it.entry == "x.e/u2" }.days.size)
+        assertTrue(left.isEmpty(), left.toString())
+    }
+
+    @Test
     fun `a capture no recipe target picks up is reported, not skipped in silence`() {
         table("archive/tables/monitor/src-e/oslo.txt", LocalDate(2026, 10, 1), 3)
         gateDir.resolve("x-cautious.tsv").writeText(header6)

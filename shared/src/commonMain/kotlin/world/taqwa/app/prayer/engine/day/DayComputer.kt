@@ -11,6 +11,8 @@ import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import world.taqwa.app.domain.Prayer
+import world.taqwa.app.prayer.engine.DayPipeline
+import world.taqwa.app.prayer.engine.astro.Side
 import world.taqwa.app.prayer.engine.astro.SolarMath
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.CURVE_REFERENCE_YEAR
@@ -22,6 +24,7 @@ import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.FixedPointMode
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.HighLatRule
+import world.taqwa.app.prayer.engine.method.ImsakFrom
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.RamadanRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
@@ -50,9 +53,15 @@ import kotlin.time.Instant
  *    on the evenings before them; a night too close to call takes each event's safe side (R61),
  *    and where the rule is read at the user's own point every night takes the latest Fajr and Isha
  *    and the earliest end of sahur across a band of latitude (R65).
+ *    Each crossing is read on its side (the final review of 20 Nov 2026,
+ *    [world.taqwa.app.prayer.engine.astro.Crossing]): a start (Fajr, Maghrib, Isha, and every floor a start keeps) the
+ *    later of the iteration's step and the sun's own moment, an end (sunrise, sunset, the end of eating, imsak, red
+ *    twilight, and every cap an end keeps) the earlier; an estimate the same way, through [HighLatitude.sign].
  * 2. Starts take the latest candidate; sunrise, sunset, the end of eating and imsak the earliest
  *    over the given and the fixed point and the [TimetableMethod.endPoints] (never the start points);
- *    the other tables' [TimetableMethod.envelopePoints] count for both.
+ *    the other tables' [TimetableMethod.envelopePoints] count for both. An imsak counted back from
+ *    the authority's printed Fajr ([ImsakFrom.PrintedFajr]) reads that Fajr where the starts are read,
+ *    with its own margin, and is bound by point 7 below to the table's own point.
  * 3. The authority's offsets (minutes, monthly seconds, Ramadan seconds) and our margins are added,
  *    then starts are rounded up and ends down to the minute. An [IshaRule.AfterMaghrib] counts its
  *    minutes from the authority's Maghrib: raw sunset plus the authority's Maghrib offsets,
@@ -93,7 +102,9 @@ import kotlin.time.Instant
  *    own day rides beside the method's (the nearest table past its bound), the method's own day at the user's point,
  *    every step above applied and nothing else beside it, and each table's own day at its own point, computed the same
  *    way with its own method (its curves read at its own latitude), give the day shown as their safe side ([safeSide]):
- *    each start the later, sunrise, sunset, the end of eating, imsak and each end the earlier.
+ *    each start the later, sunrise, sunset, the end of eating, imsak and each end the earlier. A day alongside
+ *    that begins after a date ([Alongside.after][world.taqwa.app.prayer.engine.method.Alongside.after]) rides only
+ *    on the dates after it.
  *
  * Ramadan, the month and the Isha minutes are always [date]'s, even when a day rule borrows a
  * neighbouring date's astronomy. Where [date] itself has no sunrise or no sunset the day is
@@ -137,7 +148,7 @@ object DayComputer {
             // is without them, and each other table's own day at its own point, each read with its own curves; the day
             // shown is the safe side of them all.
             val own = compute(method.copy(alongside = emptyList()), point, date, zone, school, ramadan, lagDates, lagDatesUntil)
-            return method.alongside.fold(own) { day, other ->
+            return method.alongside.filter { it.rides(date) }.fold(own) { day, other ->
                 day.safest(compute(other.method, other.point, date, zone, school, ramadan, lagDates, lagDatesUntil))
             }
         }
@@ -153,11 +164,11 @@ object DayComputer {
      * [this] reading a table's year that has no 29 February as if it had one, on the day after its 28
      * February (its 1 March, which this computes): February's monthly offsets and 29 February's curve
      * slot. A town that is a base table plus a month's offset prints its 29 February with February's
-     * (the IZ BiH vaktija on 29 February 2028, between 28 February and 1 March, a minute from each at
-     * Sarajevo and up to 3 from 1 March at Banja Luka and Bihać, whose offsets change on 1 March).
-     * Against vaktija.ba's own February 2028 (review of track T4, checked outside the gate's rows, as
-     * 2028 is past the stamps), 28 February alone was a minute early at Sarajevo's Isha; the safe side
-     * of the two is never early, and up to 3 min late at Banja Luka's and Bihać's Isha that day.
+     * (the IZ BiH vaktija on 29 February 2028: between 28 February and 1 March at Sarajevo, and with
+     * February's offset at Banja Luka and Bihać, whose offsets change on 1 March). Against vaktija.ba's
+     * own February 2028 (review of track T4, checked outside the gate's rows, as 2028 is past the
+     * stamps), 28 February's day alone was early at Sarajevo's Isha; the safe side of the two is never
+     * early, and late at Banja Luka's and Bihać's Isha that day, past class B's 2 min.
      */
     private fun TimetableMethod.asLeapDay(): TimetableMethod {
         val march = Month.MARCH.number - 1
@@ -353,7 +364,7 @@ object DayComputer {
          * ([limited]); off only for reading the next day's end of eating, which needs no Isha.
          */
         fun day(date: LocalDate, capIsha: Boolean = true): PrayerDay {
-            val own = clocked(date, banded(date, limited(date, unlimited(date), capIsha)))
+            val own = clocked(date, banded(date, limited(date, unlimited(date), capIsha)), nightCheck = capIsha)
             val table = atFixedPoint?.day(date, capIsha)
             val alone = atUserAlone?.day(date, capIsha)
             val others = atOtherTables.map { it.day(date, capIsha) }
@@ -399,9 +410,9 @@ object DayComputer {
          * A bound the date's own sun cannot give (no sunrise or sunset) leaves the moved time as it is.
          */
         private fun PrayerDay.onOwnSun(date: LocalDate): PrayerDay {
-            val rises = here.map { sky(it).sunrise(date) }
-            val sets = here.map { sky(it).sunset(date) }
-            val setsForStarts = (startHere + method.startPoints).map { sky(it).sunset(date) }
+            val rises = here.map { sky(it).sunrise(date)?.end }
+            val sets = here.map { sky(it).sunset(date)?.end }
+            val setsForStarts = (startHere + method.startPoints).map { sky(it).sunset(date)?.start }
             val sunriseShown = if (rises.all { it != null }) minOf(sunrise, endOf(rises.minOf { it!! })) else sunrise
             val sunsetShown = if (sets.all { it != null }) endOf(sets.minOf { it!! }) else sunset
             val sunFloor = if (setsForStarts.all { it != null }) endOf(setsForStarts.maxOf { it!! }) + 1.minutes else null
@@ -410,7 +421,7 @@ object DayComputer {
             val beforeHold = maghribBeforeHold?.let { own -> sunFloor?.let { maxOf(own, it) } ?: own }
             val held = maghribHeld && beforeHold != null && maghribShown > beforeHold
             val ishaShown = maxOf(isha, maghribShown + 1.minutes)
-            val redTwilight = here.mapNotNull { sky(it).altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
+            val redTwilight = here.mapNotNull { sky(it).crossing(date, -Ends.RED_TWILIGHT_DEG, morning = false)?.end }
                 .minOrNull()?.let(::endOf)
             var fajrShown = fajr
             var eating = endOfEating
@@ -482,7 +493,7 @@ object DayComputer {
          */
         private fun PrayerDay.fajrBeforeSunrise(date: LocalDate): PrayerDay {
             if (fajr < sunrise) return this
-            val sun = sky(point).sunrise(date)?.let(::endOf)
+            val sun = sky(point).sunrise(date)?.end?.let(::endOf)
             if (sun == null || sun > fajr) {
                 val moved = fajr + 1.minutes
                 return copy(sunrise = moved, ends = ends + (Prayer.FAJR to moved))
@@ -537,11 +548,21 @@ object DayComputer {
          * - The end of eating: the rule's where the rule's Fajr is shown (the authority's own dawn as
          *   an end, spec §3.3), never after that Fajr; otherwise the earliest of the rule's, the day's
          *   own and the Fajr shown.
+         * - A short night (ruling R292): where the Maghrib shown is the sun's, after the rule's, and the
+         *   Isha after it would not come before the next day's end of eating, Maghrib is the minute after
+         *   the sun has set at every start point (never before the rule's) and Isha the rule's where after
+         *   it, else the minute after it, so the night holds both before the next dawn. Only where that
+         *   fits. On a night shorter still, one the real sun alone makes too short for Isha's end
+         *   ([DayPipeline.nightTooShortForIsha]: the day declares that end not shown, ruling R302, the owner's
+         *   (a′)), Maghrib and Isha are pulled the same way wherever that Maghrib is before the next day's
+         *   Fajr, and Isha shows no end (ruling R26); where even that Maghrib is not before it, nothing moves:
+         *   Maghrib and Isha come after the next sunrise. [nightCheck]
+         *   is off for the next day read here, which needs only its end of eating and Fajr.
          * A time shown from the rule is set by rule exactly where the rule calls it an estimate; the
          * rule's own declarations join [PrayerDay.notFollowed]. A polar day whose every time the rule
          * gives is no longer [PrayerDay.polar]: nothing on it follows the nearest latitude.
          */
-        private fun clocked(date: LocalDate, day: PrayerDay): PrayerDay {
+        private fun clocked(date: LocalDate, day: PrayerDay, nightCheck: Boolean = true): PrayerDay {
             val rule = method.clockRule ?: return day
             val at = (endsHere + extraStarts).distinct().associateWith { rule.on(date, it, zone) }
             val forStarts = (startHere + extraStarts).distinct().map { at.getValue(it) }
@@ -592,15 +613,45 @@ object DayComputer {
             val noSunset = at.values.all { it.noSunset }
             val ruleMaghrib = start({ it.maghrib }, margins.maghrib)
             val maghribFromRule = ruleMaghrib != null && (noSunset || ruleMaghrib.at >= day.maghrib)
-            val maghrib = if (maghribFromRule) shown(Prayer.MAGHRIB, ruleMaghrib!!) else day.maghrib
+            var maghrib = if (maghribFromRule) shown(Prayer.MAGHRIB, ruleMaghrib!!) else day.maghrib
             val ruleSunset = forEnds.map { it.sunset }.takeIf { noSunset && it.all { s -> s != null } }?.minOf { it!! }
             val sunset = ruleSunset?.let(::endOf) ?: day.sunset
             val ruleIsha = start({ it.isha }, margins.isha)
-            val isha = if (ruleIsha != null && ruleIsha.at > maghrib) {
+            var isha = if (ruleIsha != null && ruleIsha.at > maghrib) {
                 shown(Prayer.ISHA, ruleIsha)
             } else {
                 maxOf(day.isha, maghrib + 1.minutes)
             }
+            // Ruling R292: a night too short for the sun's Maghrib and the Isha after it before the next dawn.
+            var pulled = false
+            var tooShortNight = false
+            if (nightCheck && !maghribFromRule && ruleMaghrib != null) {
+                // The sun's floor where it sets: a start point the sun does not set at (the table's own, a little
+                // further north) gives the rule's Maghrib, which [ruleMaghrib] already reads there.
+                val sunFloor = sky(point).sunset(date)?.start?.let { own ->
+                    endOf((startHere + extraStarts).distinct().mapNotNull { sky(it).sunset(date)?.start }.plus(own).max()) + 1.minutes
+                }
+                val earliest = sunFloor?.let { maxOf(ruleMaghrib.at, it) }
+                if (earliest != null && earliest < maghrib) {
+                    val next = this.day(date.plus(1, DateTimeUnit.DAY), capIsha = false)
+                    val nextEating = next.endOfEating
+                    val ishaInNight = if (ruleIsha != null && ruleIsha.at > earliest) ruleIsha.at else earliest + 1.minutes
+                    // Ruling R302 (the owner's (a′)): on a night the real sun makes too short for Isha's end, the day
+                    // declares it not shown, and Maghrib is still pulled to the minute after the sun has set wherever that
+                    // is before the next day's Fajr: at night, not after the next dawn. Where even that is not before it,
+                    // nothing moves (Maghrib and Isha after the next sunrise, the planner skips both alerts, R83).
+                    val tooShort = isha >= nextEating && ishaInNight >= nextEating && earliest < next.fajr &&
+                        DayPipeline.nightTooShortForIsha(point, date, zone)
+                    tooShortNight = tooShort
+                    if (isha >= nextEating && (ishaInNight < nextEating || tooShort)) {
+                        // IRN's own Maghrib where it is the later (then set by rule as the rule says), else the sun's.
+                        maghrib = if (earliest == ruleMaghrib.at) shown(Prayer.MAGHRIB, ruleMaghrib) else earliest
+                        isha = if (ruleIsha != null && ruleIsha.at > earliest) shown(Prayer.ISHA, ruleIsha) else ishaInNight
+                        pulled = true
+                    }
+                }
+            }
+            if (nightCheck) ClockedProbe.listener?.invoke(point, date, pulled, tooShortNight)
             val ruleEating = forEnds.map { it.endOfEating }.takeIf { it.all { e -> e != null } }
                 ?.minOf { it!! }?.let { endOf(it + method.endOfEatingMarginSeconds) }
             // Where the rule's Fajr is shown its dawn is the authority's own end (spec §3.3); otherwise
@@ -611,7 +662,7 @@ object DayComputer {
                 listOfNotNull(day.endOfEating, ruleEating, fajr).min()
             }
             // Red twilight ends Maghrib only where it is after the Maghrib shown (a rule's Maghrib can be later).
-            val redTwilight = endsHere.mapNotNull { sky(it).altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
+            val redTwilight = endsHere.mapNotNull { sky(it).crossing(date, -Ends.RED_TWILIGHT_DEG, morning = false)?.end }
                 .minOrNull()?.let(::endOf)?.takeIf { it > maghrib }
             val starts = mapOf(Prayer.FAJR to fajr, Prayer.DHUHR to dhuhr, Prayer.ASR to asr, Prayer.MAGHRIB to maghrib)
             val ends = Ends.of(
@@ -627,9 +678,10 @@ object DayComputer {
                 isha = isha, sunset = sunset, endOfEating = endOfEating, imsak = day.imsak?.let { minOf(it, fajr) },
                 ends = ends, setByRule = setByRule, notFollowed = notFollowed,
                 polar = day.polar && !fromRule.containsAll(Prayer.entries),
-                // A Maghrib the rule shows is the rule's (the sun's, or set by rule), never the day's own hold.
-                maghribHeld = day.maghribHeld && !maghribFromRule,
-                maghribBeforeHold = day.maghribBeforeHold.takeUnless { maghribFromRule },
+                // A Maghrib the rule shows is the rule's (the sun's, or set by rule), never the day's own hold; nor is one
+                // a short night pulls to the sun (R292).
+                maghribHeld = day.maghribHeld && !maghribFromRule && !pulled,
+                maghribBeforeHold = day.maghribBeforeHold.takeUnless { maghribFromRule || pulled },
             )
         }
 
@@ -682,7 +734,7 @@ object DayComputer {
         private fun ruleNight(date: LocalDate): RuleNight? {
             val rule = method.highLatitude as? HighLatRule.DumRtSummer ?: return null
             if (uncertain(rule, date)) return RuleNight.UNCERTAIN
-            val white = here.all { HighLatitude.sign(sky(it), method.highLatitude, fajrTwilight, date)?.estimated != false }
+            val white = here.all { HighLatitude.sign(sky(it), method.highLatitude, fajrTwilight, date, Side.START)?.estimated != false }
             return if (white) RuleNight.WHITE else null
         }
 
@@ -851,13 +903,14 @@ object DayComputer {
             }
             if (HighLatitude.surelyOccurs(sky, twilight, date)) return false
             if (sky.sunrise(date) == null || sky.sunset(date) == null) return true
-            return HighLatitude.sign(sky, method.highLatitude, twilight, date)?.estimated != false
+            return HighLatitude.sign(sky, method.highLatitude, twilight, date, if (twilight.morning) Side.END else Side.START)?.estimated != false
         }
 
         /** Enough days for a jump of a whole night and the bound's own room, at most [MAX_LOOKBACK_DAYS]. */
         private fun lookbackDays(date: LocalDate, room: Double): Int {
             val sky = sky(here.first())
-            val night = sky.sunset(date)?.let { dusk -> sky.sunrise(date.plus(1, DateTimeUnit.DAY))?.minus(dusk) }
+            // The night at its longest: sunset at its earlier moment, the next sunrise at its later.
+            val night = sky.sunset(date)?.end?.let { dusk -> sky.sunrise(date.plus(1, DateTimeUnit.DAY))?.start?.minus(dusk) }
                 ?: SolarMath.SECONDS_PER_DAY
             val days = ceil((night + room) / (DAILY_LIMIT.inWholeSeconds - DRIFT_SECONDS)).toInt() + 2
             return minOf(MAX_LOOKBACK_DAYS, days)
@@ -881,9 +934,10 @@ object DayComputer {
          */
         private fun ishaAbove(offsets: Offsets): Double {
             val afterMaghrib = when (val rule = method.isha) {
-                is IshaRule.Angle -> method.ramadan?.ishaFloorMinutesAfterMaghrib?.let {
-                    it * 60.0 + abs(offsets.authority(Prayer.MAGHRIB)) + abs(method.ramadan.maghribExtraSeconds)
-                } ?: 0.0
+                is IshaRule.Angle -> listOfNotNull(method.ramadan?.ishaFloorMinutesAfterMaghrib, method.ishaFloorMinutesAfterMaghrib)
+                    .maxOrNull()?.let {
+                        it * 60.0 + abs(offsets.authority(Prayer.MAGHRIB)) + abs(method.ramadan?.maghribExtraSeconds ?: 0)
+                    } ?: 0.0
                 is IshaRule.AfterMaghrib -> maxOf(rule.minutes, rule.ramadanMinutes) * 60.0 +
                     abs(offsets.authority(Prayer.MAGHRIB)) + abs(method.ramadan?.maghribExtraSeconds ?: 0)
             }
@@ -896,7 +950,8 @@ object DayComputer {
         /** The mirror of [ishaAbove]: how far before the middle of its night an end of eating or imsak can lie. */
         private fun eatingBelow(offsets: Offsets): Double {
             val fajr = abs(offsets.authority(Prayer.FAJR)) + abs(method.endOfEatingMarginSeconds) +
-                abs(offsets.total(Prayer.FAJR)) + method.fajrAfterDawnMinutes * 60.0
+                abs(offsets.total(Prayer.FAJR)) + method.fajrAfterDawnMinutes * 60.0 +
+                abs((method.imsakFrom as? ImsakFrom.PrintedFajr)?.marginSeconds ?: 0)
             val beforeFajr = ((method.endOfEating as? EndOfEating.MinutesBeforeFajr)?.minutes ?: 0) * 60.0
             val imsak = (method.imsakMinutesBeforeFajr ?: 0) * 60.0
             val white = (method.highLatitude as? HighLatRule.DumRtSummer)?.let {
@@ -996,14 +1051,19 @@ object DayComputer {
             val sunrise = end(Prayer.SUNRISE, substitute.sunrise, { it.sunrise.real() }, { it.sunrise }, offsets.total(Prayer.SUNRISE))
             val transit = startOf(ownStarts.maxOf { it.transit } + offsets.total(Prayer.DHUHR))
             val dhuhr = method.fixedDhuhrLocalMinutes?.let { maxOf(transit, localTime(date, it, zone)) } ?: transit
-            val asr = start(Prayer.ASR, substitute.asr, { it.asr.real() }, { it.asr }, offsets.total(Prayer.ASR))
-            val asrOther = start(null, substitute.asrOther, { it.asrOther.real() }, { it.asrOther }, offsets.total(Prayer.ASR))
+            val fixedAsr = method.fixedAsrLocalMinutes?.let { localTime(date, it, zone) }
+            // The Asr the sky gives, in each school, before a national Asr clock holds it later ([TimetableMethod
+            // .fixedAsrLocalMinutes]), which no clock moves for Dhuhr's end either (the trust audit's F2).
+            val asrBySky = start(Prayer.ASR, substitute.asr, { it.asr.real() }, { it.asr }, offsets.total(Prayer.ASR))
+            val asrOtherBySky = start(null, substitute.asrOther, { it.asrOther.real() }, { it.asrOther }, offsets.total(Prayer.ASR))
+            val asr = if (fixedAsr != null) maxOf(asrBySky, fixedAsr) else asrBySky
+            val asrOther = if (fixedAsr != null) maxOf(asrOtherBySky, fixedAsr) else asrOtherBySky
             val maghribOffset = offsets.total(Prayer.MAGHRIB) + offsets.ramadanMaghrib
             val maghrib = start(Prayer.MAGHRIB, substitute.maghrib, { it.sunset.real() }, { it.sunset }, maghribOffset)
             val isha = when (val rule = method.isha) {
                 is IshaRule.Angle -> {
                     val angle = start(Prayer.ISHA, substitute.isha, { it.dusk }, { it.realDusk }, offsets.total(Prayer.ISHA))
-                    // Ruling R74: the Ramadan floor on top, same as the ordinary (non-polar) day.
+                    // Ruling R74: the Ramadan floor on top (and a method's every-date floor), same as the ordinary (non-polar) day.
                     offsets.ishaFloorMinutes?.let { maxOf(angle, maghrib + it.minutes) } ?: angle
                 }
                 is IshaRule.AfterMaghrib -> start(
@@ -1012,23 +1072,31 @@ object DayComputer {
                         offsets.total(Prayer.ISHA),
                 )
             }
-            val sunset = end(null, substitute.sunset, { it.sunset.real() }, { it.sunset }, 0)
+            val sunset = end(null, substitute.sunset, { it.sunsetEnd.real() }, { it.sunsetEnd }, 0)
             val dawnEndOffset = offsets.authority(Prayer.FAJR) + method.endOfEatingMarginSeconds
             val endOfEating = when (val rule = method.endOfEating) {
-                EndOfEating.SameAsFajrDawn -> end(null, substitute.endOfEating, { it.dawn }, { it.realDawn }, dawnEndOffset)
+                EndOfEating.SameAsFajrDawn -> end(null, substitute.endOfEating, { it.dawnEnd }, { it.realDawnEnd }, dawnEndOffset)
                 is EndOfEating.DawnAngle, is EndOfEating.DawnOrMiddle ->
                     end(null, substitute.endOfEating, { it.eatingDawn }, { it.realEatingDawn }, method.endOfEatingMarginSeconds)
                 is EndOfEating.MinutesBeforeFajr ->
-                    end(null, substitute.endOfEating, { it.dawn }, { it.realDawn }, dawnEndOffset - rule.minutes * 60)
+                    end(null, substitute.endOfEating, { it.dawnEnd }, { it.realDawnEnd }, dawnEndOffset - rule.minutes * 60)
             }
+            // Every imsak counted back from the place's own dawn as an end here, an ImsakFrom.PrintedFajr's too.
             val imsak = substitute.imsak?.let { theirs ->
-                end(null, theirs, { it.dawn }, { it.realDawn }, dawnEndOffset - (method.imsakMinutesBeforeFajr ?: 0) * 60)
+                end(null, theirs, { it.dawnEnd }, { it.realDawnEnd }, dawnEndOffset - (method.imsakMinutesBeforeFajr ?: 0) * 60)
             }
 
-            // Dhuhr ends at the Standard Asr shown where the place gives it, else at the earlier of
+            // Dhuhr ends at the place's own Standard Asr where the place gives it, else at the earlier of
             // the substitute's and the place's own; Maghrib at the earlier of Isha and the place's
             // own red twilight (and the substitute's own end, where Isha is borrowed).
-            val standardAsr = if (school == AsrSchool.STANDARD) asr else asrOther
+            // Ruling R265 (G33): read as an end, the earliest over the ends' points, not the starts' rounded Asr.
+            val standardAsr = end(
+                null,
+                substitute.ends[Prayer.DHUHR] ?: if (school == AsrSchool.STANDARD) substitute.asr else substitute.asrOther,
+                { (if (school == AsrSchool.STANDARD) it.asr else it.asrOther).real() },
+                { if (school == AsrSchool.STANDARD) it.asr else it.asrOther },
+                minOf(0, offsets.total(Prayer.ASR)),
+            )
             val ownRedTwilight = own.mapNotNull { it.redTwilight }.minOrNull()?.let(::endOf)
             val maghribEndCap = listOfNotNull(
                 ownRedTwilight,
@@ -1066,7 +1134,7 @@ object DayComputer {
          * What the place has on a polar [date] at [sky]'s point: its dawn and dusk where their own
          * nights exist (the real sign, else its own estimate), its real crossings for binding what
          * is borrowed, and its sunrise, transit, Asr (while its sun is up at noon), sunset and red
-         * twilight where they occur.
+         * twilight where they occur; each crossing on the side of what reads it (a start's or an end's).
          */
         private fun ownSigns(sky: Sky, date: LocalDate): OwnSigns {
             val clock = sky.clock(date)
@@ -1080,19 +1148,23 @@ object DayComputer {
             val lastNight = sunrise != null && sky.sunset(date.minus(1, DateTimeUnit.DAY)) != null
             val tonight = sunset != null && sky.sunrise(date.plus(1, DateTimeUnit.DAY)) != null
             val rule = method.highLatitude
+            val realDawn = sky.crossing(date, -fajrDegrees(method, date), morning = true, biasDeg = fajrBias(method, date))
             return OwnSigns(
-                dawn = if (lastNight) HighLatitude.sign(sky, rule, fajrTwilight, date) else null,
-                eatingDawn = if (lastNight && ownEatingDawn) HighLatitude.sign(sky, eatingRule, eatingTwilight, date) else null,
-                realDawn = sky.altitudeTime(date, -fajrDegrees(method, date), morning = true, biasDeg = fajrBias(method, date)),
-                realEatingDawn = if (ownEatingDawn) sky.altitudeTime(date, -eatingTwilight.degreesOn(date), morning = true) else null,
-                sunrise = sunrise,
+                dawn = if (lastNight) HighLatitude.sign(sky, rule, fajrTwilight, date, Side.START) else null,
+                dawnEnd = if (lastNight) HighLatitude.sign(sky, rule, fajrTwilight, date, Side.END) else null,
+                eatingDawn = if (lastNight && ownEatingDawn) HighLatitude.sign(sky, eatingRule, eatingTwilight, date, Side.END) else null,
+                realDawn = realDawn?.start,
+                realDawnEnd = realDawn?.end,
+                realEatingDawn = if (ownEatingDawn) sky.crossing(date, -eatingTwilight.degreesOn(date), morning = true)?.end else null,
+                sunrise = sunrise?.end,
                 transit = transit,
                 asr = if (sunUp) clock.asr(school.shadowFactor, method.asrModel, asrBias) else null,
                 asrOther = if (sunUp) clock.asr(school.other.shadowFactor, method.asrModel, asrBias) else null,
-                sunset = sunset,
-                dusk = if (tonight) ishaTwilight?.let { HighLatitude.sign(sky, rule, it, date) } else null,
-                realDusk = (method.isha as? IshaRule.Angle)?.let { sky.altitudeTime(date, -ishaDegrees(method, it, date), morning = false) },
-                redTwilight = sky.altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false),
+                sunset = sunset?.start,
+                sunsetEnd = sunset?.end,
+                dusk = if (tonight) ishaTwilight?.let { HighLatitude.sign(sky, rule, it, date, Side.START) } else null,
+                realDusk = (method.isha as? IshaRule.Angle)?.let { sky.crossing(date, -ishaDegrees(method, it, date), morning = false)?.start },
+                redTwilight = sky.crossing(date, -Ends.RED_TWILIGHT_DEG, morning = false)?.end,
             )
         }
 
@@ -1131,7 +1203,7 @@ object DayComputer {
             }
             val endSkies = endPoints.map { sky(it) }
             val forEnds = atHere + endSkies.flatMap { sky -> shifts.map { rawEvents(sky, date, it) ?: return null } }
-            val sunsetHere = (skies + endSkies).minOf { it.sunset(date) ?: return null }
+            val sunsetHere = (skies + endSkies).minOf { it.sunset(date)?.end ?: return null }
 
             fun latest(event: (RawEvents) -> Double) = forStarts.maxOf(event)
             fun earliest(event: (RawEvents) -> Double) = forEnds.minOf(event)
@@ -1153,8 +1225,21 @@ object DayComputer {
             )
             val transit = startOf(latest { it.transit } + total(Prayer.DHUHR))
             val dhuhr = method.fixedDhuhrLocalMinutes?.let { maxOf(transit, localTime(date, it, zone)) } ?: transit
-            val asr = startOf(latest { it.asr } + total(Prayer.ASR))
-            val asrOther = startOf(latest { it.asrOther } + total(Prayer.ASR))
+            val fixedAsr = method.fixedAsrLocalMinutes?.let { localTime(date, it, zone) }
+            // The Asr the sky gives, in each school, before a national Asr clock holds it later ([TimetableMethod
+            // .fixedAsrLocalMinutes], COSIM's 16:00). No clock moves Dhuhr's end either: read after the clock, it stood
+            // at 16:00 in Côte d'Ivoire, up to 45 minutes after the shadow-1 Asr that ends it (the trust audit's F2).
+            val asrBySky = startOf(latest { it.asr } + total(Prayer.ASR))
+            val asrOtherBySky = startOf(latest { it.asrOther } + total(Prayer.ASR))
+            val asr = if (fixedAsr != null) maxOf(asrBySky, fixedAsr) else asrBySky
+            val asrOther = if (fixedAsr != null) maxOf(asrOtherBySky, fixedAsr) else asrOtherBySky
+            // Dhuhr's end is an end (ruling R265, the second trust audit's G33): the Standard Asr read at the ends'
+            // points (the user's, the fixed point and the end points, never the start points), the earliest, less any
+            // minutes that put the authority's Asr earlier than the sky's, rounded down. Read from the starts' Asr it
+            // stood up to 16 min after the shadow-1 Asr at a northern Ivorian town and 12 in Sughd.
+            val dhuhrEnd = endOf(
+                earliest { if (school == AsrSchool.STANDARD) it.asr else it.asrOther } + minOf(0, total(Prayer.ASR)),
+            )
             val maghribRaw = latest { it.sunset }
             val maghribAt = maghribRaw + total(Prayer.MAGHRIB) + ramadanMaghrib
             val maghribBySun = startOf(maghribAt)
@@ -1169,13 +1254,14 @@ object DayComputer {
             }
             var isha = startOf(ishaRaw + total(Prayer.ISHA))
             // Ruling R74: on the entry's Ramadan dates, an angle Isha is never earlier than the
-            // shown Maghrib plus the authority's floor (Sudan: 90 min against a Fiqh Academy imsakiya).
+            // shown Maghrib plus the authority's floor (Sudan: 90 min against a Fiqh Academy imsakiya);
+            // a method's every-date floor the same way on every date (Tajikistan: Khufton at Shom + 90).
             if (method.isha is IshaRule.Angle) {
                 offsets.ishaFloorMinutes?.let { floorMinutes -> isha = maxOf(isha, maghrib + floorMinutes.minutes) }
             }
 
             // The authority's dawn as an end: its Fajr minutes, without our start margin, rounded down.
-            val dawnEnd = endOf(earliest { it.dawn } + offsets.authority(Prayer.FAJR) + method.endOfEatingMarginSeconds)
+            val dawnEnd = endOf(earliest { it.dawnEnd } + offsets.authority(Prayer.FAJR) + method.endOfEatingMarginSeconds)
             var endOfEating = when (val rule = method.endOfEating) {
                 EndOfEating.SameAsFajrDawn -> dawnEnd
                 is EndOfEating.DawnAngle, is EndOfEating.DawnOrMiddle ->
@@ -1200,7 +1286,7 @@ object DayComputer {
             val white = method.highLatitude as? HighLatRule.DumRtSummer
             if (white != null) {
                 val ruleFajr = startOf(
-                    latest { it.sunrise } + offsets.authority(Prayer.SUNRISE) + method.margins[Prayer.FAJR] -
+                    latest { it.sunriseStart } + offsets.authority(Prayer.SUNRISE) + method.margins[Prayer.FAJR] -
                         white.sahurBeforeSunriseMinutes * 60,
                 )
                 val ruleEnd = sunrise - white.sahurBeforeSunriseMinutes.minutes
@@ -1245,9 +1331,9 @@ object DayComputer {
             val tableShift = if (method.fixedPointMode == FixedPointMode.TABLE) offsets.authority(Prayer.SUNRISE) else 0
             val sunset = endOf(sunsetHere + tableShift)
             val own = ownEndsSky
-            val asrEnd = own?.sunset(date)?.let { minOf(sunset, endOf(it)) } ?: sunset
+            val asrEnd = own?.sunset(date)?.end?.let { minOf(sunset, endOf(it)) } ?: sunset
             val redTwilightEnd = (skies + endSkies + listOfNotNull(own))
-                .mapNotNull { it.altitudeTime(date, -Ends.RED_TWILIGHT_DEG, morning = false) }
+                .mapNotNull { it.crossing(date, -Ends.RED_TWILIGHT_DEG, morning = false)?.end }
                 .minOrNull()?.let(::endOf)
             return PrayerDay(
                 date = date,
@@ -1260,12 +1346,19 @@ object DayComputer {
                 isha = isha,
                 sunset = sunset,
                 endOfEating = minOf(endOfEating, fajr),
-                // An end, like the end of eating: the authority's dawn rounded down, less its minutes.
-                imsak = method.imsakMinutesBeforeFajr?.let { dawnEnd - it.minutes },
+                // An end, like the end of eating, less its minutes: the authority's dawn rounded down, or its Fajr as it
+                // prints it, read at the starts' points and rounded up with the imsak's own margin (ImsakFrom).
+                imsak = method.imsakMinutesBeforeFajr?.let { minutes ->
+                    when (val from = method.imsakFrom) {
+                        ImsakFrom.Dawn -> dawnEnd
+                        is ImsakFrom.PrintedFajr ->
+                            startOf(latest { it.dawnEnd } + method.fajrAfterDawnMinutes * 60 + offsets.authority(Prayer.FAJR) + from.marginSeconds)
+                    } - minutes.minutes
+                },
                 // Isha's end is the next day's end of eating: the caller adds it with Ends.withNextDay.
                 ends = Ends.of(
                     sunrise = sunrise,
-                    standardAsr = if (school == AsrSchool.STANDARD) asr else asrOther,
+                    standardAsr = dhuhrEnd,
                     sunset = asrEnd,
                     earliestIsha = isha,
                     maghribEndCap = redTwilightEnd,
@@ -1293,17 +1386,20 @@ object DayComputer {
             val asrOther = clock.asr(school.other.shadowFactor, method.asrModel, asrBias) ?: return null
 
             val rule = method.highLatitude
-            val dawn = HighLatitude.sign(sky, rule, fajrTwilight, day) ?: return null
-            val dusk = ishaTwilight?.let { HighLatitude.sign(sky, rule, it, day) ?: return null }
-            val eatingDawn = if (ownEatingDawn) HighLatitude.sign(sky, eatingRule, eatingTwilight, day) ?: return null else null
+            val dawn = HighLatitude.sign(sky, rule, fajrTwilight, day, Side.START) ?: return null
+            val dawnEnd = HighLatitude.sign(sky, rule, fajrTwilight, day, Side.END) ?: return null
+            val dusk = ishaTwilight?.let { HighLatitude.sign(sky, rule, it, day, Side.START) ?: return null }
+            val eatingDawn = if (ownEatingDawn) HighLatitude.sign(sky, eatingRule, eatingTwilight, day, Side.END) ?: return null else null
             val moved = shift * SolarMath.SECONDS_PER_DAY
             return RawEvents(
                 dawn = dawn.epochSeconds - moved,
-                sunrise = sunrise - moved,
+                dawnEnd = dawnEnd.epochSeconds - moved,
+                sunrise = sunrise.end - moved,
+                sunriseStart = sunrise.start - moved,
                 transit = clock.transit() - moved,
                 asr = asr - moved,
                 asrOther = asrOther - moved,
-                sunset = sunset - moved,
+                sunset = sunset.start - moved,
                 dusk = dusk?.epochSeconds?.minus(moved),
                 eatingDawn = eatingDawn?.epochSeconds?.minus(moved),
                 dawnSetByRule = dawn.estimated,
@@ -1318,15 +1414,21 @@ object DayComputer {
      * the rest, are null where it has no such sign.
      */
     private class OwnSigns(
+        /** Fajr's dawn, a start's; [dawnEnd] the same sign as the end of eating and imsak read it. */
         val dawn: Sign?,
+        val dawnEnd: Sign?,
         val eatingDawn: Sign?,
         val realDawn: Double?,
+        val realDawnEnd: Double?,
         val realEatingDawn: Double?,
+        /** The sunrise as an end. */
         val sunrise: Double?,
         val transit: Double,
         val asr: Double?,
         val asrOther: Double?,
+        /** The sunset as Maghrib reads it, a start's; [sunsetEnd] the same as the sunset shown, an end. */
         val sunset: Double?,
+        val sunsetEnd: Double?,
         val dusk: Sign?,
         val realDusk: Double?,
         val redTwilight: Double?,
@@ -1339,13 +1441,22 @@ object DayComputer {
 
         val ramadanMaghrib: Int = if (isRamadan) method.ramadan?.maghribExtraSeconds ?: 0 else 0
 
-        /** [RamadanRule.ishaFloorMinutesAfterMaghrib] on this date; null off Ramadan or where unset. */
-        val ishaFloorMinutes: Int? = if (isRamadan) method.ramadan?.ishaFloorMinutesAfterMaghrib else null
+        /**
+         * The Isha floor after Maghrib on this date: the later of [TimetableMethod.ishaFloorMinutesAfterMaghrib] (every
+         * date) and [RamadanRule.ishaFloorMinutesAfterMaghrib] (Ramadan dates); null where neither applies.
+         */
+        val ishaFloorMinutes: Int? = listOfNotNull(
+            method.ishaFloorMinutesAfterMaghrib,
+            if (isRamadan) method.ramadan?.ishaFloorMinutesAfterMaghrib else null,
+        ).maxOrNull()
 
         fun authority(prayer: Prayer): Int =
             method.authorityMinutes[prayer] * 60 + (method.monthlyOffsets?.get(prayer)?.get(month - 1) ?: 0)
 
-        fun total(prayer: Prayer): Int = authority(prayer) + method.margins[prayer]
+        /** The seconds a day the authority prints after the days around it holds each start later ([PrintedLater]). */
+        private val printedLater = method.printedLater.firstOrNull { date in it }?.starts
+
+        fun total(prayer: Prayer): Int = authority(prayer) + method.margins[prayer] + (printedLater?.get(prayer) ?: 0)
 
         fun ishaMinutes(rule: IshaRule.AfterMaghrib): Int = if (isRamadan) rule.ramadanMinutes else rule.minutes
     }
@@ -1356,10 +1467,16 @@ object DayComputer {
     /** A morning DUM RT's rule sets ([WHITE]), or one too close to call that takes each event's safe side ([UNCERTAIN]). */
     private enum class RuleNight { WHITE, UNCERTAIN }
 
-    /** One date's astronomy for a method at a point; nullable fields are absent for the method. */
+    /**
+     * One date's astronomy for a method at a point; nullable fields are absent for the method. Each crossing on the side of
+     * what reads it: [dawn], [sunset] and [dusk] as starts, [sunrise], [dawnEnd] and [eatingDawn] as ends, [sunriseStart]
+     * as a start (DUM RT's white-night Fajr, counted back from it).
+     */
     private class RawEvents(
         val dawn: Double,
+        val dawnEnd: Double,
         val sunrise: Double,
+        val sunriseStart: Double,
         val transit: Double,
         val asr: Double,
         val asrOther: Double,
@@ -1415,4 +1532,14 @@ object DayComputer {
     private val SAME_DAY = listOf(0)
     private val NEIGHBOURS = listOf(-1, 1)
     private val LAG = listOf(0, -1)
+}
+
+/**
+ * What the Tromsø probe (tools/timetables, `tromsoProbe`) observes of rulings R292 and R302 in [DayComputer]'s clock rule:
+ * for each night the user's own day checks, whether Maghrib and Isha were pulled into it and whether the real sun makes
+ * it too short for Isha's end. Set only by the probe, never by the app: no time depends on it, and with no listener it
+ * costs one null check a night checked.
+ */
+internal object ClockedProbe {
+    var listener: ((GeoPoint, LocalDate, Boolean, Boolean) -> Unit)? = null
 }

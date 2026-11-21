@@ -93,8 +93,8 @@ class AyahPoolDbTest {
 }
 
 /**
- * [AyahPoolMirrorWriter] against the real database: the mirror it writes must actually carry the
- * hundred pool ayahs and the requested translation, and the once-only seed rule must hold.
+ * [AyahPoolMirrorWriter] against the real database: the mirror it writes must actually carry every
+ * pool ayah, all 365, and the requested translation, and the once-only seed rule must hold.
  */
 class AyahPoolMirrorWriterTest {
 

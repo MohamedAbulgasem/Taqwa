@@ -36,6 +36,20 @@ OUT_DIR = "shared/src/commonMain/composeResources/files"
 OUT = OUT_DIR + "/cities.csv"
 LANGS = ["ar", "id", "ur", "bn", "tr", "fr"]
 
+# GeoNames rows the bundle leaves out, by geonameId, each with its reason. A city the app lists is a
+# place people pick to get their prayer times, so a row whose point is not its town's is worse than
+# no row: the times shown are another place's. Put a row back only once GeoNames (or the owner) has
+# its true point. Every id here is also a row of WithdrawnCities (shared/.../city/WithdrawnCities.kt)
+# with the point it had, so a phone that picked the row before is asked for its place again;
+# WithdrawnCitiesTest holds the two lists together.
+DROPPED = {
+    # "Batang, Central Java" (Kab. Batang's town) stands in GeoNames at -6.4846, 110.7083, which is in Kab.
+    # Jepara, 12.7 km from Jepara's own point and inside its Kemenag circle: the app showed Jepara's table
+    # under Batang's name (the audit of 12 Nov 2026, finding F4; ruling R212; RegistryCitiesTest holds every
+    # Indonesian city on a Kemenag table to that table's own kab/kota).
+    "1649881": "Batang, Central Java, Indonesia: GeoNames' point is in Kab. Jepara",
+}
+
 
 def clean(field: str) -> str:
     """Strip commas (and surrounding whitespace) so naive CSV split stays safe."""
@@ -107,6 +121,8 @@ for line in raw.splitlines():
     # 0 geonameId, 1 name, 8 country code, 10 admin1 code, 4 lat, 5 lon,
     # 17 timezone, 14 population
     geoname_id = f[0]
+    if geoname_id in DROPPED:
+        continue
     name = f[1]
     country_code = f[8]
     admin1_code = f[10]
@@ -138,7 +154,7 @@ with open(OUT, "w", newline="", encoding="utf-8") as fh:
     for r in rows:
         w.writerow(r[:8])
 
-print(f"wrote {len(rows)} cities to {OUT}", file=sys.stderr)
+print(f"wrote {len(rows)} cities to {OUT} ({len(DROPPED)} dropped by rule: {', '.join(sorted(DROPPED))})", file=sys.stderr)
 
 # --- alternate names: one file per language, for bundled cities only ---
 bundled = {r[0] for r in rows}

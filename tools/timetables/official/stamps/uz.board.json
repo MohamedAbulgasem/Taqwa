@@ -1,9 +1,9 @@
 {
   "entry": "uz.board",
   "class": "D (authority)",
-  "engineHash": "8bb4f12a714184c1",
+  "engineHash": "93b5c029770954aa",
   "broken": 0,
-  "places": 7,
+  "places": 1,
   "first": "2024-07-31",
   "last": "2026-09-26",
   "checked": ["2024-07-31", "2024-08-14", "2024-08-28", "2024-09-11", "2024-09-23", "2024-10-30", "2024-11-13", "2024-11-30", "2024-12-28", "2025-01-12", "2025-01-26", "2026-04-11", "2026-05-10", "2026-06-05", "2026-06-07", "2026-06-14", "2026-07-19", "2026-09-25..2026-09-26"],
@@ -16,8 +16,9 @@
     "isha": ["2024-07-31", "2024-08-14", "2024-08-28", "2024-09-11", "2024-09-23", "2024-10-30", "2024-11-13", "2024-11-30", "2024-12-28", "2025-01-12", "2025-01-26", "2026-04-11", "2026-05-10", "2026-06-05", "2026-06-07", "2026-06-14", "2026-07-19", "2026-09-25..2026-09-26"],
     "endOfEating": ["2024-07-31", "2024-08-14", "2024-08-28", "2024-09-11", "2024-09-23", "2024-10-30", "2024-11-13", "2024-11-30", "2024-12-28", "2025-01-12", "2025-01-26", "2026-04-11", "2026-05-10", "2026-06-05", "2026-06-07", "2026-06-14", "2026-07-19", "2026-09-25..2026-09-26"]
   },
-  "placeDays": 133,
-  "heldOutDays": 114,
+  "placeDays": 19,
+  "heldOutDays": 0,
+  "tables": 2,
   "ramadanDays": 0,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
@@ -72,12 +73,12 @@
       "checked": 140,
       "early": 0,
       "late": {
-        "0": 112,
-        "1": 28,
+        "0": 72,
+        "1": 68,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.8,
+      "exactShare": 0.5143,
       "worstLate": 1,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
@@ -130,115 +131,13 @@
     }
   },
   "heldOut": {
-    "placeDays": 114,
+    "placeDays": 0,
     "ramadanDays": 0,
-    "events": {
-      "fajr": {
-        "checked": 120,
-        "early": 0,
-        "late": {
-          "0": 89,
-          "1": 31,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.7417,
-        "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "sunrise": {
-        "checked": 120,
-        "lateEnd": 0,
-        "late": {
-          "0": 6,
-          "1": 0,
-          "2": 0,
-          "3+": 114
-        },
-        "exactShare": 0.05,
-        "worstLate": 6,
-        "lateLimit": 6,
-        "lateLimitFrom": "unit tashkent",
-        "overLimit": 0
-      },
-      "dhuhr": {
-        "checked": 120,
-        "early": 0,
-        "late": {
-          "0": 80,
-          "1": 22,
-          "2": 0,
-          "3+": 18
-        },
-        "exactShare": 0.6667,
-        "worstLate": 6,
-        "lateLimit": 6,
-        "lateLimitFrom": "entry uz.board",
-        "overLimit": 0
-      },
-      "asrHanafi": {
-        "checked": 120,
-        "early": 0,
-        "late": {
-          "0": 94,
-          "1": 26,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.7833,
-        "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "maghrib": {
-        "checked": 120,
-        "early": 0,
-        "late": {
-          "0": 35,
-          "1": 75,
-          "2": 10,
-          "3+": 0
-        },
-        "exactShare": 0.2917,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "isha": {
-        "checked": 120,
-        "early": 0,
-        "late": {
-          "0": 18,
-          "1": 0,
-          "2": 32,
-          "3+": 70
-        },
-        "exactShare": 0.15,
-        "worstLate": 4,
-        "lateLimit": 4,
-        "lateLimitFrom": "entry uz.board",
-        "overLimit": 0
-      },
-      "endOfEating": {
-        "checked": 120,
-        "lateEnd": 0,
-        "late": {
-          "0": 28,
-          "1": 81,
-          "2": 11,
-          "3+": 0
-        },
-        "exactShare": 0.2333,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      }
-    }
+    "events": {}
+  },
+  "replays": {
+    "places": 6,
+    "placeDays": 114
   },
   "lateLimits": {
     "class D (authority): 3 min": {
@@ -339,12 +238,12 @@
           "checked": 140,
           "early": 0,
           "late": {
-            "0": 112,
-            "1": 28,
+            "0": 72,
+            "1": 68,
             "2": 0,
             "3+": 0
           },
-          "exactShare": 0.8,
+          "exactShare": 0.5143,
           "worstLate": 1,
           "lateLimit": 3,
           "lateLimitFrom": "class D (authority)",

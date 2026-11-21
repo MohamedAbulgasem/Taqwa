@@ -14,7 +14,9 @@ import world.taqwa.app.prayer.engine.registry.authorities.CentralAsia
 import world.taqwa.app.prayer.engine.registry.authorities.Europe
 import world.taqwa.app.prayer.engine.registry.authorities.Levant
 import world.taqwa.app.prayer.engine.registry.authorities.PlaceCurves
+import world.taqwa.app.prayer.engine.registry.authorities.SouthAsia
 import world.taqwa.app.prayer.engine.registry.data.AlgeriaWilayas
+import world.taqwa.app.prayer.engine.registry.data.KemenagKabkota
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -29,7 +31,7 @@ import kotlin.test.assertTrue
  */
 class RegistryCitiesTest {
 
-    private class City(val name: String, val region: String, val countryCode: String, val lat: Double, val lon: Double, val zone: String) {
+    private class City(val id: Int, val name: String, val region: String, val countryCode: String, val lat: Double, val lon: Double, val zone: String) {
         val place get() = Place(lat, lon, zone, countryCode)
     }
 
@@ -38,7 +40,7 @@ class RegistryCitiesTest {
         val file = if (moduleRelative.exists()) moduleRelative else File("shared/src/commonMain/composeResources/files/cities.csv")
         file.readLines().drop(1).filter { it.isNotBlank() }.map { line ->
             val f = line.split(",")
-            City(f[1], f[2], f[4], f[5].toDouble(), f[6].toDouble(), f[7])
+            City(f[0].toInt(), f[1], f[2], f[4], f[5].toDouble(), f[6].toDouble(), f[7])
         }
     }
 
@@ -62,7 +64,11 @@ class RegistryCitiesTest {
         assertTrue(algerian.size > 250, "only ${algerian.size} Algerian cities read")
         for (city in algerian) {
             val seat = assertNotNull(AlgeriaWilayas.seatFor(city.region), "${city.name}: ${city.region}")
-            assertEquals(seat.name, Registry.resolve(city.place.copy(admin1 = city.region)).unitName, city.name)
+            val r = Registry.resolve(city.place.copy(admin1 = city.region))
+            // Dellys is the one town the calendar prints on a line of its own, inside Boumerdès (ruling R217).
+            val town = if (r.unitId == "35-dellys") "Dellys".also { assertEquals("Boumerdès", seat.name) } else seat.name
+            assertEquals(town, r.unitName, city.name)
+            assertTrue(r.unitId == "${seat.code}" || r.unitId!!.startsWith("${seat.code}-"), "${city.name}: unit ${r.unitId}")
         }
         for (city in cities.filter { it.countryCode == "BN" }) {
             val district = assertNotNull(Registry.resolve(city.place.copy(admin1 = city.region)).unitName, city.name)
@@ -219,10 +225,10 @@ class RegistryCitiesTest {
     fun `every kemenag unit is reached through the app's engine at its own point and by its city entry`() {
         // Ruling R113: the app computes every place at three decimals (PrayerEngine.canonical), which moves a point
         // by up to about 0.08 km, and a unit's radius is never below 0.1 km; so each unit's own point, and the app's
-        // city entry at that point (the 18 units' points are the app's own GeoNames points), resolve to the unit
-        // the way the app resolves them.
+        // city entry at that point (every unit's point is the app's own GeoNames point for its kota or regency seat:
+        // the 18 of September 2026 and both rounds of 12 Nov 2026), resolve to the unit the way the app resolves them.
         val units = Units.of("id.kemenag")!!.units
-        assertEquals(18, units.size)
+        assertEquals(18 + KemenagKabkota.round.size + KemenagKabkota.round2.size, units.size)
         val date = LocalDate(2026, 3, 20)
         for (unit in units) {
             val zone = when {
@@ -240,6 +246,86 @@ class RegistryCitiesTest {
                 assertTrue(viaApp.resolution.measured, city.name)
             }
         }
+    }
+
+    /**
+     * The app's Indonesian cities inside a Kemenag circle that are not the circle's own seat, each read against its
+     * kab/kota (ruling R212): a town of the same regency, by its GeoNames id, with the unit it follows. A circle is
+     * drawn to stop short of the nearest other kab/kota's boundary (R103), but a city row can be misplaced: GeoNames
+     * had Batang (Kab. Batang's town, id 1649881) inside Kab. Jepara's circle, and the app showed Jepara's table
+     * under Batang's name (the audit of 12 Nov 2026, finding F4; the row is dropped, `tools/build-city-db.py`).
+     * A city is added here only once its kecamatan is read to be the unit's own. The 32 below are one reading
+     * (the builder's, 12 Nov 2026, of each town's kecamatan against the kab/kota it is commonly listed under);
+     * no boundary file or gazetteer for it is held in the archive, so this list is a reading, not a proof,
+     * and a second reading is asked of the owner in the build log.
+     */
+    private val kemenagTowns: Map<Int, String> = mapOf(
+        1651887 to "1426", // Adiwerna, Kab. Tegal
+        1624668 to "1426", // Tarub, Kab. Tegal
+        1626100 to "1217", // Sumedang Utara, Kab. Sumedang
+        1650232 to "1703", // Banjar, Kab. Buleleng
+        1640585 to "1629", // Kedungwaru, Kab. Tulungagung
+        1648082 to "1629", // Boyolangu, Kab. Tulungagung
+        1644349 to "1624", // Gedangan, Kab. Sidoarjo
+        1623096 to "1624", // Tulangan Utara, Kab. Sidoarjo
+        1647936 to "1624", // Buduran, Kab. Sidoarjo
+        1625067 to "1624", // Tanggulangin, Kab. Sidoarjo
+        1640765 to "1606", // Kebomas, Kab. Gresik
+        1627357 to "1501", // Sewon, Kab. Bantul
+        1632861 to "1501", // Pandak, Kab. Bantul
+        1642726 to "1209", // Jatibarang, Kab. Indramayu
+        1641342 to "1209", // Karangampel, Kab. Indramayu
+        1635660 to "1504", // Melati, Kab. Sleman
+        1626312 to "1402", // Sokaraja, Kab. Banyumas
+        1631851 to "1410", // Pecangaan, Kab. Jepara
+        1635164 to "1410", // Mlonggo, Kab. Jepara
+        1621678 to "1414", // Wedi, Kab. Klaten
+        1641333 to "1414", // Karanganom, Kab. Klaten
+        1647187 to "1414", // Ceper, Kab. Klaten
+        1642437 to "1414", // Jogonalan, Kab. Klaten
+        1623223 to "1414", // Trucuk, Kab. Klaten
+        1640755 to "1414", // Kebonarun, Kab. Klaten
+        1651591 to "3105", // Amahai, Kab. Maluku Tengah
+        1645428 to "1608", // Diwek, Kab. Jombang
+        1626134 to "1614", // Sumberpucung, Kab. Malang
+        1633182 to "1614", // Pakisaji, Kab. Malang
+        1643898 to "1614", // Gongdanglegi Kulon, Kab. Malang
+        1640972 to "2713", // Katobu, Kab. Muna
+        1641977 to "1626", // Kalianget, Kab. Sumenep
+    )
+
+    @Test
+    fun `every indonesian city on a kemenag table lies in that table's own kab or kota`() {
+        val entry = assertNotNull(Registry.byId("id.kemenag"))
+        val units = assertNotNull(Units.of("id.kemenag")).units.associateBy { it.id }
+        val indonesian = cities.filter { it.countryCode == "ID" }
+        assertTrue(indonesian.size > 400, "only ${indonesian.size} Indonesian cities read")
+        var seats = 0
+        val towns = mutableMapOf<Int, String>()
+        for (city in indonesian) {
+            assertEquals(entry.id, Registry.resolve(city.place.copy(admin1 = city.region)).entry.id, city.name)
+            val unitId = Registry.resolveEntry(entry, city.place.copy(admin1 = city.region)).unitId ?: continue
+            val unit = units.getValue(unitId)
+            // The unit's own seat: the app's city at the unit's point (every unit's point is its seat's GeoNames point).
+            val seat = indonesian.filter { distanceKm(GeoPoint(it.lat, it.lon), unit.point) < 0.1 }
+            assertTrue(seat.isNotEmpty(), "${unit.name}: no city at its point")
+            if (seat.any { it.id == city.id }) {
+                seats++
+                continue
+            }
+            // No province's town is ever on another province's kab/kota table.
+            assertTrue(seat.any { it.region == city.region }, "${city.name} (${city.region}, ${city.id}) is inside ${unit.name}'s circle in another province")
+            // And within the province only a town read to be the unit's own.
+            assertEquals(
+                unitId, kemenagTowns[city.id],
+                "${city.name} (${city.region}, ${city.id}) is inside ${unit.name}'s circle, ${distanceKm(GeoPoint(city.lat, city.lon), unit.point)} km " +
+                    "from its point, and is not listed as a town of that kab/kota: it would be shown ${unit.name}'s table",
+            )
+            towns[city.id] = unitId
+        }
+        assertTrue(seats >= units.size, "$seats seats read for ${units.size} units")
+        // The list holds nothing that no longer applies: a town that left a circle, or the bundle, leaves the list.
+        assertEquals(kemenagTowns.toSortedMap(), towns.toSortedMap())
     }
 
     @Test
@@ -283,7 +369,7 @@ class RegistryCitiesTest {
     @Test
     fun `no city's time is earlier beside a table printed for its own point than at its own point alone`() {
         // The city-point audit of 10–11 Oct 2026 (rulings R30, R40 and R44): ISNA's mosques, Canada's families, Chicago's
-        // 18° block, the city tables (Delhi, Karachi, Tashkent, Bishkek, Manchester Central's Wifaqul table, Gaza, Beirut,
+        // 18° block, the city tables (Delhi, Karachi, Tashkent, Manchester Central's Wifaqul table, Gaza, Beirut,
         // Damascus's two samples, Baghdad) and BIK's base table ride beside the user's point within their reach
         // (tablesAtTheirPoints), so no start is earlier, and no sunrise, sunset, end of eating or imsak later, than the
         // same method at the user's own point alone, as the app showed before (the Canadian families' curves read at both
@@ -292,9 +378,9 @@ class RegistryCitiesTest {
         // 11 Oct 2026 added the seven city tables, the Hanafi school, sunset and imsak).
         val sets = listOf(
             "us.isna", "ca.isna", "us.chicago.eighteen", "ca.eighteen", "ca.fifteen", "ca.isha90", "in.karachi", "uz.board", "xk.bik",
-            "pk.karachi", "kg.default", "gb.wifaqul", "ps.gaza.awqaf", "lb.fatwa", "sy.awqaf", "iq.sunni",
+            "pk.karachi", "gb.wifaqul", "ps.gaza.awqaf", "lb.fatwa", "sy.awqaf", "iq.sunni",
         )
-        val countries = setOf("US", "CA", "IN", "UZ", "XK", "PK", "KG", "GB", "PS", "LB", "SY", "IQ")
+        val countries = setOf("US", "CA", "IN", "UZ", "XK", "PK", "GB", "PS", "LB", "SY", "IQ")
         val methods = sets.associateWith { id ->
             Registry.byId(id)?.method ?: Registry.entries.flatMap { it.members }.first { it.id == id }.method
         }
@@ -342,9 +428,9 @@ class RegistryCitiesTest {
         // 17 Oct 2026: with the table's point read on the user's curves, Camrose's Isha had come up to 10 min later than both).
         val sets = listOf(
             "us.isna", "ca.isna", "us.chicago.eighteen", "ca.eighteen", "ca.fifteen", "ca.isha90", "in.karachi", "uz.board",
-            "pk.karachi", "kg.default", "gb.wifaqul", "ps.gaza.awqaf", "lb.fatwa", "sy.awqaf", "iq.sunni", "se.rabita",
+            "pk.karachi", "gb.wifaqul", "ps.gaza.awqaf", "lb.fatwa", "sy.awqaf", "iq.sunni", "se.rabita",
         )
-        val countries = setOf("US", "CA", "IN", "UZ", "PK", "KG", "GB", "PS", "LB", "SY", "IQ", "FI")
+        val countries = setOf("US", "CA", "IN", "UZ", "PK", "GB", "PS", "LB", "SY", "IQ", "FI")
         val methods = sets.associateWith { id ->
             Registry.byId(id)?.method ?: Registry.entries.flatMap { it.members }.first { it.id == id }.method
         }
@@ -368,7 +454,16 @@ class RegistryCitiesTest {
                 val table = shownMethod.alongside.singleOrNull()
                 assertNotNull(table, "${city.name}: $id rides one table's own day alongside")
                 assertTrue(shownMethod.fixedPoint == null && shownMethod.envelopePoints.isEmpty(), "${city.name}: $id keeps its own point alone")
-                val alone = Registry.methodAlone(id, base, p)
+                // Rulings R192 and R194 (13 Nov 2026): a Pakistani or Indian place with no card of Dawat-e-Islami's held has
+                // its own day by the latest margins the held cards ask (SouthAsia.pakistanBeyondCards, indiaBeyondCards),
+                // never earlier than the method's own.
+                val beyondCards = when (id) {
+                    "pk.karachi" -> SouthAsia.pakistanBeyondCards(p)
+                    "in.karachi" -> SouthAsia.indiaBeyondCards(p)
+                    else -> null
+                }
+                val alone = Registry.methodAlone(id, beyondCards ?: base, p)
+                val before = beyondCards?.let { Registry.methodAlone(id, base, p) }
                 val zone = TimeZone.of(city.zone)
                 for (school in world.taqwa.app.prayer.engine.method.AsrSchool.entries) {
                     for (date in dates) {
@@ -376,6 +471,12 @@ class RegistryCitiesTest {
                         val own = DayComputer.compute(alone, p, date, zone, school, Registry.ramadanCalendar())
                         val theirs = DayComputer.compute(table.method, table.point, date, zone, school, Registry.ramadanCalendar())
                         val where = "${city.name} past $id's bound on $date under $school"
+                        if (before != null) {
+                            val was = DayComputer.compute(before, p, date, zone, school, Registry.ramadanCalendar())
+                            assertTrue(own.fajr >= was.fajr && own.dhuhr >= was.dhuhr && own.asr >= was.asr && own.asrOther >= was.asrOther, where)
+                            assertTrue(own.maghrib >= was.maghrib && own.isha >= was.isha, where)
+                            assertTrue(own.sunrise <= was.sunrise && own.sunset <= was.sunset && own.endOfEating <= was.endOfEating, where)
+                        }
                         assertEquals(maxOf(own.fajr, theirs.fajr), shown.fajr, where)
                         assertEquals(maxOf(own.dhuhr, theirs.dhuhr), shown.dhuhr, where)
                         assertEquals(maxOf(own.asr, theirs.asr), shown.asr, where)

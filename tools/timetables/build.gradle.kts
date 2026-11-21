@@ -108,6 +108,11 @@ fun Task.requireArchive() {
     }
 }
 
+// The Tromsø probe is not part of the suite: it runs alone, for an hour a grid, through the `tromsoProbe` task below.
+tasks.named<Test>("jvmTest") {
+    filter { excludeTestsMatching("world.taqwa.timetables.probe.*") }
+}
+
 tasks.withType<Test>().configureEach {
     requireArchive()
     systemProperty("taqwa.repoRoot", repoRoot.path)
@@ -116,7 +121,9 @@ tasks.withType<Test>().configureEach {
     // not -Pgroup, which is Gradle's own project group).
     systemProperty("taqwa.gateGroups", providers.gradleProperty("gateGroup").getOrElse(""))
     systemProperty("taqwa.gateEntries", providers.gradleProperty("entry").getOrElse(""))
-    maxHeapSize = "2g"
+    // NeverEarlyGateTest runs the whole gate in the test's own JVM, so it takes what the gate task takes: on the
+    // merged line of 14 Nov 2026 two gigabytes ran out there too ("Java heap space" in Gate.evaluate).
+    maxHeapSize = "4g"
     // The tests read the app's strings and city files through that path, so they are inputs:
     // without this a changed strings.xml would let a cached test result stand.
     inputs.files(
@@ -127,6 +134,9 @@ tasks.withType<Test>().configureEach {
     // NeverEarlyGateTest reads the gate rows and every official table they name.
     inputs.files(fileTree(repoRoot.resolve("tools/timetables/official/gate")) { include("*.tsv") })
         .withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("gateRows")
+    // GpsCountryTest reads the gate points listed as lying in another country (official/gps-country/, ruling R258).
+    inputs.files(fileTree(repoRoot.resolve("tools/timetables/official/gps-country")) { include("*.tsv") })
+        .withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("gpsCountry")
     // UkMawaqitSurveyTest reads its survey's calendars, faults and outliers (official/survey/).
     inputs.files(fileTree(repoRoot.resolve("tools/timetables/official/survey")) { include("**/*.tsv") })
         .withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("surveys")
@@ -135,6 +145,31 @@ tasks.withType<Test>().configureEach {
     // open/ tables are read from this checkout, not the archive root: a changed one must rerun the gate.
     inputs.files(fileTree(repoRoot.resolve("tools/timetables/official/open")))
         .withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("openTables")
+}
+
+/**
+ * The Tromsø probe (ruling R321, kept since the final review of 20 Nov 2026; `probe/TromsoProbeTest`): IRN's Tromsø table
+ * replayed across `no.irn.tromso`'s circle, densely, through the real Registry, Gate and PrayerEngine paths. Outside the
+ * suite, and run once a grid:
+ *
+ *     ./gradlew -p tools/timetables tromsoProbe -Pofficial=<archive> -PprobeOut=<dir> -PprobeGrids=refine [-PprobeTag=refine]
+ *
+ * The grids by name are `refine`, `dense`, `edges` and `micro` (the four of R321; each about ten to twenty minutes), or
+ * any the test's KDoc lists. `-PprobeYear`, `-PprobeThreads`, `-PprobeGateEvery`, `-PprobeEngineEvery`, `-PprobeLimit`, `-PprobeDetail`,
+ * `-PprobeDump` and `-PprobeCompare` are handed on as the test says. MONITOR.md's December IRN step runs it on all four.
+ */
+tasks.register<Test>("tromsoProbe") {
+    group = "verification"
+    description = "Replays IRN's Tromsø table across its unit's circle (ruling R321's probe)."
+    val jvmTest = tasks.named<Test>("jvmTest").get()
+    testClassesDirs = jvmTest.testClassesDirs
+    classpath = jvmTest.classpath
+    filter { includeTestsMatching("world.taqwa.timetables.probe.TromsoProbeTest") }
+    for (name in listOf("Out", "Grids", "Year", "Tag", "Threads", "GateEvery", "EngineEvery", "Limit", "Detail", "Dump", "Compare")) {
+        providers.gradleProperty("probe$name").orNull?.let { systemProperty("probe.${name.replaceFirstChar { it.lowercase() }}", it) }
+    }
+    outputs.upToDateWhen { false }
+    testLogging { showStandardStreams = true }
 }
 
 /**
@@ -254,16 +289,21 @@ tasks.register<JavaExec>("generateQmdbPlaces") {
 }
 
 /**
- * Writes `official/gate/sa-ummalqura-reach.tsv` and `kz-qmdb-reach.tsv`: each measured Umm al-Qura and QMDB unit's
- * own tables replayed across its area, on a fixed grid and at each event's worst point of a dense sweep against the
- * archive's tables (`units/GenerateReachRows.kt`, the reviews of 9 and 10 Oct 2026). Re-run after a unit, its reach
- * or its tables change, then run the gate and commit. Takes a few minutes on every core.
+ * Writes `official/gate/<group>-reach.tsv` for every entry of `ReachRows.SPECS` (Umm al-Qura's and QMDB's units, ISNA's
+ * mosques, BIK's base table, the Kyrgyz Muftiate's localities, ESA's Egyptian towns, Oman's localities and Türkiye's
+ * il centres): each
+ * measured unit's own tables replayed across its area, on a fixed grid and at each event's worst point of a dense sweep
+ * against the archive's tables (`units/GenerateReachRows.kt`, the reviews of 9 and 10 Oct 2026). Re-run after a unit,
+ * its reach or its tables change, then run the gate and commit. Takes a few minutes on every core; `--only <entry>`
+ * writes one entry's file, and is the only way to write a pending entry's (`ReachRows.PENDING`: an entry whose reach
+ * rows the gate does not pass yet, so its file is not committed; none since ruling R302 of 17 Nov 2026: Diyanet's cities left it
+ * with ruling R293 on 16 Nov, Norway's IRN, the last, with R302).
  *
- *     ./gradlew -p tools/timetables generateReachRows [-Pthreads=N]
+ *     ./gradlew -p tools/timetables generateReachRows [-Pthreads=N] [--args="--only eg.esa"]
  */
 tasks.register<JavaExec>("generateReachRows") {
     group = "application"
-    description = "Writes the reach rows: each measured Umm al-Qura and QMDB unit's own tables across its area."
+    description = "Writes the reach rows: each measured unit's own tables across its area (ReachRows.SPECS)."
     requireArchive()
     classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
     mainClass.set("world.taqwa.timetables.units.GenerateReachRowsKt")
@@ -277,6 +317,25 @@ tasks.register<JavaExec>("generateReachRows") {
         listOf("--repo", root, "--official", official.get()) +
             (if (threads.get().isNotBlank()) listOf("--threads", threads.get()) else emptyList())
     })
+}
+
+/**
+ * Writes `ReachLimits.kt` (ruling R270): each unit of the entries `ReachLimitsFile.ENTRIES` names whose own tables, read
+ * across its reach, were measured later than its own limit, at the stamp's measured worst (`units/GenerateReachLimits.kt`).
+ * Run after the gate has written those entries' stamps with their reach rows (`-Pentry`), then run the gate again.
+ *
+ *     ./gradlew -p tools/timetables generateReachLimits
+ */
+tasks.register<JavaExec>("generateReachLimits") {
+    group = "application"
+    description = "Writes ReachLimits.kt: each unit's measured worst across its reach, where over its own limit (R270)."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.units.GenerateReachLimitsKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    maxHeapSize = "2g"
+    val root = repoRoot.path
+    argumentProviders.add(CommandLineArgumentProvider { listOf("--repo", root) })
 }
 
 /**
@@ -297,6 +356,101 @@ tasks.register<JavaExec>("generateEnvelopeRows") {
     maxHeapSize = "2g"
     val root = repoRoot.path
     argumentProviders.add(CommandLineArgumentProvider { listOf("--repo", root) })
+}
+
+/**
+ * Writes nothing: names every envelope file `generateEnvelopeRows` would write, change or remove now, and exits 1 when
+ * there is one (the audit of 13 Nov 2026). The generator is a pure function of the gate's group files, the engine's
+ * reaches and the app's cities; the committed files fall behind when `prove` appends a new capture's rows to a group
+ * file, and this is the check that says so. Run it at every release cut and after any change to a table printed for
+ * its own point; when it names a file, run `generateEnvelopeRows`, then the gate, and commit.
+ *
+ *     ./gradlew -p tools/timetables checkEnvelopeRows
+ */
+tasks.register<JavaExec>("checkEnvelopeRows") {
+    group = "verification"
+    description = "Fails while a committed envelope file is not what generateEnvelopeRows would write now."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.units.GenerateEnvelopeRowsKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    maxHeapSize = "2g"
+    val root = repoRoot.path
+    argumentProviders.add(CommandLineArgumentProvider { listOf("--repo", root, "--check") })
+}
+
+/**
+ * Measures a unit set's overlaps and writes nothing into the repository (`units/OverlapSweep.kt`, the audit of 12 Nov
+ * 2026, ruling R205): every measured unit's own tables on a lattice across its reach wherever another unit's reach
+ * holds the point too; whether a place that follows another unit is ever before this table, and how late a place is
+ * against its own table inside a neighbour's reach.
+ *
+ *     ./gradlew -p tools/timetables overlapSweep -Pentry=kg.default [-Pstep=1.5] [-Ppaths=-2027] [-Pyear=2027] [-Pout=<file>] [-Pthreads=N]
+ */
+tasks.register<JavaExec>("overlapSweep") {
+    group = "application"
+    description = "Measures a unit set's overlaps: each unit's own tables wherever another unit's reach holds the place too."
+    requireArchive()
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.units.OverlapSweepKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    maxHeapSize = "4g"
+    val root = repoRoot.path
+    val official = officialRoot
+    val options = listOf("entry", "step", "paths", "year", "out", "threads").map { it to providers.gradleProperty(it).orElse("") }
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", root, "--official", official.get()) +
+            options.flatMap { (name, value) -> if (value.get().isNotBlank()) listOf("--$name", value.get()) else emptyList() }
+    })
+}
+
+/**
+ * The ground past an authority's inner lines (ruling R260; `units/EdgeSweep.kt`), read-only: each unit's own tables on
+ * rings past its reach, belt or ride where it is the nearest unit and the place is on the edge, with and without the
+ * rule, and at the app's cities there.
+ *
+ *     ./gradlew -p tools/timetables edgeSweep -Pentry=kg.default|eg.esa|om.mara [-Pthreads=N] [-Pout=<file>]
+ */
+tasks.register<JavaExec>("edgeSweep") {
+    group = "application"
+    description = "Measures the ground past an authority's inner lines: each unit's own tables where it is the nearest unit on the edge."
+    requireArchive()
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.units.EdgeSweepKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    maxHeapSize = "4g"
+    val root = repoRoot.path
+    val official = officialRoot
+    val options = listOf("entry", "out", "threads").map { it to providers.gradleProperty(it).orElse("") }
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", root, "--official", official.get()) +
+            options.flatMap { (name, value) -> if (value.get().isNotBlank()) listOf("--$name", value.get()) else emptyList() }
+    })
+}
+
+/**
+ * QMDB's overlapping places (ruling R249; `units/KazakhRide.kt`), read-only: what resolving a place and computing a day
+ * cost where many reaches hold it, what waiting for every such place's table moves against the nearest alone, and (`pairs`,
+ * with the archive) how far QMDB's own tables of neighbouring places stand apart.
+ *
+ *     ./gradlew -p tools/timetables kazakhRide -Pmode=time|cost|pairs [-Pstep=0.05] [-Pyear=2027] [-Pout=<file>] [-Pthreads=4]
+ */
+tasks.register<JavaExec>("kazakhRide") {
+    group = "application"
+    description = "Measures QMDB's overlapping places: the cost in time on a device, and in minutes against the nearest place alone."
+    classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
+    mainClass.set("world.taqwa.timetables.units.KazakhRideKt")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
+    workingDir = repoRoot
+    maxHeapSize = "4g"
+    val root = repoRoot.path
+    val official = officialRoot
+    val options = listOf("mode", "step", "year", "out", "threads").map { it to providers.gradleProperty(it).orElse("") }
+    argumentProviders.add(CommandLineArgumentProvider {
+        listOf("--repo", root, "--official", official.get()) + options.flatMap { (name, value) -> if (value.get().isNotBlank()) listOf("--$name", value.get()) else emptyList() }
+    })
 }
 
 /**
@@ -351,7 +505,9 @@ tasks.register<JavaExec>("gate") {
     classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
     mainClass.set("world.taqwa.timetables.gate.GateMainKt")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
-    maxHeapSize = "2g"
+    // The whole gate keeps every entry's counted days (ruling R214) beside its cautious cells: with Egypt's envelope and
+    // Oman's reach rows in the same run, two gigabytes ran out (14 Nov 2026). The other long tasks already take four.
+    maxHeapSize = "4g"
     workingDir = repoRoot
     val official = officialRoot
     val groups = providers.gradleProperty("gateGroup").orElse("")
@@ -373,7 +529,8 @@ tasks.register<JavaExec>("gate") {
  * choice at a sample of the app cities where it applies, every day of the window, both Asr schools, held to the real
  * sun at the point (no Dhuhr before transit, no Maghrib before sunset, no Fajr or end of eating after sunrise, no Isha
  * at or before Maghrib). Needs no archive. Fails on a finding not listed in `official/sun-sanity/open-findings.tsv`, an
- * excused group not listed in `official/sun-sanity/excused.tsv`, or a listed one past its ceilings.
+ * excused group not listed in `official/sun-sanity/excused.tsv`, a listed one past its ceilings, or any Dhuhr before
+ * transit or Maghrib before sunset at all (the engine's own floor, ruling R180); reports what that floor moved.
  *
  *     ./gradlew -p tools/timetables sunSanity [-Pfrom=<yyyy-mm-dd, today>] [-Pto=<yyyy-mm-dd, 13 months on>] [-PeveryDays=1]
  *         [-PeveryCity=1] [-PchosenPerEntry=40] [-PotherPerEntry=400] [-Pout=<report file>]
@@ -436,7 +593,9 @@ tasks.register<JavaExec>("monitor") {
     classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
     mainClass.set("world.taqwa.timetables.monitor.MonitorMainKt")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
-    maxHeapSize = "2g"
+    // The monitor's check runs the whole gate in this JVM (MonitorMain's fullGate), so it takes what the gate task takes
+    // (ruling R280, the second audit's G17): two gigabytes ran out on the whole gate of the merged line of 14 Nov 2026.
+    maxHeapSize = "4g"
     workingDir = repoRoot
     isIgnoreExitValue = true
     val official = officialRoot
@@ -472,7 +631,9 @@ tasks.register<JavaExec>("prove") {
     classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
     mainClass.set("world.taqwa.timetables.monitor.ProveMainKt")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
-    maxHeapSize = "3g"
+    // The whole gate, as the gate task takes it (ruling R280): prove keeps one whole result at a time (the base's is let
+    // go before the gate runs again), so the gate's four gigabytes are enough; three were not, holding two.
+    maxHeapSize = "4g"
     workingDir = repoRoot
     val official = officialRoot
     val date = providers.gradleProperty("date").orElse("")
@@ -492,14 +653,26 @@ tasks.register<JavaExec>("prove") {
 tasks.register<JavaExec>("checkStamps") {
     group = "verification"
     description = "Fails on a stale or red stamp, a missing one, or a stale ProofStamps.kt (spec §5); with -Pramadan=<Hijri year>, " +
-        "on an A/B unit whose Fajr, end of eating and Maghrib were not each checked on every day of that Ramadan. Needs no archive."
+        "on an A/B unit whose Fajr, end of eating and Maghrib were not each checked on every day of that Ramadan and that is not " +
+        "covered under O4 (ruling R185: that rule reads the monitor's index from -Pofficial); with -Prelease=true, while a reach " +
+        "proof is owed (ReachRows.outstanding). The stamps themselves need no archive."
     classpath = files(jvmMainCompilation.output.allOutputs, jvmMainCompilation.runtimeDependencyFiles)
     mainClass.set("world.taqwa.timetables.gate.CheckStampsKt")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(JavaLanguageVersion.of(21)) })
     workingDir = repoRoot
     val ramadan = providers.gradleProperty("ramadan").orElse("")
+    // Ruling R185: the month-by-month rule (O4) reads the monitor's index from the official root; a standing demotion
+    // stops a release, and only the monitor's own run (scripts/prove.sh) passes -PallowDemoted=true.
+    val official = officialRoot
+    val allowDemoted = providers.gradleProperty("allowDemoted").orElse("false")
+    // A release (scripts/release.sh, scripts/ios-release.sh) passes -Prelease=true: it is refused while a reach proof is
+    // owed (a unit left out of its entry's reach rows, a pending entry, a gated entry with measured units and no spec, or
+    // a reach limit over 4 min the owner has not ruled on: ReachRows.outstanding, ruling R270). Every run also fails on a
+    // ReachLimits.kt the committed stamps no longer give.
+    val release = providers.gradleProperty("release").orElse("false")
     val root = repoRoot.path
     argumentProviders.add(CommandLineArgumentProvider {
-        listOf("--repo", root) + (if (ramadan.get().isNotBlank()) listOf("--ramadan", ramadan.get()) else emptyList())
+        listOf("--repo", root, "--allow-demoted", allowDemoted.get(), "--release", release.get()) +
+            (if (ramadan.get().isNotBlank()) listOf("--ramadan", ramadan.get(), "--official", official.get()) else emptyList())
     })
 }

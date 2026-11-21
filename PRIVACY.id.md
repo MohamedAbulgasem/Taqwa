@@ -1,6 +1,6 @@
 # Kebijakan privasi Taqwa
 
-_Terakhir diperbarui 9 November 2026. Berlaku untuk Taqwa 1.0.0 dan versi setelahnya di Android dan iOS._
+_Terakhir diperbarui 19 November 2026. Berlaku untuk Taqwa 1.0.0 dan versi setelahnya di Android dan iOS._
 
 Taqwa adalah aplikasi Islami gratis tanpa akun, tanpa iklan, dan tanpa analitik. Aplikasi ini
 berfungsi offline. Ia memakai internet untuk mengunduh tilawah Al-Qur'an, dan hanya ketika Anda
@@ -82,7 +82,7 @@ suara ditambahkan lewat app Pengaturan.
 Taqwa menolak ikut serta dalam pencadangan aplikasi Android, jadi lokasi dan pengaturan Anda tidak
 disalin ke Google. Di iOS, pengaturan, penanda, hitungan, dan tilawah yang Anda unduh dikecualikan
 dari cadangan iCloud; berkas milik Taqwa sendiri yang dicadangkan hanyalah cache kecil milik
-widget, yaitu waktu salat yang akan datang dan seratus ayat yang diputar bergiliran oleh widget
+widget, yaitu waktu salat yang akan datang dan 365 ayat yang diputar bergiliran oleh widget
 ayat harian, dan keduanya tidak memuat lokasi Anda. Jika Anda menambahkan Taqwa ke Apple Watch,
 iOS menyimpan salinan terakhir yang dikirim iPhone Anda ke jam itu, yang menyebut kota Anda, dan
 salinan itu mungkin ada di cadangan iPhone Anda. Cadangan iCloud dienkripsi dengan kunci yang

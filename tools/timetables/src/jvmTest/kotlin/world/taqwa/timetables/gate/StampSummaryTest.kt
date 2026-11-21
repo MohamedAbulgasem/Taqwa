@@ -101,6 +101,40 @@ class StampSummaryTest {
     }
 
     @Test
+    fun `a stamp's standing demotions are read with their unit, day and reason`() {
+        // Ruling R185: written by the gate from the gate files' @demoted lines.
+        val dir = Files.createTempDirectory("stamp-demoted").toFile()
+        try {
+            dir.resolve("xx.one.json").writeText(
+                Json.pretty(
+                    mapOf(
+                        "entry" to "xx.one", "class" to "A", "broken" to 0,
+                        "demoted" to listOf(
+                            mapOf("since" to "2027-01-12", "reason" to "fajr early on 3 place-days"),
+                            mapOf("unit" to "east", "since" to "2027-01-19", "reason" to "maghrib early on 1 place-days"),
+                        ),
+                    ),
+                ),
+            )
+            dir.resolve("xx.two.json").writeText(Json.pretty(mapOf("entry" to "xx.two", "class" to "C", "broken" to 0, "demoted" to listOf(mapOf("since" to "2027-01-12", "reason" to "r")))))
+            dir.resolve("xx.three.json").writeText(Json.pretty(mapOf("entry" to "xx.three", "class" to "B", "broken" to 0)))
+            val (one, three, two) = StampSummary.load(dir)
+            assertEquals(
+                listOf(StampDemotion(null, LocalDate(2027, 1, 12), "fajr early on 3 place-days"), StampDemotion("east", LocalDate(2027, 1, 19), "maghrib early on 1 place-days")),
+                one.demoted,
+            )
+            assertEquals("xx.one since 2027-01-12 (fajr early on 3 place-days)", one.demoted[0].describe("xx.one"))
+            assertEquals("xx.one/east since 2027-01-19 (maghrib early on 1 place-days)", one.demoted[1].describe("xx.one"))
+            // Standing: a demotion on a stamp that is still a checked timetable's. A class already lowered has nothing left to stop.
+            assertTrue(one.demotedStanding)
+            assertTrue(two.demoted.isNotEmpty() && !two.demotedStanding)
+            assertTrue(three.demoted.isEmpty() && !three.demotedStanding)
+        } finally {
+            dir.deleteRecursively()
+        }
+    }
+
+    @Test
     fun `a ramadan is covered only where each of its events was checked on every day`() {
         // Ruling R148: Pretoria's shape — every day checked, the end of eating on none of them.
         val year = listOf(DateRun.parse("2026-01-01..2027-12-31"))
@@ -156,5 +190,84 @@ class StampSummaryTest {
         val never = UnitSummary("siwa", "Siwa", emptyList())
         val alone = stamp.copy(units = listOf(covered, never))
         assertEquals("1 of 2 units short (siwa 0 of 32 days); no short unit checked before it", alone.describe(ramadan, alone.ramadanGaps(ramadan)))
+    }
+
+    /** Ruling R246: checked is not held out. A unit whose days are in the gate by fitted rows alone is named apart. */
+    @Test
+    fun `a unit checked on every day and held out on fewer is fitted only, never short`() {
+        val ramadan = Ramadan.of(1448)
+        val year = listOf(DateRun.parse("2026-01-01..2027-12-31"))
+        val before = listOf(DateRun.parse("2026-01-01..2026-12-31"))
+        val checked = Ramadan.EVENTS.associateWith { year }
+        val heldOut = UnitSummary("a", "A", year, checked, heldOutByEvent = checked)
+        val fitted = UnitSummary("b", "B", year, checked, heldOutByEvent = Ramadan.EVENTS.associateWith { before })
+        val fajrOnly = UnitSummary("c", "C", year, checked, heldOutByEvent = checked + ("fajr" to listOf(DateRun.parse("2026-01-01..2027-02-20"))))
+        val short = UnitSummary("d", "D", before, Ramadan.EVENTS.associateWith { before })
+        val stamp = StampSummary("xx", setOf("B"), LocalDate(2026, 1, 1), LocalDate(2027, 12, 31), 0, year, listOf(heldOut, fitted, fajrOnly, short))
+        assertEquals(listOf("d"), stamp.ramadanGaps(ramadan).map { it.unit.id })
+        val named = stamp.fittedOnly(ramadan)
+        assertEquals(listOf("b", "c"), named.map { it.unit.id })
+        assertEquals(0, named[0].heldOutDays)
+        assertEquals(32, named[0].checkedDays)
+        assertEquals("0 of 32 days held out", named[0].describeFitted())
+        assertEquals("14 of 32 days held out (fajr 14)", named[1].describeFitted())
+        assertEquals("2 of 4 units (b 0 of 32 days held out, c 14 of 32 days held out (fajr 14))", stamp.describeFitted(named))
+        // A stamp from before the held-out runs says nothing was held out: every checked unit of it is fitted only.
+        val older = StampSummary("yy", setOf("A"), LocalDate(2026, 1, 1), LocalDate(2027, 12, 31), 0, year, emptyList(), checked)
+        assertEquals("0 of 32 days held out", older.describeFitted(older.fittedOnly(ramadan)))
+    }
+
+    /** Ruling R246: the imsak joins the month's events where the unit shows one and a table of it prints one. */
+    @Test
+    fun `the imsak is one of a ramadan's events only where it is shown and printed`() {
+        val ramadan = Ramadan.of(1448)
+        val year = listOf(DateRun.parse("2026-01-01..2027-12-31"))
+        val three = Ramadan.EVENTS.associateWith { year }
+        val plain = UnitSummary("a", "A", year, three + ("imsak" to year))
+        assertEquals(Ramadan.EVENTS, plain.ramadanEvents)
+        val shownUnprinted = UnitSummary("b", "B", year, three, showsImsak = true)
+        assertEquals(Ramadan.EVENTS, shownUnprinted.ramadanEvents)
+        assertTrue(shownUnprinted.imsakUnheld && !plain.imsakUnheld)
+        val shown = UnitSummary("c", "C", year, three + ("imsak" to listOf(DateRun.parse("2026-01-01..2027-02-20"))), three, showsImsak = true)
+        assertEquals(Ramadan.EVENTS + "imsak", shown.ramadanEvents)
+        assertTrue(!shown.imsakUnheld)
+        val stamp = StampSummary("xx", setOf("A"), LocalDate(2026, 1, 1), LocalDate(2027, 12, 31), 0, year, listOf(plain, shownUnprinted, shown))
+        assertEquals(listOf("b"), stamp.imsakUnheld.map { it.id })
+        val gap = stamp.ramadanGaps(ramadan).single()
+        assertEquals("c", gap.unit.id)
+        assertEquals("14 of 32 days (imsak 14)", gap.describe())
+    }
+
+    @Test
+    fun `a stamp's held-out runs, imsak flag and published-method class are read`() {
+        val dir = Files.createTempDirectory("stamp-held-out").toFile()
+        try {
+            val runs = listOf("2026-01-01..2026-12-31")
+            dir.resolve("xx.one.json").writeText(
+                Json.pretty(
+                    mapOf(
+                        "entry" to "xx.one", "class" to "D (authority)", "broken" to 0, "showsImsak" to true,
+                        "checkedByEvent" to mapOf("fajr" to runs),
+                        "heldOut" to mapOf("placeDays" to 31, "ramadanDays" to 4, "checkedByEvent" to mapOf("fajr" to listOf("2026-12-01..2026-12-31"))),
+                        "units" to mapOf(
+                            "east" to mapOf("name" to "East", "showsImsak" to true, "checked" to runs, "heldOutByEvent" to mapOf("maghrib" to runs)),
+                            "west" to mapOf("name" to "West", "checked" to runs),
+                        ),
+                    ),
+                ),
+            )
+            dir.resolve("xx.two.json").writeText(Json.pretty(mapOf("entry" to "xx.two", "class" to "B/D (authority)", "broken" to 0)))
+            val (one, two) = StampSummary.load(dir)
+            assertTrue(one.isPublishedMethod && !one.isAOrB && one.showsImsak)
+            assertEquals(4, one.heldOutRamadanDays)
+            assertEquals(mapOf("fajr" to listOf(DateRun.parse("2026-12-01..2026-12-31"))), one.heldOutByEvent)
+            assertEquals(listOf(true, false), one.units.map { it.showsImsak })
+            assertEquals(mapOf("maghrib" to listOf(DateRun.parse(runs.single()))), one.units[0].heldOutByEvent)
+            assertTrue(one.units[1].heldOutByEvent.isEmpty())
+            // A split class with A or B in it is a checked timetable's, not a published method's.
+            assertTrue(two.isAOrB && !two.isPublishedMethod && !two.showsImsak && two.heldOutByEvent.isEmpty())
+        } finally {
+            dir.deleteRecursively()
+        }
     }
 }

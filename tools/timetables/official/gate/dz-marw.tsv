@@ -4,15 +4,69 @@
 # - The base cities Algiers, Djelfa and Adrar, each at the research's point (the unit's): fit on
 #   Algiers's 1448 table; held out, Djelfa's and Adrar's and eight days of Algiers's 1447 calendar
 #   (2025).
-# - Oran and Tamanrasset: the tables the ministry derives for them (Algiers plus Oran's monthly
-#   differences; Adrar plus Tamanrasset's half-monthly ones), each fitting its own seat's margins at
-#   the seat: fit, nothing held out.
-# Not rows: the OCR stages (dz/*_ocr.txt, dz/*_resolved.txt) and the copies of the same calendar
-# days (dz_alger_all.txt, dz_adrar.txt, dz_djelfa.txt, agentB/alger_rabi2.txt, off-alger.txt).
+# - The 24 wilayas of Algiers's calendar and the town of Dellys (rulings R230 to R232): FITTED
+#   units, each margins of our own over Algiers's method at the wilaya's seat, for 20 km around it.
+#   The table a row reads is the one the Ministry derives for the place (Algiers's daily table
+#   and the month pages' differences), held only in the private archive
+#   (archive/tables/manual/dz-marw/2026-11-13, written by archive/code/manual/dz-marw/
+#   marw_wilayas.py from the differences read by eye): none of its minutes is in the app.
+#   FIT rows, not held-out ones: the margins were found on these very days (archive/code/manual/
+#   dz-marw/marw_fit.py), so a row proves that the fitted margins are never before the place's
+#   table on any day held and how late they run (at most 3 minutes), not the engine against a
+#   table it has not seen. No day of these 25 places is held out. Nothing is claimed past the
+#   days held (ruling R231 as revised): the margins stand through 5 June 2027, the calendar's
+#   last day, and after it the app shows every start a whole minute later, sunrise and the end
+#   of eating a whole minute earlier, and no figure for the place, until the next calendar is
+#   read and fitted. The independent held-out proof stays Djelfa's and Adrar's tables and the
+#   eight days of 1447. Largest wilaya first.
+# - Oran's band (31-seat, around the fitted unit 31) and Tamanrasset: the tables the ministry
+#   derives for them (Algiers and Oran's monthly differences; Adrar and Tamanrasset's
+#   half-monthly ones), each fitting its own seat's margins at the seat: fit, nothing held out.
+#   Oran's table is so read twice, once by each of its two units, which carry the same margins:
+#   by the unit 31, which a place of the wilaya of Oran within 20 km of the seat is given, and by
+#   the band 31-seat, which the same point is given when the place's region is not known and
+#   which otherwise serves the wilaya beyond the 20 km. The band's "measured" rests on that one
+#   row at the seat; nothing is held for a place of the band beyond it. Both bands are of the
+#   calendar's days as the 25 places are: the same last day, the same minute after it.
+# - The source of the differences: the Wayback Machine's copy of 30 Jul 2026 of the Ministry's
+#   Alger.pdf (web.archive.org/web/20260730202403id_/https://marw.gov.dz/media/calendrier/1448/
+#   Alger.pdf, taken by the engine survey on 11 Nov 2026; archive/raw/manual/dz-marw/2026-11-11,
+#   with its capture note). It is bound to the Ministry's own file by the September round's direct
+#   read of 25 Sep 2026: Oran's whole column and the Ramadan page's 30 daily rows are the same
+#   in both. The rest of the copy has not been compared with the Ministry's own file: that is
+#   to do before the release (the capture note says how).
+# Not rows: the OCR stages (dz/*_ocr.txt, dz/*_resolved.txt), the copies of the same calendar
+# days (dz_alger_all.txt, dz_adrar.txt, dz_djelfa.txt, agentB/alger_rabi2.txt, off-alger.txt) and
+# the differences themselves (differences-alger-1448.txt and its OCR second reading).
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-maghreb-libya/off-marw-alger.txt	dz.marw/16			Africa/Algiers	F+E S D A M I	daily	standard	fit	Algiers, calendar 1448
 archive/tables/moral-auth-mena/maghreb/dz_alger1447.txt	dz.marw/16			Africa/Algiers	F+E S D A M I	daily	standard	test	Algiers, calendar 1447 (2025), eight days
 archive/tables/round/data-maghreb-libya/off-marw-djelfa.txt	dz.marw/17			Africa/Algiers	F+E S D A M I	daily	standard	test	Djelfa, calendar 1448 (about 1,140 m)
 archive/tables/round/data-maghreb-libya/off-marw-adrar.txt	dz.marw/1			Africa/Algiers	F+E S D A M I	daily	standard	test	Adrar, calendar 1448 (the far south-west)
-archive/tables/round/data-maghreb-libya/off-marw-oran.txt	dz.marw/31			Africa/Algiers	F+E S D A M I	daily	standard	fit	Oran, calendar 1448 (Algiers plus Oran's monthly differences)
+archive/tables/round/data-maghreb-libya/off-marw-oran.txt	dz.marw/31-seat			Africa/Algiers	F+E S D A M I	daily	standard	fit	Oran, calendar 1448 (Algiers plus Oran's monthly differences)
 archive/tables/round/data-maghreb-libya/off-marw-tamanrasset.txt	dz.marw/11			Africa/Algiers	F+E S D A M I	daily	standard	fit	Tamanrasset, calendar 1448 (Adrar plus its half-monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/oran-1448.txt	dz.marw/31			Africa/Algiers	F+E S D A M I	daily	standard	fit	Oran, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/tizi-ouzou-1448.txt	dz.marw/15			Africa/Algiers	F+E S D A M I	daily	standard	fit	Tizi Ouzou, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/blida-1448.txt	dz.marw/9			Africa/Algiers	F+E S D A M I	daily	standard	fit	Blida, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/boumerdes-1448.txt	dz.marw/35			Africa/Algiers	F+E S D A M I	daily	standard	fit	Boumerdès, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/dellys-1448.txt	dz.marw/35-dellys			Africa/Algiers	F+E S D A M I	daily	standard	fit	Dellys (a town of Boumerdès the calendar prints on its own line), calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/bejaia-1448.txt	dz.marw/6			Africa/Algiers	F+E S D A M I	daily	standard	fit	Béjaïa, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/chlef-1448.txt	dz.marw/2			Africa/Algiers	F+E S D A M I	daily	standard	fit	Chlef, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/constantine-1448.txt	dz.marw/25			Africa/Algiers	F+E S D A M I	daily	standard	fit	Constantine, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/setif-1448.txt	dz.marw/19			Africa/Algiers	F+E S D A M I	daily	standard	fit	Sétif, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/mila-1448.txt	dz.marw/43			Africa/Algiers	F+E S D A M I	daily	standard	fit	Mila, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/skikda-1448.txt	dz.marw/21			Africa/Algiers	F+E S D A M I	daily	standard	fit	Skikda, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/bordj-bou-arreridj-1448.txt	dz.marw/34			Africa/Algiers	F+E S D A M I	daily	standard	fit	Bordj Bou Arréridj, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/msila-1448.txt	dz.marw/28			Africa/Algiers	F+E S D A M I	daily	standard	fit	M'Sila, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/relizane-1448.txt	dz.marw/48			Africa/Algiers	F+E S D A M I	daily	standard	fit	Relizane, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/oum-el-bouaghi-1448.txt	dz.marw/4			Africa/Algiers	F+E S D A M I	daily	standard	fit	Oum El Bouaghi, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/annaba-1448.txt	dz.marw/23			Africa/Algiers	F+E S D A M I	daily	standard	fit	Annaba, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/ain-defla-1448.txt	dz.marw/44			Africa/Algiers	F+E S D A M I	daily	standard	fit	Aïn Defla, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/bouira-1448.txt	dz.marw/10			Africa/Algiers	F+E S D A M I	daily	standard	fit	Bouira, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/el-tarf-1448.txt	dz.marw/36			Africa/Algiers	F+E S D A M I	daily	standard	fit	El Tarf, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/tipaza-1448.txt	dz.marw/42			Africa/Algiers	F+E S D A M I	daily	standard	fit	Tipaza, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/medea-1448.txt	dz.marw/26			Africa/Algiers	F+E S D A M I	daily	standard	fit	Médéa, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/guelma-1448.txt	dz.marw/24			Africa/Algiers	F+E S D A M I	daily	standard	fit	Guelma, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/souk-ahras-1448.txt	dz.marw/41			Africa/Algiers	F+E S D A M I	daily	standard	fit	Souk Ahras, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/jijel-1448.txt	dz.marw/18			Africa/Algiers	F+E S D A M I	daily	standard	fit	Jijel, calendar 1448 (Algiers plus its monthly differences)
+archive/tables/manual/dz-marw/2026-11-13/mostaganem-1448.txt	dz.marw/27			Africa/Algiers	F+E S D A M I	daily	standard	fit	Mostaganem, calendar 1448 (Algiers plus its monthly differences)

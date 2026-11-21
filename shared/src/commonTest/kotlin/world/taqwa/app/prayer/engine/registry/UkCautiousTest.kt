@@ -12,6 +12,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.astro.altitudeTime
 import world.taqwa.app.prayer.engine.day.Cautious
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.day.Ends

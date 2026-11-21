@@ -15,6 +15,7 @@ import world.taqwa.app.prayer.engine.astro.AsrModel
 import world.taqwa.app.prayer.engine.astro.SolarMath
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.astro.altitudeTime
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.ClockRule
 import world.taqwa.app.prayer.engine.method.ClockTimes
@@ -379,7 +380,8 @@ class HighLatitudeTest {
         assertEquals(
             nearest.copy(
                 asr = ownAsr, asrOther = ownHanafi,
-                ends = nearest.ends + (Prayer.DHUHR to ownAsr),
+                // Dhuhr's end is that Asr read as an end, rounded down (ruling R265).
+                ends = nearest.ends + (Prayer.DHUHR to Instant.fromEpochSeconds(floor(own.asr(1.0, AsrModel.EXACT_MOMENT)!! / 60).toLong() * 60)),
                 polar = true, setByRule = borrowed,
             ),
             day,

@@ -1,7 +1,7 @@
 {
   "entry": "za.voc",
   "class": "D (authority)",
-  "engineHash": "882424304b3d00ec",
+  "engineHash": "dcf3535e75c1d012",
   "broken": 0,
   "places": 1,
   "first": "2026-06-01",
@@ -18,262 +18,278 @@
     "endOfEating": ["2026-06-01..2026-07-15", "2026-07-20", "2026-07-22", "2026-07-24..2026-07-27", "2026-07-29", "2026-07-31", "2026-08-02..2026-08-03", "2026-08-05", "2026-08-07..2026-08-10", "2026-08-12", "2026-08-19", "2026-08-21..2026-08-24", "2026-08-26", "2026-08-28..2026-10-31", "2026-11-02", "2026-11-04", "2026-11-06", "2026-11-08..2026-11-09", "2026-11-15..2026-11-16", "2026-11-18", "2026-11-20..2026-11-23", "2026-11-25", "2026-11-27..2026-12-31", "2027-01-02..2027-01-04", "2027-01-06", "2027-01-08", "2027-01-13", "2027-01-15..2027-01-18", "2027-01-20", "2027-01-22..2027-01-25", "2027-01-27", "2027-01-29..2027-01-31", "2027-02-03", "2027-02-05..2027-02-07", "2027-02-12", "2027-02-19..2027-02-22", "2027-02-24", "2027-02-26..2027-03-01", "2027-03-03", "2027-03-05..2027-03-08", "2027-03-14..2027-03-15", "2027-03-17", "2027-03-19..2027-03-22", "2027-03-24", "2027-03-26..2027-03-29", "2027-03-31", "2027-04-02..2027-04-05", "2027-04-07", "2027-04-14", "2027-04-16..2027-04-19", "2027-04-21", "2027-04-23..2027-04-26", "2027-04-28", "2027-04-30..2027-05-03", "2027-05-05", "2027-05-07", "2027-05-14..2027-05-17", "2027-05-19", "2027-05-21..2027-05-24", "2027-05-26", "2027-05-28..2027-05-31", "2027-06-02", "2027-06-04..2027-06-05"]
   },
   "placeDays": 271,
-  "heldOutDays": 149,
+  "heldOutDays": 59,
+  "tables": 6,
   "ramadanDays": 15,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 348,
+      "checked": 8352,
       "early": 0,
       "late": {
-        "0": 269,
-        "1": 78,
-        "2": 1,
-        "3+": 0
+        "0": 3341,
+        "1": 2060,
+        "2": 1369,
+        "3+": 1582
       },
-      "exactShare": 0.773,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.4,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit za.voc",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 226,
+      "checked": 5424,
       "lateEnd": 0,
       "late": {
-        "0": 10,
-        "1": 205,
-        "2": 11,
-        "3+": 0
+        "0": 147,
+        "1": 3134,
+        "2": 962,
+        "3+": 1181
       },
-      "exactShare": 0.0442,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.0271,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit za.voc",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 348,
+      "checked": 8352,
       "early": 0,
       "late": {
-        "0": 208,
-        "1": 140,
-        "2": 0,
-        "3+": 0
+        "0": 2704,
+        "1": 2377,
+        "2": 1512,
+        "3+": 1759
       },
-      "exactShare": 0.5977,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.3238,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit za.voc",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 348,
+      "checked": 8352,
       "early": 0,
       "late": {
-        "0": 140,
-        "1": 208,
-        "2": 0,
-        "3+": 0
+        "0": 1526,
+        "1": 3088,
+        "2": 1455,
+        "3+": 2283
       },
-      "exactShare": 0.4023,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.1827,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit za.voc",
       "overLimit": 0
     },
     "asrHanafi": {
-      "checked": 212,
+      "checked": 5088,
       "early": 0,
       "late": {
-        "0": 79,
-        "1": 128,
-        "2": 5,
-        "3+": 0
+        "0": 909,
+        "1": 1862,
+        "2": 911,
+        "3+": 1406
       },
-      "exactShare": 0.3726,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.1787,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit za.voc",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 348,
+      "checked": 8352,
       "early": 0,
       "late": {
-        "0": 61,
-        "1": 230,
-        "2": 54,
-        "3+": 3
+        "0": 713,
+        "1": 3022,
+        "2": 1886,
+        "3+": 2731
       },
-      "exactShare": 0.1753,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.0854,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "unit za.voc",
       "overLimit": 0
     },
     "isha": {
-      "checked": 348,
+      "checked": 8352,
       "early": 0,
       "late": {
-        "0": 70,
-        "1": 205,
-        "2": 73,
-        "3+": 0
+        "0": 843,
+        "1": 2701,
+        "2": 1932,
+        "3+": 2876
       },
-      "exactShare": 0.2011,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.1009,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "unit za.voc",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 348,
+      "checked": 8352,
       "lateEnd": 0,
       "late": {
-        "0": 2,
-        "1": 265,
-        "2": 81,
-        "3+": 0
+        "0": 30,
+        "1": 3953,
+        "2": 2184,
+        "3+": 2185
       },
-      "exactShare": 0.0057,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.0036,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "unit za.voc",
       "overLimit": 0
     }
   },
   "heldOut": {
-    "placeDays": 149,
-    "ramadanDays": 15,
+    "placeDays": 59,
+    "ramadanDays": 0,
+    "checkedByEvent": {
+      "fajr": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+      "sunrise": ["2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01"],
+      "dhuhr": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+      "asrStandard": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+      "maghrib": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+      "isha": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+      "endOfEating": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"]
+    },
     "events": {
       "fajr": {
-        "checked": 227,
+        "checked": 59,
         "early": 0,
         "late": {
-          "0": 183,
-          "1": 44,
+          "0": 48,
+          "1": 11,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.8062,
+        "exactShare": 0.8136,
         "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 5,
+        "lateLimitFrom": "unit za.voc",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 105,
+        "checked": 5,
         "lateEnd": 0,
         "late": {
-          "0": 7,
-          "1": 93,
-          "2": 5,
-          "3+": 0
-        },
-        "exactShare": 0.0667,
-        "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "dhuhr": {
-        "checked": 227,
-        "early": 0,
-        "late": {
-          "0": 133,
-          "1": 94,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.5859,
-        "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "asrStandard": {
-        "checked": 227,
-        "early": 0,
-        "late": {
-          "0": 102,
-          "1": 125,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.4493,
-        "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
-      "asrHanafi": {
-        "checked": 90,
-        "early": 0,
-        "late": {
-          "0": 64,
-          "1": 25,
+          "0": 0,
+          "1": 4,
           "2": 1,
           "3+": 0
         },
-        "exactShare": 0.7111,
+        "exactShare": 0,
         "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 5,
+        "lateLimitFrom": "unit za.voc",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 59,
+        "early": 0,
+        "late": {
+          "0": 33,
+          "1": 26,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.5593,
+        "worstLate": 1,
+        "lateLimit": 4,
+        "lateLimitFrom": "unit za.voc",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 59,
+        "early": 0,
+        "late": {
+          "0": 13,
+          "1": 46,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.2203,
+        "worstLate": 1,
+        "lateLimit": 5,
+        "lateLimitFrom": "unit za.voc",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 227,
+        "checked": 59,
         "early": 0,
         "late": {
-          "0": 58,
-          "1": 145,
-          "2": 24,
+          "0": 7,
+          "1": 45,
+          "2": 7,
           "3+": 0
         },
-        "exactShare": 0.2555,
+        "exactShare": 0.1186,
         "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 6,
+        "lateLimitFrom": "unit za.voc",
         "overLimit": 0
       },
       "isha": {
-        "checked": 227,
+        "checked": 59,
         "early": 0,
         "late": {
-          "0": 67,
-          "1": 123,
-          "2": 37,
+          "0": 3,
+          "1": 46,
+          "2": 10,
           "3+": 0
         },
-        "exactShare": 0.2952,
+        "exactShare": 0.0508,
         "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 6,
+        "lateLimitFrom": "unit za.voc",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 227,
+        "checked": 59,
         "lateEnd": 0,
         "late": {
-          "0": 1,
-          "1": 171,
-          "2": 55,
+          "0": 0,
+          "1": 50,
+          "2": 9,
           "3+": 0
         },
-        "exactShare": 0.0044,
+        "exactShare": 0,
         "worstLate": 2,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 6,
+        "lateLimitFrom": "unit za.voc",
         "overLimit": 0
       }
     }
   },
+  "replays": {
+    "places": 23,
+    "placeDays": 6233
+  },
   "lateLimits": {
-    "class D (authority): 3 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha", "endOfEating"]
+    "unit za.voc: 4 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["dhuhr"]
+    },
+    "unit za.voc: 5 min (asrHanafi)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["fajr", "asrStandard", "asrHanafi"]
+    },
+    "unit za.voc: 5 min (sunrise)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["sunrise"]
+    },
+    "unit za.voc: 6 min (endOfEating)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["endOfEating"]
+    },
+    "unit za.voc: 6 min (isha)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["maghrib", "isha"]
     }
   },
   "units": {
@@ -291,131 +307,157 @@
         "isha": ["2026-06-01..2026-07-15", "2026-07-20", "2026-07-22", "2026-07-24..2026-07-27", "2026-07-29", "2026-07-31", "2026-08-02..2026-08-03", "2026-08-05", "2026-08-07..2026-08-10", "2026-08-12", "2026-08-19", "2026-08-21..2026-08-24", "2026-08-26", "2026-08-28..2026-10-31", "2026-11-02", "2026-11-04", "2026-11-06", "2026-11-08..2026-11-09", "2026-11-15..2026-11-16", "2026-11-18", "2026-11-20..2026-11-23", "2026-11-25", "2026-11-27..2026-12-31", "2027-01-02..2027-01-04", "2027-01-06", "2027-01-08", "2027-01-13", "2027-01-15..2027-01-18", "2027-01-20", "2027-01-22..2027-01-25", "2027-01-27", "2027-01-29..2027-01-31", "2027-02-03", "2027-02-05..2027-02-07", "2027-02-12", "2027-02-19..2027-02-22", "2027-02-24", "2027-02-26..2027-03-01", "2027-03-03", "2027-03-05..2027-03-08", "2027-03-14..2027-03-15", "2027-03-17", "2027-03-19..2027-03-22", "2027-03-24", "2027-03-26..2027-03-29", "2027-03-31", "2027-04-02..2027-04-05", "2027-04-07", "2027-04-14", "2027-04-16..2027-04-19", "2027-04-21", "2027-04-23..2027-04-26", "2027-04-28", "2027-04-30..2027-05-03", "2027-05-05", "2027-05-07", "2027-05-14..2027-05-17", "2027-05-19", "2027-05-21..2027-05-24", "2027-05-26", "2027-05-28..2027-05-31", "2027-06-02", "2027-06-04..2027-06-05"],
         "endOfEating": ["2026-06-01..2026-07-15", "2026-07-20", "2026-07-22", "2026-07-24..2026-07-27", "2026-07-29", "2026-07-31", "2026-08-02..2026-08-03", "2026-08-05", "2026-08-07..2026-08-10", "2026-08-12", "2026-08-19", "2026-08-21..2026-08-24", "2026-08-26", "2026-08-28..2026-10-31", "2026-11-02", "2026-11-04", "2026-11-06", "2026-11-08..2026-11-09", "2026-11-15..2026-11-16", "2026-11-18", "2026-11-20..2026-11-23", "2026-11-25", "2026-11-27..2026-12-31", "2027-01-02..2027-01-04", "2027-01-06", "2027-01-08", "2027-01-13", "2027-01-15..2027-01-18", "2027-01-20", "2027-01-22..2027-01-25", "2027-01-27", "2027-01-29..2027-01-31", "2027-02-03", "2027-02-05..2027-02-07", "2027-02-12", "2027-02-19..2027-02-22", "2027-02-24", "2027-02-26..2027-03-01", "2027-03-03", "2027-03-05..2027-03-08", "2027-03-14..2027-03-15", "2027-03-17", "2027-03-19..2027-03-22", "2027-03-24", "2027-03-26..2027-03-29", "2027-03-31", "2027-04-02..2027-04-05", "2027-04-07", "2027-04-14", "2027-04-16..2027-04-19", "2027-04-21", "2027-04-23..2027-04-26", "2027-04-28", "2027-04-30..2027-05-03", "2027-05-05", "2027-05-07", "2027-05-14..2027-05-17", "2027-05-19", "2027-05-21..2027-05-24", "2027-05-26", "2027-05-28..2027-05-31", "2027-06-02", "2027-06-04..2027-06-05"]
       },
+      "heldOutByEvent": {
+        "fajr": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+        "sunrise": ["2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01"],
+        "dhuhr": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+        "asrStandard": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+        "maghrib": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+        "isha": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"],
+        "endOfEating": ["2026-06-01..2026-06-20", "2026-06-23", "2026-06-25", "2026-09-01", "2026-09-03", "2026-09-08", "2026-09-10", "2026-09-13..2026-09-17", "2026-09-22", "2026-09-24", "2026-09-29", "2026-10-01", "2026-10-06", "2026-10-08", "2026-10-12..2026-10-15", "2026-10-20", "2026-10-22", "2026-10-27", "2026-10-29", "2026-12-01", "2026-12-03", "2026-12-08", "2026-12-10..2026-12-15", "2026-12-17", "2026-12-22", "2026-12-24", "2026-12-29", "2026-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
-        "class D (authority): 3 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha", "endOfEating"]
+        "unit za.voc: 4 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["dhuhr"]
+        },
+        "unit za.voc: 5 min (asrHanafi)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["fajr", "asrStandard", "asrHanafi"]
+        },
+        "unit za.voc: 5 min (sunrise)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["sunrise"]
+        },
+        "unit za.voc: 6 min (endOfEating)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["endOfEating"]
+        },
+        "unit za.voc: 6 min (isha)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["maghrib", "isha"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 348,
+          "checked": 8352,
           "early": 0,
           "late": {
-            "0": 269,
-            "1": 78,
-            "2": 1,
-            "3+": 0
+            "0": 3341,
+            "1": 2060,
+            "2": 1369,
+            "3+": 1582
           },
-          "exactShare": 0.773,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit za.voc",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 226,
+          "checked": 5424,
           "lateEnd": 0,
           "late": {
-            "0": 10,
-            "1": 205,
-            "2": 11,
-            "3+": 0
+            "0": 147,
+            "1": 3134,
+            "2": 962,
+            "3+": 1181
           },
-          "exactShare": 0.0442,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.0271,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit za.voc",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 348,
+          "checked": 8352,
           "early": 0,
           "late": {
-            "0": 208,
-            "1": 140,
-            "2": 0,
-            "3+": 0
+            "0": 2704,
+            "1": 2377,
+            "2": 1512,
+            "3+": 1759
           },
-          "exactShare": 0.5977,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.3238,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit za.voc",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 348,
+          "checked": 8352,
           "early": 0,
           "late": {
-            "0": 140,
-            "1": 208,
-            "2": 0,
-            "3+": 0
+            "0": 1526,
+            "1": 3088,
+            "2": 1455,
+            "3+": 2283
           },
-          "exactShare": 0.4023,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.1827,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit za.voc",
           "overLimit": 0
         },
         "asrHanafi": {
-          "checked": 212,
+          "checked": 5088,
           "early": 0,
           "late": {
-            "0": 79,
-            "1": 128,
-            "2": 5,
-            "3+": 0
+            "0": 909,
+            "1": 1862,
+            "2": 911,
+            "3+": 1406
           },
-          "exactShare": 0.3726,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.1787,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit za.voc",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 348,
+          "checked": 8352,
           "early": 0,
           "late": {
-            "0": 61,
-            "1": 230,
-            "2": 54,
-            "3+": 3
+            "0": 713,
+            "1": 3022,
+            "2": 1886,
+            "3+": 2731
           },
-          "exactShare": 0.1753,
-          "worstLate": 3,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.0854,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "unit za.voc",
           "overLimit": 0
         },
         "isha": {
-          "checked": 348,
+          "checked": 8352,
           "early": 0,
           "late": {
-            "0": 70,
-            "1": 205,
-            "2": 73,
-            "3+": 0
+            "0": 843,
+            "1": 2701,
+            "2": 1932,
+            "3+": 2876
           },
-          "exactShare": 0.2011,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.1009,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "unit za.voc",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 348,
+          "checked": 8352,
           "lateEnd": 0,
           "late": {
-            "0": 2,
-            "1": 265,
-            "2": 81,
-            "3+": 0
+            "0": 30,
+            "1": 3953,
+            "2": 2184,
+            "3+": 2185
           },
-          "exactShare": 0.0057,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.0036,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "unit za.voc",
           "overLimit": 0
         }
       }

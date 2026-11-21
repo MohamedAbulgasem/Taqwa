@@ -392,11 +392,12 @@ for file in scripts/*.sh tools/watchface/validate.sh tools/watchface/lib-validat
   cp "$file" "$REL_TREE/$file"
 done
 # It records each call and fails it, unless FAKE_OUTPUTS names a tree of outputs (the store-run
-# cases below): then the stamps pass, the face's build makes the signed face the current one (or
-# FAKE_CURRENT_FACE, when set), and the four builds copy that tree in. Every call first does what
-# Gradle's configuration does with a keystore.properties beside it: a build of the root project
-# reads it unless -Ptaqwa.unsignedRelease=true is given (androidApp/build.gradle.kts, and wearApp's
-# the same, configured whatever the tasks); tools/timetables is a build of its own and never does.
+# cases below): then the stamps and the envelope rows pass, the face's build makes the signed face
+# the current one (or FAKE_CURRENT_FACE, when set), and the four builds copy that tree in. Every
+# call first does what Gradle's configuration does with a keystore.properties beside it: a build of
+# the root project reads it unless -Ptaqwa.unsignedRelease=true is given (androidApp/build.gradle.kts,
+# and wearApp's the same, configured whatever the tasks); tools/timetables is a build of its own and
+# never does.
 # A read is noted in rel-keyreads.log, with the store file it names.
 cat > "$REL_TREE/gradlew" << EOF
 #!/bin/bash
@@ -409,7 +410,7 @@ case " \$* " in
 esac
 [ -n "\${FAKE_OUTPUTS-}" ] || exit 1
 case " \$* " in
-  *" checkStamps "*) ;;
+  *" checkStamps "* | *" checkEnvelopeRows "*) ;;
   *" :watchface:assembleRelease "*)
     mkdir -p watchface/build/outputs/apk/release
     cp "\${FAKE_CURRENT_FACE:-build/face-release/watchface-release-signed.apk}" watchface/build/outputs/apk/release/watchface-release-unsigned.apk ;;

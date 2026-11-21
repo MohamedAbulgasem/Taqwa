@@ -1,0 +1,24 @@
+# Engine wave W5 (18 Oct 2026, rulings R136–R138): the regional safe default for South Asia beyond Pakistan, India
+# and Bangladesh (`default.safe.southasia`, Generic.kt; spec §6.2 c: Sri Lanka, Nepal, Bhutan, the Maldives),
+# gated for the first time, as a stress test only: no table is held for any country it serves, so it is checked
+# against the three neighbours' tables, each with its own entry and never routed here: Jamia Banuri's Karachi
+# September 2026 (both Asr columns, no Dhuhr), Dawat-e-Islami's Delhi September 2026 (Hanafi Asr) and the Islamic
+# Foundation's Dhaka permanent table for 2026, at the points their own gate files use. Every row is held out.
+#
+# What the rows show is the cost of the region's design (its late limits, Generic.kt, southAsiaLateLimits):
+# Karachi's 18°/18° with IFB's Dhuhr and Maghrib + 3 as floors and the cushion on top, against tables that print
+# smaller minutes: Maghrib up to 7 min after the printed one, sunrise up to 6 before, Dhuhr up to 6 after, Fajr
+# up to 5, Asr and Isha up to 4. The end of eating stays within the class limit.
+#
+# Masked cells, each a limit of the fallback for the owner (BUILD-LOG, W5), never an exception added quietly:
+# - Dhaka's sehri is not checked. IFB ends the fast at a printed sehri several minutes before its Fajr, a
+#   true-dawn precaution (bd.ifb's own exception, SouthAsia.kt); this region's end (the 18° dawn − 2 min) comes
+#   1 to 4 min after it on 70 days of 2026, a late end against a table of a country with its own entry. The same
+#   gap safe-default.tsv records for the world default. Its Fajr is checked as a start only.
+# - Dhaka's Isha is not checked. IFB's Isha is "about 18° + 1..4 min" (bd.ifb), and on one day of 2026 its + 4
+#   beats this region's 18° + 2 min with the cushion by a minute: a start before IFB's by a minute, the owner's
+#   §6.2 c question, never reached in production (Bangladesh has bd.ifb).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/southasia/off-banuri-daimi-karachi-2026-09.txt	default.safe.southasia	24.8607	67.0011	Asia/Karachi	F+E S - As Ah M I	daily	-	test	Pakistan (Jamia Banuri, Karachi) September 2026, stress test
+archive/tables/moral-auth-world/southasia/off-di-delhi-2026-09-e.txt	default.safe.southasia	28.6139	77.2090	Asia/Kolkata	F E S D Ah M I	daily	-	test	India (Dawat-e-Islami, Delhi) September 2026, stress test
+archive/tables/moral-auth-world/southasia/off-ifb-perm-2026.txt	default.safe.southasia	23.7104	90.4074	Asia/Dhaka	- F D A M - S	daily	hanafi	test	Bangladesh (Islamic Foundation, Dhaka) 2026, the permanent table, stress test; sehri and Isha not checked (see header)

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.TimeZone
 import okio.Path.Companion.toPath
+import world.taqwa.app.city.WithdrawnCities
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.domain.AsrMadhab
 import world.taqwa.app.domain.CalculationMethodId
@@ -250,6 +251,52 @@ class SettingsRepositoryTest {
         val r = repo("loc-city-id-absent")
         r.setLocation(GeoLocation(51.5074, -0.1278, "Europe/London", "London", "GB"))
         assertEquals(null, r.location.first()!!.cityId)
+    }
+
+    /**
+     * A row the city list has withdrawn stood at a point that is not its town's, so a phone that
+     * picked it holds another place's times under the town's name. Read back, it is no location:
+     * the app asks for the place again (ruling R212).
+     */
+    @Test
+    fun aLocationPickedFromAWithdrawnRowReadsAsNone() = runTest {
+        for (row in WithdrawnCities.rows) {
+            val r = repo("loc-withdrawn-${row.id}")
+            r.setLocation(GeoLocation(row.latitude, row.longitude, "Asia/Jakarta", row.name, "ID", cityId = row.id))
+            assertNull(r.location.first(), "${row.name} (${row.id}) picked before it was withdrawn")
+        }
+    }
+
+    /** An install from before ids were stored holds only the name; a backfill gave it a neighbour's id. */
+    @Test
+    fun aWithdrawnRowPickedBeforeIdsWereStoredReadsAsNoneToo() = runTest {
+        for (row in WithdrawnCities.rows) {
+            val r = repo("loc-withdrawn-name-${row.id}")
+            r.setLocation(GeoLocation(row.latitude, row.longitude, "Asia/Jakarta", row.name, "ID"))
+            assertNull(r.location.first(), "${row.name} by name alone")
+            r.setLocation(GeoLocation(row.latitude, row.longitude, "Asia/Jakarta", row.name, "ID", cityId = row.id + 1))
+            assertNull(r.location.first(), "${row.name} with a neighbour's id")
+        }
+    }
+
+    /** Someone really standing at the row's point is where they are: a fix carries no name and no withdrawn id. */
+    @Test
+    fun aFixAtAWithdrawnRowsPointKeepsItsLocation() = runTest {
+        for (row in WithdrawnCities.rows) {
+            val r = repo("loc-withdrawn-fix-${row.id}")
+            r.setLocation(GeoLocation(row.latitude, row.longitude, "Asia/Jakarta", cityName = null, countryCode = "ID", cityId = row.id + 1))
+            assertEquals(row.id + 1, r.location.first()?.cityId, "a fix at ${row.name}'s old point")
+        }
+    }
+
+    /** The row's name and id elsewhere are another place: only the withdrawn point is withdrawn. */
+    @Test
+    fun aWithdrawnRowsNameElsewhereKeepsItsLocation() = runTest {
+        for (row in WithdrawnCities.rows) {
+            val r = repo("loc-withdrawn-elsewhere-${row.id}")
+            r.setLocation(GeoLocation(row.latitude + 0.5, row.longitude - 0.5, "Asia/Jakarta", row.name, "ID", cityId = row.id))
+            assertEquals(row.name, r.location.first()?.cityName, "${row.name} half a degree away")
+        }
     }
 
     @Test
@@ -519,6 +566,17 @@ class SettingsRepositoryTest {
         r.setCautiousCardSeen(true)
         assertEquals(true, r.sunniCardSeen.first())
         assertEquals(true, r.cautiousCardSeen.first())
+    }
+
+    /** Home's watch card: one flag, set by its x and cleared by its Undo, absent until then. */
+    @Test
+    fun theHomeWatchCardStaysUntilItsXAndUndoBringsItBack() = runTest {
+        val r = repo("home-watch-card")
+        assertEquals(false, r.homeWatchCardDismissed.first())
+        r.setHomeWatchCardDismissed(true)
+        assertEquals(true, r.homeWatchCardDismissed.first())
+        r.setHomeWatchCardDismissed(false)
+        assertEquals(false, r.homeWatchCardDismissed.first())
     }
 }
 

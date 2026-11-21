@@ -50,8 +50,11 @@ Waktu salat dari mesin Taqwa sendiri; arah kiblat dari pustaka Adhan; teks Al-Qu
 (Plan 5 Task 10's cut, which makes room for the wrist paragraph within Play's 4,000 characters, for Mohamed's approval: it replaces P5.9's: the line of interface languages is left out too, which the App Store lists itself, beside P5.9's own cuts (the city, Mushaf, recitation and tasbeeh bullets in fewer words, and the website and support lines left out); and, as Indonesian needs more room: the high-latitude rules join the methods bullet, the 24- or 12-hour clock the Jumu'ah bullet, the (i) bullet says in fewer words that it shows whose times these are and how they are checked, the translations, bookmarks, read-aloud, Qibla, adhkar and GPL bullets and the sources line are shorter, and the trust section's first bullet keeps only what the opening does not already say (no account, no adverts), and the city bullet (P5.9's) and the wrist paragraph are written more shortly.)
 
 ### Release notes (500)
-Yang baru di versi 1.6.0:
-• Taqwa di jam tangan Anda: tampilan jam, komplikasi dan kartu, tasbih dan kiblat, di jam tangan Wear OS seperti Galaxy Watch
+Yang baru di versi 1.7.0:
+• Waktu salat kini dicocokkan dengan jadwal terbitannya di jauh lebih banyak tempat, termasuk Turki, Mesir, Maroko, Aljazair, Malaysia, Indonesia, Bangladesh, dan Pakistan
+• Di dekat perbatasan, waktu salat yang ditentukan berdasarkan lokasi Anda kini dapat memperhitungkan jadwal kedua negara
+• Widget “Ayat hari ini” kini berisi 365 ayat, satu untuk setiap hari dalam setahun
+• Kartu di layar Salat membantu Anda menyiapkan Taqwa di jam tangan Anda
 
 ## App Store
 
@@ -119,8 +122,10 @@ Waktu salat dari mesin Taqwa sendiri; arah kiblat dari pustaka Adhan; teks Al-Qu
 (Its own text since 1.6.0, as each store names only its own watch (App Store Review Guideline 2.3.10): the Play full description above, with the Apple Watch paragraph in place of the Wear OS one, and Apple in place of Google in the bullet after the location one.)
 
 ### What's new (4000)
-Yang baru di versi 1.6.0:
-• Taqwa di Apple Watch Anda: salat berikutnya di komplikasi Anda, tasbih dengan Digital Crown, dan kiblat
+Yang baru di versi 1.7.0:
+• Waktu salat kini dicocokkan dengan jadwal terbitannya di jauh lebih banyak tempat, termasuk Turki, Mesir, Maroko, Aljazair, Malaysia, Indonesia, Bangladesh, dan Pakistan
+• Di dekat perbatasan, waktu salat yang ditentukan berdasarkan lokasi Anda kini dapat memperhitungkan jadwal kedua negara
+• Widget “Ayat hari ini” kini berisi 365 ayat, satu untuk setiap hari dalam setahun
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Waktu salat di tempat Anda

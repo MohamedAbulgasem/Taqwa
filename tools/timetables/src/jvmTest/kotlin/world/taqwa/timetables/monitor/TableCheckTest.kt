@@ -86,6 +86,28 @@ class TableCheckTest {
     }
 
     @Test
+    fun `a printed imsak's capture is checked with its Subuh as the day's start (ruling R284)`() {
+        // The fetcher's layout: the Subuh beside the imsak (here the Subuh less 10, as e-solat and myQuran print it). Read
+        // as `- Im` alone the gate refuses it (ends alone, no start that day).
+        val lines = listOf("muis-2026-02-a.txt", "muis-2026-02-b.txt").flatMap { fixture.resolve("open/SG-MUIS/$it").readLines() }
+            .filter { it.isNotBlank() && !it.startsWith("#") }.map { line ->
+                val c = line.split(' ')
+                val (h, m) = c[1].split(':').map(String::toInt)
+                val total = h * 60 + m - 10
+                "${c[0]} ${c[1]} %02d:%02d".format(total / 60, total % 60)
+            }
+        val path = "archive/tables/monitor/sg-muis/singapore-imsak.txt"
+        official.resolve(path).apply { parentFile.mkdirs() }.writeText("# an invented table for the test\n" + lines.joinToString("\n") + "\n")
+        val imsak = table("sg-muis", "singapore-imsak", path, "sg.muis", null, null, "Asia/Singapore", "SG", "- Im")
+        assertEquals("F Im", check.checkedColumns(imsak))
+        assertEquals("- Im", check.checkedColumns(imsak.copy(key = "singapore")), "only an imsak capture's first column is read as its Subuh")
+        val item = check.check(imsak).item
+        assertEquals(Kind.NEW_TABLE_FINE, item.kind, item.toString())
+        // The row to paste keeps the gate file's convention: the imsak alone, beside the day's own row.
+        assertTrue(item.details.any { "\tsg.muis\t\t\tAsia/Singapore\t- Im\tdaily\t" in it }, item.toString())
+    }
+
+    @Test
     fun `a held table is labelled by what happened to it`() {
         assertEquals(Kind.CHANGED_FINE, check.check(muisTable(0), changed).item.kind)
         assertEquals(Kind.GREEN_AGAIN, check.check(muisTable(0), wasRed).item.kind)
