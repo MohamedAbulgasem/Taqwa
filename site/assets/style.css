@@ -159,7 +159,7 @@ html[dir="rtl"] .month-head a, html[dir="rtl"] .tt-stale a { direction: rtl; }
 .section h2 { font-size: clamp(26px, 3.6vw, 34px); margin-bottom: 10px; }
 .section > .wrap > .lede { margin-bottom: 36px; font-size: 18px; }
 
-/* The features: nine cards in three rows of three, On your wrist the eighth and Seven languages last.
+/* The features: nine cards in three rows of three, Your watch the eighth and Seven languages last.
    At the wrap's 992 px a column is 317 px, the same columns (and gap) as the phone screens'
    below. Three hold while a column keeps about 270 px, a text column of some 216 px: the wrap
    gives that from a 900 px window (852 px of content). Below it two to a row, and one under
@@ -208,6 +208,100 @@ html[dir="rtl"] .month-head a, html[dir="rtl"] .tt-stale a { direction: rtl; }
 .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; align-items: start; }
 .widgets-shot { justify-self: center; max-width: 420px; }
 .widgets-shot img { width: 100%; border-radius: 24px; border: 1px solid var(--hair); }
+
+/* ── On the watch ─────────────────────────────────────── */
+/* The home page's section after "On the phone" (#watch): "Taqwa, on your wrist." with the Taqwa face
+   beside Taqwa on Modular, then the face's four styles, then Today, tasbeeh and the Qibla on both
+   watches. Every rule is scoped to the section's own classes and none above is changed; logical
+   properties, so Arabic and Urdu turn it by direction alone. The pictures keep their sides: a watch
+   is hardware, and the site's images are never mirrored.
+   Every Wear OS watch is the design page's Galaxy case (faces.js galaxy(), no strap), drawn once in
+   the section as the inline <symbol> #watch-case, each watch a <use> of it with its real capture in
+   the case's 200-unit screen at the centre of 260 (76.92 % of the box, 11.54 % in from each side).
+   Every Apple Watch screen is framed the same way, by the <symbol> #watch-frame: not an Apple Watch,
+   which Apple's marketing guidelines bar drawing, but a plain rectangular watch in the Galaxy case's
+   metal and bezel with a black glass border, and no crown, button or band, round the capture at the
+   display's own corners (96 of the 422 × 514 capture). Its rim is the case's weight, 50 of the
+   capture's pixels on each side, 522 × 614 in all: the screen is 9.58 % in from each side and 8.14 %
+   from top and bottom. Both keep their own metal in both themes. */
+.watch .wear, .watch .aw { position: relative; flex: none; }
+.watch .wear { width: var(--case, 240px); aspect-ratio: 1; }
+.watch .aw { width: var(--aw, 160px); aspect-ratio: 522 / 614; }
+.watch .wear > svg, .watch .aw > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.watch .disp { position: absolute; overflow: hidden; background: #000; }
+.watch .wear .disp { inset: 11.5385%; border-radius: 50%; }
+.watch .aw .disp { inset: 8.1433% 9.5785%; border-radius: 22.7% / 18.65%; }
+.watch .disp img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* The top: the label, the page's loudest h2 (still under the hero's 60 px h1), the lede and the way to
+   set it up, beside the two watches: the face first, its case 61 % of the stage, and Apple Watch in
+   its frame 32 % (its screen 25.9 %, near the 27 % it had before the frame). They share a row and
+   their captions the row under it, so the captions start on one line however each wraps. Both stand
+   on one line: the case leaves 6 of its 260 units empty under its circle, so the framed Modular is
+   lifted by as much (6/260 of the case, 4.399 % of its own column). */
+.watch-top { display: grid; grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.26fr); gap: 32px; align-items: center; }
+.watch .watch-top h2 { font-size: clamp(32px, 4.2vw, 42px); letter-spacing: -0.025em; line-height: 1.08; margin-bottom: 16px; }
+.watch .watch-top h2 .dot { color: var(--accent); }
+.watch .watch-top .lede { max-width: 30ch; }
+.watch .watch-copy .after { text-wrap: balance; }
+.watch .stage { display: grid; grid-template-columns: 61% 32%; grid-template-rows: auto auto; column-gap: 24px; row-gap: 16px; justify-content: center; }
+.watch .stage figure { margin: 0; display: grid; grid-row: span 2; grid-template-rows: subgrid; justify-items: center; min-width: 0; }
+.watch .stage .wear { --case: 100%; align-self: end; }
+.watch .stage .aw { --aw: 100%; align-self: end; margin-block-end: 4.399%; }
+.watch .stage .cap { align-self: start; }
+.watch .cap { font-size: 14px; line-height: 1.45; color: var(--t2); text-align: center; text-wrap: balance; }
+.watch .cap b { display: block; color: var(--t1); font-weight: 600; }
+
+/* The blocks under the top, each opening with a short head: the four styles, each in the case with a
+   screen of about 180 px (four to the 992 px column), then the watch app. */
+.watch-block { margin-top: 56px; }
+.watch-block > h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+.watch-block > p { margin-top: 8px; font-size: 16px; line-height: 1.55; color: var(--t2); max-width: 74ch; text-wrap: pretty; }
+.watch-list { list-style: none; margin: 28px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px 20px; }
+.watch-list > li { display: flex; flex-direction: column; align-items: center; gap: 14px; min-width: 0; }
+.watch-list.styles .wear { --case: min(100%, 234px); }
+
+/* The watch app: in each column the Wear OS watch (a 160 px case, and never more than 80 % of its
+   column, so on a tablet the four styles above stay a quarter larger) above Apple Watch in its frame,
+   the two screens at their real sizes to each other (the Galaxy's display 34 mm across, the Ultra's
+   32 mm wide: 0.724 of the case, and with the frame's 522/422, 0.8956). Each item takes two rows of
+   the list, the pictures and the caption, so the captions share a line; the Tile, which has no Apple
+   twin, sits in the middle of its row. */
+.watch-list.apps { row-gap: 0; }
+.watch-list.apps > li { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 14px; justify-items: center; margin-bottom: 32px; }
+.watch .app-pair { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; width: 100%; }
+.watch .app-pair .wear { --case: min(80%, 160px); }
+.watch .app-pair .aw { --aw: calc(min(80%, 160px) * 0.8956); }
+.watch-list.apps .cap { align-self: start; }
+
+/* What each part needs, once, at the end. */
+.watch-foot { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--hair); font-size: 14px; line-height: 1.55; color: var(--t2); text-wrap: balance; }
+
+/* Arabic, Urdu and Bengali: no tracking (it breaks the joins), and the heading's two lines at the
+   line height the site gives its own h1 in these scripts. */
+html[lang="ar"] .watch h2, html[lang="ur"] .watch h2, html[lang="bn"] .watch h2,
+html[lang="ar"] .watch h3, html[lang="ur"] .watch h3, html[lang="bn"] .watch h3 { letter-spacing: 0; }
+html[lang="ar"] .watch .watch-top h2 { line-height: 1.3; }
+html[lang="ur"] .watch .watch-top h2, html[lang="bn"] .watch .watch-top h2 { line-height: 1.35; }
+
+@media (max-width: 720px) {
+  .watch-top { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  /* One column: the pair keeps to about a phone's width, so a small tablet gets no dinner plate. The
+     framed Modular takes 36.5 % and the case 58 %, so its screen takes 29.5 %, near the 30 % it had
+     before the frame. */
+  .watch .stage { max-width: 460px; grid-template-columns: 58% 36.5%; column-gap: 14px; }
+  .watch .stage .aw { margin-block-end: 3.667%; }   /* the case's 6/260 again: 6/260 × 58/36.5 */
+  .watch .watch-top .lede { max-width: 34ch; }
+  .watch-block { margin-top: 44px; }
+  .watch-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 14px; }
+  .watch-list.styles .wear { --case: min(100%, 195px); }
+  /* The app grid's watches take 80 % of their column, as on a tablet, so the four styles stay a quarter
+     larger than its Wear OS watches, and its framed Apple Watch stays under the top's framed Modular:
+     117.5 against 124.8 px wide at 390, 92.4 against 99.3 at 320. */
+  .watch .app-pair .wear { --case: min(80%, 142px); }
+  .watch .app-pair .aw { --aw: calc(min(80%, 142px) * 0.8956); }
+  .watch-list.apps > li { margin-bottom: 28px; }
+}
 
 /* ── Prose pages (privacy, support) ───────────────────── */
 .prose { max-width: 68ch; padding-block: 40px 72px; }

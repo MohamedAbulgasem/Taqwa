@@ -699,6 +699,8 @@ def check_site(data: timetables.Timetables) -> int:
         problem(message)
     for message in check_smart_stack():
         problem(message)
+    for message in check_watch_section():
+        problem(message)
     for message in check_chosen_words():
         problem(message)
     return problems
@@ -732,12 +734,25 @@ SMART_STACK_AT_M8 = set()
 CHOSEN_WORDS = {"ar": [("مضاعف", "إضافات")]}
 
 
+def plain_spaces(text: str) -> str:
+    """text with its no-break spaces as plain ones. The home page's watch card and section join a
+    product's name with U+00A0 (Apple Watch, Smart Stack) so that it never breaks across a line, and
+    the checks find it by its plain spelling."""
+    return text.replace(chr(0x00A0), " ")
+
+
 def folded(text: str, lang: str) -> str:
-    """text in one case for comparing, as lang writes its capitals: Turkish capitals dotless ı as I
-    and dotted i as İ, which casefold alone reads as i and i with a combining dot."""
+    """text in one case and with plain spaces for comparing, as lang writes its capitals: Turkish
+    capitals dotless ı as I and dotted i as İ, which casefold alone reads as i and i with a combining
+    dot."""
     if lang == "tr":
         text = text.replace("I", "ı").replace("İ", "i")
-    return text.casefold()
+    return plain_spaces(text).casefold()
+
+
+def watch_card(page: str):
+    """The home page's watch card: the first <article> that names Apple Watch."""
+    return next((c for c in re.findall(r"<article\b.*?</article>", page, re.S) if "Apple Watch" in plain_spaces(c)), None)
 
 
 def check_smart_stack() -> list:
@@ -752,7 +767,7 @@ def check_smart_stack() -> list:
             continue
         with open(path, encoding="utf-8") as f:
             page = f.read()
-        card = next((c for c in re.findall(r"<article\b.*?</article>", page, re.S) if "Apple Watch" in c), None)
+        card = watch_card(page)
         if card is None:
             problems.append(f"{lang}/home.html: no watch card (an article that names Apple Watch)")
             continue
@@ -765,16 +780,45 @@ def check_smart_stack() -> list:
     return problems
 
 
+def watch_section(page: str):
+    """The home page's On the watch section (#watch), from its <section> tag to its </section>, found by
+    its id whatever order the tag's attributes are in, and never by an attribute whose name only ends
+    in id, such as data-id; None if the page has none."""
+    found = re.search(r'<section\b[^>]*\sid="watch"[^>]*>', page)
+    if found is None:
+        return None
+    end = page.find("</section>", found.start())
+    return page[found.start():end if end > 0 else len(page)]
+
+
+def check_watch_section() -> list:
+    """Each language's home page holds the On the watch section (#watch), whose words
+    check_chosen_words reads. A missing home page is check_smart_stack's to report."""
+    problems = []
+    for lang in LANGUAGE_ORDER:
+        path = os.path.join(SITE, "pages", lang, "home.html")
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8") as f:
+            if watch_section(f.read()) is None:
+                problems.append(f"{lang}/home.html: no On the watch section (#watch)")
+    return problems
+
+
 def watch_texts(lang: str) -> list:
-    """(where, text) of lang's watch card on its home page and its support page's watch answer."""
+    """(where, text) of lang's watch card and On the watch section (#watch) on its home page, and of
+    its support page's watch answer."""
     texts = []
     path = os.path.join(SITE, "pages", lang, "home.html")
     if os.path.exists(path):
         with open(path, encoding="utf-8") as f:
             page = f.read()
-        card = next((c for c in re.findall(r"<article\b.*?</article>", page, re.S) if "Apple Watch" in c), None)
+        card = watch_card(page)
         if card is not None:
             texts.append((f"{lang}/home.html: the watch card", card))
+        section = watch_section(page)
+        if section is not None:
+            texts.append((f"{lang}/home.html: the watch section", section))
     path = os.path.join(SITE, "pages", lang, "support.html")
     if os.path.exists(path):
         with open(path, encoding="utf-8") as f:
@@ -787,8 +831,9 @@ def watch_texts(lang: str) -> list:
 
 
 def check_chosen_words() -> list:
-    """No word Mohamed's choice at M8 replaced is left on a language's watch card or watch answer.
-    A missing page, card or answer is check_smart_stack's and check_watch_answer's to report."""
+    """No word Mohamed's choice at M8 replaced is left on a language's watch card, watch section or
+    watch answer. A missing page, card, section or answer is check_smart_stack's,
+    check_watch_section's and check_watch_answer's to report."""
     problems = []
     for lang, words in CHOSEN_WORDS.items():
         for where, text in watch_texts(lang):
