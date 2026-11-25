@@ -15,7 +15,7 @@ object CityText {
     /**
      * Lowercases (locale-invariantly, which is what turns Turkish `İ` into `i` plus a combining
      * dot), drops the combining marks that lowercasing leaves behind, maps the marked Latin
-     * letters and the Arabic letter variants to their bare forms, drops apostrophes, turns
+     * letters, the Arabic letter variants and Bengali's nukta letters to their bare forms, drops apostrophes, turns
      * hyphens into spaces and collapses whitespace.
      */
     fun fold(s: String): String {
@@ -26,6 +26,10 @@ object CityText {
             if (raw in '\u0300'..'\u036F') continue
             // Harakat, the superscript alef, and tatweel — invisible to a searcher.
             if (raw in '\u064B'..'\u0652' || raw == '\u0670' || raw == '\u0640') continue
+            // Bengali's nukta: ya, rra and rha with it come both precomposed and as the bare letter plus the
+            // nukta, the form Unicode's NFC keeps. Dropped here, and the three precomposed letters folded to
+            // their bare letters below, so a name written either way finds the other.
+            if (raw == '\u09BC') continue
             // Nobody types the apostrophe in Xi'an, and the bundle spells it with four different
             // characters. Dropped rather than spaced, so "xian" finds «Xi’an».
             if (APOSTROPHES.indexOf(raw) >= 0) continue
@@ -67,6 +71,9 @@ object CityText {
                 'ٱ', 'أ', 'إ', 'آ' -> out.append('ا')
                 'ى' -> out.append('ي')
                 'ة' -> out.append('ه')
+                '\u09DC' -> out.append('\u09A1')
+                '\u09DD' -> out.append('\u09A2')
+                '\u09DF' -> out.append('\u09AF')
                 else -> out.append(ch)
             }
         }

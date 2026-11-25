@@ -33,19 +33,19 @@
 # ---------------------------------------------------------------- Middle East
 # Saudi Arabia: Umm al-Qura (sa.ummalqura, class A).
 makkah-saudi-arabia	104515	en ar fr tr id ur bn	en ar fr tr id ur bn	ur=مکہ مکرمہ
-madinah-saudi-arabia	109223	en ar fr tr id ur bn	en ar fr tr id ur bn	ar=المدينة المنورة
+madinah-saudi-arabia	109223	en ar fr tr id ur bn	en ar fr tr id ur bn
 riyadh-saudi-arabia	108410	en ar ur bn id	en ar id ur bn
 jeddah-saudi-arabia	105343	en ar ur bn id	ar id ur bn
 dammam-saudi-arabia	110336	en ar ur bn id
 taif-saudi-arabia	107968	en ar ur		en=Taif
 tabuk-saudi-arabia	101628	en ar ur
 abha-saudi-arabia	110690	en ar ur
-buraydah-saudi-arabia	107304	en ar ur		ar=بريدة
+buraydah-saudi-arabia	107304	en ar ur
 # UAE: Dubai's IACAD table (ae.iacad.dubai, class B) at Dubai.
 dubai-uae	292223	en ar ur bn	en ar ur bn
 # held: Abu Dhabi, Sharjah, Al Ain — Awqaf's method not yet fully checked (ae.awqaf, class D).
 # abu-dhabi-uae	292968	en ar ur bn
-# sharjah-uae	292672	en ar ur bn		ar=الشارقة
+# sharjah-uae	292672	en ar ur bn
 # al-ain-uae	292913	en ar		en=Al Ain
 # held: Kuwait — the ministry's method not yet fully checked (class D).
 # kuwait-city-kuwait	285787	en ar ur bn	ar ur bn	ur=کویت سٹی;bn=কুয়েত সিটি
@@ -61,7 +61,7 @@ salalah-oman	286621	en ar ur		en=Salalah
 # Its 2026 days are checked from 2 October (the monitor's first capture), so October, which lacks its 1st, is never shown:
 # the generator holds both until 1 November, when they show November and December.
 amman-jordan	250441	en ar	ar
-zarqa-jordan	250090	en ar		ar=الزرقاء
+zarqa-jordan	250090	en ar
 # held: Jordan — Irbid is outside jo.awqaf's checked units (class D).
 # irbid-jordan	248946	en ar
 # held: Palestine — Gaza's cautious times are not measured at the city; Hebron and Nablus follow the PA's al-Aqsa table
@@ -91,11 +91,11 @@ cairo-egypt	360630	en ar id	en ar
 alexandria-egypt	361058	en ar	ar
 giza-egypt	360995	en ar
 port-said-egypt	358619	en ar
-suez-egypt	359796	en ar		ar=السويس
+suez-egypt	359796	en ar
 luxor-egypt	360502	en ar
 aswan-egypt	359792	en ar		en=Aswan
 # Mansoura, Tanta and Assiut: ESA's units since 12 November 2026 (ruling R163), each its own town's, checked on all of 2026 from ESA's own daily pages.
-mansoura-egypt	360761	en ar		en=Mansoura;ar=المنصورة
+mansoura-egypt	360761	en ar		en=Mansoura
 tanta-egypt	347497	en ar
 assiut-egypt	359783	en ar
 # held: Libya — the Awqaf table's method not yet fully checked (ly.awqaf, class D everywhere; ruling R73).
@@ -103,12 +103,12 @@ assiut-egypt	359783	en ar
 # benghazi-libya	88319	en ar
 # misrata-libya	2214846	en ar		en=Misrata
 # zawiya-libya	2218970	en ar		en=Zawiya
-# al-bayda-libya	89055	en ar		en=Al Bayda;ar=البيضاء
+# al-bayda-libya	89055	en ar		en=Al Bayda
 # sabha-libya	2212775	en ar
 # tobruk-libya	81302	en ar
-# al-khums-libya	2219905	en ar		ar=الخمس
+# al-khums-libya	2219905	en ar
 # zliten-libya	2208485	en ar
-# sirte-libya	2210554	en ar		ar=سرت
+# sirte-libya	2210554	en ar
 # Tunisia: the National Institute of Meteorology (tn.inm, class B) at Tunis and Sfax.
 tunis-tunisia	2464470	en ar fr	fr
 sfax-tunisia	2467454	en ar fr
@@ -121,7 +121,7 @@ algiers-algeria	2507480	en ar fr	fr
 # constantine-algeria	2501152	en ar fr
 # Morocco: the Ministry of Habous's month tables (ma.habous, class B), each city at its own unit (rulings R195-R199).
 casablanca-morocco	2553604	en ar fr	fr
-rabat-morocco	2538475	en ar fr		ar=الرباط
+rabat-morocco	2538475	en ar fr
 marrakesh-morocco	2542997	en ar fr
 fes-morocco	2548885	en ar fr
 tangier-morocco	2530335	en ar fr
@@ -158,13 +158,13 @@ diyarbakir-turkiye	316541	en tr
 # multan-pakistan	1169825	en ur		ur=ملتان
 # peshawar-pakistan	1168197	en ur
 # quetta-pakistan	1167528	en ur
-# delhi-india	1273294	en ur		ur=دہلی
+# delhi-india	1273294	en ur
 # mumbai-india	1275339	en ur
 # hyderabad-india	1269843	en ur		ur=حیدرآباد
 # lucknow-india	1264733	en ur
 # bengaluru-india	1277333	en ur
 # srinagar-india	1255634	en ur
-# kolkata-india	1275004	en bn ur	bn	bn=কলকাতা
+# kolkata-india	1275004	en bn ur	bn
 # held: Bangladesh — the Islamic Foundation (bd.ifb): each of its 64 district towns is a unit since 13 Nov 2026
 # (rulings R220–R224), under the Foundation's published method like the rest of the country: it prints its
 # district pages for Ramadan alone and the year-round Dhaka table is held as sampled days from a republisher's
@@ -172,7 +172,7 @@ diyarbakir-turkiye	316541	en tr
 # dhaka-bangladesh	1185241	en bn	en bn
 # chittagong-bangladesh	1205733	en bn	bn	en=Chittagong
 # sylhet-bangladesh	1185099	en bn	bn
-# khulna-bangladesh	1336135	en bn		bn=খুলনা
+# khulna-bangladesh	1336135	en bn
 # rajshahi-bangladesh	1185128	en bn
 # held: Maldives — no authority; calculated by Taqwa (class D).
 # male-maldives	1282027	en		en=Malé
@@ -182,14 +182,14 @@ diyarbakir-turkiye	316541	en tr
 singapore	1880252	en
 # Indonesia: Kemenag (id.kemenag, class B) at its fitted kota — each city below is its own unit.
 jakarta-indonesia	1642911	en id	en id
-surabaya-indonesia	1625822	en id	id	id=Surabaya
-bandung-indonesia	1650357	en id	id	id=Bandung
-medan-indonesia	1214520	en id	id	id=Medan
-semarang-indonesia	1627896	en id		id=Semarang
-makassar-indonesia	1622786	en id		id=Makassar
-palembang-indonesia	1633070	en id		id=Palembang
-yogyakarta-indonesia	1621177	en id		id=Yogyakarta
-banda-aceh-indonesia	1215502	en id		id=Banda Aceh
+surabaya-indonesia	1625822	en id	id
+bandung-indonesia	1650357	en id	id
+medan-indonesia	1214520	en id	id
+semarang-indonesia	1627896	en id
+makassar-indonesia	1622786	en id
+palembang-indonesia	1633070	en id
+yogyakarta-indonesia	1621177	en id
+banda-aceh-indonesia	1215502	en id
 # Malaysia: JAKIM (my.jakim, class B) at its zones WLY01, PNG01, JHR02 and KTN01.
 kuala-lumpur-malaysia	1735161	en bn id
 george-town-malaysia	1735106	en bn id

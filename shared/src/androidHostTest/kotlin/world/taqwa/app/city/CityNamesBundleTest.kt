@@ -2,6 +2,7 @@ package world.taqwa.app.city
 
 import kotlinx.coroutines.test.runTest
 import java.io.File
+import java.text.Normalizer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -126,8 +127,10 @@ class CityNamesBundleTest {
     /**
      * The names `tools/build-city-db.py` writes over GeoNames' own (its `NAME_FIXES`), each checked on
      * 25 Nov 2026 against the language's Wikidata label and Wikipedia title: GeoNames had an Ottoman form,
-     * a misspelling, the English name, the country's name for its capital, or a state or country after
-     * the city's name, or no name at all (Singapore in four languages). The site titles its city pages
+     * a misspelling, the English name, a name in Latin letters in an Arabic, Urdu or Bengali file, the
+     * country's name for its capital, a district's or province's name (Sharjah's emirate, Yogyakarta's
+     * special region, Indonesia's "Kota" for its cities), a name without its article or with a mark on every
+     * letter, a state or country after the city's name, or no name at all. The site titles its city pages
      * with these names, city then country, and its indexes name other cities by them, so a rebuild that
      * lost the table would title Algiers' Arabic page with the country's name twice.
      */
@@ -135,24 +138,131 @@ class CityNamesBundleTest {
     fun theNamesFixedOverGeoNamesStayFixed() {
         val expected = mapOf(
             "ar" to mapOf(
+                89055 to "البيضاء",
+                89570 to "زاخو",
+                90026 to "طوز خورماتو",
+                95788 to "هيت",
+                101554 to "تاروت",
+                107304 to "بريدة",
+                109223 to "المدينة المنورة",
+                110250 to "عفيف",
+                163915 to "صوران",
+                165060 to "صافيتا",
+                172082 to "أعزاز",
+                248299 to "ماحص",
+                250090 to "الزرقاء",
+                267008 to "صور",
+                281715 to "صوريف",
+                286245 to "صور",
+                286282 to "صحار",
+                287830 to "عبري",
+                292672 to "الشارقة",
+                293253 to "يافا",
                 314830 to "غازي عنتاب",
+                347236 to "طوخ",
+                357039 to "فايد",
+                359678 to "الطور",
+                359796 to "السويس",
+                360761 to "المنصورة",
+                932035 to "تياتيانينغ",
+                1622786 to "ماكاسار",
+                1655078 to "موانج إكساي",
+                1655123 to "فونسافان",
                 1735106 to "جورج تاون",
+                2210554 to "سرت",
+                2219905 to "الخمس",
                 2464470 to "تونس العاصمة",
                 2507480 to "الجزائر العاصمة",
+                2538475 to "الرباط",
+                3353383 to "روندو",
+                6167865 to "تورنتو",
             ),
             "bn" to mapOf(
+                250090 to "জারকা",
+                306571 to "কোনিয়া",
+                347497 to "তান্তা",
+                358619 to "সাইদ বন্দর",
+                359783 to "আসিউত",
+                359792 to "আসওয়ান",
+                359796 to "সুয়েজ",
+                360502 to "লাক্সর",
+                360761 to "মনসুরা",
+                360995 to "গিজা",
+                1007311 to "ডারবান",
+                1185092 to "ঠাকুরগাঁও",
+                1185095 to "টেকনাফ",
+                1185141 to "পঞ্চগড়",
+                1185148 to "পটিয়া",
+                1185149 to "পার্বতীপুর",
+                1185160 to "নাগেশ্বরী",
+                1185167 to "মোড়লগঞ্জ",
+                1185173 to "মঠবাড়িয়া",
+                1185181 to "লালমনিরহাট",
+                1185191 to "কুষ্টিয়া",
+                1185199 to "কালিগঞ্জ",
+                1185204 to "ঝিকরগাছা",
+                1185206 to "জয়পুরহাট",
+                1185239 to "শরণখোলা",
+                1185247 to "চিলমারী",
+                1185251 to "লালমোহন",
+                1185260 to "অভয়নগর",
+                1185262 to "ভেড়ামারা",
+                1185270 to "বান্দরবান",
+                1185272 to "কালিয়া",
+                1189638 to "রাউজান",
+                1203878 to "দোহাজারী",
+                1210565 to "বোরহানউদ্দিন",
+                1214520 to "মেদান",
+                1215502 to "বান্দা আচেহ",
+                1275004 to "কলকাতা",
+                1336133 to "সাতকানিয়া",
+                1336134 to "কক্সবাজার",
+                1336135 to "খুলনা",
+                1336139 to "রাঙ্গামাটি",
+                1336140 to "যশোর",
+                1337240 to "চাঁপাইনবাবগঞ্জ",
+                1462681 to "মানিকছড়ি",
+                1477498 to "ভান্ডারিয়া",
+                1621177 to "যোগ্যকার্তা",
+                1622786 to "মাকাসার",
+                1625822 to "সুরাবায়া",
+                1627896 to "সেমারাং",
+                1633070 to "পালেমবাং",
+                1650357 to "বানদুং",
                 1880252 to "সিঙ্গাপুর",
+                2464470 to "তিউনিস",
+                2803138 to "আন্টভের্প",
                 3143244 to "অসলো",
+                6075357 to "মিসিসগা",
                 6167865 to "টরন্টো",
+                7483813 to "নাটোর",
             ),
-            "fr" to mapOf(1736376 to "Kota Bharu"),
+            "fr" to mapOf(
+                359783 to "Assiout",
+                1736376 to "Kota Bharu",
+            ),
             "id" to mapOf(
+                359783 to "Asyut",
+                1214520 to "Medan",
+                1215502 to "Banda Aceh",
+                1621177 to "Yogyakarta",
+                1622786 to "Makassar",
+                1625822 to "Surabaya",
+                1627896 to "Semarang",
+                1633070 to "Palembang",
+                1650357 to "Bandung",
                 1735106 to "George Town",
                 1880252 to "Singapura",
                 2800866 to "Brussel",
             ),
             "tr" to mapOf(
+                107304 to "Büreyde",
+                250090 to "Zerka",
+                359783 to "Asyut",
+                360995 to "Gize",
+                1642911 to "Cakarta",
                 1880252 to "Singapur",
+                2467454 to "Sefakus",
                 2553604 to "Kazablanka",
                 2561668 to "Agadir",
                 2803138 to "Anvers",
@@ -160,12 +270,28 @@ class CityNamesBundleTest {
             "ur" to mapOf(
                 101628 to "تبوک",
                 223817 to "جبوتی شہر",
+                250090 to "زرقاء",
+                286245 to "صور",
                 286621 to "صلالہ",
+                347497 to "طنطا",
+                358619 to "پورٹ سعید",
+                359783 to "اسیوط",
+                360761 to "منصورہ",
+                360995 to "جیزہ",
+                932035 to "تئیاتئیانگ",
+                1214520 to "مدان",
+                1215502 to "باندا آچے",
+                1273294 to "دہلی",
+                1621177 to "یوگیاکارتا",
+                1622786 to "ماکاسار",
+                1625822 to "سورابایا",
+                1627896 to "سیمارانگ",
                 1735106 to "جارج ٹاؤن",
                 1880252 to "سنگاپور",
                 2210247 to "طرابلس",
                 2219905 to "خمس",
                 2530335 to "طنجہ",
+                2800866 to "برسلز",
                 2803138 to "اینٹورپن",
                 4180439 to "اٹلانٹا",
                 4560349 to "فلاڈیلفیا",
@@ -256,5 +382,15 @@ class CityNamesBundleTest {
         val repo = repository()
         assertEquals("London", repo.search("london").first().displayName)
         assertEquals("Cape Town", repo.search("cape town").first().displayName)
+    }
+
+    @Test
+    fun everyNameIsInUnicodesComposedForm() {
+        // The city build writes NFC (tools/build-city-db.py): GeoNames had Bengali nukta letters precomposed and Arabic
+        // marks out of canonical order, so the same name could be two strings.
+        for (language in listOf("ar", "bn", "fr", "id", "tr", "ur")) {
+            val bad = namePairs(language).filterNot { (_, name) -> Normalizer.isNormalized(name, Normalizer.Form.NFC) }
+            assertTrue(bad.isEmpty(), "city-names-$language.csv: $bad")
+        }
     }
 }

@@ -153,4 +153,12 @@ class CityTextTest {
         val once = CityText.fold("İstanbul  Zürich مَكَّة")
         assertEquals(once, CityText.fold(once))
     }
+
+    @Test
+    fun bengaliNuktaLettersFoldTheSameWhicheverWayTheyAreWritten() {
+        // Cairo as GeoNames wrote it, its ya-nukta precomposed, and in Unicode's composed form (NFC).
+        assertEquals(CityText.fold("\u0995\u09BE\u09DF\u09B0\u09CB"), CityText.fold("\u0995\u09BE\u09AF\u09BC\u09B0\u09CB"))
+        assertEquals(CityText.fold("\u09A1\u09BC"), CityText.fold("\u09DC"))
+        assertEquals(CityText.fold("\u09A2\u09BC"), CityText.fold("\u09DD"))
+    }
 }

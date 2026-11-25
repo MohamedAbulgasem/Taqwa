@@ -10,7 +10,8 @@ import kotlin.concurrent.Volatile
 
 /**
  * Searches the bundled GeoNames extract. The CSV is pre-sorted by population descending, so
- * preserving file order in the results ranks the London everyone means above the others.
+ * preserving file order within each of [search]'s tiers ranks the London everyone means above
+ * the others.
  *
  * Alongside the English list it holds **at most one** per-language name map — the one for the
  * language last given to [setLanguage] — loaded lazily and dropped when the language changes
@@ -91,26 +92,76 @@ class CityRepository(
     )
 
     /**
-     * A city matches when its English name **or** its name in the loaded language starts with the
+     * A city matches when its English name **or** its name in the loaded language answers the
      * query, both folded by [CityText] so marks and harakat never stand between a reader and
-     * their own city.
+     * their own city, in one of three tiers:
+     *
+     * 1. the name starts with the query: "york" finds York;
+     * 2. a later word of the name does, the query following one of its spaces (a hyphen folds to
+     *    one): "york" finds New York City, «عنتاب» finds «غازي عنتاب»;
+     * 3. the name starts with the query once every space is left out of both: "georgetown" finds
+     *    George Town, "george town" finds Georgetown, "kualalumpur" finds Kuala Lumpur.
+     *
+     * A city takes the better tier of its two names and is listed once. The results are every
+     * tier-1 match in the list's order, then tier 2's, then tier 3's, at most [limit] in all, so a
+     * later word or a name run together never pushes out a city whose name starts with what was
+     * typed. The scan stops early only once it holds [limit] tier-1 matches: nothing further down
+     * the list can come before those.
      */
     suspend fun search(query: String, limit: Int = 30): List<City> {
         val q = CityText.fold(query)
         if (q.isEmpty()) return emptyList()
+        // Tier 3's query, its spaces taken out once per search; a name's own are skipped as it is read.
+        val squeezed = q.replace(" ", "")
         return withContext(Dispatchers.Default) {
             val loaded = data()
-            loaded.cities.asSequence()
-                .mapNotNull { city ->
-                    // Both sides are already folded — the query once, above; the names once, at
-                    // parse time — so a keystroke is comparisons and no allocation at all.
-                    val matches = city.foldedName.startsWith(q) ||
-                        loaded.folded[city.id]?.startsWith(q) == true
-                    if (matches) city.copy(localizedName = loaded.names[city.id]) else null
+            val nameStarts = ArrayList<City>()
+            val wordStarts = ArrayList<City>()
+            val spacelessStarts = ArrayList<City>()
+            for (city in loaded.cities) {
+                // Both sides are already folded — the query once, above; the names once, at parse
+                // time — so the scan is comparisons, and makes no string for a city it passes.
+                val english = tier(city.foldedName, q, squeezed)
+                val local = loaded.folded[city.id]
+                val best = when {
+                    english == NAME_START || local == null -> english
+                    else -> minOf(english, tier(local, q, squeezed))
                 }
-                .take(limit)
-                .toList()
+                when (best) {
+                    NAME_START -> {
+                        nameStarts += city
+                        if (nameStarts.size >= limit) break
+                    }
+                    WORD_START -> if (wordStarts.size < limit) wordStarts += city
+                    SPACELESS_START -> if (spacelessStarts.size < limit) spacelessStarts += city
+                }
+            }
+            (nameStarts + wordStarts + spacelessStarts).take(limit)
+                .map { it.copy(localizedName = loaded.names[it.id]) }
         }
+    }
+
+    /**
+     * The tier of [search] in which the folded [name] answers the folded query [q]: [NAME_START],
+     * [WORD_START], [SPACELESS_START] or [NO_MATCH]. [squeezed] is [q] without its spaces.
+     * Comparisons only, with no new string: it runs for every city on every keystroke.
+     */
+    private fun tier(name: String, q: String, squeezed: String): Int {
+        if (name.startsWith(q)) return NAME_START
+        // Each later word follows exactly one space: CityText.fold collapses runs and trims both ends.
+        var space = name.indexOf(' ')
+        while (space >= 0) {
+            if (name.startsWith(q, space + 1)) return WORD_START
+            space = name.indexOf(' ', space + 1)
+        }
+        // The name read with its spaces skipped, against the query without its own.
+        var i = 0
+        for (ch in squeezed) {
+            while (i < name.length && name[i] == ' ') i++
+            if (i == name.length || name[i] != ch) return NO_MATCH
+            i++
+        }
+        return SPACELESS_START
     }
 
     /**
@@ -233,6 +284,12 @@ class CityRepository(
     private companion object {
         /** The languages `files/city-names-<lang>.csv` exists for. */
         val SUPPORTED_LANGUAGES = setOf("ar", "id", "ur", "bn", "tr", "fr")
+
+        /** [search]'s tiers, best first, so the lower of a city's two is the one it is listed by. */
+        const val NAME_START = 1
+        const val WORD_START = 2
+        const val SPACELESS_START = 3
+        const val NO_MATCH = 4
     }
 }
 

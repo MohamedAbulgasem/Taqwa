@@ -25,7 +25,7 @@ uncompressed .txt) as the first argument to skip the 190 MB download:
 
     tools/build-city-db.py [path/to/alternateNamesV2.zip|.txt]
 """
-import csv, io, os, re, sys, tempfile, urllib.request, zipfile
+import csv, io, os, re, sys, tempfile, unicodedata, urllib.request, zipfile
 
 BASE = "https://download.geonames.org/export/dump/"
 CITIES_URL = BASE + "cities15000.zip"
@@ -65,31 +65,145 @@ DROPPED = {
 # checks that before it downloads anything.
 NAME_FIXES = {
     "ar": {
+        "89055": "البيضاء",  # Al Bayḑā’: GeoNames had قرية البيضاء
+        "89570": "زاخو",  # Zaxo: GeoNames had Zākhū
+        "90026": "طوز خورماتو",  # Ţūz Khūrmātū: GeoNames had Ţūzkhūrmātū
+        "95788": "هيت",  # Hīt: GeoNames had Hīt
+        "101554": "تاروت",  # Tārūt: GeoNames had Tārūt
+        "107304": "بريدة",  # Buraydah: GeoNames had بُرَيدَة
+        "109223": "المدينة المنورة",  # Madinah: GeoNames had المدينة
+        # Afif: GeoNames had ‘Afīf. Wikidata's item with its GeoNames id is the governorate's (محافظة عفيف);
+        # its alias عفيف is the city's name, as the same item's Urdu label writes it.
+        "110250": "عفيف",
+        "163915": "صوران",  # Şūrān: GeoNames had Şūrān
+        "165060": "صافيتا",  # Şāfītā: GeoNames had Şāfītā
+        "172082": "أعزاز",  # I‘zāz: GeoNames had A‘zāz
+        "248299": "ماحص",  # Māḩiş: GeoNames had Māḩiş
+        "250090": "الزرقاء",  # Zarqa: GeoNames had زرقاء
+        "267008": "صور",  # Tyre: GeoNames had Şūr
+        "281715": "صوريف",  # Surif City: GeoNames had Şūrīf
+        # Sur, Oman: GeoNames had Şūr. Wikidata's Arabic label and title are the wilayat's, ولاية صور, with no
+        # alias: this is that label less ولاية, and the item's Urdu label. Tyre is صور too, told apart by
+        # country.
+        "286245": "صور",
+        # Sohar: GeoNames had Aş Şuḩār. Wikidata's Arabic label and title are the wilayat's, ولاية صحار; its
+        # alias صحار, the city's name and the item's Urdu label, is stored with invisible direction marks, left
+        # out here.
+        "286282": "صحار",
+        "287830": "عبري",  # ‘Ibrī: GeoNames had ‘Ibrī
+        "292672": "الشارقة",  # Sharjah: GeoNames had إمارة الشارقة
+        "293253": "يافا",  # Jaffa: GeoNames had Yāffā
         # Gaziantep: GeoNames had its old name alone, as do Wikidata's label عين تاب and arwiki's title
         # عنتاب; arwiki redirects غازي عنتاب to the city, and the province is ولاية غازي عين تاب.
         "314830": "غازي عنتاب",
+        "347236": "طوخ",  # Ţūkh: GeoNames had Ţūkh
+        "357039": "فايد",  # Fāyīd: GeoNames had Fā’id
+        "359678": "الطور",  # El-Tor: GeoNames had Aţ Ţūr
+        "359796": "السويس",  # Suez: GeoNames had سويس
+        "360761": "المنصورة",  # Al Mansurah: GeoNames had منصورة
+        "932035": "تياتيانينغ",  # Teyateyaneng: GeoNames had تيايتيانeng
+        "1622786": "ماكاسار",  # Makassar: GeoNames had no Arabic name
+        "1655078": "موانج إكساي",  # Muang Xay: GeoNames had مواng ساي
+        "1655123": "فونسافان",  # Muang Phônsavan: GeoNames had مواng فونسافان
         "1735106": "جورج تاون",  # George Town, Penang: misspelt
+        "2210554": "سرت",  # Sirte: GeoNames had شعبية سرت
+        "2219905": "الخمس",  # Al Khums: GeoNames had المرقب
         # Tunis: GeoNames had the country's name, as Wikidata's label does; Wikidata gives تونس العاصمة as an
         # alias and arwiki redirects it to the city; for Algiers below the same form is the label.
         "2464470": "تونس العاصمة",
         "2507480": "الجزائر العاصمة",  # Algiers: GeoNames had the country's name
+        "2538475": "الرباط",  # Rabat: GeoNames had رباط
+        "3353383": "روندو",  # Rundu: GeoNames had رونdu
+        "6167865": "تورنتو",  # Toronto: GeoNames had تورونتو
     },
     "bn": {
+        "250090": "জারকা",  # Zarqa: GeoNames had no Bengali name
+        "306571": "কোনিয়া",  # Konya: GeoNames had no Bengali name
+        "347497": "তান্তা",  # Tanta: GeoNames had no Bengali name
+        "358619": "সাইদ বন্দর",  # Port Said: GeoNames had no Bengali name
+        "359783": "আসিউত",  # Assiut: GeoNames had no Bengali name
+        "359792": "আসওয়ান",  # Aswān: GeoNames had no Bengali name
+        "359796": "সুয়েজ",  # Suez: GeoNames had no Bengali name
+        "360502": "লাক্সর",  # Luxor: GeoNames had no Bengali name
+        "360761": "মনসুরা",  # Al Mansurah: GeoNames had no Bengali name
+        "360995": "গিজা",  # Giza: GeoNames had no Bengali name
+        "1007311": "ডারবান",  # Durban: GeoNames had no Bengali name
+        "1185092": "ঠাকুরগাঁও",  # Thākurgaon: GeoNames had Thākurgaon
+        "1185095": "টেকনাফ",  # Teknāf: GeoNames had Teknāf
+        "1185141": "পঞ্চগড়",  # Panchagarh: GeoNames had Panchagarh
+        "1185148": "পটিয়া",  # Patiya: GeoNames had Patiya
+        "1185149": "পার্বতীপুর",  # Parbatipur: GeoNames had Parbatipur
+        "1185160": "নাগেশ্বরী",  # Nageswari: GeoNames had Nageswari
+        "1185167": "মোড়লগঞ্জ",  # Morrelgonj: GeoNames had Morrelgonj
+        "1185173": "মঠবাড়িয়া",  # Mathba: GeoNames had Mathba
+        "1185181": "লালমনিরহাট",  # Lalmonirhat: GeoNames had Lalmanirhat
+        "1185191": "কুষ্টিয়া",  # Kushtia: GeoNames had Kushtia
+        "1185199": "কালিগঞ্জ",  # Kālīganj: GeoNames had Kālīganj
+        "1185204": "ঝিকরগাছা",  # Jhingergācha: GeoNames had Jhikargāchha
+        "1185206": "জয়পুরহাট",  # Joypur Hāt: GeoNames had Joypur Hāt
+        "1185239": "শরণখোলা",  # Sarankhola: GeoNames had Sarankhola
+        "1185247": "চিলমারী",  # Chilmāri: GeoNames had Chilmāri
+        "1185251": "লালমোহন",  # Lālmohan: GeoNames had Lālmohan
+        "1185260": "অভয়নগর",  # Bhātpāra Abhaynagar: GeoNames had Bhātpāra Abhaynagar
+        "1185262": "ভেড়ামারা",  # Bherāmāra: GeoNames had Bherāmāra
+        "1185270": "বান্দরবান",  # Bāndarban: GeoNames had Bāndarban
+        "1185272": "কালিয়া",  # Kālia: GeoNames had Kālia
+        "1189638": "রাউজান",  # Raojān: GeoNames had Raojān
+        "1203878": "দোহাজারী",  # Dohazāri: GeoNames had Dohazāri
+        "1210565": "বোরহানউদ্দিন",  # Burhānuddin: GeoNames had Burhānuddin
+        "1214520": "মেদান",  # Medan: GeoNames had no Bengali name
+        "1215502": "বান্দা আচেহ",  # Banda Aceh: GeoNames had no Bengali name
+        "1275004": "কলকাতা",  # Kolkata: GeoNames had Kolkata
+        "1336133": "সাতকানিয়া",  # Sātkania: GeoNames had Sātkania
+        "1336134": "কক্সবাজার",  # Cox’s Bāzār: GeoNames had Cox’s Bāzār
+        "1336135": "খুলনা",  # Khulna: GeoNames had Khulna
+        "1336139": "রাঙ্গামাটি",  # Rangamati: GeoNames had Rāngāmāti
+        "1336140": "যশোর",  # Jessore: GeoNames had Jessore
+        "1337240": "চাঁপাইনবাবগঞ্জ",  # Nawābganj: GeoNames had Nawābganj
+        "1462681": "মানিকছড়ি",  # Manikchari: GeoNames had Mānikchhari
+        "1477498": "ভান্ডারিয়া",  # Bhāndāria: GeoNames had Bhāndāria
+        "1621177": "যোগ্যকার্তা",  # Yogyakarta: GeoNames had no Bengali name
+        "1622786": "মাকাসার",  # Makassar: GeoNames had no Bengali name
+        "1625822": "সুরাবায়া",  # Surabaya: GeoNames had no Bengali name
+        "1627896": "সেমারাং",  # Semarang: GeoNames had no Bengali name
+        "1633070": "পালেমবাং",  # Palembang: GeoNames had no Bengali name
+        "1650357": "বানদুং",  # Bandung: GeoNames had no Bengali name
         "1880252": "সিঙ্গাপুর",  # Singapore: GeoNames had no Bengali name
+        "2464470": "তিউনিস",  # Tunis: GeoNames had no Bengali name
+        "2803138": "আন্টভের্প",  # Antwerp: GeoNames had no Bengali name
         "3143244": "অসলো",  # Oslo: misspelt
+        "6075357": "মিসিসগা",  # Mississauga: GeoNames had no Bengali name
         "6167865": "টরন্টো",  # Toronto: misspelt
+        "7483813": "নাটোর",  # Natore: GeoNames had Nātor
     },
     "fr": {
+        "359783": "Assiout",  # Assiut: GeoNames had no French name
         "1736376": "Kota Bharu",  # GeoNames had the variant Kota Bahru
     },
     "id": {
+        "359783": "Asyut",  # Assiut: GeoNames had no Indonesian name
+        "1214520": "Medan",  # Medan: GeoNames had Kota Medan
+        "1215502": "Banda Aceh",  # Banda Aceh: GeoNames had Kota Banda Aceh
+        "1621177": "Yogyakarta",  # Yogyakarta: GeoNames had Daerah Istimewa Yogyakarta
+        "1622786": "Makassar",  # Makassar: GeoNames had Kota Makassar
+        "1625822": "Surabaya",  # Surabaya: GeoNames had Kota Surabaya
+        "1627896": "Semarang",  # Semarang: GeoNames had Kota Semarang
+        "1633070": "Palembang",  # Palembang: GeoNames had Kota Palembang
+        "1650357": "Bandung",  # Bandung: GeoNames had Kota Bandung
         "1735106": "George Town",  # George Town, Penang: GeoNames had the variant Georgetown
         "1880252": "Singapura",  # Singapore: GeoNames had no Indonesian name
-        # Brussels: GeoNames had Brusel; idwiki's title (Wikidata's label is the Capital Region's).
+        # Brussels: GeoNames had Brusel. Brussel is idwiki's title on the Capital Region's item (Q240); the
+        # city's own item (Q239) is labelled Kota Brussel.
         "2800866": "Brussel",
     },
     "tr": {
+        "107304": "Büreyde",  # Buraydah: GeoNames had Burayda
+        "250090": "Zerka",  # Zarqa: GeoNames had no Turkish name
+        "359783": "Asyut",  # Assiut: GeoNames had no Turkish name
+        "360995": "Gize",  # Giza: GeoNames had no Turkish name
+        "1642911": "Cakarta",  # Jakarta: GeoNames had Jakarta
         "1880252": "Singapur",  # Singapore: GeoNames had no Turkish name
+        "2467454": "Sefakus",  # Sfax: GeoNames had Safakes
         "2553604": "Kazablanka",  # Casablanca: GeoNames had the Ottoman form
         "2561668": "Agadir",  # GeoNames had ğ for its g
         "2803138": "Anvers",  # Antwerp: GeoNames had the English name
@@ -99,12 +213,30 @@ NAME_FIXES = {
         # Djibouti the city: GeoNames had "region", and Wikidata's label is the country's name; urwiki
         # titles it جبوتی (شہر) and redirects جبوتی شہر there, "city" as in تونس شہر and الجزائر شہر.
         "223817": "جبوتی شہر",
+        "250090": "زرقاء",  # Zarqa: GeoNames had no Urdu name
+        "286245": "صور",  # Sur: GeoNames had صور، عمان
         "286621": "صلالہ",  # Salalah: GeoNames had سلالہ, with س, which urwiki gives to a village in Iran
+        "347497": "طنطا",  # Tanta: GeoNames had no Urdu name
+        "358619": "پورٹ سعید",  # Port Said: GeoNames had no Urdu name
+        "359783": "اسیوط",  # Assiut: GeoNames had no Urdu name
+        "360761": "منصورہ",  # Al Mansurah: GeoNames had no Urdu name
+        "360995": "جیزہ",  # Giza: GeoNames had no Urdu name
+        "932035": "تئیاتئیانگ",  # Teyateyaneng: GeoNames had تیاتیانeng
+        "1214520": "مدان",  # Medan: GeoNames had no Urdu name
+        "1215502": "باندا آچے",  # Banda Aceh: GeoNames had no Urdu name
+        "1273294": "دہلی",  # Delhi: GeoNames had پرانی دہلی
+        "1621177": "یوگیاکارتا",  # Yogyakarta: GeoNames had no Urdu name
+        "1622786": "ماکاسار",  # Makassar: GeoNames had no Urdu name
+        "1625822": "سورابایا",  # Surabaya: GeoNames had no Urdu name
+        "1627896": "سیمارانگ",  # Semarang: GeoNames had no Urdu name
         "1735106": "جارج ٹاؤن",  # George Town: GeoNames had ", Penang" after it
         "1880252": "سنگاپور",  # Singapore: GeoNames had no Urdu name
         "2210247": "طرابلس",  # Tripoli: GeoNames had ", Libya" after it
         "2219905": "خمس",  # Al Khums: GeoNames had ", Libya" after it
         "2530335": "طنجہ",  # Tangier: GeoNames had the English name in Urdu letters
+        # Brussels: GeoNames had no Urdu name. urwiki's title and the label on the Capital Region's item (Q240),
+        # as Indonesian's Brussel; the city's own item (Q239) writes برسلز شہر, "the City of Brussels".
+        "2800866": "برسلز",
         # Antwerp: GeoNames had the Arabic spelling, with ت and ب for ٹ and پ; urwiki's title (Wikidata's label
         # splits it, اینٹ ورپن).
         "2803138": "اینٹورپن",
@@ -165,6 +297,8 @@ for lang, fixes in NAME_FIXES.items():
     for gid, name in fixes.items():
         if clean(name) != name:
             sys.exit(f"name fix {lang} {gid} ({name!r}) has a comma or surrounding space")
+        if unicodedata.normalize("NFC", name) != name:
+            sys.exit(f"name fix {lang} {gid} ({name!r}) is not in Unicode's composed form (NFC)")
 
 # --- admin1 code -> readable region name, e.g. "GB.ENG" -> "England" ---
 admin1_names = {}
@@ -287,5 +421,7 @@ for lang in LANGS:
         w = writer(fh)
         w.writerow(["id", "name"])
         for gid in sorted(names, key=int):
-            w.writerow([gid, names[gid][0]])
+            # In Unicode's composed form (NFC): GeoNames writes some Bengali nukta letters precomposed and
+            # some Arabic marks out of their canonical order, and a name in two forms is two strings.
+            w.writerow([gid, unicodedata.normalize("NFC", names[gid][0])])
     print(f"wrote {len(names)} {lang} names to {path}", file=sys.stderr)

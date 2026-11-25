@@ -68,7 +68,7 @@ id,name
 105299,Cızan
 105343,Cidde
 106281,Hail
-107304,Burayda
+107304,Büreyde
 107312,Abkayk
 107968,Taif
 108410,Riyad
@@ -226,6 +226,7 @@ id,name
 245338,Am Timan
 245785,Abeche
 248946,İrbid
+250090,Zerka
 250441,Amman
 250774,Akabe
 251833,Volos
@@ -441,11 +442,13 @@ id,name
 358048,Dimyat
 358620,Safaga
 358840,Bilbeys
+359783,Asyut
 359792,Asvan
 359796,Süveyş
 360502,El-Uksur
 360630,Kahire
 360761,Mansura
+360995,Gize
 361055,İsmailiye
 361058,İskenderiye
 361291,Hurgada
@@ -1421,7 +1424,7 @@ id,name
 1626459,Suai
 1636670,Maliana
 1637730,Likisa
-1642911,Jakarta
+1642911,Cakarta
 1645457,Dili
 1649539,Baukau
 1651816,Aileu
@@ -1972,7 +1975,7 @@ id,name
 2464915,Sousse
 2465030,Siliana
 2465840,Sidi Bu Zeyd
-2467454,Safakes
+2467454,Sefakus
 2467815,Rades
 2468018,Kebili
 2468353,Gafsa

@@ -101,9 +101,18 @@
     line.addEventListener("click", function () { details.open = true; });
   }
 
+  /* A city link's keys and the folded query are compared with every space left out, so that a
+     name typed without its space, or with one it does not have, still finds the city:
+     "georgetown" finds George Town. A key that holds the query as typed holds it this way too,
+     so every city the plain comparison found is still found. */
+  function spaceless(text) {
+    return text.replace(/\s+/g, "");
+  }
+
   function indexFilter(input) {
     var main = document.querySelector(".index");
     var links = [].slice.call(main.querySelectorAll(".cities a[data-k]"));
+    var keys = links.map(function (a) { return spaceless(a.getAttribute("data-k")); });
     var countries = [].slice.call(main.querySelectorAll(".country"));
     var regions = [].slice.call(main.querySelectorAll(".region"));
     var none = main.querySelector(".no-match");
@@ -111,10 +120,11 @@
 
     function apply() {
       var query = fold(input.value.trim());
+      var bare = spaceless(query);
       main.classList.toggle("filtering", query !== "");
       var shown = [];
-      links.forEach(function (a) {
-        var hit = query === "" || a.getAttribute("data-k").indexOf(query) !== -1;
+      links.forEach(function (a, i) {
+        var hit = query === "" || keys[i].indexOf(bare) !== -1;
         a.parentNode.toggleAttribute("data-hidden", !hit);
         if (hit) shown.push(a);
       });

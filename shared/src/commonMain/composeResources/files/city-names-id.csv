@@ -316,6 +316,7 @@ id,name
 358619,Port Said
 358620,Safaga
 358840,Bilbeis
+359783,Asyut
 359792,Aswan
 359796,Suez
 360502,Luxor
@@ -945,7 +946,7 @@ id,name
 1214294,Panguruan
 1214302,Pangkalan Brandan
 1214488,Meulaboh
-1214520,Kota Medan
+1214520,Medan
 1214658,Kota Lhokseumawe
 1214724,Langsa
 1214776,Lahewa
@@ -959,7 +960,7 @@ id,name
 1215355,Kota Binjai
 1215395,Berastagi
 1215412,Belawan
-1215502,Kota Banda Aceh
+1215502,Banda Aceh
 1215957,Termez
 1216187,Shahrisabz
 1216265,Samarkand
@@ -1272,7 +1273,7 @@ id,name
 1611439,Chachoengsao
 1611453,Buri Ram
 1621060,Amnat Charoen
-1621177,Daerah Istimewa Yogyakarta
+1621177,Yogyakarta
 1621395,Wonosobo
 1621520,Wiradesa
 1621613,Weru
@@ -1282,7 +1283,7 @@ id,name
 1622138,Wanaraja
 1622318,Waingapu
 1622636,Ungaran
-1622786,Kota Makassar
+1622786,Makassar
 1622846,Ubud
 1623080,Tulungagung
 1623096,Tulangan Utara
@@ -1307,7 +1308,7 @@ id,name
 1625585,Tahuna
 1625708,Tabanan
 1625812,Kota Surakarta
-1625822,Kota Surabaya
+1625822,Surabaya
 1625908,Sungai Raya
 1625929,Sungai Penuh
 1626183,Sumber
@@ -1332,7 +1333,7 @@ id,name
 1627253,Sidoarjo
 1627267,Sidareja
 1627549,Kabupaten Serang
-1627896,Kota Semarang
+1627896,Semarang
 1627957,Selong
 1628858,Sanana
 1628899,Sampang
@@ -1374,7 +1375,7 @@ id,name
 1633034,Kota Palu
 1633037,Palopo
 1633056,Palimanan
-1633070,Kota Palembang
+1633070,Palembang
 1633118,Kota Palangka Raya
 1633182,Pakisaji
 1633419,Kota Padang
@@ -1496,7 +1497,7 @@ id,name
 1650232,Banjar
 1650234,Banjar
 1650298,Bangkalan
-1650357,Kota Bandung
+1650357,Bandung
 1650527,Kota Balikpapan
 1650600,Balai Pungut
 1650815,Baekrajan

@@ -154,7 +154,7 @@
     "checks_kinds_calculated_body": "لا يُعرف جدول سُنّي رسمي هنا، أو ليس لدى تقوى منه ما يكفي للتحقق، فيحسب تقوى المواقيت على جانب الاحتياط.",
     "checks_kinds_example": "مثل: {places}",
     "checks_kinds_none_ex": "إسطنبول، مكة، لندن",
-    "checks_kinds_cautious_ex": "كيب تاون، باريس، تورونتو",
+    "checks_kinds_cautious_ex": "كيب تاون، باريس، تورنتو",
     "checks_kinds_published_ex": "دكا",
     "checks_kinds_calculated_ex": "نيروبي",
     "checks_kinds_move": "حين تُثبت الفحوص مواقيت مكانٍ مقابل جدول جهته، ينتقل إلى الصف الأول في التحديث التالي للتطبيق. صفحات المدن للنوعين الأولين فقط، حيث كل يوم معروض مُثبَت.",

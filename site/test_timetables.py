@@ -1065,6 +1065,13 @@ class IndexFilterScriptTest(unittest.TestCase):
         self.assertEqual((["made-up-town"], ["others"], False), self.filtered("ar", "made-up town"))
         self.assertEqual((["made-up-port"], ["others"], False), self.filtered("ar", "الميناء"))
 
+    def test_a_name_typed_without_its_space_or_with_one_it_lacks_still_finds_the_city(self):
+        # As "georgetown" finds George Town on the Indonesian index: the keys and the query are also compared with
+        # every space left out, in either script.
+        self.assertEqual((["made-up-town"], ["others"], False), self.filtered("fr", "bourginvente"))
+        self.assertEqual((["made-up-port"], ["others"], False), self.filtered("ar", "الميناءالمخترع"))
+        self.assertEqual((["made-up-port"], ["others"], False), self.filtered("fr", "nether lands"))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -56,6 +56,8 @@ The regression guard for all three is a test over the real bundle: no English na
 
 A city matches when its folded English name **or** its folded name in the loaded language starts with the folded query, keeping today's prefix rule and today's ranking. `search` returns at most `limit` as before.
 
+*Since 25 November 2026 (the owner's decision), a match has three tiers, each tried on both names: the name's start (the rule above), then the start of a later word, then the name's start with every space left out of both. Results list the first tier, then the second, then the third, each in the list's order, each city once, at most `limit`, so "york" lists York before New York City and "georgetown" finds George Town. The fold also drops Bengali's nukta and folds its three precomposed nukta letters (rra, rha and ya) to their bare letters, and the city build writes every name in Unicode's composed form (NFC), so a name typed either way finds the other.*
+
 ## 5. What is shown
 
 `City` gains `id: Int`, `localizedName: String?` (the loaded language's name, null when that city has none) and a derived `foldedName`, folded once when the row is parsed rather than on every keystroke; the loaded language's name map is held folded alongside its display form for the same reason. `City.displayName` is `localizedName ?: name`. The search list, its `cityQualifier`, the Prayer header, the Settings location row and the Location screen all render `displayName`.
