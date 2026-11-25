@@ -99,6 +99,9 @@ html[dir="rtl"] .soon a, html[dir="rtl"] .after a, html[dir="rtl"] .row span a {
 /* So do the prayer-time pages' links, which are all city names or sentences. */
 html[dir="rtl"] .crumbs a, html[dir="rtl"] .chips a, html[dir="rtl"] .cities a,
 html[dir="rtl"] .month-head a, html[dir="rtl"] .tt-stale a { direction: rtl; }
+/* An index's city stays inline, as on a left-to-right page, so a line never starts with the dot after
+   it (.cities li): as an inline block, Chrome broke the line between the name and the dot's no-break space. */
+html[dir="rtl"] .cities a { display: inline; }
 
 /* Blocks that share this class (.top, .hero, .prose, .foot) set only padding-block, so the
    24px inline padding survives on narrow screens where there is no centring margin. */
@@ -447,6 +450,13 @@ html[lang="ar"] .tt thead th, html[lang="ur"] .tt thead th, html[lang="bn"] .tt 
 .country a:hover { color: var(--accent); }
 .no-match { margin-top: 32px; color: var(--t2); }
 [data-hidden] { display: none !important; }
+/* The cities with no page in this language, each linked to its English page (25 November 2026): after the regions,
+   under a hairline, its countries quieter than the language's own; an English name in a right-to-left list stays
+   left to right. */
+.region.others { margin-top: 34px; border-top: 1px solid var(--hair); }
+.others-note { margin: -6px 0 18px; max-width: 60ch; font-size: 15px; line-height: 1.5; color: var(--t2); text-wrap: pretty; }
+.others .country h3 { color: var(--t2); }
+html[dir="rtl"] .cities a[dir="ltr"] { direction: ltr; }
 
 .cities-strip { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 40px; align-items: center; }
 .cities-strip .lede { font-size: 17px; max-width: 36ch; }

@@ -38,6 +38,8 @@
     "index_lede": "Bulan ini untuk {count} kota, dan bulan depan setelah diperiksa, dihitung persis seperti di aplikasi. Di tempat lain, aplikasinya bekerja di mana pun Anda berada.",
     "search": "Cari kota",
     "no_match": "Belum ada kota dengan nama itu di sini. Aplikasinya memuat lebih dari tiga puluh ribu kota dan juga bekerja dengan lokasi Anda.",
+    "index_others": "Kota lain, dalam bahasa Inggris",
+    "index_others_note": "Kota-kota ini belum punya halaman berbahasa Indonesia. Halaman berbahasa Inggrisnya menampilkan waktu yang sama.",
     "title": "Jadwal salat {city}, {country} · {month} · {brand}",
     "og_title": "Jadwal salat {city}, {country}",
     "description_qibla": " Kiblat: {qibla}.",

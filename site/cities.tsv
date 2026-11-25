@@ -36,11 +36,11 @@ makkah-saudi-arabia	104515	en ar fr tr id ur bn	en ar fr tr id ur bn	ur=مکہ �
 madinah-saudi-arabia	109223	en ar fr tr id ur bn	en ar fr tr id ur bn	ar=المدينة المنورة
 riyadh-saudi-arabia	108410	en ar ur bn id	en ar id ur bn
 jeddah-saudi-arabia	105343	en ar ur bn id	ar id ur bn
-dammam-saudi-arabia	110336	en ar ur
-taif-saudi-arabia	107968	en ar		en=Taif
-tabuk-saudi-arabia	101628	en ar
-abha-saudi-arabia	110690	en ar
-buraydah-saudi-arabia	107304	en ar		ar=بريدة
+dammam-saudi-arabia	110336	en ar ur bn id
+taif-saudi-arabia	107968	en ar ur		en=Taif
+tabuk-saudi-arabia	101628	en ar ur
+abha-saudi-arabia	110690	en ar ur
+buraydah-saudi-arabia	107304	en ar ur		ar=بريدة
 # UAE: Dubai's IACAD table (ae.iacad.dubai, class B) at Dubai.
 dubai-uae	292223	en ar ur bn	en ar ur bn
 # held: Abu Dhabi, Sharjah, Al Ain — Awqaf's method not yet fully checked (ae.awqaf, class D).
@@ -54,9 +54,9 @@ doha-qatar	290030	en ar ur bn
 # held: Bahrain — the council's method not yet fully checked (class D).
 # manama-bahrain	290340	en ar ur
 # Oman: the Ministry of Endowments (om.mara, class B) at Muscat.
-muscat-oman	287286	en ar ur
+muscat-oman	287286	en ar ur bn
 # Salalah: the ministry's unit since 12 November 2026 (ruling R166), checked every day to 31 December 2027 from its own day page.
-salalah-oman	286621	en ar		en=Salalah
+salalah-oman	286621	en ar ur		en=Salalah
 # Jordan: the Ministry of Awqaf (jo.awqaf, class A) at Amman and Zarqa, its one table for Amman, Balqa, Zarqa and Madaba.
 # Its 2026 days are checked from 2 October (the monitor's first capture), so October, which lacks its 1st, is never shown:
 # the generator holds both until 1 November, when they show November and December.
@@ -86,8 +86,8 @@ zarqa-jordan	250090	en ar		ar=الزرقاء
 # aden-yemen	415189	en ar
 
 # ---------------------------------------------------------------- North Africa
-# Egypt: ESA (eg.esa, class B) at Cairo, Alexandria, Giza (Cairo's unit), Port Said, Suez, Luxor and Aswan, each its town's unit. Its stamp now covers October 2026 (the monitor's captures of 28 Sep and 2 Oct), so the pages show October alone until November is checked.
-cairo-egypt	360630	en ar	en ar
+# Egypt: ESA (eg.esa, class B) at Cairo, Alexandria, Giza (Cairo's unit), Port Said, Suez, Luxor and Aswan, each its town's unit. Each of these units is checked through 31 December 2026, so the pages show every month through December 2026.
+cairo-egypt	360630	en ar id	en ar
 alexandria-egypt	361058	en ar	ar
 giza-egypt	360995	en ar
 port-said-egypt	358619	en ar
@@ -115,7 +115,7 @@ sfax-tunisia	2467454	en ar fr
 # held: Sousse — outside tn.inm's checked units (class D).
 # sousse-tunisia	2464915	en ar fr
 # Algeria: the ministry's calendar (dz.marw, class B) at Algiers.
-algiers-algeria	2507480	en ar fr	fr	fr=Alger
+algiers-algeria	2507480	en ar fr	fr
 # held: Oran, Constantine — class D at the city (fitted units, margins of our own never before the city's table and up to 3 min after it, not the checked timetable itself; rulings R230, R233).
 # oran-algeria	2485926	en ar fr
 # constantine-algeria	2501152	en ar fr
@@ -135,13 +135,13 @@ agadir-morocco	2561668	en ar fr
 
 # ---------------------------------------------------------------- Türkiye and Central Asia
 # Türkiye: Diyanet (tr.diyanet, class A) at İstanbul, Ankara and, since 12 November 2026 (ruling R140), İzmir, Bursa, Konya, Antalya, Gaziantep and Diyarbakır, each its own checked district. Their stamps cover the whole of 2026 and 2027 since the monitor's capture of 9 November 2026, so the pages show every month through 2027.
-istanbul-turkiye	745044	en tr	en tr
+istanbul-turkiye	745044	en tr ar	en tr
 ankara-turkiye	323786	en tr	tr
 izmir-turkiye	311046	en tr	tr	en=Izmir
 bursa-turkiye	750269	en tr	tr
 konya-turkiye	306571	en tr	tr
 antalya-turkiye	323777	en tr
-gaziantep-turkiye	314830	en tr
+gaziantep-turkiye	314830	en tr ar
 diyarbakir-turkiye	316541	en tr
 # held: Uzbekistan — the Muslim Board's method not yet fully checked (class D).
 # tashkent-uzbekistan	1512569	en
@@ -191,15 +191,15 @@ palembang-indonesia	1633070	en id		id=Palembang
 yogyakarta-indonesia	1621177	en id		id=Yogyakarta
 banda-aceh-indonesia	1215502	en id		id=Banda Aceh
 # Malaysia: JAKIM (my.jakim, class B) at its zones WLY01, PNG01, JHR02 and KTN01.
-kuala-lumpur-malaysia	1735161	en
-george-town-malaysia	1735106	en
-johor-bahru-malaysia	1732752	en
-kota-bharu-malaysia	1736376	en
+kuala-lumpur-malaysia	1735161	en bn id
+george-town-malaysia	1735106	en bn id
+johor-bahru-malaysia	1732752	en bn id
+kota-bharu-malaysia	1736376	en bn id
 # Brunei: the Ministry of Religious Affairs (bn.mora, class B) at Brunei-Muara.
 bandar-seri-begawan-brunei	1820906	en
 
 # ---------------------------------------------------------------- Africa
-# South Africa: cautious times (za.cape, class C) at Cape Town: the MJC's, the community calendar's and Jamiat's tables, all three checked for September and October 2026, so the page shows October alone until November is checked.
+# South Africa: cautious times (za.cape, class C) at Cape Town: the MJC's, the community calendar's and Jamiat's tables, so the page shows a month once all three are checked for it.
 cape-town-south-africa	3369157	en
 # South Africa: Jamiatul Ulama (za.jamiat, class B) at Johannesburg, Pretoria and Durban, each its own unit.
 johannesburg-south-africa	993800	en
@@ -228,7 +228,7 @@ durban-south-africa	1007311	en
 
 # ---------------------------------------------------------------- Europe
 # United Kingdom: the London Unified Prayer Timetable (gb.london.lupt, class B) at London (M25).
-london-uk	2643743	en ur bn ar	en ur bn
+london-uk	2643743	en ur bn ar tr	en ur bn
 # held: Birmingham, Manchester, Bradford, Leicester, Glasgow — cautious times (gb.cautious, survey-proven) not measured at the city.
 # birmingham-uk	2655603	en ur bn		ur=برمنگھم;bn=বার্মিংহাম
 # manchester-uk	2643123	en ur		ur=مانچسٹر
@@ -236,16 +236,16 @@ london-uk	2643743	en ur bn ar	en ur bn
 # leicester-uk	2644668	en ur		ur=لیسٹر
 # glasgow-uk	2648579	en ur
 # France: cautious times (fr.cautious, class C) at Paris.
-paris-france	2988507	en fr ar	fr
+paris-france	2988507	en fr ar tr	fr
 # held: Marseille, Lyon, Toulouse, Lille, Strasbourg — cautious times (fr.cautious) not measured at the city.
 # marseille-france	2995469	en fr ar
 # lyon-france	2996944	en fr ar
 # toulouse-france	2972315	en fr ar
 # lille-france	2998324	en fr ar
 # strasbourg-france	2973783	en fr tr
-# Belgium: cautious times (be.cautious, class C) at Brussels and Antwerp. Both members are checked through 1 November 2026 (Diyanet's captures end there, and EMB's table is checked on the same days), so the pages show October alone until November is checked.
-brussels-belgium	2800866	en fr ar	fr
-antwerp-belgium	2803138	en fr ar
+# Belgium: cautious times (be.cautious, class C) at Brussels and Antwerp. Diyanet's tables for both are checked through 2027 and EMB's table through 31 December 2026, so the pages show every month through December 2026.
+brussels-belgium	2800866	en fr ar tr	fr
+antwerp-belgium	2803138	en fr ar tr
 # held: the Netherlands — cautious times (nl.cautious) not measured at the city.
 # amsterdam-netherlands	2759794	en tr ar
 # rotterdam-netherlands	2747891	en tr ar
@@ -283,7 +283,7 @@ oslo-norway	3143244	en ur
 # Chicago: cautious times (us.chicago, class C). Both members are checked at Chicago through 31 December 2026 (the 18° block's tables and the Mosque Foundation's for us.isna), so its page shows two months until December.
 chicago-usa	4887398	en ar ur
 # held: United States — ISNA's method not yet fully checked (us.isna, class D).
-# new-york-usa	5128581	en ar ur bn	en bn	en=New York;ar=نيويورك;ur=نیویارک;bn=নিউ ইয়র্ক
+# new-york-usa	5128581	en ar ur bn	en bn	en=New York;ur=نیویارک;bn=নিউ ইয়র্ক
 # los-angeles-usa	5368361	en ar
 # houston-usa	4699066	en ar ur
 # dearborn-usa	4990510	en ar
@@ -294,7 +294,7 @@ chicago-usa	4887398	en ar ur
 # minneapolis-usa	5037649	en
 # Canada: cautious times (ca.toronto, class C) at Toronto and Mississauga.
 toronto-canada	6167865	en ur ar	en
-mississauga-canada	6075357	en ur
+mississauga-canada	6075357	en ur ar
 # held: Montreal, Ottawa — ISNA's method not yet fully checked (ca.isna, class D).
 # montreal-canada	6077243	en fr ar	fr	en=Montreal
 # ottawa-canada	6094817	en ar

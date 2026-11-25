@@ -50,6 +50,73 @@ DROPPED = {
     "1649881": "Batang, Central Java, Indonesia: GeoNames' point is in Kab. Jepara",
 }
 
+# Names GeoNames has wrong in a language, or lacks there, by language and geonameId. Its alternate names
+# are kept by many hands, and a city can carry an old Ottoman form, a misspelling, the English name left
+# untranslated, its country's own name, or a Wikipedia title with the state or country after a comma, none
+# of them marked historic and none beaten by a preferred name, so the pick below keeps them; and a city
+# with no name in a language (Singapore in Turkish, Indonesian, Urdu and Bengali) shows the English one.
+# The app shows these names in its city search and on Prayer, and the website titles its city pages with
+# them, city then country (Algiers' Arabic page read the country's name twice), and names the other cities
+# on each language's index by them: a name override in site/cities.tsv is a finding to fix here. Each name
+# below was checked on 25 Nov 2026 against the city's Wikidata label and Wikipedia title in that language
+# and is one of them (a title less the state or country it adds), unless a comment above the name says
+# what else it rests on. It wins over GeoNames' choice, so a rebuild writes the same names;
+# CityNamesBundleTest pins them. A fix is written as it stands, so it must have no ASCII comma: the script
+# checks that before it downloads anything.
+NAME_FIXES = {
+    "ar": {
+        # Gaziantep: GeoNames had its old name alone, as do Wikidata's label عين تاب and arwiki's title
+        # عنتاب; arwiki redirects غازي عنتاب to the city, and the province is ولاية غازي عين تاب.
+        "314830": "غازي عنتاب",
+        "1735106": "جورج تاون",  # George Town, Penang: misspelt
+        # Tunis: GeoNames had the country's name, as Wikidata's label does; Wikidata gives تونس العاصمة as an
+        # alias and arwiki redirects it to the city; for Algiers below the same form is the label.
+        "2464470": "تونس العاصمة",
+        "2507480": "الجزائر العاصمة",  # Algiers: GeoNames had the country's name
+    },
+    "bn": {
+        "1880252": "সিঙ্গাপুর",  # Singapore: GeoNames had no Bengali name
+        "3143244": "অসলো",  # Oslo: misspelt
+        "6167865": "টরন্টো",  # Toronto: misspelt
+    },
+    "fr": {
+        "1736376": "Kota Bharu",  # GeoNames had the variant Kota Bahru
+    },
+    "id": {
+        "1735106": "George Town",  # George Town, Penang: GeoNames had the variant Georgetown
+        "1880252": "Singapura",  # Singapore: GeoNames had no Indonesian name
+        # Brussels: GeoNames had Brusel; idwiki's title (Wikidata's label is the Capital Region's).
+        "2800866": "Brussel",
+    },
+    "tr": {
+        "1880252": "Singapur",  # Singapore: GeoNames had no Turkish name
+        "2553604": "Kazablanka",  # Casablanca: GeoNames had the Ottoman form
+        "2561668": "Agadir",  # GeoNames had ğ for its g
+        "2803138": "Anvers",  # Antwerp: GeoNames had the English name
+    },
+    "ur": {
+        "101628": "تبوک",  # Tabuk: GeoNames had ", Saudi Arabia" after it
+        # Djibouti the city: GeoNames had "region", and Wikidata's label is the country's name; urwiki
+        # titles it جبوتی (شہر) and redirects جبوتی شہر there, "city" as in تونس شہر and الجزائر شہر.
+        "223817": "جبوتی شہر",
+        "286621": "صلالہ",  # Salalah: GeoNames had سلالہ, with س, which urwiki gives to a village in Iran
+        "1735106": "جارج ٹاؤن",  # George Town: GeoNames had ", Penang" after it
+        "1880252": "سنگاپور",  # Singapore: GeoNames had no Urdu name
+        "2210247": "طرابلس",  # Tripoli: GeoNames had ", Libya" after it
+        "2219905": "خمس",  # Al Khums: GeoNames had ", Libya" after it
+        "2530335": "طنجہ",  # Tangier: GeoNames had the English name in Urdu letters
+        # Antwerp: GeoNames had the Arabic spelling, with ت and ب for ٹ and پ; urwiki's title (Wikidata's label
+        # splits it, اینٹ ورپن).
+        "2803138": "اینٹورپن",
+        # Atlanta: GeoNames had ", Georgia" after it, as Wikidata's label does; urwiki's title is bare.
+        "4180439": "اٹلانٹا",
+        # Philadelphia: GeoNames had ", Pennsylvania" after it; urwiki's title without the state (Wikidata's
+        # label spells it فلاڈلفیا).
+        "4560349": "فلاڈیلفیا",
+        "4990510": "ڈئربورن",  # Dearborn: GeoNames had ", Michigan" after it
+    },
+}
+
 
 def clean(field: str) -> str:
     """Strip commas (and surrounding whitespace) so naive CSV split stays safe."""
@@ -90,6 +157,14 @@ def alt_names_lines(local: str | None):
         if tmp:
             os.unlink(tmp.name)
 
+
+# A name fix goes into its file as it stands, not through clean(), so it must already be what clean()
+# would write: csv.writer would put a name with a comma in quotes, and the app, which takes everything
+# after the id's comma as the name, would show them.
+for lang, fixes in NAME_FIXES.items():
+    for gid, name in fixes.items():
+        if clean(name) != name:
+            sys.exit(f"name fix {lang} {gid} ({name!r}) has a comma or surrounding space")
 
 # --- admin1 code -> readable region name, e.g. "GB.ENG" -> "England" ---
 admin1_names = {}
@@ -196,6 +271,14 @@ for line in alt_names_lines(sys.argv[1] if len(sys.argv) > 1 else None):
         or (preferred == seen[1] and seen[2] and not marked)
     ):
         picked[f[2]][f[1]] = (name, preferred, marked)
+
+# The hand-checked names win over whatever GeoNames offered (NAME_FIXES above).
+for lang, fixes in NAME_FIXES.items():
+    for gid, name in fixes.items():
+        if gid not in bundled:
+            print(f"name fix {lang} {gid} ({name}) not applied: the city is not in the bundle", file=sys.stderr)
+            continue
+        picked[lang][gid] = (name, True, is_marked(name))
 
 for lang in LANGS:
     path = f"{OUT_DIR}/city-names-{lang}.csv"

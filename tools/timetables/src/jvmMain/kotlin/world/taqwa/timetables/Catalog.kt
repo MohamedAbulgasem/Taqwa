@@ -26,8 +26,16 @@ data class City(
     private val names: Map<String, String>,
     /** The city's first-level region as the app's city list names it (the engine's `admin1`). */
     val admin1: String? = null,
+    /**
+     * Its name in each site language the rule of [names] gives one in, a page language or not: what another
+     * language's index and checks page call it when it has no page there (the owner's decision of 25 November 2026).
+     */
+    private val labels: Map<String, String> = names,
 ) {
     fun name(language: String): String = names.getValue(language)
+
+    /** Its name in [language] by the rule its pages' names follow, or null where neither the list nor the app has one. */
+    fun label(language: String): String? = names[language] ?: labels[language]
 }
 
 class CatalogError(problems: List<String>) :
@@ -92,11 +100,18 @@ object Catalog {
             val overrides = namesText.split(';').filter { it.contains('=') }.associate {
                 it.substringBefore('=').trim() to it.substringAfter('=').trim()
             }
-            val names = mutableMapOf<String, String>()
-            for (language in languages.filter { it in SITE_LANGUAGES }) {
+            // The name in every site language, by one rule: the list's override, else the app's (English from
+            // cities.csv). A page language must have one; any other may lack it, and then another index names the
+            // city in English.
+            val labels = SITE_LANGUAGES.mapNotNull { language ->
                 val name = overrides[language]
                     ?: if (language == "en") row.getValue("name") else localNames.getValue(language)[id]
-                if (name.isNullOrBlank()) problems += "$where: $slug has no $language name; add $language=… to its names"
+                name?.takeIf { it.isNotBlank() }?.let { language to it }
+            }.toMap()
+            val names = mutableMapOf<String, String>()
+            for (language in languages.filter { it in SITE_LANGUAGES }) {
+                val name = labels[language]
+                if (name == null) problems += "$where: $slug has no $language name; add $language=… to its names"
                 else names[language] = name
             }
 
@@ -116,6 +131,7 @@ object Catalog {
                 featured = featured,
                 names = names,
                 admin1 = row.getValue("region").ifEmpty { null },
+                labels = labels,
             )
         }
         if (problems.isNotEmpty()) throw CatalogError(problems)

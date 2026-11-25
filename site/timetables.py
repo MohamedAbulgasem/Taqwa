@@ -35,6 +35,10 @@ from stores import block as store_block
 
 SECTION = "prayer-times/"
 CHECKS_PAGE_SLUG = "how-taqwa-checks"  # reserved for the "How Taqwa checks" page; no city may use it
+# The index's section of the cities with no page in its language, and the prefix of its countries' ids
+# (the regions' countries take the bare codes, which the city pages' breadcrumbs link to).
+OTHERS_ID = "others"
+OTHERS_PREFIX = "o-"
 # Where the checks page sends a reader who wants to see the proof for themselves (spec §5.6).
 STAMPS_URL = "https://github.com/MohamedAbulgasem/Taqwa/tree/main/tools/timetables/official/stamps"
 DESIGN_URL = "https://github.com/MohamedAbulgasem/Taqwa/blob/main/docs/superpowers/specs/2026-09-26-taqwa-prayer-times-engine-design.md"
@@ -399,6 +403,11 @@ class Timetables:
             for lang in city["languages"]:
                 if lang not in langs:
                     raise DataError(f"{city['slug']} has a {lang} page but the site has no {lang}")
+            # Every index lists every city, by these names where it has no page in the index's language.
+            unnamed = [lang for lang in langs if lang not in (city.get("labels") or {})]
+            if unnamed:
+                raise DataError(f"{city['slug']} has no labels for {', '.join(unnamed)}: the document is older than the site; "
+                                "regenerate it with ./gradlew -p tools/timetables generate")
         self.corrected = [c["slug"] for c in self.cities if correct_clocks(c)]
         for slug in self.corrected:
             # A GitHub Actions notice, so the run summary says which pages the JDK was behind on.
@@ -414,6 +423,38 @@ class Timetables:
 
     def cities_in(self, lang: str) -> list:
         return [c for c in self.cities if lang in c["pages"]]
+
+    def cities_without(self, lang: str) -> list:
+        """The published cities with no page in `lang`, which its index and checks page link to their English pages
+        (the owner's decision of 25 November 2026: every index reaches every city)."""
+        return [c for c in self.cities if lang not in c["pages"]]
+
+    def name_in(self, city: dict, lang: str) -> tuple:
+        """A city's name on `lang`'s pages, and whether that is its English name standing in: its page's in `lang`,
+        else the generator's label for it in `lang` (the same rule), else its English name, which the markup then
+        marks as English."""
+        if lang in city["pages"]:
+            return city["pages"][lang]["city"], False
+        label = city["labels"][lang]["city"]
+        return (label, False) if label else (city["pages"]["en"]["city"], True)
+
+    def country_in(self, city: dict, lang: str) -> str:
+        """The city's country in `lang`, as its page there prints it or, where it has none, as the generator's label."""
+        return city["pages"][lang]["country"] if lang in city["pages"] else city["labels"][lang]["country"]
+
+    def english_page(self, from_dir: str, slug: str) -> str:
+        """The address of a city's English page relative to the page in `from_dir`: up to the site root, where
+        English lives, then down into the section ("../../prayer-times/london-uk/" from "fr/prayer-times/")."""
+        return "../" * from_dir.count("/") + self.city_dir("en", slug)
+
+    def english_link(self, city: dict, lang: str, from_dir: str, *, keys: bool = False) -> str:
+        """A city with no page in `lang`, linked from the page in `from_dir` to its English page, by its name in
+        `lang` where the generator has one, else by its English name marked as English (and, on a right-to-left page,
+        laid out left to right, so the name never reorders). With `keys`, the names the index filter finds it by."""
+        name, english = self.name_in(city, lang)
+        mark = (' lang="en"' + (' dir="ltr"' if self.langs[lang]["dir"] == "rtl" else "")) if english else ""
+        found = f' data-k="{attr(self.keys(city, lang))}"' if keys else ""
+        return f'<a href="{self.english_page(from_dir, city["slug"])}" hreflang="en"{mark}{found}>{esc(name)}</a>'
 
     def picker_to_city(self, city: dict) -> dict:
         """Where each language's name leads from a city page: the twin, or that language's index."""
@@ -435,7 +476,7 @@ class Timetables:
 
     def build_index(self, lang: str, template: str, write_page) -> None:
         t = self.langs[lang]["timetable"]
-        count = digits(len(self.cities_in(lang)), t["digits"])
+        count = digits(len(self.cities), t["digits"])  # every index reaches every city (index_body)
         twins = {other: self.index_dir(other) for other in self.langs}
         meta = {
             "title": plain(t["index_title"], count=count),
@@ -997,9 +1038,10 @@ class Timetables:
             "checks_head_timetable", "checks_head_kind", "checks_head_days", "checks_head_places", "checks_head_through", "checks_head_at_most"))
 
         def places(entry: str) -> str:
-            """The cities with a page on this timetable, linked where they have one in this
-            language (a cautious entry's name is the same "Cautious times" everywhere, so its
-            cities are what tells the rows apart)."""
+            """The cities with a page on this timetable, each linked to its page in this language
+            or, where it has none, to its English page, named as the index's other cities are (a
+            cautious entry's name is the same "Cautious times" everywhere, so its cities are what
+            tells the rows apart)."""
             links = []
             for city in self.cities:
                 if city["method"] != entry:
@@ -1007,7 +1049,7 @@ class Timetables:
                 if lang in city["pages"]:
                     links.append(f'<a href="../{city["slug"]}/">{esc(city["pages"][lang]["city"])}</a>')
                 else:
-                    links.append(esc(city["pages"]["en"]["city"]))
+                    links.append(self.english_link(city, lang, self.checks_dir(lang)))
             return list_comma(lang).join(links)
 
         rows = []
@@ -1077,10 +1119,13 @@ class Timetables:
     # ---------------------------------------------------------------- the index and the home section
 
     def index_body(self, lang: str) -> str:
+        """The index (spec §6): the cities with a page in this language by region and country, then every other
+        published city, linked to its English page (others_section): since the owner's decision of 25 November 2026
+        every index reaches every city, so the lede counts them all."""
         cfg = self.langs[lang]
         t = cfg["timetable"]
         cities = self.cities_in(lang)
-        count = digits(len(cities), t["digits"])
+        count = digits(len(self.cities), t["digits"])
         regions = []
         for region in self.doc["regions"]:
             in_region = [c for c in cities if c["region"] == region]
@@ -1101,17 +1146,42 @@ class Timetables:
   <p class="lede">{fill(t["index_lede"], count=count)}</p>
   <p class="index-checks">{esc(t["checks_index_line"])} <a href="{CHECKS_PAGE_SLUG}/">{esc(t["checks_nav"])} {sep}</a></p>
   <label class="search" hidden>{SEARCH}<input id="city-filter" type="search" placeholder="{attr(t["search"])}" aria-label="{attr(t["search"])}" autocomplete="off" spellcheck="false"></label>
-  {"".join(regions)}
+  {"".join(regions)}{self.others_section(lang)}
   <p class="no-match" hidden>{esc(t["no_match"])}</p>
 </main>
 <script src="{{root}}assets/timetable.js?v={{script_version}}" defer></script>
 '''
 
+    def others_section(self, lang: str) -> str:
+        """"Other cities, in English": after the regions, every published city with no page in this language, by
+        country in the order the regions list countries (as the English index, which has them all), each linked to
+        its English page by its name here where the generator has one. It carries the regions' classes, so the
+        search filters it with them; its countries' ids carry their own prefix (OTHERS_PREFIX), the regions' being
+        the bare codes the city pages' breadcrumbs link to. Nothing where every city has a page in this language,
+        as on the English index."""
+        others = self.cities_without(lang)
+        if not others:
+            return ""
+        t = self.langs[lang]["timetable"]
+        countries = []
+        for region in self.doc["regions"]:
+            for code in dict.fromkeys(c["country"] for c in self.cities if c["region"] == region):
+                here = [c for c in others if c["region"] == region and c["country"] == code]
+                if not here:
+                    continue
+                links = "".join(f'<li>{self.english_link(c, lang, self.index_dir(lang), keys=True)}</li>' for c in here)
+                countries.append(f'<div class="country" id="{OTHERS_PREFIX}{code.lower()}"><h3>{esc(self.country_in(here[0], lang))}</h3>'
+                                 f'<ul class="cities">{links}</ul></div>')
+        return (f'\n  <section class="region others" id="{OTHERS_ID}"><h2 class="label">{esc(t["index_others"])}</h2>'
+                f'<p class="others-note">{esc(t["index_others_note"])}</p><div class="countries">{"".join(countries)}</div></section>')
+
     def keys(self, city: dict, lang: str) -> str:
         """Every name the index filter should find a city by: in this language and in English,
-        with its country, and the words of its address."""
-        page, english = city["pages"][lang], city["pages"]["en"]
-        words = [page["city"], english["city"], page["country"], english["country"], city["slug"].replace("-", " ")]
+        with its country, and the words of its address. A city with no page in this language is
+        found by its labels' names here (its English name standing in for one it lacks)."""
+        english = city["pages"]["en"]
+        words = [self.name_in(city, lang)[0], english["city"], self.country_in(city, lang), english["country"],
+                 city["slug"].replace("-", " ")]
         return " ".join(dict.fromkeys(fold(w) for w in words))
 
     def home_section(self, lang: str) -> str:
@@ -1119,7 +1189,7 @@ class Timetables:
             return ""
         t = self.langs[lang]["timetable"]
         featured = [c for c in self.cities_in(lang) if lang in c["featured"]]
-        count = digits(len(self.cities_in(lang)), t["digits"])
+        count = digits(len(self.cities), t["digits"])  # the index it leads to reaches every city
         chips = "".join(f'<a href="{{prayer_times}}{c["slug"]}/">{esc(c["pages"][lang]["city"])}</a>' for c in featured)
         return f'''<section class="section" id="prayer-times">
     <div class="wrap cities-strip">
@@ -1140,9 +1210,10 @@ def check_page(rel_path: str, doc: str, data: Timetables) -> list:
     each with a row for every day of that month, six times in each with the two detail lines of
     the detailed view, the view's switch, a print button per month, the live data the script
     needs for those days and no others, its folded explainer with the link to the checks page,
-    its app section and, on a cautious page, the decides table; an index lists every city that
-    has a page in its language and links to the checks page; the checks page prints the
-    document's totals and a row per published timetable."""
+    its app section and, on a cautious page, the decides table; an index lists every published
+    city, by its page in the index's language or, in the section of the other cities, by its
+    English page, and links to the checks page; the checks page prints the document's totals and
+    a row per published timetable."""
     problems = []
     parts = rel_path.split("/")
     if SECTION.rstrip("/") not in parts:
@@ -1151,9 +1222,22 @@ def check_page(rel_path: str, doc: str, data: Timetables) -> list:
     lang = parts[0] if at == 1 else "en"
     rest = parts[at + 1:]
     if rest == ["index.html"]:
-        for city in data.cities_in(lang):
-            if f'href="{city["slug"]}/"' not in doc:
-                problems.append(f"timetable index: {rel_path} does not list {city['slug']}")
+        # Every index reaches every city (the owner's decision of 25 November 2026): the section of the
+        # others holds exactly those with no page in its language, and is there only when one has none.
+        found = re.search(rf'<section class="region others" id="{OTHERS_ID}">(.*?)</section>', doc, re.S)
+        others = found.group(1) if found else ""
+        own = doc[:found.start()] + doc[found.end():] if found else doc
+        for city in data.cities:
+            english = f'href="{data.english_page(data.index_dir(lang), city["slug"])}" hreflang="en"'
+            if lang in city["pages"]:
+                if f'href="{city["slug"]}/"' not in own:
+                    problems.append(f"timetable index: {rel_path} does not list {city['slug']}")
+                if english in others:
+                    problems.append(f"timetable index: {rel_path} lists {city['slug']} among the other cities, though it has a {lang} page")
+            elif english not in others:
+                problems.append(f"timetable index: {rel_path} does not list {city['slug']} among the other cities, by its English page")
+        if found and not data.cities_without(lang):
+            problems.append(f"timetable index: {rel_path} has a section of other cities, though every city has a {lang} page")
         if f'href="{CHECKS_PAGE_SLUG}/"' not in doc:
             problems.append(f"timetable index: {rel_path} does not link to the checks page")
         return problems

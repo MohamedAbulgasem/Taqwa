@@ -33,6 +33,14 @@ default settings.
 | Navigation | "Prayer times" first in the header, every language. |
 | The Jumuʿah pill | On Fridays, next to Dhuhr: on the city pages' Today card and in the month table, and in the app's Prayer screen. |
 
+*Languages per city, amended 25 November 2026 (the owner's decision):* every language's index lists
+every published city, those without a page in that language under "Other cities, in English",
+linked to the city's English page (§3.3). The rule above otherwise stands. 24 pages were added on
+25 November where a large community reading that language is documented: Arabic for İstanbul,
+Gaziantep and Mississauga; Bengali and Indonesian for Dammam, Kuala Lumpur, Johor Bahru, George
+Town and Kota Bharu; Bengali for Muscat; Indonesian for Cairo; Turkish for Brussels, Antwerp, Paris
+and London; Urdu for Salalah, Taif, Tabuk, Abha and Buraydah.
+
 ## 3. Architecture
 
 ```
@@ -94,9 +102,13 @@ country, coordinates and time zone always come from the app's `cities.csv`.
 Sentences live in each language's `meta.json` under `timetable`; the JSON supplies only values.
 
 - `/{lang}/prayer-times/` lists the cities in that language by region and country, with a filter.
+  *Since 25 November 2026 (the owner's decision), every other city follows under "Other cities, in
+  English", by country, each linked to its English page, and the filter covers them too.*
 - `/{lang}/prayer-times/{slug}/` is a city page.
 - The language picker on a city page links to the city's twin where it exists and to that
   language's index where it does not; hreflang lists only real twins, x-default is English.
+  *Since 25 November 2026 (the owner's decision), that index lists the city too, under "Other
+  cities, in English", linked to its English page.*
 - The sitemap gains every city page and index with their alternates.
 - A city page carries `BreadcrumbList` structured data and the language's share card.
 

@@ -38,6 +38,8 @@
     "index_lede": "Les horaires de ce mois-ci pour {count} villes, et ceux du mois suivant dès qu’ils sont vérifiés, calculés exactement comme dans l’application. Partout ailleurs, l’application fonctionne là où vous êtes.",
     "search": "Trouver une ville",
     "no_match": "Aucune ville de ce nom ici pour l’instant. L’application en compte plus de trente mille, et fonctionne aussi avec votre position.",
+    "index_others": "Autres villes, en anglais",
+    "index_others_note": "Ces villes n’ont pas encore de page en français. Leur page en anglais donne les mêmes horaires.",
     "title": "Horaires de prière à {city}, {country} · {month} · {brand}",
     "og_title": "Horaires de prière à {city}, {country}",
     "description_qibla": " Qibla : {qibla}.",

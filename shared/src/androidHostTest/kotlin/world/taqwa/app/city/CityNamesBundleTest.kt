@@ -123,6 +123,63 @@ class CityNamesBundleTest {
         }
     }
 
+    /**
+     * The names `tools/build-city-db.py` writes over GeoNames' own (its `NAME_FIXES`), each checked on
+     * 25 Nov 2026 against the language's Wikidata label and Wikipedia title: GeoNames had an Ottoman form,
+     * a misspelling, the English name, the country's name for its capital, or a state or country after
+     * the city's name, or no name at all (Singapore in four languages). The site titles its city pages
+     * with these names, city then country, and its indexes name other cities by them, so a rebuild that
+     * lost the table would title Algiers' Arabic page with the country's name twice.
+     */
+    @Test
+    fun theNamesFixedOverGeoNamesStayFixed() {
+        val expected = mapOf(
+            "ar" to mapOf(
+                314830 to "غازي عنتاب",
+                1735106 to "جورج تاون",
+                2464470 to "تونس العاصمة",
+                2507480 to "الجزائر العاصمة",
+            ),
+            "bn" to mapOf(
+                1880252 to "সিঙ্গাপুর",
+                3143244 to "অসলো",
+                6167865 to "টরন্টো",
+            ),
+            "fr" to mapOf(1736376 to "Kota Bharu"),
+            "id" to mapOf(
+                1735106 to "George Town",
+                1880252 to "Singapura",
+                2800866 to "Brussel",
+            ),
+            "tr" to mapOf(
+                1880252 to "Singapur",
+                2553604 to "Kazablanka",
+                2561668 to "Agadir",
+                2803138 to "Anvers",
+            ),
+            "ur" to mapOf(
+                101628 to "تبوک",
+                223817 to "جبوتی شہر",
+                286621 to "صلالہ",
+                1735106 to "جارج ٹاؤن",
+                1880252 to "سنگاپور",
+                2210247 to "طرابلس",
+                2219905 to "خمس",
+                2530335 to "طنجہ",
+                2803138 to "اینٹورپن",
+                4180439 to "اٹلانٹا",
+                4560349 to "فلاڈیلفیا",
+                4990510 to "ڈئربورن",
+            ),
+        )
+        for ((language, names) in expected) {
+            val file = namePairs(language).toMap()
+            for ((id, name) in names) {
+                assertEquals(name, file[id], "city-names-$language.csv, id $id")
+            }
+        }
+    }
+
     @Test
     fun arabicTripoliCarriesNoHarakat() {
         val tripoli = namePairs("ar").toMap().getValue(2210247)

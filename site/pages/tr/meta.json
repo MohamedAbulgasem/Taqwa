@@ -38,6 +38,8 @@
     "index_lede": "{count} şehir için bu ayın vakitleri ve doğrulandığında gelecek ayınkiler, tam da uygulamanın hesapladığı gibi. Başka her yerde uygulama, bulunduğunuz yerde çalışır.",
     "search": "Şehir arayın",
     "no_match": "Bu adla bir şehir burada henüz yok. Uygulamada otuz binden fazla şehir var ve konumunuzla da çalışır.",
+    "index_others": "Diğer şehirler (İngilizce)",
+    "index_others_note": "Bu şehirlerin henüz Türkçe sayfası yok. İngilizce sayfaları aynı vakitleri gösterir.",
     "title": "{city} namaz vakitleri, {country} · {month} · {brand}",
     "og_title": "{city} namaz vakitleri, {country}",
     "description_qibla": " Kıble: {qibla}.",

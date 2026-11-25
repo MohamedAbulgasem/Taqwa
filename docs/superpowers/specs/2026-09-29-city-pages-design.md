@@ -552,7 +552,10 @@ document's `proof` block (§9.2), sentences in `meta.json` (`checks_*`):
    for the gate, each checked at its own mosque" (125, from `official/survey/*/calendars.tsv`).
 5. **Which places have a page** — the proven rule in plain words (§2) and a table of the published
    timetables: name, kind ("Reproduced and checked" / "Cautious times"), place-days, places, checked
-   through, at most (the entry's worst over the starts). Rows come from `proof.published`.
+   through, at most (the entry's worst over the starts). Rows come from `proof.published`. *Since
+   25 November 2026 (the owner's decision), a city under a row's name with no page in the checks page's
+   language links to its English page, by its name in that language where `cities.tsv` or the app's
+   city files give one, as the index's other cities do (§6).*
 6. **Read it yourself** — links to the stamps folder and the engine's design in the public repository
    (`https://github.com/MohamedAbulgasem/Taqwa/tree/main/tools/timetables/official/stamps`,
    `…/blob/main/docs/superpowers/specs/2026-09-26-taqwa-prayer-times-engine-design.md`), and the line that
@@ -564,7 +567,12 @@ The index (`/prayer-times/`) is unchanged in shape: h1, lede, the search, region
 it gains one line under the lede — "Every city here has a timetable Taqwa has rebuilt and checked over
 every day shown. **How Taqwa checks ›**" (`checks_index_line`) — and the checks page's link. The home
 strip (`<!-- prayer-times -->`) is unchanged; its count is the published count. The header and footer
-"Prayer times" links return with the section (existing `PRAYER_TIMES_LIVE`).
+"Prayer times" links return with the section (existing `PRAYER_TIMES_LIVE`). *Since 25 November 2026
+(the owner's decision), every language's index lists every published city: after its regions, those
+with no page in that language follow under "Other cities, in English" (`index_others`, with the note
+`index_others_note`), by country, each linked to its English page by its name in that language where
+`cities.tsv` or the app's city files give one (the document's `labels`), else in English; the filter
+covers them, and the index's and the home strip's count is every published city's.*
 
 ## 7. Get-the-app states (R98)
 
@@ -621,7 +629,12 @@ minutes, the rounding note, joined with the language's list comma), `howChecked`
 `statNever`, `statMinutes`, `statAtMost`, `cautiousBody`, `maghribGuard` (the built day's guard sentence, or "") with `maghribGuardTemplate` and `maghribNoSunsetTemplate`, `whichDecides`, `matchMosque`, `setByRule`,
 `polarLine`, `stopEating` per day is built from `about_stop_eating` + the day's clock), `members`
 (names), and per day `asrOther`, `endOfEating`, `imsak`, and for cautious pages `members` clocks; `days[i]`
-also carries `setByRule` as localized prayer names.
+also carries `setByRule` as localized prayer names. *Since 25 November 2026 (the owner's decision), per
+city also `labels` = `{lang: {city, country}}` for all seven site languages in the order `en ar fr tr id
+ur bn`, page languages or not: `city` is its name by the rule its pages' names follow (the `cities.tsv`
+override, else the app's `city-names-<lang>.csv`, English from `cities.csv`), or null where neither has
+one, and `country` its country as a page in that language prints it. A language's index and checks page
+name a city with no page in that language by them (§5 item 5, §6).*
 
 Document-level, added: `proof` = `{entries, placeDays, heldOutDays, ramadanDays, earlyStarts, lateEnds,
 brokenStamps, tables (gate rows), surveyCalendars, published: [{entry, class, placeDays, places, first,

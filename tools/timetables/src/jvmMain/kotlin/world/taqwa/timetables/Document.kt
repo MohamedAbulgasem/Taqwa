@@ -23,9 +23,10 @@ import kotlin.time.Instant
  * the timetable — its registry id, class and unit — and Asr school the app's engine follows there,
  * the Qibla, the stamp's proof figures, and for every day of the months the page shows the instants
  * as epoch seconds for the page's live countdown, a cautious place's members' own days among them);
- * and per page language, every string the page shows about that city, already written the way the
- * app writes it (the About screen's sentences filled for the city). The site build adds only its
- * own sentences around these values, so it never formats a number or a date itself.
+ * its and its country's names in every site language (`labels`, for the indexes that list it without
+ * a page of their own); and per page language, every string the page shows about that city, already
+ * written the way the app writes it (the About screen's sentences filled for the city). The site
+ * build adds only its own sentences around these values, so it never formats a number or a date itself.
  *
  * [build] applies the proven rule (spec §2, [Proven]): a city the stamps do not prove every day of
  * its current month of is written under `held` with its reason, never as a page; a page carries its
@@ -171,6 +172,13 @@ class Document(
                         facts["sunSets"] = day.sunSets
                     }
                 }
+            },
+            // The city's and its country's names in all seven languages, page languages or not (the owner's decision of
+            // 25 November 2026): every index lists every city, one without a page in its language by these names, linked
+            // to its English page. The city's follows its pages' rule ([City.label]) and is null where the list and the
+            // app have none; the country's is the one its page in that language would print.
+            "labels" to SITE_LANGUAGES.associateWith { language ->
+                linkedMapOf("city" to city.label(language), "country" to Formats(language, city.countryCode).countryName(city.countryCode))
             },
             "pages" to linkedMapOf(
                 *city.languages.map { it to page(p, it, qibla) }.toTypedArray(),

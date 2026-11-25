@@ -14,6 +14,7 @@ import copy
 import datetime
 import json
 import os
+import posixpath
 import re
 import shutil
 import subprocess
@@ -160,6 +161,7 @@ class RulerTest(unittest.TestCase):
 PRAYERS = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"]
 OCTOBER, NOVEMBER = (2026, 10), (2026, 11)
 SLUG = "made-up-city"
+SITE_LANGS = ("en", "ar", "fr", "tr", "id", "ur", "bn")
 
 
 def language(lang: str) -> dict:
@@ -235,6 +237,8 @@ def made_up_document(months: list, today: str) -> dict:
         "qibla": {"bearing": 119.2, "km": 4000.0}, "today": today, "months": month_facts,
         "nextUnchecked": None if len(months) > 1 else {"timetable": "made.up", "day": "2026-11-01"},
         "days": facts, "pages": {"en": page},
+        # The generator names every city in all seven languages, page languages or not (made up: the same everywhere).
+        "labels": {lang: {"city": "Made-up City", "country": "United Kingdom"} for lang in SITE_LANGS},
     }
     return {"generated": f"{today}T06:07:00Z", "prayersArabic": ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"],
             "regions": ["europe"], "cities": [city], "held": [], "proof": {"published": []}}
@@ -618,6 +622,227 @@ class FrenchElisionTest(unittest.TestCase):
         self.assertEqual(set(timetables.ELIDED), words)
 
 
+# ---------------------------------------------------------------- every index reaches every city
+
+COUNTRIES = {"SA": {"en": "Saudi Arabia", "ar": "السعودية", "fr": "Arabie saoudite"},
+             "GB": {"en": "United Kingdom", "ar": "المملكة المتحدة", "fr": "Royaume-Uni"},
+             "NL": {"en": "Netherlands", "ar": "هولندا", "fr": "Pays-Bas"}}
+
+
+def index_document() -> dict:
+    """Four made-up cities on the made-up city's days, for the indexes and the checks page (the owner's decision of
+    25 November 2026: every index lists every city, those with no page in its language under "Other cities, in
+    English", linked to their English pages). In the document's order: Made-up City and Made-up Town in the United
+    Kingdom, in English and French, and in English alone; Made-up Port in the Netherlands, in English alone; and last
+    Made-up Oasis in Saudi Arabia, with pages in English and Arabic, though its region comes first, so an index is
+    seen to take the regions' order and not the document's. The generator's labels name each in some languages
+    besides its pages' and in none of the others, where its English name stands in; no city has a Bengali page."""
+    doc = made_up_document([NOVEMBER], "2026-11-13")
+    doc["regions"] = ["middle-east", "europe"]
+    base = doc["cities"][0]
+
+    def city(slug: str, code: str, region: str, names: dict, pages: list) -> dict:
+        made = copy.deepcopy(base)
+        made.update(slug=slug, country=code, region=region, languages=pages, featured=pages)
+        made["labels"] = {lang: {"city": names.get(lang), "country": COUNTRIES[code].get(lang, COUNTRIES[code]["en"])}
+                          for lang in SITE_LANGS}
+        made["pages"] = {lang: dict(copy.deepcopy(base["pages"]["en"]), city=names[lang], country=COUNTRIES[code][lang])
+                         for lang in pages}
+        return made
+
+    doc["cities"] = [
+        city("made-up-city", "GB", "europe", {"en": "Made-up City", "ar": "المدينة المخترعة", "fr": "Ville inventée"}, ["en", "fr"]),
+        city("made-up-town", "GB", "europe", {"en": "Made-up Town", "fr": "Bourg inventé"}, ["en"]),
+        city("made-up-port", "NL", "europe", {"en": "Made-up Port", "ar": "الميناء المخترع"}, ["en"]),
+        city("made-up-oasis", "SA", "middle-east", {"en": "Made-up Oasis", "ar": "الواحة المخترعة", "fr": "Oasis inventée"}, ["en", "ar"]),
+    ]
+    doc["proof"] = {
+        "entries": 1, "placeDays": 365, "heldOutDays": 0, "ramadanDays": 30, "earlyStarts": 0, "lateEnds": 0, "brokenStamps": 0,
+        "tables": 12, "surveyCalendars": 0, "republished": [], "partlyRepublished": [],
+        "published": [{"entry": "made.up", "class": "B", "placeDays": 365, "places": 4, "first": "2026-01-01", "through": "2026-12-31",
+                       "atMost": 2, "names": {lang: "Made-up Authority" for lang in SITE_LANGS},
+                       "throughText": {lang: "31 December 2026" for lang in SITE_LANGS}}],
+    }
+    return doc
+
+
+def index_data() -> timetables.Timetables:
+    return timetables.Timetables({lang: language(lang) for lang in ("en", "ar", "fr", "bn")}, index_document())
+
+
+def others_of(body: str):
+    """The index's section of the other cities, or None."""
+    found = re.search(r'<section class="region others" id="others">(.*?)</section>', body, re.S)
+    return found.group(1) if found else None
+
+
+def links_in(markup: str) -> dict:
+    """Each link's city, as (address, attributes, words), by the slug its address ends in."""
+    return {href.rstrip("/").rsplit("/", 1)[-1]: (href, attrs, text)
+            for href, attrs, text in re.findall(r'<a href="([^"]*)"([^>]*)>([^<]*)</a>', markup)}
+
+
+class EveryCityIndexTest(unittest.TestCase):
+    """Every language's index lists every published city: its own pages by region and country, then "Other cities,
+    in English", each city with no page in that language by country, linked to its English page; the checks page
+    links such a city the same way, and the index's and the home section's counts are every city's."""
+
+    def setUp(self):
+        self.data = index_data()
+
+    def test_the_section_lists_exactly_the_cities_without_a_page_in_the_language(self):
+        for lang, own, others in (("fr", ["made-up-city"], ["made-up-oasis", "made-up-town", "made-up-port"]),
+                                  ("ar", ["made-up-oasis"], ["made-up-city", "made-up-town", "made-up-port"]),
+                                  ("bn", [], ["made-up-oasis", "made-up-city", "made-up-town", "made-up-port"])):
+            body = self.data.index_body(lang)
+            section = others_of(body)
+            self.assertIsNotNone(section, lang)
+            self.assertEqual(others, list(links_in(section)), lang)
+            self.assertEqual(own, re.findall(r'<a href="([\w-]+)/" data-k=', body.replace(section, "")), lang)
+
+    def test_it_follows_the_regions_with_its_heading_and_note_and_their_classes(self):
+        body = self.data.index_body("fr")
+        t = self.data.langs["fr"]["timetable"]
+        head = re.search(r'<section class="region others" id="others"><h2 class="label">([^<]*)</h2>'
+                         r'<p class="others-note">([^<]*)</p><div class="countries">', body)
+        self.assertEqual((t["index_others"], t["index_others_note"]), head.groups())
+        self.assertLess(body.rindex('<section class="region" id="r-'), body.index('class="region others"'))
+        self.assertLess(body.index('class="region others"'), body.index('class="no-match"'))
+        # The filter's classes: countries in .country, cities in ul.cities, each link with its keys.
+        section = others_of(body)
+        self.assertEqual(3, len(re.findall(r'<div class="country" id="o-[a-z]+"><h3>[^<]+</h3><ul class="cities"><li><a ', section)))
+        self.assertTrue(all('data-k="' in attrs for _, attrs, _ in links_in(section).values()))
+
+    def test_its_countries_take_the_regions_order_not_the_documents(self):
+        # The document lists Made-up Oasis last, yet the Middle East is the first region: the section follows the
+        # regions, and inside a region the order its countries first appear in, as the regions above it do.
+        self.assertEqual(["made-up-city", "made-up-town", "made-up-port", "made-up-oasis"], [c["slug"] for c in self.data.cities])
+        self.assertEqual(["middle-east", "europe"], self.data.doc["regions"])
+        bn = others_of(self.data.index_body("bn"))
+        self.assertEqual(["o-sa", "o-gb", "o-nl"], re.findall(r'<div class="country" id="([^"]+)">', bn))
+        self.assertEqual(["made-up-oasis", "made-up-city", "made-up-town", "made-up-port"], list(links_in(bn)))
+        self.assertEqual(["Arabie saoudite", "Royaume-Uni", "Pays-Bas"], re.findall(r"<h3>([^<]*)</h3>", others_of(self.data.index_body("fr"))))
+        self.assertEqual(["sa", "gb", "nl"], re.findall(r'<div class="country" id="([a-z]+)">', self.data.index_body("en")))
+
+    def test_its_links_go_to_the_english_pages_from_the_index(self):
+        for lang in ("fr", "ar", "bn"):
+            index = self.data.index_dir(lang)
+            for slug, (href, attrs, _) in links_in(others_of(self.data.index_body(lang))).items():
+                self.assertIn(' hreflang="en"', attrs, (lang, slug))
+                self.assertEqual(f"{timetables.SECTION}{slug}", posixpath.normpath(posixpath.join(index, href)), (lang, href))
+        self.assertEqual("../../prayer-times/made-up-town/", links_in(others_of(self.data.index_body("fr")))["made-up-town"][0])
+
+    def test_a_city_is_named_by_its_label_else_by_its_english_name_marked_english(self):
+        fr = others_of(self.data.index_body("fr"))
+        links = links_in(fr)
+        self.assertEqual(["Oasis inventée", "Bourg inventé", "Made-up Port"], [text for _, _, text in links.values()])
+        self.assertNotIn(" lang=", links["made-up-oasis"][1] + links["made-up-town"][1])
+        self.assertIn(' lang="en"', links["made-up-port"][1])
+        self.assertNotIn("dir=", links["made-up-port"][1])  # a left-to-right page needs no direction for it
+        ar = others_of(self.data.index_body("ar"))
+        links = links_in(ar)
+        self.assertEqual(["المدينة المخترعة", "Made-up Town", "الميناء المخترع"], [text for _, _, text in links.values()])
+        # On a right-to-left page the English name is laid out left to right as well, so it never reorders.
+        self.assertIn(' lang="en" dir="ltr"', links["made-up-town"][1])
+        self.assertNotIn(" lang=", links["made-up-city"][1] + links["made-up-port"][1])
+        # The countries' headings are the labels' names in the page's language.
+        self.assertEqual(["Arabie saoudite", "Royaume-Uni", "Pays-Bas"], re.findall(r"<h3>([^<]*)</h3>", fr))
+        self.assertEqual(["المملكة المتحدة", "هولندا"], re.findall(r"<h3>([^<]*)</h3>", ar))
+
+    def test_every_id_on_an_index_is_unique(self):
+        for lang in ("en", "fr", "ar", "bn"):
+            ids = re.findall(r'\bid="([^"]+)"', self.data.index_body(lang))
+            self.assertEqual(len(ids), len(set(ids)), (lang, ids))
+        # The United Kingdom is in both parts of the French index: the regions' country keeps its code (the city
+        # pages' breadcrumbs link to it), the other cities' takes the prefix.
+        fr = self.data.index_body("fr")
+        self.assertIn('<div class="country" id="gb">', fr)
+        self.assertIn('<div class="country" id="o-gb">', fr)
+
+    def test_the_english_index_has_no_section_of_other_cities(self):
+        body = self.data.index_body("en")
+        self.assertIsNone(others_of(body))
+        self.assertNotIn(self.data.langs["en"]["timetable"]["index_others"], body)
+        self.assertEqual(["made-up-oasis", "made-up-city", "made-up-town", "made-up-port"], re.findall(r'<a href="([\w-]+)/" data-k=', body))
+
+    def test_the_filter_finds_another_city_by_its_name_and_its_country_in_both_languages(self):
+        keys = self.data.keys(self.data.by_slug["made-up-town"], "fr")
+        for words in ("Bourg inventé", "Made-up Town", "Royaume-Uni", "United Kingdom"):
+            self.assertIn(timetables.fold(words), keys)
+        # One the labels do not name in French is found by its English name, and by its country in both.
+        keys = self.data.keys(self.data.by_slug["made-up-port"], "fr")
+        for words in ("Made-up Port", "Pays-Bas", "Netherlands"):
+            self.assertIn(timetables.fold(words), keys)
+        self.assertIn(f'data-k="{timetables.attr(keys)}"', others_of(self.data.index_body("fr")))
+
+    def test_check_page_holds_every_index_to_every_city(self):
+        for lang in ("en", "fr", "ar", "bn"):
+            rel = f"{self.data.index_dir(lang)}index.html"
+            self.assertEqual([], timetables.check_page(rel, self.data.index_body(lang), self.data), lang)
+        rel = "fr/prayer-times/index.html"
+        fr = self.data.index_body("fr")
+        dropped = re.sub(r'<li><a href="\.\./\.\./prayer-times/made-up-port/".*?</li>', "", fr)
+        self.assertEqual([f"timetable index: {rel} does not list made-up-port among the other cities, by its English page"],
+                         timetables.check_page(rel, dropped, self.data))
+        # A city with a French page belongs in the regions, not among the others.
+        mislaid = fr.replace('<li><a href="../../prayer-times/made-up-town/"',
+                             '<li><a href="../../prayer-times/made-up-city/" hreflang="en">Ville inventée</a></li>'
+                             '<li><a href="../../prayer-times/made-up-town/"')
+        self.assertEqual([f"timetable index: {rel} lists made-up-city among the other cities, though it has a fr page"],
+                         timetables.check_page(rel, mislaid, self.data))
+        # And an index whose every city has a page in its language has no such section.
+        en = self.data.index_body("en").replace('<p class="no-match"', '<section class="region others" id="others"></section><p class="no-match"')
+        self.assertEqual(["timetable index: prayer-times/index.html has a section of other cities, though every city has a en page"],
+                         timetables.check_page("prayer-times/index.html", en, self.data))
+
+    def test_the_checks_page_links_a_city_with_no_page_in_the_language_to_its_english_page(self):
+        def places(lang: str) -> str:
+            return re.search(r'<tr><th scope="row">Made-up Authority<small>(.*?)</small></th>', self.data.checks_body(lang)).group(1)
+
+        # In the document's order, as the page lists a timetable's places.
+        self.assertEqual(", ".join([
+            '<a href="../made-up-city/">Ville inventée</a>',
+            '<a href="../../../prayer-times/made-up-town/" hreflang="en">Bourg inventé</a>',
+            '<a href="../../../prayer-times/made-up-port/" hreflang="en" lang="en">Made-up Port</a>',
+            '<a href="../../../prayer-times/made-up-oasis/" hreflang="en">Oasis inventée</a>',
+        ]), places("fr"))
+        self.assertEqual("، ".join([
+            '<a href="../../../prayer-times/made-up-city/" hreflang="en">المدينة المخترعة</a>',
+            '<a href="../../../prayer-times/made-up-town/" hreflang="en" lang="en" dir="ltr">Made-up Town</a>',
+            '<a href="../../../prayer-times/made-up-port/" hreflang="en">الميناء المخترع</a>',
+            '<a href="../made-up-oasis/">الواحة المخترعة</a>',
+        ]), places("ar"))
+        self.assertEqual(", ".join(f'<a href="../{slug}/">{name}</a>' for slug, name in (
+            ("made-up-city", "Made-up City"), ("made-up-town", "Made-up Town"), ("made-up-port", "Made-up Port"),
+            ("made-up-oasis", "Made-up Oasis"))), places("en"))
+        checks = self.data.checks_dir("fr")
+        for slug, (href, _, _) in links_in(places("fr")).items():
+            self.assertEqual(f"{self.data.index_dir('fr' if slug == 'made-up-city' else 'en')}{slug}",
+                             posixpath.normpath(posixpath.join(checks, href)), slug)
+
+    def test_the_counts_are_every_published_city(self):
+        for lang in ("en", "fr", "ar", "bn"):
+            t = self.data.langs[lang]["timetable"]
+            four = timetables.digits(4, t["digits"])
+            self.assertIn(f'<p class="lede">{timetables.fill(t["index_lede"], count=four)}</p>', self.data.index_body(lang), lang)
+            self.assertIn(timetables.fill(t["home_lede"], count=four), self.data.home_section(lang), lang)
+            written = {}
+            self.data.build_index(lang, "", lambda *_, **page: written.update(page))
+            self.assertEqual(timetables.plain(t["index_description"], count=four), written["meta"]["description"], lang)
+
+    def test_every_language_says_the_sections_heading_and_note(self):
+        for lang in SITE_LANGS:
+            t = language(lang)["timetable"]
+            self.assertTrue(t["index_others"] and t["index_others_note"], lang)
+            self.assertIsNone(re.search(r"\{\w+\}", t["index_others"] + t["index_others_note"]), lang)
+
+    def test_a_document_without_labels_is_refused(self):
+        doc = index_document()
+        del doc["cities"][2]["labels"]["fr"]
+        with self.assertRaises(timetables.DataError):
+            timetables.Timetables({"en": language("en"), "fr": language("fr")}, doc)
+
+
 def find_chrome():
     """Chrome, to run the page script in: $CHROME, the Mac's, or one on the PATH."""
     for candidate in (os.environ.get("CHROME"), "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -788,6 +1013,57 @@ class CautiousGuardScriptTest(unittest.TestCase):
         shown = run_page(self.plain, instant)
         self.assertIn("now", shown["rows"][timetables.ASR])
         self.assertEqual("Maghrib in", shown["label"])
+
+
+@unittest.skipUnless(CHROME, "no Chrome to run the page script in")
+class IndexFilterScriptTest(unittest.TestCase):
+    """The index's search filters the other cities with the regions: the page script reads the same classes, and
+    finds a city by its name and its country in the page's language and in English."""
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            ran = 'id="ok"' in dump_dom('<!doctype html><p id="ok">ok</p>')
+        except (OSError, subprocess.SubprocessError):
+            ran = False
+        if not ran:
+            raise unittest.SkipTest(f"{CHROME} runs no page here")
+        cls.data = index_data()
+
+    def filtered(self, lang: str, query: str) -> tuple:
+        """The index with `query` in its search box when the page script runs (it filters a box that is not
+        empty at once): the cities shown, the parts shown (a region's id, or the other cities'), and whether the
+        no-match line is."""
+        with open(os.path.join(SITE, "assets", "timetable.js"), encoding="utf-8") as f:
+            script = f.read()
+        body = self.data.index_body(lang).replace('<input id="city-filter"', f'<input id="city-filter" value="{timetables.attr(query)}"')
+        body = re.sub(r'<script src="\{root\}assets/timetable\.js\?v=\{script_version\}" defer></script>',
+                      lambda _: "<script>" + script + "</script>", body)
+        dir_ = self.data.langs[lang]["dir"]
+        dom = dump_dom(f'<!doctype html><html lang="{lang}" dir="{dir_}"><head><meta charset="utf-8"></head><body>{body}</body></html>')
+        if 'id="city-filter"' not in dom:
+            raise AssertionError(f"Chrome returned no page: {dom[:200]!r}")
+        cities = [href.rstrip("/").rsplit("/", 1)[-1] for hidden, href in re.findall(r'<li( data-hidden="")?><a href="([^"]*)"', dom) if not hidden]
+        parts = [part for part, hidden in re.findall(r'<section class="region[^"]*" id="([^"]+)"( data-hidden="")?>', dom) if not hidden]
+        no_match = re.search(r'<p class="no-match"( hidden="")?>', dom).group(1) is None
+        return cities, parts, no_match
+
+    def test_a_query_only_another_city_matches_shows_the_other_cities_alone(self):
+        self.assertEqual((["made-up-town"], ["others"], False), self.filtered("fr", "bourg"))
+        # By its country in the page's language, and by its English name where the labels have no French one.
+        self.assertEqual((["made-up-port"], ["others"], False), self.filtered("fr", "pays-bas"))
+        self.assertEqual((["made-up-port"], ["others"], False), self.filtered("fr", "made-up port"))
+
+    def test_a_query_both_parts_match_shows_both(self):
+        self.assertEqual((["made-up-city", "made-up-town"], ["r-europe", "others"], False), self.filtered("fr", "united kingdom"))
+
+    def test_a_query_only_the_languages_own_city_matches_hides_the_other_cities(self):
+        self.assertEqual((["made-up-city"], ["r-europe"], False), self.filtered("fr", "ville"))
+        self.assertEqual(([], [], True), self.filtered("fr", "nowhere"))
+
+    def test_on_a_right_to_left_index_an_english_named_city_is_found_by_either_name(self):
+        self.assertEqual((["made-up-town"], ["others"], False), self.filtered("ar", "made-up town"))
+        self.assertEqual((["made-up-port"], ["others"], False), self.filtered("ar", "الميناء"))
 
 
 if __name__ == "__main__":

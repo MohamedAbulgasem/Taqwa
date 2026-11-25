@@ -131,6 +131,9 @@ tasks.withType<Test>().configureEach {
             include("values*/strings.xml", "files/cities.csv", "files/city-names-*.csv")
         },
     ).withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("appResources")
+    // CityLabelsTest reads the site's own list of cities.
+    inputs.file(repoRoot.resolve("site/cities.tsv")).withPathSensitivity(PathSensitivity.RELATIVE)
+        .withPropertyName("siteCities")
     // NeverEarlyGateTest reads the gate rows and every official table they name.
     inputs.files(fileTree(repoRoot.resolve("tools/timetables/official/gate")) { include("*.tsv") })
         .withPathSensitivity(PathSensitivity.RELATIVE).withPropertyName("gateRows")
