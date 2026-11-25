@@ -6,9 +6,11 @@ import kotlinx.datetime.plus
 import world.taqwa.app.prayer.ClockChange
 import world.taqwa.app.prayer.ClockChanges
 import world.taqwa.app.prayer.engine.registry.data.UmmAlQuraDates
+import world.taqwa.timetables.gate.DateRun
 import world.taqwa.timetables.gate.Ramadan
 import world.taqwa.timetables.gate.StampSummary
 import world.taqwa.timetables.gate.lastDay
+import world.taqwa.timetables.gate.unchecked
 
 /**
  * A published calendar the engine leans on for a year at a time: on and after [fromMonth]/[fromDay]
@@ -18,12 +20,44 @@ import world.taqwa.timetables.gate.lastDay
 data class NextYearRule(val entryId: String, val fromMonth: Int, val fromDay: Int, val what: String, val fix: String)
 
 /**
+ * A day that needs work of its own before it comes, which nothing else would bring up in time: from
+ * [from] the monitor says so on every run, until [entryId]'s proof holds every day of [days] with
+ * nothing broken at **every unit** of the entry and for **each of [events]** (the stamp's event
+ * keys) — the work is then done: the gate read the authority's own rows for those days, everywhere
+ * the entry answers. One place's row, or another event's, does not end it (the review of 13 Nov
+ * 2026: the entry's own `checked` runs are any place's and any event's). A notice, never a failing
+ * test: the engine is right until the day itself.
+ */
+data class DatedNotice(
+    val entryId: String,
+    val from: LocalDate,
+    val days: DateRun,
+    val events: List<String>,
+    val what: String,
+    val why: String,
+    val fix: String,
+    val key: String,
+) {
+    /**
+     * The units of [stamp] (their ids; `"the entry"` for a stamp that keeps none) that do not hold
+     * every day of [days] for each of [events].
+     */
+    fun short(stamp: StampSummary): List<String> {
+        fun holds(byEvent: Map<String, List<DateRun>>) = events.all { byEvent[it].orEmpty().unchecked(days.from, days.to).isEmpty() }
+        return if (stamp.units.isEmpty()) listOfNotNull("the entry".takeUnless { holds(stamp.checkedByEvent) })
+        else stamp.units.filterNot { holds(it.checkedByEvent) }.map { it.id }
+    }
+}
+
+/**
  * Every built-in data horizon (spec §5, brief P item 5), attention only inside its window:
  *
  * - Umm al-Qura's built-in dates ([UmmAlQuraDates.lastDate]) from six months before they end;
  * - each clock change's `until` ([ClockChanges.table]) from eight weeks before it until it passes;
  * - London Unified's next year not held by 1 December, IRN's (Tromsø's 2027 calendar, ruling R82)
  *   by 1 November ([NEXT_YEAR]);
+ * - a day that needs work of its own before it comes ([DATED]): Kyrgyzstan's 29 February 2028, from
+ *   1 December 2027;
  * - any stamp whose `last` (ProofStamps' `lastChecked`) is older than twelve months, and any unit
  *   whose own last checked day is, while its entry's is not (ruling R145);
  * - from eight weeks before each Ramadan (the tabular calendar, [Ramadan]) to its end, the A/B
@@ -44,9 +78,40 @@ object Horizons {
         ),
         NextYearRule(
             "no.irn", 11, 1, "IRN's next-year calendars (Tromsø's rule, ruling R82)",
-            "fetch Islamsk Råd Norge's calendars for the coming year (Oslo, Trondheim, Tromsø; bonnetid.info, " +
-                "restricted: archive only), add gate rows in official/gate/no-irn.tsv, re-run the gate; " +
-                "check Tromsø's rule dates against IrnArctic and narrow the widened window (ruling R82).",
+            "download Islamsk Råd Norge's calendars for the coming year by hand (Oslo, Trondheim, Tromsø; bonnetid.info, " +
+                "restricted: archive only; the December step in docs/MONITOR.md, ruling R189), add gate rows in " +
+                "official/gate/no-irn.tsv, re-run the gate; check Tromsø's rule dates against IrnArctic and narrow the " +
+                "widened window (ruling R82).",
+        ),
+    )
+
+    /**
+     * Kyrgyzstan's leap day (the owner, 12 Nov 2026: keep the engine as it is and make the gap
+     * impossible to forget). The Muftiate prints the same times every year, in a leap year by day of
+     * the year (its 29 February is every other year's 1 March, and every later day of the year the
+     * day after its month-day's), the engine by month and day (`fixedTableYear`); 2028 is the first
+     * leap year since kg.default was fitted. Three months' warning, and it stays until the gate has
+     * read the Muftiate's own 29 February and 1 March 2028 at every locality, for Fajr, the end of
+     * eating, Maghrib and Isha.
+     */
+    val DATED: List<DatedNotice> = listOf(
+        DatedNotice(
+            entryId = "kg.default",
+            from = LocalDate(2027, 12, 1),
+            days = DateRun(LocalDate(2028, 2, 29), LocalDate(2028, 3, 1)),
+            events = listOf("fajr", "endOfEating", "maghrib", "isha"),
+            what = "kg.default needs its 29 Feb 2028 handling",
+            why = "The Muftiate prints a leap year's rows by day of the year (its 29 February is every other year's 1 March), " +
+                "the engine reads its fixed year by month and day: from 29 Feb 2028 to the year's end the app is a day behind " +
+                "the Muftiate's row. Where a time moves later day by day it would start before the Muftiate's, by a minute or " +
+                "two: Maghrib and Isha first (until June), Fajr later in the year; and where Fajr moves earlier (until June) " +
+                "the end of eating would come after the Muftiate's. Which days and by how much is not yet computed.",
+            fix = "give the shared engine's fixed-year mapping (DayComputer.fixedDay) a day-of-year mode for kg.default's leap " +
+                "years, with a test of the rule; fetch the Muftiate's 2028 tables (the kg-muftiyat fetcher), add gate rows for " +
+                "them in official/gate/kg-default.tsv and re-run the gate: this notice goes when the proof holds 29 Feb and " +
+                "1 Mar 2028 at every locality for Fajr, the end of eating, Maghrib and Isha, with nothing broken " +
+                "(docs/MONITOR.md, \"Work by hand, by date\").",
+            key = "horizon:kg-default:leap-2028",
         ),
     )
 
@@ -58,6 +123,7 @@ object Horizons {
         uqLast: LocalDate = UmmAlQuraDates.lastDate,
         changes: List<ClockChange> = ClockChanges.table,
         rules: List<NextYearRule> = NEXT_YEAR,
+        dated: List<DatedNotice> = DATED,
         /**
          * Entries a manual source in `sources.tsv` watches, with the date its next edition is
          * expected: a proof older than twelve months stays quiet for them until that date passes
@@ -113,6 +179,33 @@ object Horizons {
             }
         }
 
+        for (notice in dated) {
+            if (today < notice.from) continue
+            val stamp = byId[notice.entryId]
+            val short = stamp?.let(notice::short)
+            val held = stamp != null && stamp.broken == 0 && short.orEmpty().isEmpty()
+            if (!held) {
+                val now = when {
+                    stamp == null -> "no stamp now"
+                    short.orEmpty().isEmpty() -> "held now, but the stamp is red"
+                    stamp.units.isEmpty() -> "not held now; proven through ${stamp.last}"
+                    else -> "not held now at ${short!!.size} of ${stamp.units.size} units: ${short.take(5).joinToString(", ")}" +
+                        (if (short.size > 5) ", …" else "") + "; proven through ${stamp.last}"
+                }
+                items += Item(
+                    Kind.HORIZON,
+                    notice.what,
+                    listOf(
+                        notice.why,
+                        "Raised from ${notice.from}; it goes when ${notice.entryId}'s proof holds ${notice.days} at every unit for " +
+                            "${notice.events.joinToString(", ")} with nothing broken ($now).",
+                    ),
+                    notice.fix,
+                    key = notice.key,
+                )
+            }
+        }
+
         val staleBefore = today.plus(-12, DateTimeUnit.MONTH)
         val fetchNewest = "fetch the authority's newest table (add a fetcher if it has none), add gate rows and re-run the gate; " +
             "where the authority prints one table a year, list it as a manual source in sources.tsv naming this entry, " +
@@ -160,7 +253,7 @@ object Horizons {
                     "the Ramadan build refuses to build unless every A/B unit's Fajr, end of eating and Maghrib were checked on every day " +
                         "of Ramadan or the gate has demoted the entry (./gradlew -p tools/timetables checkStamps -Pramadan=${ramadan.hijriYear}, " +
                         "spec §5): fetch each authority's table for those dates (most publish the Ramadan imsakiya a few weeks before), " +
-                        "add gate rows (split test) and re-run the gate.",
+                        "add gate rows held out of the fit (split test) and re-run the gate.",
                     key = "horizon:ramadan:${ramadan.first}",
                 )
             }

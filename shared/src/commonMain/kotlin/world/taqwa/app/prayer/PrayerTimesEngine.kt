@@ -54,7 +54,8 @@ class PrayerTimesEngine {
 
         /**
          * The engine's place for a stored location: its point and zone, its country (from the
-         * zone where an old install stored none, spec §8) and its first-level region (ruling R32).
+         * zone where an old install stored none, spec §8), its first-level region (ruling R32), and
+         * a GPS fix's second country where the zone says it may be across a border (ruling R259).
          */
         fun placeOf(location: GeoLocation): Place = Place(
             lat = location.latitude,
@@ -62,6 +63,8 @@ class PrayerTimesEngine {
             zoneId = location.timeZoneId,
             countryCode = location.countryCode ?: ZoneCountries.of(location.timeZoneId) ?: "",
             admin1 = location.region,
+            alsoCountryCode = location.alsoCountryCode,
+            alsoAdmin1 = location.alsoRegion.takeIf { location.alsoCountryCode != null },
         )
 
         /** The settings that change the times, as the engine takes them. */

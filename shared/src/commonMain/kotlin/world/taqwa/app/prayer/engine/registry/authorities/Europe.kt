@@ -1068,7 +1068,15 @@ object Europe {
      * unit follows it wherever the sun allows (a Fajr it puts after the sun has risen, and its
      * midnight-sun sunrise, the sun's lowest point, are declared not followed), with the window dates
      * widened a day either way until IRN's 2027 calendar is held, its Maghrib base at + 5 and margins
-     * fitted on its 2026 calendar. The rule is Tromsø's alone: beyond the unit the edge keeps the
+     * fitted on its 2026 calendar. On the nights the sun sets for minutes, the week before and the week
+     * after the midnight sun, wherever the Isha after the sun's Maghrib would not come before the next
+     * day's end of eating, Maghrib is the minute after the real sunset, never before IRN's, and Isha
+     * IRN's where after it, else the minute after it (ruling R292). On a night shorter still, one the
+     * real sun alone makes too short for Isha's end (ruling R302, `DayPipeline.nightTooShortForIsha`:
+     * the day declares that end not shown), Maghrib and Isha are pulled the same way wherever that
+     * Maghrib is before the next day's Fajr, and Isha shows no end; only where even that Maghrib is not
+     * before the next Fajr does nothing move, and Maghrib and Isha come after the next sunrise. The
+     * rule is Tromsø's alone: beyond the unit the edge keeps the
      * calendar's plain method (16°/15° with the hour before sunrise from April to September), since
      * IRN's other Arctic calendars are not held.
      */

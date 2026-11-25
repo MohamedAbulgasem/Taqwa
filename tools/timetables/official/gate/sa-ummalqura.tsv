@@ -6,6 +6,8 @@
 # Jeddah, Dammam and Abha 2025–2027; Haql, Al Kharkhir, At Tuwal, Taif and Tabuk 2026); held out,
 # Makkah and Riyadh 2024–2030 and Turaif (the far north, 31.7° N) 2024 and 2026–2030, whose 2024 has
 # no lag dates and whose 2028–2030 lie beyond every fitted day.
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	sa.ummalqura	archive/tables/round/data-umm-al-qura/*	E	the end of eating's margin is the fit over every table of the first round, Turaif's held out among them (UmmAlQura.kt, proof 7a)
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/round/data-umm-al-qura/off-uq-madinah.txt	sa.ummalqura	24.54	39.63	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Madinah 2025–2027
 archive/tables/round/data-umm-al-qura/off-uq-jeddah.txt	sa.ummalqura	21.5	39.17	Asia/Riyadh	F+E S D A M I	daily	standard	fit	Jeddah 2025–2027

@@ -142,7 +142,10 @@ jobs:
     # check runs only on its yes.
     if: ${{ !cancelled() && (needs.due.outputs.run == 'true' || github.event_name != 'schedule' || github.event.schedule != '23 1 * * *') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 170
+    # Ruling R280: the line's whole gate (five times main's rows of 2 Nov) runs in the monitor's check, in prove's rounds
+    # and in prove's checks, so the job has GitHub's ceiling for a hosted job (360) less a margin; prove stops itself
+    # in time for the handoff to be packed (the step "Prove the new captures").
+    timeout-minutes: 350
     # Read-only: this job runs third-party fetchers, pip and Gradle, so it holds no token that can write anywhere.
     permissions:
       contents: read
@@ -201,6 +204,23 @@ jobs:
         # refuses the run before it fetches, so the issue says why (failing this step would skip the issue).
         run: |
           line="$(python3 taqwa/tools/timetables/monitor/tzdb.py --java-home "$JAVA_HOME")" && echo "$line" || echo "::error::$line"
+
+      - name: The runner's memory
+        # Ruling R280 (the second audit's G17): the monitor's check, prove and the tools' tests each run the whole gate in
+        # a forked JVM of 4 GB (tools/timetables/build.gradle.kts), beside Gradle's own daemon (2 GB,
+        # tools/timetables/gradle.properties) and Kotlin's; GitHub's standard runner for a private repository has about
+        # 7 GB and some swap. The figures go into the log, and a runner with less than 6 GB is annotated, so a run that
+        # runs out of memory says why (scripts/monitor.sh and prove.sh name an OutOfMemoryError when it is the cause).
+        run: |
+          # The job's start, for prove's own time limit (ruling R280).
+          echo "JOB_START=$(date +%s)" >> "$GITHUB_ENV"
+          total_kb="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
+          avail_kb="$(awk '/^MemAvailable:/ {print $2}' /proc/meminfo)"
+          swap_kb="$(awk '/^SwapTotal:/ {print $2}' /proc/meminfo)"
+          echo "runner memory: $((total_kb / 1024)) MB in all, $((avail_kb / 1024)) MB available, $((swap_kb / 1024)) MB of swap, $(nproc) CPUs"
+          if [ "$total_kb" -lt 6291456 ]; then
+            echo "::warning::the runner has $((total_kb / 1024)) MB of memory: the whole gate's JVM takes 4 GB beside Gradle's 2 GB daemon (ruling R280)"
+          fi
 
       - name: Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
@@ -385,8 +405,28 @@ jobs:
             'tzdata==2026.5 --hash=sha256:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac --hash=sha256:8cc73c0a0bfca7dbfa59235d60b2eff82231dee33f53d206db1acd9173cfc0a7' \
             > "$RUNNER_TEMP/site-requirements.txt"
           python3 -m pip install --quiet --require-hashes --no-deps -r "$RUNNER_TEMP/site-requirements.txt"
-          taqwa/scripts/prove.sh --date "$RUN_DATE"
+          # Ruling R280: prove stops itself 25 minutes before the job's limit (350), so the handoff is still packed and
+          # the issue says why. A prove stopped midway is put back here as prove.sh would: its pinned copies (prove
+          # alone writes under archive/tables/pinned/) and every change in Taqwa's checkout; then nothing is pushed.
+          left=$(( 350 - 25 - ($(date +%s) - ${JOB_START:-$(date +%s)}) / 60 ))
+          echo "prove may run $left minutes"
+          if [ "$left" -lt 10 ]; then
+            echo "::error::prove did not run: the job had $left minutes left for it (ruling R280)"
+            echo "code=2" >> "$GITHUB_OUTPUT"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          timeout --signal=TERM --kill-after=120 "${left}m" taqwa/scripts/prove.sh --date "$RUN_DATE"
           code=$?
+          if [ "$code" = 124 ] || [ "$code" = 137 ]; then
+            git clean -fdq -- archive/tables/pinned
+            git checkout -- archive/tables/pinned 2>/dev/null
+            git -C taqwa checkout -- . && git -C taqwa clean -fdq -- tools/timetables/official shared
+            mkdir -p monitor/proof
+            echo false > monitor/proof/changed
+            code=2
+            echo "::error::prove ran out of the job's time after $left minutes and was stopped; everything it changed is put back (ruling R280)"
+          fi
           changed="$(cat monitor/proof/changed 2>/dev/null || echo false)"
           echo "code=$code" >> "$GITHUB_OUTPUT"
           echo "changed=$changed" >> "$GITHUB_OUTPUT"

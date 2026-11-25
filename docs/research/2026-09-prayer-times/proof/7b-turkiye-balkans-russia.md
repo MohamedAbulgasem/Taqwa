@@ -185,9 +185,9 @@ Held out alone (3,168 place-days): the same shape, 74–76% exact, worst 1. Clas
 At the nine districts beyond every unit (the edge, + 60 s on starts, − 60 s on sunrise; 3,564
 place-days): 0 early, 0 late ends, 1–2 min late on every day (limit 3).
 
-İstanbul, 26 Sep 2026 (the spec's row, pinned in `TurkiyeBalkansRussiaProofTest`): Fajr, Asr and Isha
-are shown a minute late (their moments fall 19–27 s past the minute, inside the 10 s safety; nearest
-rounding would need − 27 s, which is early on other days), the rest exact, the end of eating exact.
+İstanbul, on one day of its table: Fajr, Asr and Isha are shown a minute
+late (their moments fall seconds past the minute, inside the 10 s safety; nearest rounding would need a
+margin that is early on other days), the rest on the minute, the end of eating too.
 
 **`other.turkey`** (plain ± 30 s, R31) at Diyanet's six published points, 2,376 place-days: 0 early,
 0 late ends, 1 min late on almost every day and its Asr 2–3 min (it now carries Task 7h's adhan2

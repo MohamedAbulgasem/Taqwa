@@ -1,0 +1,272 @@
+{
+  "entry": "default.safe.europe",
+  "class": "D (none)",
+  "engineHash": "2d311d504b0332c4",
+  "broken": 0,
+  "places": 7,
+  "first": "2026-01-01",
+  "last": "2026-12-31",
+  "checked": ["2026-01-01..2026-12-31"],
+  "checkedByEvent": {
+    "fajr": ["2026-01-01..2026-12-31"],
+    "sunrise": ["2026-01-01..2026-12-31"],
+    "dhuhr": ["2026-01-01..2026-12-31"],
+    "asrStandard": ["2026-01-01..2026-12-31"],
+    "maghrib": ["2026-01-01..2026-12-31"],
+    "isha": ["2026-01-01..2026-12-31"],
+    "endOfEating": ["2026-01-01..2026-12-31"]
+  },
+  "placeDays": 2555,
+  "heldOutDays": 2555,
+  "sharedDays": 365,
+  "tables": 6,
+  "ramadanDays": 210,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 2828,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 2828
+      },
+      "exactShare": 0,
+      "worstLate": 56,
+      "lateLimit": 57,
+      "lateLimitFrom": "entry default.safe.europe",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 2463,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 2463
+      },
+      "exactShare": 0,
+      "worstLate": 6,
+      "lateLimit": 10,
+      "lateLimitFrom": "entry default.safe.europe",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 3193,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 178,
+        "3+": 3015
+      },
+      "exactShare": 0,
+      "worstLate": 9,
+      "lateLimit": 10,
+      "lateLimitFrom": "entry default.safe.europe",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 2463,
+      "early": 0,
+      "late": {
+        "0": 41,
+        "1": 355,
+        "2": 791,
+        "3+": 1276
+      },
+      "exactShare": 0.0166,
+      "worstLate": 6,
+      "lateLimit": 10,
+      "lateLimitFrom": "entry default.safe.europe",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 2463,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 2463
+      },
+      "exactShare": 0,
+      "worstLate": 8,
+      "lateLimit": 10,
+      "lateLimitFrom": "entry default.safe.europe",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 3193,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 3193
+      },
+      "exactShare": 0,
+      "worstLate": 144,
+      "lateLimit": 145,
+      "lateLimitFrom": "entry default.safe.europe",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 3193,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 180,
+        "3+": 3013
+      },
+      "exactShare": 0,
+      "worstLate": 134,
+      "lateLimit": 135,
+      "lateLimitFrom": "entry default.safe.europe",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 2555,
+    "ramadanDays": 210,
+    "checkedByEvent": {
+      "fajr": ["2026-01-01..2026-12-31"],
+      "sunrise": ["2026-01-01..2026-12-31"],
+      "dhuhr": ["2026-01-01..2026-12-31"],
+      "asrStandard": ["2026-01-01..2026-12-31"],
+      "maghrib": ["2026-01-01..2026-12-31"],
+      "isha": ["2026-01-01..2026-12-31"],
+      "endOfEating": ["2026-01-01..2026-12-31"]
+    },
+    "events": {
+      "fajr": {
+        "checked": 2190,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 2190
+        },
+        "exactShare": 0,
+        "worstLate": 56,
+        "lateLimit": 57,
+        "lateLimitFrom": "entry default.safe.europe",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 1825,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 1825
+        },
+        "exactShare": 0,
+        "worstLate": 6,
+        "lateLimit": 10,
+        "lateLimitFrom": "entry default.safe.europe",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 2555,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 178,
+          "3+": 2377
+        },
+        "exactShare": 0,
+        "worstLate": 9,
+        "lateLimit": 10,
+        "lateLimitFrom": "entry default.safe.europe",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 1825,
+        "early": 0,
+        "late": {
+          "0": 6,
+          "1": 221,
+          "2": 545,
+          "3+": 1053
+        },
+        "exactShare": 0.0033,
+        "worstLate": 6,
+        "lateLimit": 10,
+        "lateLimitFrom": "entry default.safe.europe",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 1825,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 1825
+        },
+        "exactShare": 0,
+        "worstLate": 8,
+        "lateLimit": 10,
+        "lateLimitFrom": "entry default.safe.europe",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 2555,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 2555
+        },
+        "exactShare": 0,
+        "worstLate": 144,
+        "lateLimit": 145,
+        "lateLimitFrom": "entry default.safe.europe",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 2555,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 180,
+          "3+": 2375
+        },
+        "exactShare": 0,
+        "worstLate": 134,
+        "lateLimit": 135,
+        "lateLimitFrom": "entry default.safe.europe",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "entry default.safe.europe: 10 min": {
+      "reason": "Paris's floors (Dhuhr + 5, Maghrib + 4) and the 1986 ones (sunrise − 2, Asr + 2) with the safety cushion on top, against calendars printing smaller minutes: sunrise up to 6 min before, Dhuhr up to 9 min after, Maghrib up to 8, Asr up to 6 (engine wave W5, safe-default-europe.tsv).",
+      "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
+    },
+    "entry default.safe.europe: 57 min": {
+      "reason": "This region's Fajr is the latest dawn convention in wide European use (12°): 7 to 37 min after the 15° to 18° dawns Paris's, Lyon's, Marseille's and Munich's calendars print, and up to 56 min after Munich's Diyanet calendar in summer, whose seasonal takdir holds its dawn early (engine wave W5, safe-default-europe.tsv).",
+      "events": ["fajr"]
+    },
+    "entry default.safe.europe: 135 min": {
+      "reason": "The fast begins 2 min before the 18° dawn, the earliest convention in use: 12 to 60 min before the 12° to 15° Fajr the French and German calendars print, and up to 2 h 14 min before it in summer north of about 45°, where the 18° dawn comes soon after midnight or, when the sun no longer reaches it, is set by the 1986 proportion (engine wave W5, safe-default-europe.tsv).",
+      "events": ["endOfEating"]
+    },
+    "entry default.safe.europe: 145 min": {
+      "reason": "This region's Isha is the latest convention in use (18° + 2 min): 13 to 60 min after the 12° to 17° Isha the French and German calendars print, and up to 2 h 24 min after it in summer north of about 45°, where the 18° dusk comes near midnight or, when the sun no longer reaches it, is set by the 1986 proportion (engine wave W5, safe-default-europe.tsv).",
+      "events": ["isha"]
+    }
+  }
+}

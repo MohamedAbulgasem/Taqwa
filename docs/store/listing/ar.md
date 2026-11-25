@@ -52,8 +52,11 @@
 (Plan 5 Task 10's cut, which makes room for the wrist paragraph within Play's 4,000 characters, for Mohamed's approval: the website and support lines are left out, since both stores show them in their own fields, and so is the line of interface languages, which the App Store lists itself.)
 
 ### Release notes (500)
-الجديد في الإصدار 1.6.0:
-• تقوى على ساعتك: واجهة ساعة، وإضافات، ومربّع، والتسبيح والقبلة، على ساعات Wear OS مثل Galaxy Watch
+الجديد في الإصدار 1.7.0:
+• تُقارَن مواقيت الصلاة الآن بالجدول المنشور في أماكن أكثر بكثير، منها تركيا ومصر والمغرب والجزائر وماليزيا وإندونيسيا وبنغلاديش وباكستان
+• قرب الحدود، عند استخدام موقعك، يمكن الآن أن تراعي المواقيت جداول البلدين كليهما
+• أداة «آية اليوم» فيها الآن 365 آية، آية لكل يوم من أيام السنة
+• بطاقة في شاشة «الصلاة» تساعدك على إعداد تقوى على ساعتك
 
 ## App Store
 
@@ -123,8 +126,10 @@
 (Its own text since 1.6.0, as each store names only its own watch (App Store Review Guideline 2.3.10): the Play full description above, with the Apple Watch paragraph in place of the Wear OS one, and Apple in place of Google in the bullet after the location one.)
 
 ### What's new (4000)
-الجديد في الإصدار 1.6.0:
-• تقوى على Apple Watch: الصلاة التالية في إضافات ساعتك، والتسبيح باستخدام Digital Crown، والقبلة
+الجديد في الإصدار 1.7.0:
+• تُقارَن مواقيت الصلاة الآن بالجدول المنشور في أماكن أكثر بكثير، منها تركيا ومصر والمغرب والجزائر وماليزيا وإندونيسيا وبنغلاديش وباكستان
+• قرب الحدود، عند استخدام موقعك، يمكن الآن أن تراعي المواقيت جداول البلدين كليهما
+• أداة «آية اليوم» فيها الآن 365 آية، آية لكل يوم من أيام السنة
 
 ## Screenshot captions
 1. مواقيت الصلاة حيث أنت

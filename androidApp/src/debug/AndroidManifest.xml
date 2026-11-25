@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Debug-only additions: the cleartext exception for the local test server, the two broadcast
-  receivers a device round drives recitation with, and the watch link's harness (plan 2 Task 7).
-  None is in the release manifest, and nothing in a main source set references any of them.
+  receivers a device round drives recitation with, the watch link's harness (plan 2 Task 7), and
+  the gallery that draws Home's watch card in each of its states for screenshots (1.7.0). None is
+  in the release manifest, and nothing in a main source set references any of them.
 
   `src/androidDebug`, not `src/debug`: `androidApp/build.gradle.kts` points AGP's build-type
   manifest overlay here, at the KMP layout's own debug source set, so a receiver declared in
@@ -27,5 +28,11 @@
                 <action android:name="world.taqwa.app.debug.WATCH" />
             </intent-filter>
         </receiver>
+        <!-- MainActivity's configChanges, so the gallery's sideways shot is drawn once. -->
+        <activity
+            android:name="world.taqwa.app.debug.WatchCardGalleryActivity"
+            android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+            android:theme="@style/Theme.Taqwa" />
     </application>
 </manifest>

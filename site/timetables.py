@@ -246,7 +246,7 @@ ELISIONS = {"fr": (re.compile(r"\b([Dd])e (?=[aeiouàâäéèêëîïôöùûü�
 # The French site sentences that put a value which can begin with a letter after "de"; every other
 # "de {…}" in French is followed by a number. test_timetables.py holds meta.json to this list, so
 # a new one cannot go out unelided.
-ELIDED = ("description_checked", "description_cautious", "nearby")
+ELIDED = ("description_checked", "description_checked_copy", "description_checked_part", "description_cautious", "nearby")
 
 
 def elide(lang: str, sentence: str) -> str:
@@ -464,8 +464,15 @@ class Timetables:
         page = city["pages"][lang]
         month = page["months"][0]["title"]
         values = self.sentence_values(city, lang)
-        described = "description_cautious" if city["entryClass"] == "C" else "description_checked"
-        description = elide(lang, plain(t[described], **values, month=month))
+        # A timetable checked against a republisher's copy says whose (finding F26 of the audit of
+        # 12 Nov 2026): "checked by Taqwa" alone would be read as checked against the authority.
+        # Where only some of the place's tables were a copy, the rest the authority's own, "partly" (ruling R276).
+        republisher = city.get("republisher")
+        partly = city.get("partlyRepublisher")
+        described = ("description_cautious" if city["entryClass"] == "C"
+                     else "description_checked_copy" if republisher
+                     else "description_checked_part" if partly else "description_checked")
+        description = elide(lang, plain(t[described], **values, month=month, republisher=republisher or partly or ""))
         if not at_kaaba(city):
             description += plain(t["description_qibla"], **values)
         meta = {
@@ -637,7 +644,7 @@ class Timetables:
             steps = [
                 f'<li><h2>{esc(words["whoPublishes"])}</h2><p>{esc(words["whoPublishesBody"])} {esc(words["notAffiliated"])}</p></li>',
                 f'<li><h2>{esc(words["howReproduces"])}</h2><p>{esc(t["no_copy"])}</p><p>{esc(words["methodIntro"])}</p></li>',
-                f'<li><h2>{esc(words["howChecked"])}</h2><p>{fill(t["replays"], authority=authority)}</p>{tiles}{ruler}{checks_link}</li>',
+                f'<li><h2>{esc(words["howChecked"])}</h2><p>{self.replays(city, lang)}</p>{tiles}{ruler}{checks_link}</li>',
             ]
         return f'''<details class="whence" id="about">
     <summary>
@@ -647,6 +654,19 @@ class Timetables:
     </summary>
     <div class="whence-body"><ol class="steps">{"".join(steps)}</ol></div>
   </details>'''
+
+    def replays(self, city: dict, lang: str) -> str:
+        """What the checked days were replayed against: the authority's published timetable, or,
+        where the tables were read from a republisher, that copy of it by name (finding F26)."""
+        t = self.langs[lang]["timetable"]
+        authority = city["pages"][lang]["method"]
+        republisher = city.get("republisher")
+        if republisher:
+            return fill(t["replays_copy"], authority=authority, republisher=republisher)
+        # Some of the place's tables a republisher's copy, the rest the authority's own (ruling R276).
+        if city.get("partlyRepublisher"):
+            return fill(t["replays_part"], authority=authority, republisher=city["partlyRepublisher"])
+        return fill(t["replays"], authority=authority)
 
     def source_line(self, city: dict, lang: str) -> str:
         """Whose times these are (spec §3.3): the authority line of the explainer's summary, which
@@ -659,7 +679,11 @@ class Timetables:
             comma = list_comma(lang)
             return (f'<b>{esc(words["whoseTitle"])}</b> · {esc(comma.join(page["members"]))}{esc(comma)}{esc(t["combined"])}'
                     f' · {esc(t["not_affiliated_any"])}')
-        return f'<b>{esc(words["whoseTitle"])}</b> · {esc(t["reproduced"])} · {esc(words["notAffiliated"])}'
+        republisher = city.get("republisher")
+        partly = city.get("partlyRepublisher")
+        reproduced = (fill(t["reproduced_copy"], republisher=republisher) if republisher
+                      else fill(t["reproduced_part"], republisher=partly) if partly else esc(t["reproduced"]))
+        return f'<b>{esc(words["whoseTitle"])}</b> · {reproduced} · {esc(words["notAffiliated"])}'
 
     def print_foot(self, city: dict, lang: str) -> str:
         """The foot of every printed sheet, hidden on screen: the Taqwa mark and name, the page's
@@ -990,7 +1014,14 @@ class Timetables:
         for row in sorted(proof["published"], key=lambda r: (r["class"] == "C", fold(r["names"][lang]))):
             kind = t["checks_kind_cautious"] if row["class"] == "C" else t["checks_kind_checked"]
             at_most = fill(t["checks_minutes"], n=n(row["atMost"])) if row["atMost"] is not None else "—"
-            rows.append(f'<tr><th scope="row">{esc(row["names"][lang])}<small>{places(row["entry"])}</small></th><td>{esc(kind)}</td>'
+            # "Reproduced and checked" against whose copy, where the tables were a republisher's.
+            if row.get("republisher"):
+                kind = f'{esc(kind)}<small>{fill(t["checks_copy_note"], republisher=row["republisher"])}</small>'
+            elif row.get("partlyRepublisher"):
+                kind = f'{esc(kind)}<small>{fill(t["checks_part_note"], republisher=row["partlyRepublisher"])}</small>'
+            else:
+                kind = esc(kind)
+            rows.append(f'<tr><th scope="row">{esc(row["names"][lang])}<small>{places(row["entry"])}</small></th><td>{kind}</td>'
                         f'<td>{n(row["placeDays"])}</td><td>{n(row["places"])}</td><td>{esc(row["throughText"][lang])}</td><td>{at_most}</td></tr>')
         # The four kinds of times, in the app's own words (the label the Prayer screen sets into the
         # prayer list's edge, or none), so the site never names them differently from the screen.
@@ -1006,6 +1037,12 @@ class Timetables:
         )
         gate = fill(t["checks_gate_body"], tables=n(proof["tables"]), days=n(proof["placeDays"]), entries=n(proof["entries"]),
                     early=n(proof["earlyStarts"]), late=n(proof["lateEnds"]))
+        # The gate's tables that are a republisher's copy of an authority's, said beside the count they are part of.
+        for copied in proof.get("republished", []):
+            gate += " " + fill(t["checks_gate_copy"], authority=copied["names"][lang], republisher=copied["republisher"])
+        # And those only some of whose tables are (ruling R276).
+        for copied in proof.get("partlyRepublished", []):
+            gate += " " + fill(t["checks_gate_part"], authority=copied["names"][lang], republisher=copied["republisher"])
         return f'''<main class="wrap prose checks">
   <h1>{esc(t["checks_h1"])}</h1>
   <p class="meta">{esc(t["checks_lede"])}</p>

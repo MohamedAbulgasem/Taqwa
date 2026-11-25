@@ -29,8 +29,8 @@ android {
         // Watch Face Format 2 runs on Wear OS 4 (API 33) and up; the face itself is for Wear OS 6.
         minSdk = 33
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 45
-        versionName = "1.6.0"
+        versionCode = 46
+        versionName = "1.7.0"
     }
 
     // The four findings lint makes of a face are all about its being resources and no code, which

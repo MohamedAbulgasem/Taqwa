@@ -1,0 +1,300 @@
+{
+  "entry": "default.safe.americas",
+  "class": "D (none)",
+  "engineHash": "99a24a3fdb81d8ed",
+  "broken": 0,
+  "places": 8,
+  "first": "2025-02-01",
+  "last": "2026-12-31",
+  "checked": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+  "checkedByEvent": {
+    "fajr": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+    "sunrise": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+    "dhuhr": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+    "asrStandard": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+    "asrHanafi": ["2026-01-01..2026-10-30", "2026-11-01..2026-12-31"],
+    "maghrib": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+    "isha": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+    "endOfEating": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"]
+  },
+  "placeDays": 2917,
+  "heldOutDays": 2917,
+  "sharedDays": 2917,
+  "tables": 0,
+  "ramadanDays": 239,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 2917,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 2,
+        "2": 442,
+        "3+": 2473
+      },
+      "exactShare": 0,
+      "worstLate": 6,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry default.safe.americas",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 2917,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 2917
+      },
+      "exactShare": 0,
+      "worstLate": 7,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.americas",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 2552,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 2552
+      },
+      "exactShare": 0,
+      "worstLate": 6,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.americas",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 2553,
+      "early": 0,
+      "late": {
+        "0": 110,
+        "1": 163,
+        "2": 900,
+        "3+": 1380
+      },
+      "exactShare": 0.0431,
+      "worstLate": 5,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.americas",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 364,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 30,
+        "2": 101,
+        "3+": 233
+      },
+      "exactShare": 0,
+      "worstLate": 4,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.americas",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 2917,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 22,
+        "3+": 2895
+      },
+      "exactShare": 0,
+      "worstLate": 7,
+      "lateLimit": 8,
+      "lateLimitFrom": "entry default.safe.americas",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 2917,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 2917
+      },
+      "exactShare": 0,
+      "worstLate": 30,
+      "lateLimit": 31,
+      "lateLimitFrom": "entry default.safe.americas",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 2917,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 2917
+      },
+      "exactShare": 0,
+      "worstLate": 30,
+      "lateLimit": 31,
+      "lateLimitFrom": "entry default.safe.americas",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 2917,
+    "ramadanDays": 239,
+    "checkedByEvent": {
+      "fajr": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+      "sunrise": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+      "dhuhr": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+      "asrStandard": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+      "asrHanafi": ["2026-01-01..2026-10-30", "2026-11-01..2026-12-31"],
+      "maghrib": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+      "isha": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"],
+      "endOfEating": ["2025-02-01..2025-03-31", "2025-05-01..2026-12-31"]
+    },
+    "events": {
+      "fajr": {
+        "checked": 2917,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 2,
+          "2": 442,
+          "3+": 2473
+        },
+        "exactShare": 0,
+        "worstLate": 6,
+        "lateLimit": 7,
+        "lateLimitFrom": "entry default.safe.americas",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 2917,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 2917
+        },
+        "exactShare": 0,
+        "worstLate": 7,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.americas",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 2552,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 2552
+        },
+        "exactShare": 0,
+        "worstLate": 6,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.americas",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 2553,
+        "early": 0,
+        "late": {
+          "0": 110,
+          "1": 163,
+          "2": 900,
+          "3+": 1380
+        },
+        "exactShare": 0.0431,
+        "worstLate": 5,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.americas",
+        "overLimit": 0
+      },
+      "asrHanafi": {
+        "checked": 364,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 30,
+          "2": 101,
+          "3+": 233
+        },
+        "exactShare": 0,
+        "worstLate": 4,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.americas",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 2917,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 22,
+          "3+": 2895
+        },
+        "exactShare": 0,
+        "worstLate": 7,
+        "lateLimit": 8,
+        "lateLimitFrom": "entry default.safe.americas",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 2917,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 2917
+        },
+        "exactShare": 0,
+        "worstLate": 30,
+        "lateLimit": 31,
+        "lateLimitFrom": "entry default.safe.americas",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 2917,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 2917
+        },
+        "exactShare": 0,
+        "worstLate": 30,
+        "lateLimit": 31,
+        "lateLimitFrom": "entry default.safe.americas",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "entry default.safe.americas: 7 min": {
+      "reason": "ISNA's 15° dawn is this region's Fajr too, and the mosque tables add a minute or two of their own: up to 6 min after them (engine wave W5, safe-default-americas.tsv).",
+      "events": ["fajr"]
+    },
+    "entry default.safe.americas: 8 min": {
+      "reason": "The 1986 floors (sunrise − 2, Dhuhr, Asr and Maghrib + 2) with the safety cushion on top, against mosque tables that print the sun's own times: sunrise up to 7 min before, Dhuhr up to 6 min after, Maghrib up to 7, Asr up to 5 (engine wave W5, safe-default-americas.tsv).",
+      "events": ["sunrise", "dhuhr", "asrStandard", "asrHanafi", "maghrib"]
+    },
+    "entry default.safe.americas: 31 min": {
+      "reason": "This region's Isha is the latest convention in the Americas (18° + 2 min), 15 to 30 min after the 15° Isha the ISNA mosques print; the fast begins 2 min before the 18° dawn, 15 to 30 min before their 15° Fajr (engine wave W5, safe-default-americas.tsv).",
+      "events": ["isha", "endOfEating"]
+    }
+  }
+}

@@ -13,6 +13,8 @@ import world.taqwa.app.resources.authority_bahrain_council
 import world.taqwa.app.resources.authority_bik
 import world.taqwa.app.resources.authority_cape_calendar
 import world.taqwa.app.resources.authority_chicago
+import world.taqwa.app.resources.authority_cosim
+import world.taqwa.app.resources.authority_council_ulama_tj
 import world.taqwa.app.resources.authority_dar_al_fatwa
 import world.taqwa.app.resources.authority_diyanet
 import world.taqwa.app.resources.authority_diyanet_europe
@@ -112,6 +114,8 @@ fun authorityNameRes(key: String): StringResource? = when (key) {
     "authority_bik" -> Res.string.authority_bik
     "authority_cape_calendar" -> Res.string.authority_cape_calendar
     "authority_chicago" -> Res.string.authority_chicago
+    "authority_cosim" -> Res.string.authority_cosim
+    "authority_council_ulama_tj" -> Res.string.authority_council_ulama_tj
     "authority_dar_al_fatwa" -> Res.string.authority_dar_al_fatwa
     "authority_diyanet" -> Res.string.authority_diyanet
     "authority_diyanet_europe" -> Res.string.authority_diyanet_europe

@@ -2,6 +2,7 @@ package world.taqwa.app.prayer.engine.registry.authorities
 
 import world.taqwa.app.prayer.engine.astro.AsrModel
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.method.Alongside
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.GeoPoint
@@ -23,6 +24,7 @@ import world.taqwa.app.prayer.engine.registry.atEdge
 import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.followedBeyond
 import world.taqwa.app.prayer.engine.registry.margins
+import world.taqwa.app.prayer.engine.registry.withNearestBeyond
 import world.taqwa.app.prayer.engine.registry.single
 import world.taqwa.app.prayer.engine.registry.widened
 
@@ -67,8 +69,8 @@ object Gulf {
      */
     private val ruralMethod = dubaiMethod.copy(
         id = "ae.iacad.dubai.rural",
-        margins = margins(start = 0, sunrise = -241, fajr = 4, dhuhr = 111, asr = 8, maghrib = 209, isha = -35),
-        endOfEatingMarginSeconds = 12,
+        margins = margins(start = 0, sunrise = -241, fajr = 4, dhuhr = 111, asr = 8, maghrib = 209, isha = -35 + RURAL_REACH_SECONDS),
+        endOfEatingMarginSeconds = 12 - RURAL_REACH_SECONDS,
         fixedPoint = GeoPoint(24.66, 55.60),
     )
 
@@ -169,20 +171,18 @@ object Gulf {
      *
      * Margins (Task 7a, qa-calendarhouse.tsv): fitted on the printed Doha calendar (16 Jun–11 Sep 2026)
      * and the Ramadan 1447 imsakiya, the Conventions' formulas with 5 s: Dhuhr +37, Asr +40, Maghrib
-     * and Isha −28 (so Maghrib is sunset + 152 s: Ramadan 1447 needs + 147 s). On the held-out website
-     * captures, 21 May 2024's Fajr was a minute early with the fitted −73 and 8 Aug 2024's end of
-     * eating a minute late with −45, so they are widened by the excess plus 5 s (proof
-     * 7a-gulf-egypt.md): Fajr −63, end of eating −54; and sunrise, not late there but within its
-     * 5 s, +15 (the fit said +18).
+     * and Isha −28 (so Maghrib is sunset + 152 s: Ramadan 1447 needs + 147 s). On two held-out website
+     * captures, Fajr was a minute early with the fitted −73 on one and the end of eating a minute late
+     * with −45 on the other, so both are widened by the excess plus 5 s (proof 7a-gulf-egypt.md): Fajr
+     * −63, end of eating −54; and sunrise, not late there but within its 5 s, +15 (the fit said +18).
      * Held out, 0 early and 0 late ends on 2,845 place-days (the API's 2026, the website's 2023–2026
      * and Doha's table at seven towns of the east coast and the metro). Class B.
      * 2027 (track T4, 11 Oct 2026): the API answers every date of 2027, and there Maghrib and Isha were a
-     * minute early on 25 February 2027, Ramadan 1448's eighteenth day, at Doha and four of the towns. The
-     * calendar's Ramadan Maghrib is its latest (above), and that day alone asks more: gated at whole seconds, 1 s
-     * more is still a minute early at all five places and 2 s clears them, so Ramadan's Maghrib, and the Isha
-     * counted from it, take 8 s more ([RamadanRule]; 2 s and 6 to spare, inside the fits' 5 s), the rest of the
-     * year keeping −28 (raised all year, 13 summer days at Doha reached 3 min, over class B's 2). Dhuhr +42, its
-     * 8 January 2027 inside the 5 s. Both were set on 2027's rows, so those rows are fit, not held out.
+     * minute early on one day of Ramadan 1448 at Doha and four of the towns. The calendar's Ramadan Maghrib
+     * is its latest (above), and that day asks a few seconds more, so Ramadan's Maghrib, and the Isha counted
+     * from it, take 8 s more ([RamadanRule], the fits' 5 s included), the rest of the year keeping −28 (raised
+     * all year, 13 summer days at Doha reached 3 min, over class B's 2). Dhuhr +42. Both were set on 2027's
+     * rows, so those rows are fit, not held out.
      */
     val qatarMethod = TimetableMethod(
         id = "qa.calendarhouse",
@@ -311,16 +311,70 @@ object Gulf {
     )
 
     /**
-     * Oman: the Ministry of Awqaf and Religious Affairs, 18°/18°, Dhuhr, Asr and Maghrib + 5, rounded
-     * up, the sun once a day at about 0h UT, 86 localities at their own coordinates (HIGH as
-     * inferred). The fast begins at the printed Fajr.
+     * Oman: the Ministry of Awqaf and Religious Affairs, 18°/18°, Dhuhr, Asr and Maghrib + 5, the sun once a day at
+     * about 0h UT, 86 localities at their own coordinates (HIGH as inferred). Muscat's times are rounded up, every
+     * other locality's to the nearest minute (below). The fast begins at the printed Fajr.
      *
      * Margins (Task 7a, om-mara.tsv): fitted on Muscat's 2026 year with the Conventions' formulas and
      * 5 s: Fajr +8, sunrise +54, Dhuhr, Asr and Maghrib +9 (with the ministry's 5 min), Isha +7, end
      * of eating +52. Held out, Muscat's January and July 2021 and March and September 2031: 0 early,
-     * 0 late ends, at most 1 min (81–89 % to the minute). Only Muscat is measured: class B there, and
-     * beyond it every locality's own table is the same method at a point not known here, so +60 s /
-     * −60 s (class D).
+     * 0 late ends, at most 1 min (81–89 % to the minute).
+     *
+     * The ministry's 85 other localities (rulings R166 and R169, the round of 12 November 2026): its all-localities day
+     * page, read for every day from 1 November 2026 to 31 December 2027 (Ramadan 1448 among it) and the 1st and 15th
+     * of each month of 2029, prints each one's table at its own point. Dhuhr follows longitude alone: at the app's
+     * towns noon + 5 gives the printed Dhuhr rounded to the nearest minute on 390–421 of 426 days and rounded up on
+     * about 200, where Muscat's is rounded up (417), so the ministry rounds Muscat up and every other locality to the
+     * nearest minute (R169; R166 had read every locality as rounded up, which put each point 0.125° east of its town,
+     * the same half minute). Each is a unit of 20 km at its own point, fitted from its 2026–2027 days
+     * (archive/code/manual/om-mara/fit_points.py) and rounded to 0.01° as fitted rounded up, then 0.125° west, with
+     * [omanNearest]'s margins: the same day at that point as R166's checked. Where the app lists the town, the point
+     * lies 0.3–4.5 km from the app's (Quriyat 11.5). Held out on the 2029 days, which no point was fitted on: see
+     * om-mara.tsv. Where two localities' reaches overlap (ruling R167, as Egypt's R165), the nearer holds the place and
+     * every other whose reach holds it rides beside, its point in the envelope where the two share their margins, its
+     * own day at its own point where they do not (Muscat beside another), so no start there is before either table.
+     *
+     * Al Hamra (ruling R170): the ministry's "الحمرة" (its English page's "Al-Hamra", read 12 Nov 2026), the wilayat
+     * otherwise missing from its list, is printed for 23.78 N 57.285 E: the town's longitude and about 0.66° north of
+     * it (23°47′ for 23°07′). Its unit sits at the town, with that point riding beside, so every start is the later
+     * and every end the earlier of the town's own sun and the table's, as at an off-point ESA town. Its reach is 12 km,
+     * short of Bahla's point (16 km), and its dawn runs up to 3 min after the table in early summer (an exception).
+     * Bahla's own exception is the other side of the same table (ruling R254, 14 Nov 2026): Al Hamra's circle holds the
+     * north of Bahla's, from about 4 km north of Bahla's point, and there the 23.78 N table rides beside Bahla's (R167), so
+     * from May to July Asr and Isha run up to 3 min after Bahla's table and the end of eating 3 min before it, where
+     * the entry's limit is 2 (measured across Bahla's reach in om-mara-reach.tsv; no start early, no end late). The
+     * ministry's Rakhyut is printed about half a degree east of the town, beside Raysut's: its unit stays where it is
+     * printed, and the town itself lies in Dhalkut's reach, whose table runs 2–3 min after Rakhyut's (late, never early).
+     *
+     * Past a circle on the edge (ruling R210, the audit of 12 Nov 2026): the ministry prints by locality, with no
+     * boundaries, so a circle is this engine's line, not the ministry's, and a place just past one, where no other
+     * locality's circle holds it, still reads that locality's table. Left alone, the edge there was a minute before the
+     * table on up to a third of days (As Sifah, east of Muscat's circle) or showed sunrise and the end of eating a minute
+     * after it (the edge beside most circles, Al Hamra's north). So beyond every circle a locality's table rides half
+     * again its circle ([omanRideKm]: 30 km; Muscat 45 km, which holds As Sifah; Al Hamra 18 km, which holds Jebel
+     * Shams), as its own day beside the user's own: the later start and the earlier end of the two. Nothing gets earlier
+     * anywhere; within a ride, starts are at most the riding table's minute later and sunrise and the end of eating its
+     * minute earlier. Inside another locality's circle nothing changes: that locality's own printed table holds the
+     * place, and another's rides beside it only where its own circle also holds the place (R167).
+     *
+     * The ride moved the line; it did not end it. Half again the circle is this engine's judgement, as the circle is,
+     * and the ministry gives nothing to fit it to: just past the end of a ride the place was the plain edge again, and
+     * there the edge stood a minute before the nearest locality's table on some days or showed its sunrise and end of
+     * eating a minute after it (measured in docs/BUILD-LOG.md, 13 Nov 2026; the second audit's G3, 14 Nov 2026). So past
+     * every ride (ruling R260) the nearest locality's own day still rides beside the user's own, and with it any other
+     * locality no more than a quarter farther ([ridingBeyond]), out to five minutes of longitude from its point (about
+     * 127 km; farther, the Rub' al Khali and the far desert, the edge alone). Where a farther locality's ride holds the
+     * place but the nearest locality's does not, the nearest and any about as near ride beside it too (ruling R262, 15 Nov
+     * 2026, [withNearestBeyond]: 3 km past Quriyat's ride, inside Muscat's, the end of eating was a minute after Quriyat's
+     * printed Fajr on 24 days of 2027). `om-mara-envelope.tsv` holds each table to the promise on the edge inside its
+     * ride and on rings past it.
+     *
+     * Beyond every circle, the same method at a point not known here (class D). Its starts are a minute after Muscat's
+     * rounding up, so a minute and a half after the other 85 tables' rounding to the nearest minute (R169). Its sunrise
+     * and end of eating are a minute before the nearest rounding's, a minute and a half before Muscat's (ruling R240,
+     * the audit's F12): a minute before Muscat's alone left them half a minute, and the end of eating 52 s, before the
+     * 85 tables the edge lies beside, and the edge showed their sunrise late on about one day in twenty-five just past
+     * a circle.
      */
     val omanMethod = TimetableMethod(
         id = "om.mara",
@@ -333,10 +387,189 @@ object Gulf {
         endOfEatingMarginSeconds = 52,
     )
 
+    /**
+     * Ruling R169: the ministry's localities but Muscat, rounded to the nearest minute rather than up: the national
+     * margins 30 s earlier at every event, the end of eating too. At its own point each is the same day the round of 12
+     * November 2026 checked 0.125° east of it with the national margins (noon moves 30 s in 0.125°).
+     */
+    private val omanNearest = omanMethod.copy(
+        id = "om.mara.nearest",
+        margins = margins(start = 9 - NEAREST_SECONDS, sunrise = 54 - NEAREST_SECONDS, fajr = 8 - NEAREST_SECONDS, isha = 7 - NEAREST_SECONDS),
+        endOfEatingMarginSeconds = 52 - NEAREST_SECONDS,
+    )
+
+    private fun locality(name: String, lat: Double, lon: Double, id: String = name.lowercase().replace(' ', '-')) =
+        AuthorityUnit(id = id, name = name, point = GeoPoint(lat, lon), radiusKm = 20.0, method = omanNearest, named = false)
+
+    /** Al Hamra's table, printed for 23.78 N at the town's longitude (ruling R170). */
+    private val alHamraTable = GeoPoint(23.78, 57.285)
+
+    /** Ruling R265: the sunrise shown is never after the real sunrise at the place, measured at Muscat and Al Hamra. */
+    private val omanRealSunrise = LateLimit(
+        3,
+        "The sunrise shown is never after the real sunrise at the place itself (ruling R265), and the ministry's printed " +
+            "sunrise stands after the sun has risen there on some days: the sunrise comes up to 3 min before the print",
+        setOf(TimedEvent.SUNRISE),
+    )
+
+    private val omanLocalities = listOf(
+        // Every locality is named by the app in the reader's language, never the ministry's Latin name (the second
+        // audit's G12: "في Muscat"), as Egypt's towns are (F34).
+        AuthorityUnit(
+            "muscat", "Muscat", GeoPoint(23.58413, 58.40778), 30.0, named = false, lateLimits = listOf(omanRealSunrise),
+        ),
+        // The ministry's other localities (rulings R166, R169), each at its own point fitted from its printed days.
+        locality("Al Hamra", 23.11667, 57.28333).copy(
+            radiusKm = AL_HAMRA_KM,
+            method = omanNearest.copy(id = "om.mara.al-hamra", envelopePoints = listOf(alHamraTable)),
+            lateLimits = listOf(
+                LateLimit(
+                    3,
+                    "The ministry computes Al Hamra's table about two thirds of a degree north of the town, and Taqwa " +
+                        "keeps the town's own later dawn in early summer",
+                    setOf(TimedEvent.FAJR),
+                ),
+                omanRealSunrise,
+            ),
+        ),
+        locality("Ibra", 22.70, 58.545),
+        locality("Adam", 22.37, 57.535),
+        locality("Izki", 22.93, 57.785),
+        locality("Al Ashkharah", 21.85, 59.565),
+        locality("Al Buraimi", 24.24, 55.785, id = "buraimi"),
+        locality("Al Jazer", 18.67, 56.545),
+        locality("Al Jammah", 23.56, 57.545),
+        locality("Al Hashman", 18.45, 53.075),
+        locality("Al Hallaniyat", 17.50, 55.995),
+        locality("Al Khaburah", 24.00, 57.095),
+        locality("Al Khadrafi", 16.70, 53.145),
+        locality("Al Khuwair", 22.86, 55.395),
+        locality("Duqm", 19.63, 57.635),
+        locality("Rustaq", 23.43, 57.435),
+        locality("Al Awabi", 23.31, 57.545),
+        locality("Al Qabil (Ash Sharqiyah)", 22.56, 58.685, id = "al-qabil-sharqiyah"),
+        locality("Al Qabil (Adh Dhahirah)", 23.95, 55.795, id = "al-qabil-dhahirah"),
+        locality("Al Kamil Wal Wafi", 22.20, 59.195),
+        locality("Al Mudaybi", 22.56, 58.115),
+        locality("Al Mamurah", 17.06, 54.225),
+        locality("Al Huwaisah", 21.88, 55.895),
+        locality("Al Wasit", 24.20, 56.265),
+        locality("Al Wasil", 22.50, 58.745),
+        locality("Bukha", 26.13, 56.165),
+        locality("Bidbid", 23.40, 58.135),
+        locality("Bidiyah", 22.43, 58.815),
+        locality("Barka", 23.68, 57.895),
+        // Ruling R254: Al Hamra's table rides beside Bahla's in the north of Bahla's circle, measured across the reach.
+        locality("Bahla", 22.97, 57.295).copy(
+            lateLimits = listOf(
+                LateLimit(
+                    3,
+                    "Al Hamra's table, which the ministry computes about two thirds of a degree north of that town, " +
+                        "also holds the north of Bahla's area, and there Taqwa keeps the later start and the earlier " +
+                        "end of the two tables in summer",
+                    setOf(TimedEvent.ASR, TimedEvent.ISHA, TimedEvent.END_OF_EATING),
+                ),
+            ),
+        ),
+        locality("Thumrait", 17.61, 54.045),
+        locality("Jiddat al Harasis", 19.59, 56.245),
+        locality("Jaalan Bani Bu Hassan", 22.08, 59.285),
+        locality("Jaalan Bani Bu Ali", 21.98, 59.345),
+        locality("Habrut", 17.32, 52.745),
+        locality("Hij", 20.76, 58.295),
+        locality("Khazzan", 22.03, 56.695),
+        locality("Dibba", 25.63, 56.245),
+        locality("Ras al Hadd", 22.53, 59.785),
+        locality("Ras Madrakah", 19.00, 57.825),
+        locality("Rakhyut", 16.75, 53.935),
+        locality("Wahiba Sands", 22.23, 58.785),
+        locality("Raysut", 16.95, 53.995),
+        locality("Sadah", 17.05, 55.045),
+        locality("Samail", 23.30, 57.965),
+        locality("Samad al Shan", 22.73, 58.145),
+        locality("Sinaw", 22.50, 58.035),
+        locality("Suwayq", 23.85, 57.435),
+        locality("Saih al Rawl", 21.26, 56.665),
+        locality("Saiq", 23.08, 57.645),
+        locality("Shalim", 18.09, 55.645),
+        locality("Shinas", 24.73, 56.465),
+        locality("Sohar", 24.34, 56.725),
+        locality("Saham", 24.16, 56.885),
+        locality("Sarab", 20.17, 57.815),
+        locality("Sarfait", 16.70, 53.095),
+        locality("Salalah", 17.03, 54.075),
+        locality("Sur", 22.57, 59.535),
+        locality("Dank", 23.54, 56.245),
+        locality("Taqah", 17.04, 54.395),
+        locality("Dhalkut", 16.71, 53.245),
+        locality("Ibri", 23.23, 56.515),
+        locality("Fahud", 22.34, 56.475),
+        locality("Qarn Alam", 21.10, 57.685),
+        locality("Quriyat", 23.16, 58.915),
+        locality("Kanhat", 23.55, 56.785),
+        locality("Liwa", 24.51, 56.565),
+        locality("Mahdah", 24.40, 55.965),
+        locality("Mahut", 20.57, 58.165),
+        locality("Madha", 25.26, 56.295),
+        locality("Mirbat", 16.98, 54.685),
+        locality("Marmur", 17.97, 54.475),
+        locality("Marmul", 18.13, 55.185),
+        locality("Musandam", 26.18, 56.245),
+        locality("Al Musanaah", 23.78, 57.645),
+        locality("Masirah", 20.67, 58.895),
+        locality("Muqshin", 19.55, 54.885),
+        locality("Manah", 22.78, 57.595),
+        locality("Nakhal", 23.40, 57.825),
+        locality("Nizwa", 22.93, 57.535),
+        locality("Nimr", 18.55, 55.845),
+        locality("Harweel", 18.03, 54.635),
+        locality("Haima", 20.07, 56.295),
+        locality("Wadi Bani Khalid", 22.48, 59.115),
+        locality("Wadi Hibi", 23.92, 56.545),
+        locality("Yanqul", 23.58, 56.545),
+    )
+
+    /**
+     * How far [unit]'s table rides beyond every circle, where no table holds the place (ruling R210): [OMAN_RIDE] of its
+     * own circle (30 km for a locality, 45 km for Muscat, 18 km for Al Hamra).
+     */
+    internal fun omanRideKm(unit: AuthorityUnit): Double = OMAN_RIDE * unit.radiusKm
+
+    /**
+     * [placed] with [others] riding beside it: each one's point(s) in the envelope where it shares [mine]'s margins,
+     * its own day at its own point(s) where it does not (Muscat beside another locality, every locality beside the edge).
+     */
+    private fun omanRide(placed: TimetableMethod, mine: TimetableMethod, others: List<AuthorityUnit>): TimetableMethod {
+        if (others.isEmpty()) return placed
+        val (shared, own) = others.partition { (it.method ?: omanMethod).margins == mine.margins }
+        val ownDays = own.flatMap { u ->
+            val m = u.method ?: omanMethod
+            (listOf(u.point) + m.envelopePoints).map { Alongside(it, m.copy(envelopePoints = emptyList())) }
+        }
+        return placed.copy(
+            envelopePoints = (placed.envelopePoints + shared.flatMap { listOf(it.point) + (it.method?.envelopePoints ?: emptyList()) }).distinct(),
+            alongside = placed.alongside + ownDays,
+        )
+    }
+
+    /**
+     * Beyond every circle: the national method at a point not known here (class D). Starts a minute after Muscat's
+     * rounding up; sunrise and the end of eating a minute before the localities' rounding to the nearest (ruling R240).
+     */
+    private val omanEdge = omanMethod.atEdge("om.mara.edge", omanMethod.margins.widened(60, sunrise = -(60 + NEAREST_SECONDS)))
+
     val omanUnits = UnitSet(
         "om.mara",
-        listOf(AuthorityUnit("muscat", "Muscat", GeoPoint(23.58413, 58.40778), 30.0)),
-    ) { omanMethod.atEdge("om.mara.edge", omanMethod.margins.widened(60)) }
+        omanLocalities,
+        around = { user, unit, placed ->
+            // Ruling R167: every other locality whose circle holds the user rides beside the nearest.
+            omanRide(placed, unit.method ?: omanMethod, omanLocalities.filter { it.id != unit.id && distanceKm(user, it.point) <= it.radiusKm })
+        },
+    ) { user ->
+        // Ruling R210: beyond every circle, every locality whose ride holds the user rides beside the user's own day; past
+        // every ride, or past the nearest locality's own ride, the nearest and any about as near (rulings R260, R262).
+        omanRide(omanEdge, omanEdge, withNearestBeyond(omanLocalities.filter { distanceKm(user, it.point) <= omanRideKm(it) }, omanLocalities, user))
+    }
 
     val oman: RegistryEntry = single(
         id = "om.mara", nameKey = "authority_oman_awqaf", entryClass = EntryClass.B, method = omanMethod,
@@ -392,9 +625,26 @@ object Gulf {
     val entries = listOf(dubai, awqaf, qatar, kuwait, bahrain, oman)
     val others = listOf(otherKuwait, otherQatar, otherDubai)
 
+    /**
+     * Ruling R271 (the reach proof of 14 Nov 2026, finding G26): Dubai Rural's table read across its reach was a minute
+     * early at Isha on one day of 2024 and its end of eating a minute late on two days of 2023, at every point of the
+     * reach that does not see the sun later than its fixed point (its own point, 24.80° N, did, which hid it): its
+     * Isha margin and its end of eating each move this much to the safe side.
+     */
+    private const val RURAL_REACH_SECONDS = 30
+
     /** Where an authority's zone points are not known: a minute of offset either way. */
     private const val ZONE_EDGE_SECONDS = 60
 
     /** Qatar's zones and the rest of the country (see [qatarUnits]). */
     private const val QATAR_ZONE_EDGE_SECONDS = 90
+
+    /** Half a minute: the ministry's nearest rounding beside Muscat's rounding up (ruling R169). */
+    private const val NEAREST_SECONDS = 30
+
+    /** Al Hamra's reach: the wilayat's town and villages, short of Bahla's point 16 km away, which keeps its own (R170). */
+    private const val AL_HAMRA_KM = 12.0
+
+    /** Beyond every circle a locality's table rides half again its circle (ruling R210). */
+    private const val OMAN_RIDE = 1.5
 }

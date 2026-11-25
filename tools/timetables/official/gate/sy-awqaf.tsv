@@ -4,6 +4,8 @@
 # slightly different point) is held out.
 # End of eating (audit of 3 Oct 2026, before Ramadan 1448): the samples print no imsak column; the fast begins at the printed
 # Fajr, so the Fajr column is also checked as the end of eating (F+E).
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	sy.awqaf	archive/tables/normalized-7e/sy-awqaf-damascus-test.txt	D A M	the held-out date was early on Dhuhr, Asr and Maghrib, and those margins were widened to it (proof 7e)
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/normalized-7e/sy-awqaf-damascus-fit.txt	sy.awqaf	33.5138	36.2765	Asia/Damascus	F+E S D A M I	daily	standard	fit	Damascus, Ramadan 1447 imsakiya sample
 archive/tables/normalized-7e/sy-awqaf-damascus-test.txt	sy.awqaf	33.5116	36.3064	Asia/Damascus	F+E S D A M I	daily	standard	test	Umayyad Mosque, held out

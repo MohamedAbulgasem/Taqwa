@@ -1,9 +1,9 @@
 {
   "entry": "xk.bik",
   "class": "D (authority)",
-  "engineHash": "ea0d5c37a5a82bd9",
+  "engineHash": "8a8208d4a4ff9009",
   "broken": 0,
-  "places": 44,
+  "places": 2,
   "first": "2026-01-01",
   "last": "2027-12-31",
   "checked": ["2026-01-01..2027-12-31"],
@@ -16,9 +16,10 @@
     "isha": ["2026-01-01..2027-12-31"],
     "endOfEating": ["2026-01-01..2027-12-31"]
   },
-  "placeDays": 25185,
-  "heldOutDays": 24090,
-  "ramadanDays": 2045,
+  "placeDays": 1460,
+  "heldOutDays": 0,
+  "tables": 3,
+  "ramadanDays": 118,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
@@ -130,115 +131,13 @@
     }
   },
   "heldOut": {
-    "placeDays": 24090,
-    "ramadanDays": 1957,
-    "events": {
-      "fajr": {
-        "checked": 24090,
-        "early": 0,
-        "late": {
-          "0": 7547,
-          "1": 6424,
-          "2": 4225,
-          "3+": 5894
-        },
-        "exactShare": 0.3133,
-        "worstLate": 7,
-        "lateLimit": 7,
-        "lateLimitFrom": "unit base",
-        "overLimit": 0
-      },
-      "sunrise": {
-        "checked": 24455,
-        "lateEnd": 0,
-        "late": {
-          "0": 0,
-          "1": 5239,
-          "2": 7018,
-          "3+": 12198
-        },
-        "exactShare": 0,
-        "worstLate": 8,
-        "lateLimit": 8,
-        "lateLimitFrom": "unit base",
-        "overLimit": 0
-      },
-      "dhuhr": {
-        "checked": 24455,
-        "early": 0,
-        "late": {
-          "0": 0,
-          "1": 4889,
-          "2": 7064,
-          "3+": 12502
-        },
-        "exactShare": 0,
-        "worstLate": 7,
-        "lateLimit": 7,
-        "lateLimitFrom": "unit base",
-        "overLimit": 0
-      },
-      "asrStandard": {
-        "checked": 24455,
-        "early": 0,
-        "late": {
-          "0": 0,
-          "1": 4427,
-          "2": 5430,
-          "3+": 14598
-        },
-        "exactShare": 0,
-        "worstLate": 8,
-        "lateLimit": 8,
-        "lateLimitFrom": "unit base",
-        "overLimit": 0
-      },
-      "maghrib": {
-        "checked": 24455,
-        "early": 0,
-        "late": {
-          "0": 0,
-          "1": 6229,
-          "2": 6781,
-          "3+": 11445
-        },
-        "exactShare": 0,
-        "worstLate": 8,
-        "lateLimit": 8,
-        "lateLimitFrom": "unit base",
-        "overLimit": 0
-      },
-      "isha": {
-        "checked": 24455,
-        "early": 0,
-        "late": {
-          "0": 6245,
-          "1": 6278,
-          "2": 5445,
-          "3+": 6487
-        },
-        "exactShare": 0.2554,
-        "worstLate": 7,
-        "lateLimit": 7,
-        "lateLimitFrom": "unit base",
-        "overLimit": 0
-      },
-      "endOfEating": {
-        "checked": 24455,
-        "lateEnd": 0,
-        "late": {
-          "0": 0,
-          "1": 10220,
-          "2": 7257,
-          "3+": 6978
-        },
-        "exactShare": 0,
-        "worstLate": 9,
-        "lateLimit": 9,
-        "lateLimitFrom": "unit base",
-        "overLimit": 0
-      }
-    }
+    "placeDays": 0,
+    "ramadanDays": 0,
+    "events": {}
+  },
+  "replays": {
+    "places": 42,
+    "placeDays": 23725
   },
   "lateLimits": {
     "unit base: 7 min": {

@@ -1,7 +1,7 @@
 {
   "entry": "nz.fianz",
   "class": "D (authority)",
-  "engineHash": "5fcc1cb2691583f7",
+  "engineHash": "7e7823af81b565cc",
   "broken": 0,
   "places": 1,
   "first": "2026-03-01",
@@ -17,195 +17,189 @@
     "endOfEating": ["2026-03-01..2026-03-31", "2026-06-01..2026-06-30", "2026-09-01..2026-09-30", "2026-12-01..2026-12-31"]
   },
   "placeDays": 122,
-  "heldOutDays": 61,
+  "heldOutDays": 0,
+  "tables": 1,
   "ramadanDays": 19,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 122,
+      "checked": 2928,
       "early": 0,
       "late": {
-        "0": 76,
-        "1": 46,
-        "2": 0,
-        "3+": 0
+        "0": 949,
+        "1": 884,
+        "2": 528,
+        "3+": 567
       },
-      "exactShare": 0.623,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.3241,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit auckland",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 122,
+      "checked": 2928,
       "lateEnd": 0,
       "late": {
-        "0": 81,
-        "1": 41,
-        "2": 0,
-        "3+": 0
+        "0": 1101,
+        "1": 912,
+        "2": 437,
+        "3+": 478
       },
-      "exactShare": 0.6639,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.376,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit auckland",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 122,
+      "checked": 2928,
       "early": 0,
       "late": {
-        "0": 96,
-        "1": 26,
-        "2": 0,
-        "3+": 0
+        "0": 1123,
+        "1": 604,
+        "2": 609,
+        "3+": 592
       },
-      "exactShare": 0.7869,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.3835,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit auckland",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 122,
+      "checked": 2928,
       "early": 0,
       "late": {
-        "0": 107,
-        "1": 15,
-        "2": 0,
-        "3+": 0
+        "0": 1185,
+        "1": 595,
+        "2": 582,
+        "3+": 566
       },
-      "exactShare": 0.877,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.4047,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit auckland",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 122,
+      "checked": 2928,
       "early": 0,
       "late": {
-        "0": 69,
-        "1": 53,
-        "2": 0,
-        "3+": 0
+        "0": 809,
+        "1": 936,
+        "2": 574,
+        "3+": 609
       },
-      "exactShare": 0.5656,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.2763,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit auckland",
       "overLimit": 0
     },
     "isha": {
-      "checked": 122,
+      "checked": 2928,
       "early": 0,
       "late": {
-        "0": 72,
-        "1": 50,
-        "2": 0,
-        "3+": 0
+        "0": 844,
+        "1": 903,
+        "2": 480,
+        "3+": 701
       },
-      "exactShare": 0.5902,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.2883,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "unit auckland",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 122,
+      "checked": 2928,
       "lateEnd": 0,
       "late": {
-        "0": 83,
-        "1": 39,
-        "2": 0,
-        "3+": 0
+        "0": 1206,
+        "1": 925,
+        "2": 338,
+        "3+": 459
       },
-      "exactShare": 0.6803,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.4119,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit auckland",
       "overLimit": 0
     }
   },
   "heldOut": {
-    "placeDays": 61,
+    "placeDays": 0,
     "ramadanDays": 0,
+    "checkedByEvent": {
+      "sunrise": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+      "dhuhr": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+      "asrStandard": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+      "maghrib": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+      "isha": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+      "endOfEating": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"]
+    },
     "events": {
-      "fajr": {
-        "checked": 61,
-        "early": 0,
-        "late": {
-          "0": 52,
-          "1": 9,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.8525,
-        "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
-        "overLimit": 0
-      },
       "sunrise": {
         "checked": 61,
         "lateEnd": 0,
         "late": {
-          "0": 35,
-          "1": 26,
+          "0": 13,
+          "1": 48,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.5738,
+        "exactShare": 0.2131,
         "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 5,
+        "lateLimitFrom": "unit auckland",
         "overLimit": 0
       },
       "dhuhr": {
         "checked": 61,
         "early": 0,
         "late": {
-          "0": 49,
-          "1": 12,
+          "0": 36,
+          "1": 25,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.8033,
+        "exactShare": 0.5902,
         "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 4,
+        "lateLimitFrom": "unit auckland",
         "overLimit": 0
       },
       "asrStandard": {
         "checked": 61,
         "early": 0,
         "late": {
-          "0": 54,
-          "1": 7,
+          "0": 29,
+          "1": 32,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.8852,
+        "exactShare": 0.4754,
         "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 4,
+        "lateLimitFrom": "unit auckland",
         "overLimit": 0
       },
       "maghrib": {
         "checked": 61,
         "early": 0,
         "late": {
-          "0": 24,
-          "1": 37,
+          "0": 23,
+          "1": 38,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.3934,
+        "exactShare": 0.377,
         "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 4,
+        "lateLimitFrom": "unit auckland",
         "overLimit": 0
       },
       "isha": {
@@ -219,8 +213,8 @@
         },
         "exactShare": 0.3607,
         "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 6,
+        "lateLimitFrom": "unit auckland",
         "overLimit": 0
       },
       "endOfEating": {
@@ -234,15 +228,32 @@
         },
         "exactShare": 0.541,
         "worstLate": 1,
-        "lateLimit": 3,
-        "lateLimitFrom": "class D (authority)",
+        "lateLimit": 5,
+        "lateLimitFrom": "unit auckland",
         "overLimit": 0
       }
     }
   },
+  "replays": {
+    "places": 23,
+    "placeDays": 2806
+  },
   "lateLimits": {
-    "class D (authority): 3 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+    "unit auckland: 4 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["dhuhr", "asrStandard", "maghrib"]
+    },
+    "unit auckland: 5 min (endOfEating)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["sunrise", "endOfEating"]
+    },
+    "unit auckland: 5 min (fajr)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["fajr"]
+    },
+    "unit auckland: 6 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["isha"]
     }
   },
   "units": {
@@ -259,116 +270,137 @@
         "isha": ["2026-03-01..2026-03-31", "2026-06-01..2026-06-30", "2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
         "endOfEating": ["2026-03-01..2026-03-31", "2026-06-01..2026-06-30", "2026-09-01..2026-09-30", "2026-12-01..2026-12-31"]
       },
+      "heldOutByEvent": {
+        "sunrise": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+        "dhuhr": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+        "asrStandard": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+        "maghrib": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+        "isha": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"],
+        "endOfEating": ["2026-09-01..2026-09-30", "2026-12-01..2026-12-31"]
+      },
       "broken": 0,
       "lateLimits": {
-        "class D (authority): 3 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+        "unit auckland: 4 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["dhuhr", "asrStandard", "maghrib"]
+        },
+        "unit auckland: 5 min (endOfEating)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["sunrise", "endOfEating"]
+        },
+        "unit auckland: 5 min (fajr)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["fajr"]
+        },
+        "unit auckland: 6 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["isha"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 122,
+          "checked": 2928,
           "early": 0,
           "late": {
-            "0": 76,
-            "1": 46,
-            "2": 0,
-            "3+": 0
+            "0": 949,
+            "1": 884,
+            "2": 528,
+            "3+": 567
           },
-          "exactShare": 0.623,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.3241,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit auckland",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 122,
+          "checked": 2928,
           "lateEnd": 0,
           "late": {
-            "0": 81,
-            "1": 41,
-            "2": 0,
-            "3+": 0
+            "0": 1101,
+            "1": 912,
+            "2": 437,
+            "3+": 478
           },
-          "exactShare": 0.6639,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.376,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit auckland",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 122,
+          "checked": 2928,
           "early": 0,
           "late": {
-            "0": 96,
-            "1": 26,
-            "2": 0,
-            "3+": 0
+            "0": 1123,
+            "1": 604,
+            "2": 609,
+            "3+": 592
           },
-          "exactShare": 0.7869,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.3835,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit auckland",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 122,
+          "checked": 2928,
           "early": 0,
           "late": {
-            "0": 107,
-            "1": 15,
-            "2": 0,
-            "3+": 0
+            "0": 1185,
+            "1": 595,
+            "2": 582,
+            "3+": 566
           },
-          "exactShare": 0.877,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4047,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit auckland",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 122,
+          "checked": 2928,
           "early": 0,
           "late": {
-            "0": 69,
-            "1": 53,
-            "2": 0,
-            "3+": 0
+            "0": 809,
+            "1": 936,
+            "2": 574,
+            "3+": 609
           },
-          "exactShare": 0.5656,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.2763,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit auckland",
           "overLimit": 0
         },
         "isha": {
-          "checked": 122,
+          "checked": 2928,
           "early": 0,
           "late": {
-            "0": 72,
-            "1": 50,
-            "2": 0,
-            "3+": 0
+            "0": 844,
+            "1": 903,
+            "2": 480,
+            "3+": 701
           },
-          "exactShare": 0.5902,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.2883,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "unit auckland",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 122,
+          "checked": 2928,
           "lateEnd": 0,
           "late": {
-            "0": 83,
-            "1": 39,
-            "2": 0,
-            "3+": 0
+            "0": 1206,
+            "1": 925,
+            "2": 338,
+            "3+": 459
           },
-          "exactShare": 0.6803,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
+          "exactShare": 0.4119,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit auckland",
           "overLimit": 0
         }
       }

@@ -77,6 +77,11 @@ sealed interface PrayerUiState {
         val polar: Boolean = false,
         /** The one-time card below the list, when one is due this launch (spec §2.1). */
         val oneTimeCard: OneTimeCard? = null,
+        /**
+         * A once-only card was shown since the app started, answered or not: the watch card waits
+         * for a later launch (one card per launch, the owner's decisions of 19 November 2026).
+         */
+        val oneTimeCardThisLaunch: Boolean = false,
         /** Why the times may be an hour off for this place, when they may (spec §3.9). */
         val clockWarning: ClockWarning? = null,
         /** "Show both Asr times": the other school's Asr, under Asr (spec §2.1). */
@@ -163,8 +168,11 @@ class PrayerViewModel(
      * 60 times a minute. On iOS that outran `WidgetCenter`'s ~40-70 reloads/day budget in under a
      * minute and the widget then stopped updating for the rest of the day; on Android it put two
      * Glance recompositions plus `AppWidgetManager` IPC on the caller's dispatcher every second.
-     * Every field in the snapshot is now minute-granular (see `WidgetMirrorWriter.RING_STEPS`),
-     * so comparing the serialised form collapses those 60 ticks to one.
+     * The snapshot changes only when its countdown passes a whole minute or its ring one of the
+     * 120 steps from one prayer to the next (see `WidgetMirrorWriter.RING_STEPS`), so comparing
+     * the serialised form collapses those 60 ticks to once or twice a minute with the prayers two
+     * hours apart or more, and more often when they are closer (about 2.7 times a minute at 70
+     * minutes).
      */
     private var lastWrittenMirror: String? = null
 
@@ -211,7 +219,7 @@ class PrayerViewModel(
      *
      * `LaunchedEffect` alone was not enough — Android stops an activity (screen off, Home
      * pressed) without destroying it, so the composable, and the effect, stayed alive and this
-     * loop kept writing the widget mirror once a minute for as long as the process lived.
+     * loop kept writing the widget mirror once or more a minute for as long as the process lived.
      * `repeatOnLifecycle` cancels the block on STOP and restarts it fresh on the next START,
      * which is why the first thing this does on every (re)entry is an immediate [refresh] rather
      * than waiting out the first second — the screen must be correct the instant it reappears.
@@ -290,6 +298,8 @@ class PrayerViewModel(
             setByRule = if (today.polar) emptySet() else today.setByRule,
             polar = today.polar,
             oneTimeCard = card,
+            // Read after this refresh's own card is remembered: true from the card's first frame on.
+            oneTimeCardThisLaunch = cardSession.shown != null,
             clockWarning = ClockChanges.warningFor(
                 zoneId = location.timeZoneId,
                 now = instant,
@@ -358,7 +368,10 @@ class PrayerViewModel(
 
     /**
      * The listed timetable that begins [prayer] at [at], the most-followed where several do: the
-     * members' own days as the engine combined them ([DayPipeline.members]).
+     * members' own days as the engine combined them ([DayPipeline.members]). A member whose own
+     * Dhuhr, Asr or Maghrib is before the real sun's floor at the user's point begins at the floor
+     * (rulings R180 and R265: [PrayerDay.earliestStart] is held to it), so it is the one that begins at [at]
+     * where [at] is that floor.
      */
     private fun memberBeginning(
         day: EngineDay,
@@ -373,7 +386,7 @@ class PrayerViewModel(
         val days = memberDays?.takeIf { it.first == key }?.second
             ?: DayPipeline.members(resolution, date, zone, day.school, prefs.hijriOffsetDays).also { memberDays = key to it }
         return resolution.members.indices
-            .filter { it < days.size && days[it].startOf(prayer) == at }
+            .filter { it < days.size && (days[it].startOf(prayer) == at || (prayer in SunFloored && days[it].startOf(prayer) < at)) }
             .minByOrNull { resolution.members[it].shareRank }
             ?.let { resolution.members[it] }
     }
@@ -542,3 +555,6 @@ class PrayerViewModel(
     }
 
 }
+
+/** The starts the real sun's floor holds (rulings R180 and R265, [DayPipeline.onRealSun]). */
+private val SunFloored = setOf(Prayer.DHUHR, Prayer.ASR, Prayer.MAGHRIB)

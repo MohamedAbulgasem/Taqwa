@@ -1,5 +1,7 @@
 package world.taqwa.timetables
 
+import world.taqwa.app.prayer.engine.registry.TimedEvent
+import world.taqwa.timetables.units.ReachRows
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -10,6 +12,7 @@ import world.taqwa.app.i18n.CountdownDigits
 import world.taqwa.app.prayer.PrayerTimesEngine
 import world.taqwa.app.prayer.engine.EngineDay
 import world.taqwa.app.prayer.engine.registry.EntryClass
+import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.Resolution
 import world.taqwa.app.qibla.QiblaMath
 import java.io.File
@@ -37,6 +40,8 @@ class Document(
     private val stamps: Map<String, Stamp>,
     private val official: File,
     private val timetable: Timetable = Timetable(),
+    /** The owner's rulings on reach figures over the ceiling ([ReachRows.RULED]); a test of another rule may pass its own. */
+    private val ruled: Map<String, Map<TimedEvent, Int>> = ReachRows.RULED,
 ) {
 
     fun build(cities: List<City>, now: Instant): Map<String, Any?> {
@@ -87,7 +92,7 @@ class Document(
         val today = timetable.localToday(city, now)
         val source = timetable.source(city, today)
         val place = PrayerTimesEngine.placeOf(timetable.location(city))
-        val verdict = Proven.verdict(source.effective, place, stamps, months.map { it.days.first().date..it.days.last().date })
+        val verdict = Proven.verdict(source.effective, place, stamps, months.map { it.days.first().date..it.days.last().date }, ruled)
         // Only the proven months go any further: the months list, the days, the pages' texts and
         // everything the site builds from them, the live data included.
         val shown = (verdict as? Verdict.Published)?.let { months.take(it.months.size) } ?: months
@@ -113,6 +118,11 @@ class Document(
             "method" to p.source.effectiveEntry.id,
             "madhab" to p.source.school.name,
             "entryClass" to effective.entryClass.name,
+            // Whose copy of the timetable the proof was read from, where not the authority's own pages (finding F26):
+            // the page's own sentences say so wherever they say it was checked.
+            "republisher" to effective.entry.republisher,
+            // Whose copy some of the place's own tables were read from, the rest the authority's own (ruling R276).
+            "partlyRepublisher" to effective.partlyRepublisher,
             "measured" to effective.measured,
             "unitId" to effective.unitId,
             "unitName" to effective.unitName,
@@ -281,7 +291,14 @@ class Document(
             "checkedThrough" to when {
                 through == null -> ""
                 cautious -> strings.get(language, "about_cautious_checked")
-                else -> strings.format(language, "about_checked_through", authority, through)
+                // The place's own run: a copy of its own tables is named, in whole or in part (finding F26, ruling R276).
+                else -> when {
+                    effective.entry.republisher != null ->
+                        strings.format(language, "about_checked_through_copy", authority, through, effective.entry.republisher!!)
+                    effective.partlyRepublisher != null ->
+                        strings.format(language, "about_checked_through_part", authority, through, effective.partlyRepublisher!!)
+                    else -> strings.format(language, "about_checked_through", authority, through)
+                }
             },
             "whoPublishes" to strings.get(language, "about_who_publishes"),
             "whoPublishesBody" to checked("about_who_publishes_body", authority, unitLabel),
@@ -291,8 +308,22 @@ class Document(
             } ?: ""),
             "howChecked" to strings.get(language, "about_how_checked"),
             "statDaysValue" to (stamp?.let { f.digits(it.placeDays) } ?: ""),
-            "statDays" to (stamp?.let { strings.format(language, "about_stat_days_at_places", f.digits(it.places)) } ?: ""),
-            "statNever" to (if (stamp == null) "" else checked("about_stat_never_before", authority)),
+            // "days at one place" where the stamp holds one, as the app's tile says it (the second audit's G11).
+            "statDays" to (stamp?.let {
+                if (it.places == 1) strings.get(language, "about_stat_days_at_one_place")
+                else strings.format(language, "about_stat_days_at_places", f.digits(it.places))
+            } ?: ""),
+            "statNever" to when {
+                stamp == null || cautious -> ""
+                // The whole entry's days, as the app's tile: a copy any of them was read from is named (ruling R276).
+                else -> when {
+                    effective.entry.republisher != null ->
+                        strings.format(language, "about_stat_never_before_copy", authority, effective.entry.republisher!!)
+                    effective.entry.partlyRepublisher != null ->
+                        strings.format(language, "about_stat_never_before_part", authority, effective.entry.partlyRepublisher!!)
+                    else -> strings.format(language, "about_stat_never_before", authority)
+                }
+            },
             "statNeverAny" to (if (cautious && stamp != null) strings.get(language, "about_stat_never_before_decider") else ""),
             "statMinutes" to (atMost?.let { strings.format(language, "about_stat_minutes_value", f.digits(it)) } ?: ""),
             "statAtMost" to (if (atMost == null) "" else strings.get(language, "about_stat_at_most_after")),
@@ -345,6 +376,8 @@ class Document(
             linkedMapOf(
                 "entry" to id,
                 "class" to first.effective.entryClass.name,
+                "republisher" to entry.republisher,
+                "partlyRepublisher" to entry.partlyRepublisher,
                 "placeDays" to stamp.placeDays,
                 "places" to stamp.places,
                 "first" to stamp.first.toString(),
@@ -359,15 +392,31 @@ class Document(
         }
         return linkedMapOf(
             "entries" to all.size,
-            "placeDays" to all.sumOf { it.placeDays },
+            "placeDays" to ProofTotals.placeDays(all),
             "heldOutDays" to all.sumOf { it.heldOutDays },
             "ramadanDays" to all.sumOf { it.ramadanDays },
             "earlyStarts" to all.sumOf { it.early() },
             "lateEnds" to all.sumOf { it.lateEnds() },
             "brokenStamps" to all.count { it.broken != 0 },
-            "tables" to ProofTotals.gateRows(official),
+            "tables" to ProofTotals.publishedTables(all),
             "surveyCalendars" to ProofTotals.surveyCalendars(official),
             "published" to rows,
+            // Every timetable in the gate's figures whose tables are a republisher's copy, with or without a page.
+            "republished" to Registry.entries.filter { it.republisher != null && it.id in stamps }.map { entry ->
+                linkedMapOf(
+                    "entry" to entry.id,
+                    "republisher" to entry.republisher,
+                    "names" to SITE_LANGUAGES.associateWith { lang -> strings.timetable(lang, entry).orEmpty() },
+                )
+            },
+            // And every one only some of whose tables are a republisher's copy, the rest the authority's own (ruling R276).
+            "partlyRepublished" to Registry.entries.filter { it.partlyRepublisher != null && it.id in stamps }.map { entry ->
+                linkedMapOf(
+                    "entry" to entry.id,
+                    "republisher" to entry.partlyRepublisher,
+                    "names" to SITE_LANGUAGES.associateWith { lang -> strings.timetable(lang, entry).orEmpty() },
+                )
+            },
         )
     }
 

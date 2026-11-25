@@ -1,0 +1,272 @@
+{
+  "entry": "default.safe.levant",
+  "class": "D (none)",
+  "engineHash": "b663c94b9447dc9a",
+  "broken": 0,
+  "places": 16,
+  "first": "2025-02-09",
+  "last": "2027-12-31",
+  "checked": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2027-12-31"],
+  "checkedByEvent": {
+    "fajr": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2027-12-31"],
+    "sunrise": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2027-12-31"],
+    "dhuhr": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2027-12-31"],
+    "asrStandard": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2027-12-31"],
+    "maghrib": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2027-12-31"],
+    "isha": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2027-12-31"],
+    "endOfEating": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2027-12-31"]
+  },
+  "placeDays": 10341,
+  "heldOutDays": 486,
+  "sharedDays": 10341,
+  "tables": 0,
+  "ramadanDays": 827,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 10341,
+      "early": 0,
+      "late": {
+        "0": 87,
+        "1": 289,
+        "2": 329,
+        "3+": 9636
+      },
+      "exactShare": 0.0084,
+      "worstLate": 19,
+      "lateLimit": 20,
+      "lateLimitFrom": "entry default.safe.levant",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 10341,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 10341
+      },
+      "exactShare": 0,
+      "worstLate": 14,
+      "lateLimit": 15,
+      "lateLimitFrom": "entry default.safe.levant",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 10341,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 10341
+      },
+      "exactShare": 0,
+      "worstLate": 7,
+      "lateLimit": 15,
+      "lateLimitFrom": "entry default.safe.levant",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 10341,
+      "early": 0,
+      "late": {
+        "0": 157,
+        "1": 562,
+        "2": 1826,
+        "3+": 7796
+      },
+      "exactShare": 0.0152,
+      "worstLate": 7,
+      "lateLimit": 15,
+      "lateLimitFrom": "entry default.safe.levant",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 10341,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 10341
+      },
+      "exactShare": 0,
+      "worstLate": 11,
+      "lateLimit": 15,
+      "lateLimitFrom": "entry default.safe.levant",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 10341,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 33,
+        "2": 373,
+        "3+": 9935
+      },
+      "exactShare": 0,
+      "worstLate": 11,
+      "lateLimit": 12,
+      "lateLimitFrom": "entry default.safe.levant",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 10341,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 14,
+        "3+": 10327
+      },
+      "exactShare": 0,
+      "worstLate": 23,
+      "lateLimit": 24,
+      "lateLimitFrom": "entry default.safe.levant",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 486,
+    "ramadanDays": 30,
+    "checkedByEvent": {
+      "fajr": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2026-12-31"],
+      "sunrise": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2026-12-31"],
+      "dhuhr": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2026-12-31"],
+      "asrStandard": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2026-12-31"],
+      "maghrib": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2026-12-31"],
+      "isha": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2026-12-31"],
+      "endOfEating": ["2025-02-09..2025-02-18", "2025-07-12..2025-07-21", "2025-12-18..2025-12-27", "2026-01-01..2026-12-31"]
+    },
+    "events": {
+      "fajr": {
+        "checked": 486,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 486
+        },
+        "exactShare": 0,
+        "worstLate": 19,
+        "lateLimit": 20,
+        "lateLimitFrom": "entry default.safe.levant",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 486,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 486
+        },
+        "exactShare": 0,
+        "worstLate": 14,
+        "lateLimit": 15,
+        "lateLimitFrom": "entry default.safe.levant",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 486,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 486
+        },
+        "exactShare": 0,
+        "worstLate": 7,
+        "lateLimit": 15,
+        "lateLimitFrom": "entry default.safe.levant",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 486,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 123,
+          "3+": 363
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 15,
+        "lateLimitFrom": "entry default.safe.levant",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 486,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 486
+        },
+        "exactShare": 0,
+        "worstLate": 10,
+        "lateLimit": 15,
+        "lateLimitFrom": "entry default.safe.levant",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 486,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 486
+        },
+        "exactShare": 0,
+        "worstLate": 10,
+        "lateLimit": 12,
+        "lateLimitFrom": "entry default.safe.levant",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 486,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 14,
+          "3+": 472
+        },
+        "exactShare": 0,
+        "worstLate": 15,
+        "lateLimit": 24,
+        "lateLimitFrom": "entry default.safe.levant",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "entry default.safe.levant: 12 min": {
+      "reason": "This region's Isha is Jordan's 18.2° + 2 min: up to 10 min after Lebanon's and 11 after the PA's, at its towns in Israel (engine wave W5 and the safe defaults lane, safe-default-levant.tsv).",
+      "events": ["isha"]
+    },
+    "entry default.safe.levant: 15 min": {
+      "reason": "Sunrise and sunset at the −2.25° horizon Jordan and the PA use, about 7 min outside the sun's edge, with the floors and the safety cushion on top: sunrise up to 14 min before Beirut's printed one, Maghrib up to 10 min after, Dhuhr up to 7, Asr up to 5 (engine wave W5, safe-default-levant.tsv).",
+      "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
+    },
+    "entry default.safe.levant: 20 min": {
+      "reason": "This region's Fajr is the 18° dawn in use in Jordan and Palestine, with 138 s more for the PA's towns in Israel; Lebanon's Dar al-Fatwa prints a 20° one, 9 to 19 min earlier, Jordan's and the PA's tables add their own minutes, up to 6, and the PA's thirteen towns in Israel print up to 10 min earlier (engine wave W5 and the safe defaults lane of 12 Nov 2026, safe-default-levant.tsv).",
+      "events": ["fajr"]
+    },
+    "entry default.safe.levant: 24 min": {
+      "reason": "The fast begins 2 min before the 20° dawn, Lebanon's, the earliest in the Levant: 10 to 16 min before the 18° Fajr Jordan and the PA print at Amman and al-Aqsa, and up to 23 min before the PA's at its towns in Israel in summer (engine wave W5 and the safe defaults lane, safe-default-levant.tsv).",
+      "events": ["endOfEating"]
+    }
+  }
+}

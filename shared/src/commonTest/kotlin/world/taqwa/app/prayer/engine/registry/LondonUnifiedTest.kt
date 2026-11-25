@@ -59,10 +59,18 @@ class LondonUnifiedTest {
             TimedEvent.FAJR to 5, TimedEvent.ISHA to 5, TimedEvent.ASR to 3, TimedEvent.MAGHRIB to 3,
             TimedEvent.SUNRISE to 3, TimedEvent.END_OF_EATING to 4,
         )
-        for ((event, minutes) in expected) assertEquals(minutes, assertNotNull(lateLimitFor(event, m25, entry), "$event").minutes)
-        // Dhuhr stays within class B's 2 min everywhere in the M25; there is no imsak.
-        assertNull(lateLimitFor(TimedEvent.DHUHR, m25, entry))
-        assertNull(lateLimitFor(TimedEvent.IMSAK, m25, entry))
+        for ((event, minutes) in expected) assertEquals(minutes, assertNotNull(ownLateLimitFor(event, m25, entry), "$event").minutes)
+        // Dhuhr has no exception of its own; there is no imsak.
+        assertNull(ownLateLimitFor(TimedEvent.DHUHR, m25, entry))
+        assertNull(ownLateLimitFor(TimedEvent.IMSAK, m25, entry))
+        // Since ruling R297 the M25 is read across the whole of it, and the limit held for each event is the larger of the
+        // recorded exception and the area's measured worst (ReachLimits.kt), exactly; neither, the class's limit (none).
+        for (event in TimedEvent.entries) {
+            val own = ownLateLimitFor(event, m25, entry)?.minutes
+            val reach = reachLateLimit("gb.london.lupt", "gb.london.lupt", event)?.minutes
+            val held = lateLimitFor(event, m25, entry)?.minutes
+            if (own == null && reach == null) assertNull(held, "$event") else assertEquals(maxOf(own ?: 0, reach ?: 0), held, "$event")
+        }
     }
 
     @Test

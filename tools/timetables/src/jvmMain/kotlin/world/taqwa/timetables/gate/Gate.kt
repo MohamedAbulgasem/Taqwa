@@ -22,7 +22,9 @@ import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.Resolution
 import world.taqwa.app.prayer.engine.registry.Units
+import world.taqwa.app.prayer.engine.registry.distanceKm
 import world.taqwa.app.prayer.engine.registry.lateLimitFor
+import world.taqwa.app.prayer.engine.registry.reachLateLimit
 import java.io.File
 import java.util.Locale
 import java.util.SortedMap
@@ -78,7 +80,12 @@ class Gate(
     private val hijriOffsetDays: Int = 0,
 ) {
 
-    fun evaluate(manifest: GateManifest): GateResult {
+    /**
+     * [manifest]'s rows checked. [whole] is the gate they were taken from, where they are fewer (a run of one entry or
+     * one file): what an entry shares with another is read off every row there is ([AcrossEntries]), so that a stamp
+     * written by a part run says what the whole gate's would.
+     */
+    fun evaluate(manifest: GateManifest, whole: GateManifest = manifest): GateResult {
         val problems = mutableListOf<String>()
         val stats = sortedMapOf<String, EntryStats>()
         val skipped = mutableListOf<GateRow>()
@@ -96,6 +103,15 @@ class Gate(
             override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Days>): Boolean = size > DAYS_KEPT
         }
 
+        // Ruling R214: which row counts each table's days, and which cells the margins never saw (by table file and, with
+        // the archive held, by the days each table prints: a fitted table fetched again is no held-out table).
+        val columnDays = if (roots.held) columnDays(roots) else null
+        // Ruling R299: a table that repeats another day for day is that table again, read off every row there is.
+        val repeats = if (roots.held) Repeats(whole.rows, printedDays(roots)) else null
+        val counted = Counted(manifest, columnDays, unitOf(lookup), repeats)
+        // And across the entries (the review round of 14 Nov 2026): a day another entry counts, the tables an entry owns.
+        val across = AcrossEntries(whole.rows, columnDays, if (roots.held) roots::file else null, repeats)
+
         for (row in manifest.rows) {
             // Every row is checked for its entry, unit, point and zone, held or not, so that CI
             // (which holds no archive) still refuses a gate file with a mistake in it.
@@ -110,6 +126,12 @@ class Gate(
             val s = stats.getOrPut(entry.id) { EntryStats(entry) }
             val limits = row.columns.flatten().associateWith { lateLimit(it, setup.unit, resolution.entry, resolution.entryClass) }
             val promiseOnly = row.promiseOnly
+            // A row that reads ends alone (a printed imsak, an end of eating) checks those ends on days a row reading a
+            // start holds, and adds no place-day of its own: no day counts as checked, nor as held out, by its ends alone.
+            val endsOnly = row.endsOnly
+            // Ruling R214: a table's days are counted at one row; any other row reading it is a replay, a check alone.
+            val own = counted.isOwn(row)
+            val scope = counted.scope(row)
             val unit = if (promiseOnly) null else setup.unit?.let { UnitKey(it.id, it.name) }
             s.rows += row.where
             s.unreadable += table.unreadable
@@ -125,6 +147,7 @@ class Gate(
 
             for (official in table.days) {
                 val day = days.day(official.date)
+                val epochDay = official.date.toEpochDays().toInt()
                 // A place-day is the entry at one point on one date, however many tables hold it.
                 val group = "${entry.id}@${pointKey(point)}"
                 if (promiseOnly && group != promiseGroup) {
@@ -132,10 +155,17 @@ class Gate(
                     promiseCells.clear()
                     promiseGroup = group
                 }
+                // The entry shows an imsak here, so a Ramadan is proven here only with its imsak too (ruling R246).
+                if (!promiseOnly && day.imsak != null) s.imsakShown(unit)
+                // Ruling R302: a day with no Isha end on a night the real sun at the row's point makes too short for one is
+                // declared, never out of order; recomputed here from the sun alone, never read off the day.
+                val shortNight = { DayPipeline.nightTooShortForIsha(point, official.date, zone) }
                 if (promiseOnly) {
-                    s.promiseDay(group, official.date, day)
+                    s.promiseDay(group, official.date, day, shortNight)
+                } else if (endsOnly) {
+                    s.endsOnlyDay(group, official.date, unit, row.where)
                 } else {
-                    s.placeDay(group, official.date, row.split, ramadan.isRamadan(official.date), day, unit, row.member, point)
+                    s.placeDay(group, official.date, row.split, ramadan.isRamadan(official.date), day, unit, row.member, point, own, counted.heldOut(row, epochDay), across.shared(row, epochDay), shortNight)
                 }
                 row.columns.forEachIndexed { column, events ->
                     val minutes = official.minutes[column] ?: return@forEachIndexed
@@ -146,11 +176,21 @@ class Gate(
                             if (!promiseOnly) s.event(event).absent++
                             continue
                         }
+                        // Ruling R214. A promise-only row is in no stamp: its breaks alone are tallied, under its own split as ever.
+                        val heldOut = if (promiseOnly) row.split == Split.TEST else counted.heldOut(row, event, epochDay)
+                        val observation = Observation(
+                            official.date, event, shown, at, resolution.entryClass, row, limits.getValue(event), unit,
+                            heldOut, replay = !promiseOnly && !counted.counts(row, event), scope = scope,
+                        )
                         if (event.declarable in day.notFollowed) {
-                            if (!promiseOnly) s.declare(event, official.date, row.split, unit)
+                            if (!promiseOnly) s.declare(event, official.date, counted.heldOut(row, event, epochDay) && counted.counts(row, event), unit)
+                            // Ruling R294: a declared Isha is only ever moved later, to the minute after a Maghrib past the
+                            // authority's (DayComputer's point 9, and the real-sun floor's R293), so it is never before the printed
+                            // Isha; it is held to that as a start, here or at a promise-only row. A declared Fajr is earlier than
+                            // the printed one by design (point 8) and a declared sunrise is an end; neither is checked.
+                            if (event == Event.ISHA && shown < at) s.declaredEarly(observation)
                             continue
                         }
-                        val observation = Observation(official.date, event, shown, at, resolution.entryClass, row, limits.getValue(event), unit)
                         if (cautious) {
                             (if (promiseOnly) promiseCells else cells).getOrPut("$group|${official.date}|${event.key}") {
                                 CautiousCell(s, mostFollowed!!, promiseOnly) { days.maghribBars(official.date) }
@@ -164,7 +204,15 @@ class Gate(
         }
         for (cell in cells.values) cell.account()
         for (cell in promiseCells.values) cell.account()
+        for (s in stats.values) {
+            for ((where, dates) in s.endsOnlyUnheld()) {
+                problems += "$where: reads ends alone on ${dateRanges(dates).joinToString(", ")}, which no row reading a start holds at its point"
+            }
+        }
         for (excuse in manifest.excuses) excuse(excuse, stats, problems)
+        // Ruling R185: an entry's standing demotions go into its stamp.
+        for (s in stats.values) s.demoted = standing(manifest.demotions, s.entry.id)
+        for (s in stats.values) s.tables = across.tables(s.entry.id)
         if (problems.isNotEmpty()) throw GateError(problems)
         return GateResult(roots, checked, skipped, stats)
     }
@@ -279,7 +327,7 @@ class Gate(
                     MaghribBar.Printed -> o
                     is MaghribBar.Sun -> {
                         if (!promiseOnly) stats.maghribGuard(member, o, atSun = true)
-                        Observation(o.date, o.event, o.shown, bar.at, o.entryClass, o.row, o.limit, o.unit)
+                        Observation(o.date, o.event, o.shown, bar.at, o.entryClass, o.row, o.limit, o.unit, o.heldOut, o.replay, o.scope)
                     }
                     MaghribBar.None -> {
                         if (!promiseOnly) stats.maghribGuard(member, o, atSun = false)
@@ -299,6 +347,36 @@ class Gate(
     companion object {
         /** How many points' computed days [evaluate] keeps at once (rows of one point stand together). */
         private const val DAYS_KEPT = 64
+
+        /**
+         * For [Repeats] (ruling R299): the days a row's table prints, each table read once per reader and column count.
+         * Null where the table is not there or does not read.
+         */
+        fun printedDays(roots: OfficialRoots): (GateRow) -> List<OfficialDay>? {
+            val read = HashMap<String, List<OfficialDay>?>()
+            return { row ->
+                read.getOrPut("${row.path}|${row.format}|${row.columns.size}") {
+                    runCatching { OfficialFormats.named(row.format).read(roots.file(row.path).readLines(), row.columns.size).days }.getOrNull()
+                }
+            }
+        }
+
+        /**
+         * For [Counted]'s rule by date: the days each column of a row's table holds a time on, as epoch days, each table
+         * read once per reader and column count. Null where the table is not there or does not read: [setUp] says so.
+         */
+        fun columnDays(roots: OfficialRoots): (GateRow) -> List<java.util.BitSet>? {
+            val read = HashMap<String, List<java.util.BitSet>>()
+            return { row ->
+                read.getOrPut("${row.path}|${row.format}|${row.columns.size}") {
+                    val file = roots.file(row.path)
+                    val days = runCatching { OfficialFormats.named(row.format).read(file.readLines(), row.columns.size).days }.getOrDefault(emptyList())
+                    List(row.columns.size) { column ->
+                        java.util.BitSet().also { on -> for (day in days) if (day.minutes[column] != null) on.set(day.date.toEpochDays().toInt()) }
+                    }
+                }
+            }
+        }
 
         /**
          * [row] made ready to check: the entry by id, the table's point (its own, else its unit's
@@ -372,10 +450,21 @@ class Gate(
                 }
                 read
             }
-            val resolution = Registry.resolveEntry(entry, Place(point.lat, point.lon, row.zone, entry.countries.firstOrNull() ?: ""))
-            if (unit != null && resolution.unitName != unit.name) {
-                return null.also { problems += "${row.where}: the point resolves to ${resolution.unitName ?: "no unit"}, not ${unit.name}" }
+            val place = Place(point.lat, point.lon, row.zone, entry.countries.firstOrNull() ?: "")
+            val found = Registry.resolveEntry(entry, place)
+            // A row names its unit, and a row's place has no region. Where that unit shares its point with the one the
+            // point resolves to (a seat's unit whose table is held for it, a printed or a fitted one, ruling R217: Oran;
+            // a wilaya's own unit, which a place without a region is never handed, ruling R219), or is one a place
+            // reaches by its region alone and holds the row's point within its own reach (Dellys, in Boumerdès), the
+            // row's own unit is the one checked, as itself.
+            val asItself = unit != null && entry.method != null && found.unitId != unit.id && (
+                found.unitPoint == unit.point ||
+                    (found.unitName != unit.name && Units.of(entry.id)?.choose != null && distanceKm(point, unit.point) <= unit.radiusKm)
+                )
+            if (unit != null && !asItself && found.unitName != unit.name) {
+                return null.also { problems += "${row.where}: the point resolves to ${found.unitName ?: "no unit"}, not ${unit.name}" }
             }
+            val resolution = if (unit != null && asItself) Registry.resolveEntry(entry, place, inUnit = unit) else found
             val changed = if (change == null) resolution else resolution.copy(method = resolution.method?.let(change))
             val resolved = unit ?: Units.of(entry.id)?.units?.firstOrNull { it.name == resolution.unitName && it.point == resolution.unitPoint }
             return Setup(entry, point, zone, changed, table, resolved, clock)
@@ -404,6 +493,29 @@ class Gate(
             lines.any { line -> line.trimStart().startsWith("#") && ROUNDED_UP.containsMatchIn(line) }
 
         /**
+         * The unit a row that names none stands in ([Counted.scope], the second trust audit's G27): its point resolved as
+         * [setUp] resolves it, once per entry, point and zone. Null for a row with a unit or no point, an unknown entry,
+         * or a point no unit holds.
+         */
+        fun unitOf(lookup: (String) -> RegistryEntry? = Registry::byId): (GateRow) -> String? {
+            val known = java.util.concurrent.ConcurrentHashMap<String, String>()
+            return { row ->
+                if (row.unit != null || row.lat == null || row.lon == null) {
+                    null
+                } else {
+                    known.getOrPut("${row.entry}|${row.lat},${row.lon}|${row.zone}") {
+                        val entry = lookup(row.entry)
+                        if (entry == null || Units.of(entry.id) == null) {
+                            ""
+                        } else {
+                            Registry.resolveEntry(entry, Place(row.lat, row.lon, row.zone, entry.countries.firstOrNull() ?: "")).unitId.orEmpty()
+                        }
+                    }.ifEmpty { null }
+                }
+            }
+        }
+
+        /**
          * [event]'s late limit on a row (rulings R37, R41): the `LateLimit` [lateLimitFor] finds for it
          * (the unit's own, else the entry's), else the class default. An exception covers only the
          * events it names.
@@ -411,7 +523,8 @@ class Gate(
         fun lateLimit(event: Event, unit: AuthorityUnit?, entry: RegistryEntry, entryClass: EntryClass): Limit {
             val found = lateLimitFor(event.timed, unit, entry)
                 ?: return Limit(classLimit(entryClass), "class ${entryClass.label()}", null)
-            val owner = if (unit != null && unit.lateLimits.any { it === found }) "unit ${unit.id}" else "entry ${entry.id}"
+            val reach = unit != null && found == reachLateLimit(entry.id, unit.id, event.timed)
+            val owner = if (unit != null && (reach || unit.lateLimits.any { it === found })) "unit ${unit.id}" else "entry ${entry.id}"
             return Limit(found.minutes, owner, found.reason)
         }
 
@@ -495,6 +608,12 @@ class Observation(
     val row: GateRow,
     val limit: Limit,
     val unit: UnitKey? = null,
+    /** Held out of the fit (ruling R214, [Counted.heldOut]): a test row's cell no fit row reads from the same table. */
+    val heldOut: Boolean = row.split == Split.TEST,
+    /** Read again at a row that does not count the table's cells of this event (ruling R214, [Counted.counts]). */
+    val replay: Boolean = false,
+    /** Where the cell stands ([Counted.scope]): a held-out cell two captures print is tallied once there. */
+    val scope: String = "",
 )
 
 /** One event's tally for one entry. [late] counts minutes on the safe side: 0, 1, 2, 3 or more. */
@@ -542,6 +661,18 @@ class EventStats {
     val exact: Double get() = if (checked == 0) 0.0 else late[0].toDouble() / checked
 }
 
+/**
+ * Ruling R185: [entry]'s standing demotions among a manifest's `@demoted` lines, one for the entry
+ * as a whole or for each unit (the earliest, where several lines say the same), the whole entry
+ * first; a unit's line under a line for the whole entry says nothing more and is left out.
+ */
+fun standing(demotions: List<Demotion>, entry: String): List<Demotion> {
+    val own = demotions.filter { it.entry == entry }.sortedWith(compareBy({ it.since }, { it.source }, { it.line }))
+    val whole = own.firstOrNull { it.unit == null }
+    if (whole != null) return listOf(whole)
+    return own.distinctBy { it.unit }.sortedBy { it.unit }
+}
+
 /** Everything the gate found for one registry entry. */
 class EntryStats(val entry: RegistryEntry) {
     val rows = mutableListOf<String>()
@@ -550,22 +681,74 @@ class EntryStats(val entry: RegistryEntry) {
     val classes = sortedSetOf<EntryClass>()
     val events = sortedMapOf<Event, EventStats>()
 
-    /** The same tally over the held-out (`split=test`) rows alone. */
+    /** The entry's standing `@demoted` lines ([standing], ruling R185); empty on most. */
+    var demoted: List<Demotion> = emptyList()
+
+    /** The same tally over the held-out cells alone (ruling R214: a test row's, of a table no fit row reads the event from). */
     val heldOut = sortedMapOf<Event, EventStats>()
     var unreadable = 0
     var duplicates = 0
-    /** Each place-day once: its group's index (below) in the high half, its epoch day in the low. */
+    /**
+     * Each place-day checked, once: its group's index (below) in the high half, its epoch day in the low. Every row
+     * reading a start adds its days here, a replay too (ruling R214): the days the gate compared, not the figure shown.
+     */
     private val placeDays = HashSet<Long>()
     private val groups = HashMap<String, Int>()
+
+    /**
+     * Ruling R214, the figures a reader is shown: the place-days of the rows that count their tables' days
+     * ([Counted.isOwn]), each once, keyed as [placeDays]; those of them a fit table holds ([fitDays], so a day two tables
+     * print is held out only when neither was fitted, in whatever order the rows are read); the points they were read
+     * at ([tablePlaces]); and how many of each fall in Ramadan.
+     */
+    private val tableDays = HashSet<Long>()
+    private val fitDays = HashSet<Long>()
+    val tablePlaces = LinkedHashSet<GeoPoint>()
+
+    /** Of [tableDays], those no entry before this one counts too ([AcrossEntries.shared]). */
+    private val unsharedDays = HashSet<Long>()
+
+    /** The entry's own place-days another entry counts as well: the checks page's total leaves them out here. */
+    val sharedDayCount: Int get() = tableDays.size - unsharedDays.size
+
+    /** The published tables counted at this entry, each once across the entries ([AcrossEntries.tables]). */
+    var tables = 0
+    private var fitRamadanDays = 0
+
+    /** The published tables' own place-days (ruling R214): the stamp's `placeDays`, what About and the site show. */
+    val tableDayCount: Int get() = tableDays.size
+
+    /** Place-days checked at a replay alone (ruling R214): in the gate as checks, in no figure shown. */
+    val replayDayCount: Int get() = placeDays.size - tableDays.size
+
+    /** The published tables' own place-days in Ramadan (Umm al-Qura's dates). */
     var ramadanDays = 0
         private set
-    var testDays = 0
-        private set
-    var testRamadanDays = 0
-        private set
+
+    /** Of [tableDayCount], the days no fitted table holds: the held-out days. */
+    val testDays: Int get() = tableDays.size - fitDays.size
+    val testRamadanDays: Int get() = ramadanDays - fitRamadanDays
     var outOfOrder = 0
         private set
     val outOfOrderSamples = mutableListOf<String>()
+
+    /**
+     * Ruling R302 (the owner's (a′) of 17 Nov 2026): the place-days, own or promise-only, whose Isha shows no end on a
+     * night the real sun at the row's point makes too short for one ([DayPipeline.nightTooShortForIsha], recomputed by the
+     * gate, never read off the day), and their dates. Declared, never out of order: no day in order fits such a night.
+     * Only for an entry the ruling names ([SHORT_NIGHT_ENTRIES]); any other entry's such day is out of order as before.
+     */
+    var shortNights = 0
+        private set
+    val shortNightDates = sortedSetOf<LocalDate>()
+
+    /** Whether the owner's R302 declaration covers this entry ([SHORT_NIGHT_ENTRIES]). */
+    private val shortNightsRuled = entry.id in SHORT_NIGHT_ENTRIES
+
+    private fun declareShortNight(date: LocalDate) {
+        shortNights++
+        shortNightDates += date
+    }
 
     /**
      * Cautious entries, ruling R156: by member, the Maghrib cells its printed time was not the bar for (the
@@ -658,6 +841,10 @@ class EntryStats(val entry: RegistryEntry) {
         unit: UnitKey?,
         member: String? = null,
         point: GeoPoint? = null,
+        own: Boolean = true,
+        heldOut: Boolean = split == Split.TEST,
+        shared: Boolean = false,
+        shortNight: () -> Boolean = { false },
     ) {
         if (unit != null) units.getOrPut(unit.id) { UnitStats(unit.name) }.placeDays += date
         // Recorded before the place-day check: a second member's table at the same point and date is
@@ -666,17 +853,26 @@ class EntryStats(val entry: RegistryEntry) {
             memberDays.getOrPut(member) { sortedMapOf() }.getOrPut(pointKey(point)) { sortedSetOf() } += date
         }
         val key = (groups.getOrPut(group) { groups.size }.toLong() shl 32) or (date.toEpochDays().toLong() and 0xFFFFFFFFL)
+        // Ruling R214: the day counts in the figures shown only at the row that counts its table's days, and is held
+        // out only while no fitted table holds the same place-day.
+        if (own) {
+            if (point != null) tablePlaces += point
+            if (tableDays.add(key) && ramadan) ramadanDays++
+            if (!heldOut && fitDays.add(key) && ramadan) fitRamadanDays++
+            if (!shared) unsharedDays += key
+        }
         if (!placeDays.add(key)) return
         promiseDays.remove(key)
-        if (ramadan) ramadanDays++
-        if (split == Split.TEST) testDays++
-        if (split == Split.TEST && ramadan) testRamadanDays++
         if (first == null || date < first!!) first = date
         if (last == null || date > last!!) last = date
         if (day.repaired || Prayer.ISHA !in day.ends) {
-            outOfOrder++
-            if (outOfOrderSamples.size < SAMPLES) {
-                outOfOrderSamples += "$date: " + (if (day.repaired) "repaired into order" else "Isha not before the next end of eating") + " ($group)"
+            if (!day.repaired && shortNightsRuled && shortNight()) {
+                declareShortNight(date)
+            } else {
+                outOfOrder++
+                if (outOfOrderSamples.size < SAMPLES) {
+                    outOfOrderSamples += "$date: " + (if (day.repaired) "repaired into order" else "Isha not before the next end of eating") + " ($group)"
+                }
             }
         }
         // Ruling R158: a cautious day whose Maghrib no end in play follows shows none.
@@ -686,14 +882,36 @@ class EntryStats(val entry: RegistryEntry) {
         }
     }
 
+    /** By row, the days an ends-only row read ([endsOnlyDay]): its group's index and epoch day, as [placeDays]. */
+    private val endsOnlyDays = LinkedHashMap<String, MutableList<Long>>()
+
+    /**
+     * A day of a row that reads ends alone (a printed imsak, an end of eating): its ends are checked, but the day is no
+     * place-day of its own (nor its unit's, nor held out), since none of its starts was read. [endsOnlyUnheld] names the
+     * days no row reading a start holds at the same point.
+     */
+    internal fun endsOnlyDay(group: String, date: LocalDate, unit: UnitKey?, where: String) {
+        if (unit != null) units.getOrPut(unit.id) { UnitStats(unit.name) }
+        val key = (groups.getOrPut(group) { groups.size }.toLong() shl 32) or (date.toEpochDays().toLong() and 0xFFFFFFFFL)
+        endsOnlyDays.getOrPut(where) { mutableListOf() } += key
+    }
+
+    /** By row, the dates an ends-only row read that no place-day holds: a mistake in the gate file. */
+    internal fun endsOnlyUnheld(): Map<String, List<LocalDate>> = endsOnlyDays.mapNotNull { (where, keys) ->
+        val unheld = keys.filter { it !in placeDays }.map { LocalDate.fromEpochDays((it and 0xFFFFFFFFL).toInt()) }.distinct().sorted()
+        unheld.takeIf { it.isNotEmpty() }?.let { where to it }
+    }.toMap()
+
     /**
      * A place-day of a promise-only row ([GateRow.promiseOnly]): counted apart from the entry's own place-days (its
      * stamp's), where no row of the entry's own files holds it, and a day out of order breaks the promise as anywhere.
      */
-    internal fun promiseDay(group: String, date: LocalDate, day: PrayerDay) {
+    internal fun promiseDay(group: String, date: LocalDate, day: PrayerDay, shortNight: () -> Boolean = { false }) {
         val key = (groups.getOrPut(group) { groups.size }.toLong() shl 32) or (date.toEpochDays().toLong() and 0xFFFFFFFFL)
         if (key in placeDays || !promiseDays.add(key)) return
-        if (day.repaired || Prayer.ISHA !in day.ends) {
+        if (!day.repaired && Prayer.ISHA !in day.ends && shortNightsRuled && shortNight()) {
+            declareShortNight(date)
+        } else if (day.repaired || Prayer.ISHA !in day.ends) {
             outOfOrder++
             if (outOfOrderSamples.size < SAMPLES) {
                 outOfOrderSamples += "$date: " + (if (day.repaired) "repaired into order" else "Isha not before the next end of eating") + " ($group, promise-only)"
@@ -702,28 +920,72 @@ class EntryStats(val entry: RegistryEntry) {
     }
 
     /** A cell of [event] on [date] the day declared not followed: counted, never checked. */
-    internal fun declare(event: Event, date: LocalDate, split: Split, unit: UnitKey?) {
+    /** Whether the entry showed an imsak on a day checked (ruling R246): at some point of it, and by unit in [UnitStats.showsImsak]. */
+    var showsImsak = false
+        private set
+
+    internal fun imsakShown(unit: UnitKey?) {
+        showsImsak = true
+        if (unit != null) units.getOrPut(unit.id) { UnitStats(unit.name) }.showsImsak = true
+    }
+
+    internal fun declare(event: Event, date: LocalDate, heldOut: Boolean, unit: UnitKey?) {
         fun EventStats.add() {
             declared++
             declaredDates += date
         }
         event(event).add()
-        if (split == Split.TEST) heldOut.getOrPut(event) { EventStats() }.add()
+        if (heldOut) this.heldOut.getOrPut(event) { EventStats() }.add()
         unit?.let { units.getValue(it.id).events.getOrPut(event) { EventStats() }.add() }
+    }
+
+    /**
+     * Ruling R294: a cell the day declared not followed whose start is shown before the printed one (a declared Isha,
+     * which no declaration may move earlier): early as any start, in the entry's tally and its unit's, never checked.
+     */
+    internal fun declaredEarly(o: Observation) {
+        val minutes = (o.official - o.shown).inWholeSeconds / 60
+        fun EventStats.early() {
+            early++
+            worstEarly = maxOf(worstEarly, minutes.toInt())
+            brokenDates += o.date
+            sample(broken, o, "$minutes min early (a cell declared not followed)")
+        }
+        event(o.event).early()
+        o.unit?.let { units.getValue(it.id).events.getOrPut(o.event) { EventStats() }.early() }
     }
 
     internal fun account(o: Observation) {
         // A promise-only row's class (a place beyond the entry's own area) is none of the entry's proof.
         if (!o.row.promiseOnly) classes += o.entryClass
         tally(event(o.event), o)
-        if (o.row.split == Split.TEST) tally(heldOut.getOrPut(o.event) { EventStats() }, o)
-        o.unit?.let { unit -> tally(units.getValue(unit.id).events.getOrPut(o.event) { EventStats() }, o) }
+        // Ruling R214: the held-out tally takes each held-out cell once, where its table is counted, and once however
+        // many captures of the table print the day; a later capture of the same day still gives its breaks and its worst.
+        if (o.heldOut && !o.replay) tally(heldOut.getOrPut(o.event) { EventStats() }, o, again = !heldOutSeen(o))
+        o.unit?.let { unit ->
+            val u = units.getValue(unit.id)
+            tally(u.events.getOrPut(o.event) { EventStats() }, o)
+            // The unit's own held-out days by event (ruling R214), at whichever of its rows read them: the Ramadan guard's reading.
+            if (o.heldOut && !o.row.promiseOnly) u.heldOut.getOrPut(o.event) { java.util.BitSet() }.set(o.date.toEpochDays().toInt())
+        }
     }
 
-    private fun tally(e: EventStats, o: Observation) {
+    /** By [Observation.scope], by event, the days a held-out cell was tallied on, as epoch days. */
+    private val heldOutCells = HashMap<String, Array<java.util.BitSet?>>()
+
+    /** Whether [o]'s held-out cell is tallied for the first time: the same place, event and day in no capture before. */
+    private fun heldOutSeen(o: Observation): Boolean {
+        val byEvent = heldOutCells.getOrPut(o.scope) { arrayOfNulls(Event.entries.size) }
+        val days = byEvent[o.event.ordinal] ?: java.util.BitSet().also { byEvent[o.event.ordinal] = it }
+        val day = o.date.toEpochDays().toInt()
+        return !days.get(day).also { days.set(day) }
+    }
+
+    /** [again]: a cell tallied before from another capture (the held-out tally alone): its breaks and its worst, no count. */
+    private fun tally(e: EventStats, o: Observation, again: Boolean = false) {
         // A promise-only row ([GateRow.promiseOnly]) is held to the promise alone: an early start or a late end counts as
         // anywhere; no cell checked, no limit applied and no lateness recorded in the entry's tally (its stamp's).
-        val promiseOnly = o.row.promiseOnly
+        val promiseOnly = o.row.promiseOnly || again
         if (!promiseOnly) {
             e.checked++
             e.day(o.date)
@@ -739,9 +1001,9 @@ class EntryStats(val entry: RegistryEntry) {
             sample(e.broken, o, if (o.event.isStart) "${-safe / 60} min early" else "${-safe / 60} min late (an end)")
             return
         }
-        if (promiseOnly) return
+        if (o.row.promiseOnly) return
         val minutes = (safe / 60).toInt()
-        e.late[minOf(minutes, 3)]++
+        if (!again) e.late[minOf(minutes, 3)]++
         if (minutes > e.worst) e.worst = minutes
         if (minutes > o.limit.minutes) {
             e.over++
@@ -753,8 +1015,18 @@ class EntryStats(val entry: RegistryEntry) {
         if (into.size < SAMPLES) into += "${o.date} ${o.event.key}: $what (${o.row.path})"
     }
 
-    private companion object {
-        const val SAMPLES = 5
+    companion object {
+        private const val SAMPLES = 5
+
+        /**
+         * Ruling R302: the entries whose days without an Isha end on a night too short for one are declared. The owner
+         * ruled on Norway's IRN (the far-north entry's question (1), 17 Nov 2026), and by ruling R314 (17 Nov 2026, the
+         * rulings entry's For the owner (1), option (a)) on Norway's Cautious times (no.cautious, IRN a member), which meets
+         * the same nights at Tromsø's reach and shows no Isha end on them too; its About says those nights in its own
+         * sentence within Tromsø's reach (beyond it, Alta to Kirkenes and Svalbard, no sentence says them; no gate row meets
+         * such a night today). Any other entry's such day is out of order.
+         */
+        val SHORT_NIGHT_ENTRIES: Set<String> = setOf("no.irn", "no.cautious")
     }
 }
 
@@ -762,6 +1034,16 @@ class EntryStats(val entry: RegistryEntry) {
 class UnitStats(val name: String) {
     val placeDays = sortedSetOf<LocalDate>()
     val events = sortedMapOf<Event, EventStats>()
+
+    /** Whether the unit showed an imsak on a day checked (ruling R246). */
+    var showsImsak = false
+
+    /** By event, the days a held-out cell of the unit was compared on, as epoch days (ruling R214, [Counted.heldOut]). */
+    val heldOut = sortedMapOf<Event, java.util.BitSet>()
+
+    /** Those days by event key, in order. */
+    val heldOutDates: Map<String, List<LocalDate>>
+        get() = heldOut.entries.associate { (event, days) -> event.key to days.stream().mapToObj { LocalDate.fromEpochDays(it) }.toList() }
 
     val broken: Int get() = events.values.sumOf { it.early + it.lateEnd + it.over }
 }
@@ -849,6 +1131,9 @@ class GateResult(
 ) {
     val placeDays: Int get() = entries.values.sumOf { it.placeDayCount }
 
+    /** The published tables' own place-days (ruling R214): what the stamps count, a replay's days left out. */
+    val tableDays: Int get() = entries.values.sumOf { it.tableDayCount }
+
     /** Place-days checked by promise-only rows alone ([GateRow.promiseOnly]): the envelope's, in no entry's stamp. */
     val promisePlaceDays: Int get() = entries.values.sumOf { it.promisePlaceDayCount }
 
@@ -916,8 +1201,11 @@ class GateResult(
 
     /** A table per entry and event: days, early, late ends, 0/1/2/3+ minutes late, exact share. */
     fun report(): String = buildString {
-        append("Gate over ${roots.archive.path}: $checkedRows rows checked ($placeDays place-days)")
-        if (promisePlaceDays > 0) append(" and $promisePlaceDays more place-days held to the promise alone (the envelope's rows)")
+        append("Gate over ${roots.archive.path}: $checkedRows rows checked ($placeDays place-days")
+        // Ruling R214: the days checked, and of them the published tables' own (what the stamps count) and the replays.
+        if (placeDays > tableDays) append(", $tableDays of them the published tables' own and ${placeDays - tableDays} the same tables replayed at other points")
+        append(")")
+        if (promisePlaceDays > 0) append(" and $promisePlaceDays more place-days held to the promise alone (the envelope's rows and the hand-kept promise files')")
         append(if (roots.held) "\n" else ", ${skippedRows.size} rows skipped (no archive there)\n")
         for (s in entries.values) {
             append('\n')
@@ -928,8 +1216,10 @@ class GateResult(
             if (exceptionsIn(s.events).isNotEmpty()) {
                 append(if (classLimits.isEmpty()) " by exception: ${describeExceptions(s.events)}" else " (by exception: ${describeExceptions(s.events)})")
             }
-            append(" · ${s.places.size} place${if (s.places.size == 1) "" else "s"} · ${s.first}..${s.last}")
-            append(" · ${s.placeDayCount} place-days (${s.testDays} held out, ${s.ramadanDays} in Ramadan) · ${s.rows.size} rows\n")
+            append(" · ${s.tablePlaces.size} place${if (s.tablePlaces.size == 1) "" else "s"} · ${s.first}..${s.last}")
+            append(" · ${s.tableDayCount} place-days (${s.testDays} held out, ${s.ramadanDays} in Ramadan)")
+            if (s.replayDayCount > 0) append(" and ${s.replayDayCount} more replayed at ${s.places.size - s.tablePlaces.size} other points")
+            append(" · ${s.rows.size} rows\n")
             table(s, s.events)
             for ((event, e) in s.events) if (e.absent > 0) append("    ${event.key}: the engine shows none on ${e.absent} days\n")
             for ((event, e) in s.events) {
@@ -937,7 +1227,7 @@ class GateResult(
                     append("    ${event.key}: ${e.declared} cells declared not followed (${dateRanges(e.declaredDates).joinToString(", ")})\n")
                 }
             }
-            if (s.testDays in 1 until s.placeDayCount) {
+            if (s.heldOut.isNotEmpty() && s.testDays < s.tableDayCount) {
                 append("  held out only (${s.testDays} place-days, ${s.testRamadanDays} in Ramadan):\n")
                 table(s, s.heldOut)
             }
@@ -955,6 +1245,9 @@ class GateResult(
                 append("  lines: ${s.unreadable} unreadable (skipped), ${s.duplicates} repeating a date (each checked)\n")
             }
             if (s.outOfOrder > 0) append("  out of order: ${s.outOfOrder} days\n")
+            if (s.shortNights > 0) {
+                append("  nights too short for Isha's end (declared, ruling R302): ${s.shortNights} days, ${dateRanges(s.shortNightDates).joinToString(", ")}\n")
+            }
             for (line in guarded(s)) append("  ${line.removePrefix("${s.entry.id} ")}\n")
             maghribNoEnd(s)?.let { append("  ${it.removePrefix("${s.entry.id} ")}\n") }
             for ((member, points) in s.memberExcused) {

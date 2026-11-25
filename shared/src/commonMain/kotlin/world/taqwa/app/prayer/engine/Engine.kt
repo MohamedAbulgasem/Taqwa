@@ -9,6 +9,7 @@ import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.astro.AsrModel
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.day.Cautious
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.HighLatRule
@@ -69,6 +70,7 @@ enum class SchoolChoice { Automatic, Standard, Hanafi }
  * - [resolution]: what Automatic resolves to here, whatever the user chose.
  * - [effective]: what the day was computed from: [resolution], or the chosen entry's own
  *   resolution when it is in scope here (with the legacy high-latitude rule for an Other method).
+ *   Both as they stand on the day's own date ([Resolution.on], ruling R231 as revised).
  * - [school]: the Asr school [PrayerDay.asr] is in; [PrayerDay.asrOther] is the other.
  * - [pausedAdjustments]: earlier adjustments not applied, because they were confirmed under
  *   another timetable, never confirmed, or the timetable itself is paused (spec §2.2, §8).
@@ -213,11 +215,28 @@ object PrayerEngine {
             // made under the paused entry would take a time below Automatic's (ruling R52).
             confirmed = if (timetablePaused) emptyMap() else settings.confirmedAdjustments,
             entryId = effective.entry.id,
-            dhuhrFloor = { startOf(sky(place, date, zone).transit() + 60.0) },
-            asrFloor = { sky(place, date, zone).asr(AsrSchool.STANDARD.shadowFactor, AsrModel.EXACT_MOMENT)?.let(::startOf) },
-            maghribFloor = { sky(place, date, zone).altitudeTime(horizonOf(effective), morning = false)?.let(::startOf) },
+            // Neither earlier start goes below the real sun's floor of the day itself (ruling R180, the review of
+            // 13 Nov 2026): Dhuhr's own floor is a minute stricter already, and Maghrib's, the sunset at the method's
+            // horizon rounded up, is the later of itself and the first whole minute after the real sunset.
+            dhuhrFloor = {
+                maxOf(startOf(sky(place, date, zone).transit() + 60.0), Cautious.minuteAfter(DayPipeline.realTransit(effective.point, date, zone)))
+            },
+            // Asr's, the Standard Asr at the method's sky rounded up (ruling R51: in either school an earlier Asr may
+            // reach the first shadow), is held to the real sun's floor too (ruling R265): never before the first whole
+            // minute after the real shadow-1 Asr.
+            asrFloor = {
+                val own = sky(place, date, zone).asr(AsrSchool.STANDARD.shadowFactor, AsrModel.EXACT_MOMENT)?.let(::startOf)
+                val real = DayPipeline.realAsr(effective.point, date, zone, AsrSchool.STANDARD)?.let { Cautious.minuteAfter(it) }
+                if (own != null && real != null) maxOf(own, real) else own
+            },
+            maghribFloor = {
+                val own = sky(place, date, zone).startTime(horizonOf(effective), morning = false)?.let(::startOf)
+                val real = DayPipeline.realSunset(effective.point, date, zone)?.let { Cautious.minuteAfter(it) }
+                if (own != null && real != null) maxOf(own, real) else own
+            },
         )
-        return EngineDay(applied.day, resolved.automatic, effective, school, applied.paused, timetablePaused)
+        // Ruling R231 as revised: what the place claims on this date (a unit fitted on a calendar that ends claims no figure after it).
+        return EngineDay(applied.day, resolved.automatic.on(date), effective.on(date), school, applied.paused, timetablePaused)
     }
 
     /** The Asr school a day is computed in: Automatic is the place's own, whatever timetable applies (spec §3.7). */
@@ -237,7 +256,9 @@ object PrayerEngine {
         val chosen = (settings.timetable as? TimetableChoice.Entry)
             ?.let { Registry.byId(it.id) }
             ?.takeIf { it.id != automatic.entry.id && Registry.inScope(it, place) }
-        val effective = chosen?.let { Registry.resolveEntry(it, place) } ?: automatic
+        // A choice that applies only in the place's second country (ruling R259) is resolved there, and claims no figure
+        // there where its proof reads only fixes placed in its country alone (ruling R318).
+        val effective = chosen?.let { Registry.resolveChosen(it, place) } ?: automatic
         return Resolved(automatic, withLegacyRule(effective, settings.legacyHighLatitude), chosen = chosen != null)
     }
 
@@ -257,7 +278,8 @@ object PrayerEngine {
     /**
      * The astronomical sun at the user's point on [date] (the exact model, the zone's offset at local
      * noon), for the adjustments' floors: Dhuhr a minute after its transit, Asr at its Standard
-     * shadow, Maghrib at its sunset (ruling R51, review C1).
+     * shadow, Maghrib at its sunset (ruling R51, review C1), and neither Dhuhr nor Maghrib below the
+     * real sun's floor of the day itself (ruling R180).
      */
     private fun sky(place: Place, date: LocalDate, zone: TimeZone): SunClock {
         val noonOffset = zone.offsetAt(date.atTime(12, 0).toInstant(zone)).totalSeconds
@@ -267,8 +289,17 @@ object PrayerEngine {
     /** A start: rounded up to the minute. */
     private fun startOf(epochSeconds: Double): Instant = Instant.fromEpochSeconds(ceil(epochSeconds / 60.0).toLong() * 60)
 
-    private fun canonical(place: Place): Place =
-        place.copy(lat = roundedE3(place.lat), lon = roundedE3(place.lon), countryCode = place.countryCode.uppercase())
+    private fun canonical(place: Place): Place {
+        val country = place.countryCode.uppercase()
+        val also = place.alsoCountryCode?.uppercase()?.takeIf { it.isNotBlank() && it != country }
+        return place.copy(
+            lat = roundedE3(place.lat),
+            lon = roundedE3(place.lon),
+            countryCode = country,
+            alsoCountryCode = also,
+            alsoAdmin1 = place.alsoAdmin1.takeIf { also != null },
+        )
+    }
 
     /** As `SettingsRepository` stores a location's coordinates, to the same double. */
     private fun roundedE3(degrees: Double): Double = round(degrees * 1000.0) / 1000.0

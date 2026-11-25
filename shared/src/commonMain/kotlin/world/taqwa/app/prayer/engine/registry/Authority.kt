@@ -1,10 +1,13 @@
 package world.taqwa.app.prayer.engine.registry
 
+import kotlinx.datetime.LocalDate
 import world.taqwa.app.prayer.engine.method.Alongside
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EventOffsets
 import world.taqwa.app.prayer.engine.method.GeoPoint
+import world.taqwa.app.prayer.engine.method.ImsakFrom
 import world.taqwa.app.prayer.engine.method.TimetableMethod
+import world.taqwa.app.prayer.engine.registry.data.ReachLimits
 
 /**
  * How sure Taqwa is of an entry's times (spec §5 and §6.1). A and B reproduce an authority's
@@ -31,8 +34,22 @@ enum class Scope { UNIT, CITY, COUNTRY, GLOBAL }
  * country code and, when known, its first-level region ([admin1], as the app's city list names it;
  * Task 8 fills it from the nearest city). Where an authority's units are its regions the region
  * decides, the nearest unit only when it is not known (ruling R32).
+ *
+ * [alsoCountryCode], with its region [alsoAdmin1]: a second country the place may be in (ruling R259, the second trust
+ * audit's G4 and G5). A GPS fix carries no country; the app takes it from the nearest bundled city, and where the
+ * device's time zone belongs to another country than that city's, the place may stand on either side of a border.
+ * Automatic then holds the day to both countries' entries ([Registry.resolve]): each start the later, each end the
+ * earlier. Null everywhere else: a city picked by hand, a fix whose zone agrees with its nearest city, the site.
  */
-data class Place(val lat: Double, val lon: Double, val zoneId: String, val countryCode: String, val admin1: String? = null)
+data class Place(
+    val lat: Double,
+    val lon: Double,
+    val zoneId: String,
+    val countryCode: String,
+    val admin1: String? = null,
+    val alsoCountryCode: String? = null,
+    val alsoAdmin1: String? = null,
+)
 
 /**
  * [name] folded for matching region names across spellings: lower case, the accents of the Latin
@@ -89,6 +106,22 @@ data class Member(
  * - [measured]: for an entry without units, whether official days exist for its whole area, so an
  *   "at most" figure can be claimed; an entry with units takes it from the unit (see [Units]).
  * - [lateLimits]: its exceptions to the late limit, each for its own events (see [lateLimitFor]).
+ * - [republisher]: whose copy of the authority's figures the tables it is checked against were read from, where they
+ *   were not read from the authority's own pages (the audit of 12 Nov 2026, finding F26: Kemenag's kab/kota tables
+ *   come from the myQuran API); null where no republisher is recorded, which is not a finding that the
+ *   authority's own publication was read: the other entries' sources have not been audited for it. The app and the site say so
+ *   wherever they say "checked against its published timetable".
+ * - [partlyRepublisher]: whose copy SOME of the tables it is checked against were read from, the rest from the
+ *   authority's own pages (the second audit's G7, ruling R276: JAKIM's 2025 tables and nine zones' 2027 from the
+ *   api.waktusolat.app mirror, 2026 and the other zones' 2027 from e-solat itself; the Islamic Foundation's Dhaka
+ *   permanent table from a PDF on kivabe.com, its Ramadan pages from its own). A unit says it where its own tables are
+ *   among them ([AuthorityUnit.partlyRepublished]); a sentence of the whole entry's days (About's tiles, "checked on …
+ *   days so far", the site's checks page) says it always. Null where no table of the entry is a republisher's.
+ * - [safeSideOfKey]: for an entry Taqwa calculates itself ([EntryClass.D_NONE]), the short-name key of the body whose
+ *   published timetable Taqwa holds a part of and calculates on the safe side of (Tajikistan's Council of Ulama,
+ *   Côte d'Ivoire's COSIM; the trust audit's F30, ruling R209): the card and About name the body and say so, where
+ *   they would otherwise say no local timetable is known. Null where nothing of a local timetable is held. The kind
+ *   stays "Calculated by Taqwa": the times are Taqwa's own calculation, not the body's method reproduced.
  */
 data class RegistryEntry(
     val id: String,
@@ -105,9 +138,17 @@ data class RegistryEntry(
     val area: Area? = null,
     val measured: Boolean = false,
     val lateLimits: List<LateLimit> = emptyList(),
+    val republisher: String? = null,
+    val safeSideOfKey: String? = null,
+    val partlyRepublisher: String? = null,
 ) {
     init {
         require((method == null) == (entryClass == EntryClass.C)) { "$id: a method, or members when cautious" }
+        require(republisher == null || republisher.isNotBlank()) { "$id: a republisher has a name" }
+        require(partlyRepublisher == null || republisher == null) { "$id: its tables are a copy in whole or in part, not both" }
+        require(safeSideOfKey == null || entryClass == EntryClass.D_NONE) {
+            "$id: only Taqwa's own calculation is on the safe side of a body's part-held timetable"
+        }
         requireEachEventOnce(lateLimits, id)
         require(entryClass != EntryClass.C || members.size >= 2) { "$id: cautious needs two members or more" }
     }
@@ -138,8 +179,85 @@ data class LateLimit(val minutes: Int, val reason: String, val events: Set<Timed
  * The late-limit exception for [event] at a place: the [unit]'s own that covers it, else the
  * [entry]'s, else null (the class limit applies).
  */
-fun lateLimitFor(event: TimedEvent, unit: AuthorityUnit?, entry: RegistryEntry): LateLimit? =
+fun lateLimitFor(event: TimedEvent, unit: AuthorityUnit?, entry: RegistryEntry): LateLimit? {
+    val own = ownLateLimitFor(event, unit, entry)
+    // Ruling R298: an entry with no units (MUIS's one table) claims its figure across its country (ruling R297), and its
+    // reach's measured worst is keyed by the entry itself: the registry's entry, not a variant a tool builds under its id.
+    val key = unit?.id ?: entry.id.takeIf { Units.of(it) == null && Registry.byId(it) == entry } ?: return own
+    val reach = reachLateLimit(entry.id, key, event) ?: return own
+    return if (own != null && own.minutes >= reach.minutes) own else reach
+}
+
+/** [lateLimitFor] without the reach's own measured figure ([reachLateLimit]): the unit's recorded exception, else the entry's. */
+fun ownLateLimitFor(event: TimedEvent, unit: AuthorityUnit?, entry: RegistryEntry): LateLimit? =
     unit?.lateLimits?.firstOrNull { event in it.events } ?: entry.lateLimits.firstOrNull { event in it.events }
+
+/**
+ * Ruling R270 (the second trust audit of 14 Nov 2026, finding G26): a unit's limit for [event] where its own tables,
+ * read across its reach, were measured later than its own limit allowed ([ReachLimits], written from the gate's stamps
+ * by `generateReachLimits`, as R254 and R255 did for Bahla and Türkiye by hand and by script): the measured worst, so
+ * that About's "at most N min" and the gate say the same figure. Null where the reach needs nothing more. Since ruling
+ * R298 an entry with no units, whose table is read across the area it claims (R297), is keyed by its own id as [unitId].
+ */
+fun reachLateLimit(entryId: String, unitId: String, event: TimedEvent): LateLimit? = reachLimits[entryId]?.get(unitId)?.get(event)
+
+private val reachLimits: Map<String, Map<String, Map<TimedEvent, LateLimit>>> by lazy {
+    ReachLimits.MINUTES.mapValues { (entryId, units) ->
+        units.mapValues { (unitId, events) ->
+            events.mapValues { (event, minutes) ->
+                LateLimit(minutes, reachReason(event, minutes, area = "$entryId/$unitId" in AREA_READ_UNITS), setOf(event))
+            }
+        }
+    }
+}
+
+/**
+ * The claims the proof reads across an area rather than a unit's circle alone (the tools' `ReachAreas.AREAS`, which a
+ * test holds to this list), as `<entry>/<unit>` (an entry with no units under its own id, ruling R298): London
+ * Unified's M25, MUIS's Singapore and the Supreme Council's Bahrain (ruling R297), and KACST's Tayma table, which the set
+ * also hands to the town 111 km south of it (ruling R300). Their reach limit gives the area's reason; any other unit's,
+ * the circle's, even where the unit is keyed by its entry's id (Austria's IGGO, a circle round Vienna).
+ */
+val AREA_READ_UNITS: Set<String> = setOf("bh.council/bh.council", "gb.london.lupt/gb.london.lupt", "sa.ummalqura/tayma", "sg.muis/sg.muis")
+
+/**
+ * Ruling R318 (the owner's ruling of 18 Nov 2026, the final audit's B1): the claims the proof reads only where a GPS fix
+ * is placed in the claim's country alone, its nearest app city the country's and no other country held beside it (the
+ * tools' `ReachAreas` Cell, Chosen and Handed claims, which a test holds to this): MUIS's and the Supreme Council's
+ * nearest-city cells (ruling R307), Tayma's town (R300) and every zone of JAKIM's (R310), as `<entry>/<unit>` (an entry
+ * with no units under its own id) or the whole entry. Chosen at a border place whose nearest city is the neighbour's and
+ * resolved in the claim's country through the second country (ruling R259, [Registry.resolveChosen]), such a timetable
+ * is shown at a point no reach row reads, so it claims no figure there. London's M25 is not here: its shape is read at
+ * every point inside it, whatever the nearest city; nor are the units read by their circles (`ReachRows.SPECS`), whose
+ * rows hold every point of the circle, whatever the country.
+ */
+fun readInCountryAlone(entryId: String, unitId: String?): Boolean =
+    entryId in READ_IN_COUNTRY_ALONE_ENTRIES || "$entryId/${unitId ?: entryId}" in READ_IN_COUNTRY_ALONE_UNITS
+
+/** [readInCountryAlone]'s claims of one unit (or of an entry with no units). */
+val READ_IN_COUNTRY_ALONE_UNITS: Set<String> = setOf("bh.council/bh.council", "sa.ummalqura/tayma", "sg.muis/sg.muis")
+
+/** [readInCountryAlone]'s entries, every unit of theirs: JAKIM's zones, each read across the ground the app hands it (ruling R310). */
+val READ_IN_COUNTRY_ALONE_ENTRIES: Set<String> = setOf("my.jakim")
+
+/**
+ * The reason a reach limit gives. [area]: a table followed across an area rather than a unit's circle
+ * ([AREA_READ_UNITS]: London Unified's M25, MUIS's Singapore, rulings R297 and R298; Tayma's town, R300), where no other
+ * table rides.
+ */
+private fun reachReason(event: TimedEvent, minutes: Int, area: Boolean): String {
+    val end = event == TimedEvent.SUNRISE || event == TimedEvent.END_OF_EATING || event == TimedEvent.IMSAK
+    val measured = "was measured " + (if (end) "up to $minutes min before it" else "up to $minutes min after it") +
+        " on some days, and never " + (if (end) "after" else "before") + " it"
+    return if (area) {
+        "This table, read across the area the proof draws for it (ReachAreas.AREAS), not only its own point, " +
+            "$measured: away from the point it is printed for the user's own sun decides the time shown (rulings R270 and R297)."
+    } else {
+        "This place's table, read across the place's reach (the ground around the point it is printed for that " +
+            "follows it), $measured: toward the edge of the reach the user's own sun, and the tables that ride beside this " +
+            "one, decide the time shown (ruling R270)."
+    }
+}
 
 /** One owner's limits cover each event at most once, so the limit for an event is never ambiguous. */
 internal fun requireEachEventOnce(limits: List<LateLimit>, owner: String) {
@@ -172,6 +290,26 @@ internal fun requireEachEventOnce(limits: List<LateLimit>, owner: String) {
  * - [alongside]: another entry's tables riding beside the place's day ([CrossRide], the owner's decision of
  *   17 Oct 2026), each that table's own day at its own point: the day shown is the safe side of the place's own
  *   day (a cautious one, its members combined) and theirs. Empty almost everywhere; no figure is claimed for them.
+ * - [measuredThrough]: the last date [measured] holds for ([AuthorityUnit.measuredThrough]); null where it holds on
+ *   every date. What the place is on a given date is [on].
+ * - [partlyRepublisher]: [RegistryEntry.partlyRepublisher] where the place's own tables are among those read from that
+ *   copy (its unit's [AuthorityUnit.partlyRepublished], or no unit: the entry's days), else null.
+ * - [partlyRepublishedYears]: the years the place's copied tables are ([AuthorityUnit.republishedYears]), every other
+ *   checked year the authority's own; empty where not known apart. A sentence about one day reads [wholeCopyOn] and
+ *   [partlyCopyOn] (ruling R278).
+ * - [checkedClass]: where [on] made a checked authority [EntryClass.D_AUTHORITY] for a day its timetable was not
+ *   compared on (ruling R275), the class it has on the days that were (A or B), so the site's proven rule can still
+ *   name the first unchecked day; null otherwise.
+ * - [sides]: where the place may be in either of two countries ([Place.alsoCountryCode], ruling R259), each country's
+ *   own resolution there, the nearest city's country first; the day is held to both ([DayPipeline][world.taqwa.app
+ *   .prayer.engine.DayPipeline]: each start the later of their days, each end the earlier), the resolution is
+ *   cautious and claims no figure, and [members] lists both sides' timetables for the screens that name them. Empty
+ *   everywhere else.
+ * - [safeSideOfTableKey]: the short-name key of the body whose own table for this place rides beside a calculated day
+ *   ([UnitSet.safeSideOf], ruling R285: Habous's Sebta and Melilla tables beside Spain's safe default within 10 km of
+ *   either, ruling R261), so the day's end of eating and sunrise are that table's where it is the earlier; null
+ *   everywhere else. [safeSideOfKey] is the body the card and About name: this, else the entry's own
+ *   ([RegistryEntry.safeSideOfKey]).
  */
 data class Resolution(
     val entry: RegistryEntry,
@@ -189,7 +327,55 @@ data class Resolution(
     val unitLabel: String? = unitName,
     val unitCityId: Int? = null,
     val alongside: List<Alongside> = emptyList(),
-)
+    val measuredThrough: LocalDate? = null,
+    val checkedClass: EntryClass? = null,
+    val partlyRepublisher: String? = entry.partlyRepublisher,
+    val partlyRepublishedYears: Set<Int> = emptySet(),
+    val sides: List<Resolution> = emptyList(),
+    val safeSideOfTableKey: String? = null,
+) {
+    /** The body whose timetable a calculated day is on the safe side of: a table riding beside it here, else the entry's (ruling R285). */
+    val safeSideOfKey: String? get() = safeSideOfTableKey ?: entry.safeSideOfKey
+
+    /**
+     * Whose copy the place's own table compared on [date] was, wholly, for a sentence about that one day (the Prayer
+     * screen's card; ruling R278, the second audit's G7 as its review read it): the entry's [RegistryEntry.republisher]
+     * where every table is one (Kemenag's myQuran); where only some of the place's are and their years are known
+     * ([partlyRepublishedYears]: Kuala Lumpur's 2025 and 2027 are the mirror's, its 2026 e-solat's own), the copy in
+     * those years; else null. A run of days (About's "checked through", the site's page) keeps [partlyRepublisher].
+     */
+    fun wholeCopyOn(date: LocalDate): String? =
+        entry.republisher ?: partlyRepublisher?.takeIf { date.year in partlyRepublishedYears }
+
+    /** [partlyRepublisher] for a sentence about [date]: only where the copy's years are not known apart (Dhaka's), so every day may be either. */
+    fun partlyCopyOn(date: LocalDate): String? =
+        partlyRepublisher?.takeIf { partlyRepublishedYears.isEmpty() && wholeCopyOn(date) == null }
+
+    /**
+     * This resolution as it stands on [date].
+     *
+     * - Ruling R231 as revised (13 Nov 2026): a unit whose figure rests on a calendar that ends ([measuredThrough]:
+     *   Algeria's fitted seats, fitted on the 1448 calendar's days) claims no figure on a later date: there it is not
+     *   [measured].
+     * - Ruling R275 (the second audit's G9, 14 Nov 2026): a checked authority (class A or B) is checked only on a day
+     *   its timetable was compared on there ([CheckedDays], the stamp's runs for the place's unit, as the site's proven
+     *   rule reads them). On any other day (past the last checked run, in a hole between runs) it is the authority's
+     *   published method not checked on that day: [EntryClass.D_AUTHORITY], with its label ("Published method"), card
+     *   and About, as the city page is held then. The times are not touched: only what the user is told of them.
+     *   Its name, unit and measured flag stay, so About's "checked on … days so far" keeps the days that were.
+     *
+     * Every other resolution is itself on every date.
+     */
+    fun on(date: LocalDate): Resolution {
+        val figure = if (measured && measuredThrough != null && date > measuredThrough) copy(measured = false) else this
+        val checked = entryClass != EntryClass.A && entryClass != EntryClass.B || CheckedDays.covers(entry.id, unitId, date)
+        return if (checked) {
+            figure
+        } else {
+            figure.copy(entryClass = EntryClass.D_AUTHORITY, about = aboutFor(EntryClass.D_AUTHORITY), checkedClass = entryClass)
+        }
+    }
+}
 
 /** The About template each class fills. */
 internal fun aboutFor(entryClass: EntryClass): AboutTemplate = when (entryClass) {
@@ -213,10 +399,14 @@ internal fun single(
     nearby: List<String> = emptyList(),
     lateLimits: List<LateLimit> = emptyList(),
     area: Area? = null,
+    republisher: String? = null,
+    safeSideOfKey: String? = null,
+    partlyRepublisher: String? = null,
 ): RegistryEntry = RegistryEntry(
     id = id, shortNameKey = nameKey, entryClass = entryClass, about = aboutFor(entryClass), method = method,
     school = school, schoolKnown = schoolKnown, nearby = nearby, scope = scope, countries = countries, area = area,
-    measured = measured, lateLimits = lateLimits,
+    measured = measured, lateLimits = lateLimits, republisher = republisher, safeSideOfKey = safeSideOfKey,
+    partlyRepublisher = partlyRepublisher,
 )
 
 /** A cautious entry over [members] (most-followed first); the named ones are listed as nearby. */
@@ -271,11 +461,14 @@ internal fun EventOffsets.widened(starts: Int, sunrise: Int = -starts) = EventOf
  * [this] where the authority's own point is not known (a unit's edge, spec §3.5), with the edge's
  * [margins]: the end of eating moves as far as sunrise does, since the point moves both ends alike,
  * and a margin fitted at a table's point applies there only, so it is at most [SAFE_END] (ruling R44).
+ * An imsak counted back from the printed Fajr ([ImsakFrom.PrintedFajr]) is counted back from the dawn
+ * again: its margin too was fitted at the table's point alone.
  */
 internal fun TimetableMethod.atEdge(id: String, margins: EventOffsets) = copy(
     id = id,
     margins = margins,
     endOfEatingMarginSeconds = minOf(endOfEatingMarginSeconds + (margins.sunrise - this.margins.sunrise), SAFE_END),
+    imsakFrom = ImsakFrom.Dawn,
 )
 
 /**

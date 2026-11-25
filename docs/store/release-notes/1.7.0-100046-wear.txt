@@ -1,0 +1,21 @@
+<en-GB>
+The prayer times on your watch come from Taqwa on your phone, which now compares them with the published timetable in many more places.
+</en-GB>
+<ar>
+مواقيت الصلاة على ساعتك تأتي من تقوى على هاتفك، وهو يقارنها الآن بالجدول المنشور في أماكن أكثر بكثير.
+</ar>
+<fr-FR>
+Les horaires de prière de votre montre viennent de Taqwa sur votre téléphone, qui les compare désormais au calendrier publié dans bien plus d’endroits.
+</fr-FR>
+<tr-TR>
+Saatinizdeki namaz vakitleri telefonunuzdaki Taqwa’dan gelir; Taqwa artık bunları yayımlanan takvimle çok daha fazla yerde karşılaştırıyor.
+</tr-TR>
+<id>
+Waktu salat di jam tangan Anda berasal dari Taqwa di ponsel Anda, yang kini mencocokkannya dengan jadwal terbitannya di jauh lebih banyak tempat.
+</id>
+<ur>
+آپ کی گھڑی پر نماز کے اوقات آپ کے فون پر موجود تقویٰ سے آتے ہیں، جو اب انہیں کہیں زیادہ جگہوں پر شائع شدہ نقشۂ اوقات سے ملا کر دیکھتا ہے۔
+</ur>
+<bn-BD>
+আপনার ঘড়ির নামাজের সময় আসে আপনার ফোনের তাকওয়া থেকে, যা এখন আরও অনেক জায়গায় সেগুলো প্রকাশিত সময়সূচির সঙ্গে মিলিয়ে দেখে।
+</bn-BD>

@@ -764,7 +764,7 @@ html[dir="rtl"] .cautious-line { direction: rtl; }
 html[lang="ar"] .checks-table thead th, html[lang="ur"] .checks-table thead th, html[lang="bn"] .checks-table thead th { font-size: 12.5px; letter-spacing: 0; font-weight: 700; }
 .checks-table thead th:first-child, .checks-table tbody th { padding-inline-start: 16px; }
 .checks-table tbody th { font-weight: 700; min-width: 11em; }
-.checks-table tbody th small { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; line-height: 1.4; color: var(--t2); }
+.checks-table tbody th small, .checks-table tbody td small { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; line-height: 1.4; color: var(--t2); }
 .checks-table tbody th small a { font-weight: 600; }
 .checks-table tbody td { color: var(--t2); white-space: nowrap; }
 .checks-table tbody td:nth-child(2) { white-space: normal; min-width: 9em; }

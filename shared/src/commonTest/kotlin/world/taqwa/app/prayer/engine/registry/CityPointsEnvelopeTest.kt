@@ -20,7 +20,7 @@ import kotlin.time.Duration.Companion.minutes
 /**
  * The city-point round of 11 Oct 2026, under the owner's rule "rather late, never early": a place is never before any
  * table printed for its own point whose reach holds it, nor any end after one (the envelope), BIK's printed town figures,
- * the nearest Habous table's ends, Diyanet's Sydney table at every plausible point, and a named table followed wherever
+ * Kénitra's Habous table at Sidi Taibi, Diyanet's Sydney table at every plausible point, and a named table followed wherever
  * it is chosen.
  */
 class CityPointsEnvelopeTest {
@@ -241,11 +241,16 @@ class CityPointsEnvelopeTest {
     }
 
     @Test
-    fun `sidi taibi in Rabat's unit ends no later than Kenitra's table too`() {
+    fun `sidi taibi follows Kenitra's own habous table with Rabat's beside it`() {
+        // Since every Habous place is a unit (ruling R195), the nearer table holds it, and every other table whose own
+        // reach holds the place rides as its own day (R198): Rabat's here, 21 km away, and no other.
         val r = at("ma.habous", 34.18698, -6.68176, "Africa/Casablanca", "MA")
-        assertEquals("rabat", r.unitId)
-        assertEquals(listOf(GeoPoint(34.26101, -6.5802)), r.method!!.endPoints)
-        assertTrue(r.method!!.startPoints.isEmpty())
+        assertEquals("kenitra", r.unitId)
+        assertTrue(r.method!!.endPoints.isEmpty() && r.method!!.startPoints.isEmpty())
+        val units = Units.of("ma.habous")!!.units
+        val holding = units.filter { it.id != "kenitra" && distanceKm(GeoPoint(34.18698, -6.68176), it.point) <= it.radiusKm }
+        assertEquals(listOf("rabat"), holding.map { it.id })
+        assertEquals(holding.map { it.method!!.fixedPoint ?: it.point }, r.method!!.alongside.map { it.point })
     }
 
     @Test

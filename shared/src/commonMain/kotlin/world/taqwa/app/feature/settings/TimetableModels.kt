@@ -14,7 +14,7 @@ import world.taqwa.app.prayer.engine.registry.RegistryEntry
 import world.taqwa.app.prayer.engine.registry.Resolution
 import world.taqwa.app.prayer.engine.registry.TimedEvent
 import world.taqwa.app.prayer.engine.registry.Units
-import world.taqwa.app.prayer.engine.registry.lateLimitFor
+import world.taqwa.app.prayer.engine.registry.ownLateLimitFor
 import kotlin.time.Instant
 
 /** The stored timetable that follows the place (spec §2.2). */
@@ -185,6 +185,9 @@ fun timetableRowIds(automatic: RegistryEntry, place: Place, storedId: String?): 
  * it asks again, more strongly, past it): the "at most N minutes late" the timetable is held to
  * for [prayer] here (the unit's or entry's exception, else its class's), or null where no figure is
  * claimed (a place not measured, or a time Taqwa calculates with nothing to compare against).
+ * The recorded exception alone ([ownLateLimitFor]), not a reach's measured figure (ruling R270, the review of 15 Nov
+ * 2026): a reach can read far later than its own point (Kazan's Fajr 135 min toward a white-night onset), and the
+ * stronger question exists to catch a step that early; whether it should follow the reach is the owner's to say.
  */
 fun marginMinutes(resolution: Resolution, prayer: Prayer): Int? {
     if (!resolution.measured || resolution.entryClass == EntryClass.D_NONE) return null
@@ -199,7 +202,9 @@ fun marginMinutes(resolution: Resolution, prayer: Prayer): Int? {
     val unit: AuthorityUnit? = resolution.unitName?.let { name ->
         Units.of(resolution.entry.id)?.units?.firstOrNull { it.name == name && it.point == resolution.unitPoint }
     }
-    return lateLimitFor(event, unit, resolution.entry)?.minutes ?: classLimit(resolution.entryClass)
+    // A checked authority shown as its published method on a day no table was compared on (ruling R275) keeps its own
+    // class's figure: the times are the same, and the smaller margin asks again sooner, never later.
+    return ownLateLimitFor(event, unit, resolution.entry)?.minutes ?: classLimit(resolution.checkedClass ?: resolution.entryClass)
 }
 
 /** The most minutes late each class allows (spec §1 and §5), as the gate holds them. */

@@ -1,4 +1,9 @@
-"""Norway, Islamsk Råd Norge's joint calendars (bonnetid.info): the site's own month tables for
+"""NOT WIRED since 13 November 2026 (ruling R189): bonnetid.info's calendars now need a key the monitor was
+never given, and the owner chose to download them by hand each December (sources.tsv's no-irn row is `manual`,
+the step is in docs/MONITOR.md, "Work by hand, by date"). The module is kept, with its tests, for the day the
+site serves plain tables again; nothing runs it.
+
+Norway, Islamsk Råd Norge's joint calendars (bonnetid.info): the site's own month tables for
 Oslo, Trondheim and Tromsø through its WordPress AJAX call (action get_prayer_times, with the
 nonce its page carries), twelve months per city. The page shows one year at a time (the current
 one; the next appears when IRN publishes it, usually in December), so a table is keyed by its year.
@@ -24,11 +29,11 @@ SOURCE = "no-irn"
 # Since 31 October 2026 bonnetid.info is a React app (an empty `<div id="root">` and one script under
 # /assets/) whose calendars come from a Supabase data API at disp-api.bonnetider.eu, which answers 401 "No
 # API key found in request" without the key the app's script carries (checked 12 Nov 2026). The monitor
-# sends no key it was not given: the owner decides how IRN is read (docs/MONITOR.md), and until then this
-# says so instead of "no prayerAjax".
+# sends no key it was not given, and the owner's choice (12 Nov 2026, ruling R189) is the hand download each
+# December; should this module be named again, it says so instead of "no prayerAjax".
 APP_SHELL = re.compile(r"<div id=\"root\">\s*</div>|src=\"/assets/index-[^\"]+\.js\"")
 APP_SHELL_MESSAGE = ("bonnetid.info is now an app whose calendars come from a data API that needs a key (disp-api.bonnetider.eu, "
-                     "401 without it): not read until the owner decides how (the key the app carries, IRN's leave, or a hand export)")
+                     "401 without it): not read by the monitor; the owner downloads IRN's year by hand each December (ruling R189)")
 HOME = "https://bonnetid.info/"
 HOST = "bonnetid.info"
 # The month a reply names, in the site's Norwegian or in English, folded.

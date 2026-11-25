@@ -27,8 +27,15 @@ source	capture	gate	entry	member	point	days	from
 sa-ummalqura	*	sa-ummalqura.tsv	index	-	index	all	-
 # London Unified: one table for the whole M25 (ruling R44), so a new year is read at every point the gate file reads LUPT at, the unit's own and the twelve edges, as the 2026 rows are.
 gb-london-lupt	elm-*	gb-london-lupt.tsv	gb.london.lupt/gb.london.lupt	-	all	all	-
+# Ruling R297: London Unified's table read across the whole M25 (gb-london-lupt-reach.tsv, ReachAreas.AREAS), a new year at every point of the claim too.
+gb-london-lupt	elm-*	gb-london-lupt-reach.tsv	gb.london.lupt/gb.london.lupt	-	all	all	-
 sa-ummalqura-cities	*	sa-ummalqura.tsv	index	-	index	all	-
 tr-diyanet	*	tr-diyanet.tsv	same	*	same	all	-
+# A district new to the fetcher has no earlier monitor capture to clone: the 62 il centres of the round of 12–13 November
+# 2026 (ruling R202) stand on tables read by hand (archive/tables/held/tr-diyanet/). The index names each one's unit, so
+# this line reads its capture at the unit's own point; its family is the hand-read row, whose table prints the same on
+# every day both hold. A key the line above already clones at its unit is planned once (the same row).
+tr-diyanet	*	tr-diyanet.tsv	index	-	index	all	-
 tr-diyanet-europe	*	tr-diyanet-europe.tsv	same	*	same	all	-
 tr-diyanet-europe	*	be-emb.tsv	same	*	same	all	-
 tr-diyanet-europe	*	fr-cautious.tsv	same	*	same	all	-
@@ -46,8 +53,70 @@ id-kemenag	semarang-*	id-kemenag.tsv	id.kemenag/1433	-	unit	all	-
 id-kemenag	surabaya-*	id-kemenag.tsv	id.kemenag/1638	-	unit	all	-
 id-kemenag	yogyakarta-*	id-kemenag.tsv	id.kemenag/1505	-	unit	all	-
 my-jakim	*	my-jakim.tsv	index	-	index	all	-
+# The printed imsak (ruling R284, the second audit's G25): JAKIM's and Kemenag's fetchers keep each table's imsak as its own
+# capture, `<key>-imsak` (two columns, the Subuh and the imsak, the layout of the hand read-backs under
+# archive/tables/imsak/), and only a line whose pattern ends `-imsak` reads it (Recipe.matches). Each new year is held
+# where the gate files already hold the imsak: every JAKIM zone at its unit, and the eighteen Kemenag kab/kota of
+# id-kemenag-imsak.tsv at theirs (the other units' imsak is checked by the monitor's own check, not yet held).
+my-jakim	*-imsak	my-jakim.tsv	index	-	index	all	-
+id-kemenag	bandaaceh-*-imsak	id-kemenag-imsak.tsv	id.kemenag/0119	-	unit	all	-
+id-kemenag	bandung-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1219	-	unit	all	-
+id-kemenag	batu-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1630	-	unit	all	-
+id-kemenag	bogor-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1222	-	unit	all	-
+id-kemenag	bukittinggi-*-imsak	id-kemenag-imsak.tsv	id.kemenag/0313	-	unit	all	-
+id-kemenag	denpasar-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1709	-	unit	all	-
+id-kemenag	garut-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1208	-	unit	all	-
+id-kemenag	jakarta-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1301	-	unit	all	-
+id-kemenag	jayapura-*-imsak	id-kemenag-imsak.tsv	id.kemenag/3329	-	unit	all	-
+id-kemenag	jayawijaya-*-imsak	id-kemenag-imsak.tsv	id.kemenag/3308	-	unit	all	-
+id-kemenag	makassar-*-imsak	id-kemenag-imsak.tsv	id.kemenag/2622	-	unit	all	-
+id-kemenag	malang-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1634	-	unit	all	-
+id-kemenag	medan-*-imsak	id-kemenag-imsak.tsv	id.kemenag/0228	-	unit	all	-
+id-kemenag	palembang-*-imsak	id-kemenag-imsak.tsv	id.kemenag/0816	-	unit	all	-
+id-kemenag	semarang-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1433	-	unit	all	-
+id-kemenag	surabaya-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1638	-	unit	all	-
+id-kemenag	wonosobo-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1429	-	unit	all	-
+id-kemenag	yogyakarta-*-imsak	id-kemenag-imsak.tsv	id.kemenag/1505	-	unit	all	-
 sg-muis	*	sg-muis.tsv	index	-	index	all	-
-eg-esa	*	eg-esa.tsv	index	-	index	all	-
+# Ruling R297: MUIS's table read across the whole of Singapore (sg-muis-reach.tsv, ReachAreas.AREAS), each capture at every point of the claim too.
+sg-muis	*	sg-muis-reach.tsv	sg.muis	-	all	all	-
+# ESA's 30 towns Dar al-Ifta republishes a month at a time, each named: a town's whole month becomes its own row. Not the
+# bare `*`: the 48 cities ESA's daily page alone prints (egypt.py's ESA_CITIES, kept since 13 Nov 2026, audit finding F25)
+# have no line here, on purpose. Their growing tables hold the one day each run reads, six days in seven never compared:
+# the monitor's own check reads every such day at the town's point (an early start is raised on every run), but a day
+# sampled is no gate row, so a stamp never says a town was checked through a day between days nothing compared (About's
+# "checked through"), and the Ramadan guard never counts the sample as its month being watched (ruling R185 (b)). Their
+# 2027 days come from ESA's pages read by hand (sources.tsv, eg-esa-2027).
+eg-esa	cairo	eg-esa.tsv	index	-	index	all	-
+eg-esa	alexandria	eg-esa.tsv	index	-	index	all	-
+eg-esa	aswan	eg-esa.tsv	index	-	index	all	-
+eg-esa	marsa-matruh	eg-esa.tsv	index	-	index	all	-
+eg-esa	el-arish	eg-esa.tsv	index	-	index	all	-
+eg-esa	sallum	eg-esa.tsv	index	-	index	all	-
+eg-esa	sidi-barrani	eg-esa.tsv	index	-	index	all	-
+eg-esa	siwa	eg-esa.tsv	index	-	index	all	-
+eg-esa	halaib	eg-esa.tsv	index	-	index	all	-
+eg-esa	rafah	eg-esa.tsv	index	-	index	all	-
+eg-esa	taba	eg-esa.tsv	index	-	index	all	-
+eg-esa	sharm-el-sheikh	eg-esa.tsv	index	-	index	all	-
+eg-esa	hurghada	eg-esa.tsv	index	-	index	all	-
+eg-esa	kharga	eg-esa.tsv	index	-	index	all	-
+eg-esa	mut	eg-esa.tsv	index	-	index	all	-
+eg-esa	bawiti	eg-esa.tsv	index	-	index	all	-
+eg-esa	luxor	eg-esa.tsv	index	-	index	all	-
+eg-esa	quseir	eg-esa.tsv	index	-	index	all	-
+eg-esa	port-said	eg-esa.tsv	index	-	index	all	-
+eg-esa	el-tor	eg-esa.tsv	index	-	index	all	-
+eg-esa	saint-catherine	eg-esa.tsv	index	-	index	all	-
+eg-esa	edfu	eg-esa.tsv	index	-	index	all	-
+eg-esa	el-dabaa	eg-esa.tsv	index	-	index	all	-
+eg-esa	damietta	eg-esa.tsv	index	-	index	all	-
+eg-esa	ras-gharib	eg-esa.tsv	index	-	index	all	-
+eg-esa	shalatin	eg-esa.tsv	index	-	index	all	-
+eg-esa	farafra	eg-esa.tsv	index	-	index	all	-
+eg-esa	nuweiba	eg-esa.tsv	index	-	index	all	-
+eg-esa	suez	eg-esa.tsv	index	-	index	all	-
+eg-esa	dahab	eg-esa.tsv	index	-	index	all	-
 qa-calendarhouse	*	qa-calendarhouse.tsv	index	-	index	all	-
 ly-awqaf	*	ly-awqaf.tsv	index	-	index	all	-
 jo-awqaf	amman	jo-awqaf.tsv	jo.awqaf	-	31.955,35.945	all	-
@@ -55,6 +124,7 @@ tn-inm	*	tn-inm.tsv	index	-	index	all	-
 ma-habous	*	ma-habous.tsv	index	-	index	all	-
 za-jamiat	*	za-jamiat.tsv	index	-	index	all	-
 kz-qmdb	*	kz-qmdb.tsv	index	-	index	all	-
+kg-muftiyat	*	kg-default.tsv	index	-	index	all	-
 # The reach rows (sa-ummalqura-reach.tsv, kz-qmdb-reach.tsv; generateReachRows): each measured unit's own table
 # replayed across its reach, a line per unit, so that each new year of a unit's table is read at every point of
 # its reach too (`all`: the points the reach file reads that unit at). The pattern ends `-2*` so that a place's
@@ -177,6 +247,8 @@ sa-ummalqura-cities	umluj-2*	sa-ummalqura-reach.tsv	sa.ummalqura/umluj	-	all	all
 sa-ummalqura-cities	duba-2*	sa-ummalqura-reach.tsv	sa.ummalqura/duba	-	all	all	-
 sa-ummalqura	haql-2*	sa-ummalqura-reach.tsv	sa.ummalqura/haql	-	all	all	-
 sa-ummalqura-cities	tayma-2*	sa-ummalqura-reach.tsv	sa.ummalqura/tayma	-	all	all	-
+# Ruling R300: Tayma's table read within a minute's reach of the town as well (sa-ummalqura-tayma-reach.tsv, ReachAreas.AREAS), a new year at every point of the claim too.
+sa-ummalqura-cities	tayma-2*	sa-ummalqura-tayma-reach.tsv	sa.ummalqura/tayma	-	all	all	-
 sa-ummalqura-cities	al-bada-2*	sa-ummalqura-reach.tsv	sa.ummalqura/al-bada	-	all	all	-
 sa-ummalqura	tabuk-2*	sa-ummalqura-reach.tsv	sa.ummalqura/tabuk	-	all	all	-
 sa-ummalqura-cities	al-ghazalah-2*	sa-ummalqura-reach.tsv	sa.ummalqura/al-ghazalah	-	all	all	-
@@ -318,11 +390,379 @@ kz-qmdb	pulemetovka-2*	kz-qmdb-reach.tsv	kz.qmdb/pulemetovka	-	all	all	-
 kz-qmdb	aksu-turkistan-2*	kz-qmdb-reach.tsv	kz.qmdb/aksu-turkistan	-	all	all	-
 kz-qmdb	turar-ryskulov-2*	kz-qmdb-reach.tsv	kz.qmdb/turar-ryskulov	-	all	all	-
 kz-qmdb	shiyeli-2*	kz-qmdb-reach.tsv	kz.qmdb/shiyeli	-	all	all	-
+# The Kyrgyz Muftiate's localities (kg-default-reach.tsv, the Kyrgyz round's review of 12 Nov 2026): each locality's own
+# table replayed across its reach, and Aravan town's (the Aravan table, read across the town's reach).
+kg-muftiyat	bishkek-2*	kg-default-reach.tsv	kg.default/bishkek	-	all	all	-
+kg-muftiyat	osh-2*	kg-default-reach.tsv	kg.default/osh	-	all	all	-
+kg-muftiyat	kemin-2*	kg-default-reach.tsv	kg.default/kemin	-	all	all	-
+kg-muftiyat	talas-2*	kg-default-reach.tsv	kg.default/talas	-	all	all	-
+kg-muftiyat	balykchy-2*	kg-default-reach.tsv	kg.default/balykchy	-	all	all	-
+kg-muftiyat	karakol-2*	kg-default-reach.tsv	kg.default/karakol	-	all	all	-
+kg-muftiyat	cholpon-ata-2*	kg-default-reach.tsv	kg.default/cholpon-ata	-	all	all	-
+kg-muftiyat	bokonbaev-2*	kg-default-reach.tsv	kg.default/bokonbaev	-	all	all	-
+kg-muftiyat	bakay-ata-2*	kg-default-reach.tsv	kg.default/bakay-ata	-	all	all	-
+kg-muftiyat	manas-talas-2*	kg-default-reach.tsv	kg.default/manas-talas	-	all	all	-
+kg-muftiyat	aytmatov-2*	kg-default-reach.tsv	kg.default/aytmatov	-	all	all	-
+kg-muftiyat	tokmok-2*	kg-default-reach.tsv	kg.default/tokmok	-	all	all	-
+kg-muftiyat	kant-2*	kg-default-reach.tsv	kg.default/kant	-	all	all	-
+kg-muftiyat	sokuluk-2*	kg-default-reach.tsv	kg.default/sokuluk	-	all	all	-
+kg-muftiyat	kara-balta-2*	kg-default-reach.tsv	kg.default/kara-balta	-	all	all	-
+kg-muftiyat	suusamyr-2*	kg-default-reach.tsv	kg.default/suusamyr	-	all	all	-
+kg-muftiyat	kochkor-2*	kg-default-reach.tsv	kg.default/kochkor	-	all	all	-
+kg-muftiyat	naryn-2*	kg-default-reach.tsv	kg.default/naryn	-	all	all	-
+kg-muftiyat	at-bashy-2*	kg-default-reach.tsv	kg.default/at-bashy	-	all	all	-
+kg-muftiyat	ak-talaa-2*	kg-default-reach.tsv	kg.default/ak-talaa	-	all	all	-
+kg-muftiyat	torugart-2*	kg-default-reach.tsv	kg.default/torugart	-	all	all	-
+kg-muftiyat	ozgorush-2*	kg-default-reach.tsv	kg.default/ozgorush	-	all	all	-
+kg-muftiyat	toktogul-2*	kg-default-reach.tsv	kg.default/toktogul	-	all	all	-
+kg-muftiyat	karakol-36-2*	kg-default-reach.tsv	kg.default/karakol-36	-	all	all	-
+kg-muftiyat	tash-komur-2*	kg-default-reach.tsv	kg.default/tash-komur	-	all	all	-
+kg-muftiyat	shamaldy-say-2*	kg-default-reach.tsv	kg.default/shamaldy-say	-	all	all	-
+kg-muftiyat	kochkor-ata-2*	kg-default-reach.tsv	kg.default/kochkor-ata	-	all	all	-
+kg-muftiyat	nooken-2*	kg-default-reach.tsv	kg.default/nooken	-	all	all	-
+kg-muftiyat	bazar-korgon-2*	kg-default-reach.tsv	kg.default/bazar-korgon	-	all	all	-
+kg-muftiyat	manas-city-2*	kg-default-reach.tsv	kg.default/manas-city	-	all	all	-
+kg-muftiyat	suzak-2*	kg-default-reach.tsv	kg.default/suzak	-	all	all	-
+kg-muftiyat	mayluu-suu-2*	kg-default-reach.tsv	kg.default/mayluu-suu	-	all	all	-
+kg-muftiyat	ozgon-2*	kg-default-reach.tsv	kg.default/ozgon	-	all	all	-
+kg-muftiyat	kara-suu-2*	kg-default-reach.tsv	kg.default/kara-suu	-	all	all	-
+kg-muftiyat	otuz-adyr-2*	kg-default-reach.tsv	kg.default/otuz-adyr	-	all	all	-
+kg-muftiyat	aravan-2*	kg-default-reach.tsv	kg.default/aravan	-	all	all	-
+kg-muftiyat	nookat-2*	kg-default-reach.tsv	kg.default/nookat	-	all	all	-
+kg-muftiyat	gulcho-2*	kg-default-reach.tsv	kg.default/gulcho	-	all	all	-
+kg-muftiyat	daroot-korgon-2*	kg-default-reach.tsv	kg.default/daroot-korgon	-	all	all	-
+kg-muftiyat	kara-kulzha-2*	kg-default-reach.tsv	kg.default/kara-kulzha	-	all	all	-
+kg-muftiyat	amanbaev-2*	kg-default-reach.tsv	kg.default/amanbaev	-	all	all	-
+kg-muftiyat	batken-2*	kg-default-reach.tsv	kg.default/batken	-	all	all	-
+kg-muftiyat	kadamzhay-2*	kg-default-reach.tsv	kg.default/kadamzhay	-	all	all	-
+kg-muftiyat	razzakov-2*	kg-default-reach.tsv	kg.default/razzakov	-	all	all	-
+kg-muftiyat	suluktu-2*	kg-default-reach.tsv	kg.default/suluktu	-	all	all	-
+kg-muftiyat	kyzyl-kyya-2*	kg-default-reach.tsv	kg.default/kyzyl-kyya	-	all	all	-
+kg-muftiyat	ak-say-2*	kg-default-reach.tsv	kg.default/ak-say	-	all	all	-
+kg-muftiyat	burgondu-2*	kg-default-reach.tsv	kg.default/burgondu	-	all	all	-
+kg-muftiyat	katrang-2*	kg-default-reach.tsv	kg.default/katrang	-	all	all	-
+kg-muftiyat	kulundu-2*	kg-default-reach.tsv	kg.default/kulundu	-	all	all	-
+kg-muftiyat	kok-tash-batken-2*	kg-default-reach.tsv	kg.default/kok-tash-batken	-	all	all	-
+kg-muftiyat	maydan-2*	kg-default-reach.tsv	kg.default/maydan	-	all	all	-
+kg-muftiyat	muras-2*	kg-default-reach.tsv	kg.default/muras	-	all	all	-
+kg-muftiyat	ormosh-2*	kg-default-reach.tsv	kg.default/ormosh	-	all	all	-
+kg-muftiyat	ravat-2*	kg-default-reach.tsv	kg.default/ravat	-	all	all	-
+kg-muftiyat	samarkandek-2*	kg-default-reach.tsv	kg.default/samarkandek	-	all	all	-
+kg-muftiyat	sogment-2*	kg-default-reach.tsv	kg.default/sogment	-	all	all	-
+kg-muftiyat	zhengish-2*	kg-default-reach.tsv	kg.default/zhengish	-	all	all	-
+kg-muftiyat	rout-2*	kg-default-reach.tsv	kg.default/rout	-	all	all	-
+kg-muftiyat	ak-tash-2*	kg-default-reach.tsv	kg.default/ak-tash	-	all	all	-
+kg-muftiyat	ala-buka-2*	kg-default-reach.tsv	kg.default/ala-buka	-	all	all	-
+kg-muftiyat	arkyt-2*	kg-default-reach.tsv	kg.default/arkyt	-	all	all	-
+kg-muftiyat	arslanbap-2*	kg-default-reach.tsv	kg.default/arslanbap	-	all	all	-
+kg-muftiyat	kazarman-2*	kg-default-reach.tsv	kg.default/kazarman	-	all	all	-
+kg-muftiyat	kanysh-kyya-2*	kg-default-reach.tsv	kg.default/kanysh-kyya	-	all	all	-
+kg-muftiyat	kara-alma-2*	kg-default-reach.tsv	kg.default/kara-alma	-	all	all	-
+kg-muftiyat	kara-kol-2*	kg-default-reach.tsv	kg.default/kara-kol	-	all	all	-
+kg-muftiyat	kerben-2*	kg-default-reach.tsv	kg.default/kerben	-	all	all	-
+kg-muftiyat	kyzyl-tuu-2*	kg-default-reach.tsv	kg.default/kyzyl-tuu	-	all	all	-
+kg-muftiyat	kyzyl-ozgorush-2*	kg-default-reach.tsv	kg.default/kyzyl-ozgorush	-	all	all	-
+kg-muftiyat	kok-tash-jalal-abad-2*	kg-default-reach.tsv	kg.default/kok-tash-jalal-abad	-	all	all	-
+kg-muftiyat	maasy-2*	kg-default-reach.tsv	kg.default/maasy	-	all	all	-
+kg-muftiyat	chychkan-suu-2*	kg-default-reach.tsv	kg.default/chychkan-suu	-	all	all	-
+kg-muftiyat	baetov-2*	kg-default-reach.tsv	kg.default/baetov	-	all	all	-
+kg-muftiyat	segizinchi-mart-2*	kg-default-reach.tsv	kg.default/segizinchi-mart	-	all	all	-
+kg-muftiyat	kazybek-2*	kg-default-reach.tsv	kg.default/kazybek	-	all	all	-
+kg-muftiyat	kosh-bulak-2*	kg-default-reach.tsv	kg.default/kosh-bulak	-	all	all	-
+kg-muftiyat	kosh-dobo-2*	kg-default-reach.tsv	kg.default/kosh-dobo	-	all	all	-
+kg-muftiyat	kyzart-2*	kg-default-reach.tsv	kg.default/kyzart	-	all	all	-
+kg-muftiyat	ming-kush-2*	kg-default-reach.tsv	kg.default/ming-kush	-	all	all	-
+kg-muftiyat	tash-bashat-2*	kg-default-reach.tsv	kg.default/tash-bashat	-	all	all	-
+kg-muftiyat	chaek-2*	kg-default-reach.tsv	kg.default/chaek	-	all	all	-
+kg-muftiyat	akshar-2*	kg-default-reach.tsv	kg.default/akshar	-	all	all	-
+kg-muftiyat	oy-tal-2*	kg-default-reach.tsv	kg.default/oy-tal	-	all	all	-
+kg-muftiyat	papan-2*	kg-default-reach.tsv	kg.default/papan	-	all	all	-
+kg-muftiyat	salamalik-2*	kg-default-reach.tsv	kg.default/salamalik	-	all	all	-
+kg-muftiyat	sary-mogol-2*	kg-default-reach.tsv	kg.default/sary-mogol	-	all	all	-
+kg-muftiyat	sopu-korgon-2*	kg-default-reach.tsv	kg.default/sopu-korgon	-	all	all	-
+kg-muftiyat	terek-alay-kuu-2*	kg-default-reach.tsv	kg.default/terek-alay-kuu	-	all	all	-
+kg-muftiyat	erkeshtam-2*	kg-default-reach.tsv	kg.default/erkeshtam	-	all	all	-
+kg-muftiyat	kara-oy-2*	kg-default-reach.tsv	kg.default/kara-oy	-	all	all	-
+kg-muftiyat	kyzyl-adyr-2*	kg-default-reach.tsv	kg.default/kyzyl-adyr	-	all	all	-
+kg-muftiyat	pokrovka-2*	kg-default-reach.tsv	kg.default/pokrovka	-	all	all	-
+kg-muftiyat	taldy-bulak-2*	kg-default-reach.tsv	kg.default/taldy-bulak	-	all	all	-
+kg-muftiyat	sheker-2*	kg-default-reach.tsv	kg.default/sheker	-	all	all	-
+kg-muftiyat	otmok-2*	kg-default-reach.tsv	kg.default/otmok	-	all	all	-
+kg-muftiyat	manas-airport-2*	kg-default-reach.tsv	kg.default/manas-airport	-	all	all	-
+kg-muftiyat	belovodskoe-2*	kg-default-reach.tsv	kg.default/belovodskoe	-	all	all	-
+kg-muftiyat	kaindy-2*	kg-default-reach.tsv	kg.default/kaindy	-	all	all	-
+kg-muftiyat	kamyshanovka-2*	kg-default-reach.tsv	kg.default/kamyshanovka	-	all	all	-
+kg-muftiyat	kyzyl-oy-2*	kg-default-reach.tsv	kg.default/kyzyl-oy	-	all	all	-
+kg-muftiyat	too-ashuu-2*	kg-default-reach.tsv	kg.default/too-ashuu	-	all	all	-
+kg-muftiyat	chaldovar-2*	kg-default-reach.tsv	kg.default/chaldovar	-	all	all	-
+kg-muftiyat	ysyk-ata-2*	kg-default-reach.tsv	kg.default/ysyk-ata	-	all	all	-
+kg-muftiyat	ak-bulung-2*	kg-default-reach.tsv	kg.default/ak-bulung	-	all	all	-
+kg-muftiyat	ak-shyyrak-2*	kg-default-reach.tsv	kg.default/ak-shyyrak	-	all	all	-
+kg-muftiyat	ala-bash-2*	kg-default-reach.tsv	kg.default/ala-bash	-	all	all	-
+kg-muftiyat	ananevo-2*	kg-default-reach.tsv	kg.default/ananevo	-	all	all	-
+kg-muftiyat	barskoon-2*	kg-default-reach.tsv	kg.default/barskoon	-	all	all	-
+kg-muftiyat	kara-koo-2*	kg-default-reach.tsv	kg.default/kara-koo	-	all	all	-
+kg-muftiyat	kumtor-2*	kg-default-reach.tsv	kg.default/kumtor	-	all	all	-
+kg-muftiyat	kyzyl-suu-2*	kg-default-reach.tsv	kg.default/kyzyl-suu	-	all	all	-
+kg-muftiyat	tamchy-2*	kg-default-reach.tsv	kg.default/tamchy	-	all	all	-
+kg-muftiyat	tup-2*	kg-default-reach.tsv	kg.default/tup	-	all	all	-
+kg-muftiyat	engilchek-2*	kg-default-reach.tsv	kg.default/engilchek	-	all	all	-
+kg-muftiyat	aravan-2*	kg-default-reach.tsv	kg.default/aravan-town	-	all	all	-
+# Kemenag's kab/kota (id-kemenag-reach.tsv, the review of 12 Nov 2026): each unit's new year read across its circle
+# as its own point's rows are, a line per unit by the fetcher's key.
+id-kemenag	jakarta-2*	id-kemenag-reach.tsv	id.kemenag/1301	-	all	all	-
+id-kemenag	bandaaceh-2*	id-kemenag-reach.tsv	id.kemenag/0119	-	all	all	-
+id-kemenag	makassar-2*	id-kemenag-reach.tsv	id.kemenag/2622	-	all	all	-
+id-kemenag	denpasar-2*	id-kemenag-reach.tsv	id.kemenag/1709	-	all	all	-
+id-kemenag	jayapura-2*	id-kemenag-reach.tsv	id.kemenag/3329	-	all	all	-
+id-kemenag	malang-2*	id-kemenag-reach.tsv	id.kemenag/1634	-	all	all	-
+id-kemenag	bandung-2*	id-kemenag-reach.tsv	id.kemenag/1219	-	all	all	-
+id-kemenag	jayawijaya-2*	id-kemenag-reach.tsv	id.kemenag/3308	-	all	all	-
+id-kemenag	batu-2*	id-kemenag-reach.tsv	id.kemenag/1630	-	all	all	-
+id-kemenag	bukittinggi-2*	id-kemenag-reach.tsv	id.kemenag/0313	-	all	all	-
+id-kemenag	bogor-2*	id-kemenag-reach.tsv	id.kemenag/1222	-	all	all	-
+id-kemenag	garut-2*	id-kemenag-reach.tsv	id.kemenag/1208	-	all	all	-
+id-kemenag	wonosobo-2*	id-kemenag-reach.tsv	id.kemenag/1429	-	all	all	-
+id-kemenag	surabaya-2*	id-kemenag-reach.tsv	id.kemenag/1638	-	all	all	-
+id-kemenag	medan-2*	id-kemenag-reach.tsv	id.kemenag/0228	-	all	all	-
+id-kemenag	semarang-2*	id-kemenag-reach.tsv	id.kemenag/1433	-	all	all	-
+id-kemenag	palembang-2*	id-kemenag-reach.tsv	id.kemenag/0816	-	all	all	-
+id-kemenag	yogyakarta-2*	id-kemenag-reach.tsv	id.kemenag/1505	-	all	all	-
+id-kemenag	kotabekasi-2*	id-kemenag-reach.tsv	id.kemenag/1221	-	all	all	-
+id-kemenag	depok-2*	id-kemenag-reach.tsv	id.kemenag/1225	-	all	all	-
+id-kemenag	kotatangerang-2*	id-kemenag-reach.tsv	id.kemenag/1107	-	all	all	-
+id-kemenag	tangsel-2*	id-kemenag-reach.tsv	id.kemenag/1108	-	all	all	-
+id-kemenag	batam-2*	id-kemenag-reach.tsv	id.kemenag/0506	-	all	all	-
+id-kemenag	pekanbaru-2*	id-kemenag-reach.tsv	id.kemenag/0412	-	all	all	-
+id-kemenag	bandarlampung-2*	id-kemenag-reach.tsv	id.kemenag/1014	-	all	all	-
+id-kemenag	padang-2*	id-kemenag-reach.tsv	id.kemenag/0314	-	all	all	-
+id-kemenag	samarinda-2*	id-kemenag-reach.tsv	id.kemenag/2310	-	all	all	-
+id-kemenag	tasikmalaya-2*	id-kemenag-reach.tsv	id.kemenag/1227	-	all	all	-
+id-kemenag	kotaserang-2*	id-kemenag-reach.tsv	id.kemenag/1106	-	all	all	-
+id-kemenag	balikpapan-2*	id-kemenag-reach.tsv	id.kemenag/2308	-	all	all	-
+id-kemenag	pontianak-2*	id-kemenag-reach.tsv	id.kemenag/2013	-	all	all	-
+id-kemenag	banjarmasin-2*	id-kemenag-reach.tsv	id.kemenag/2113	-	all	all	-
+id-kemenag	jambi-2*	id-kemenag-reach.tsv	id.kemenag/0610	-	all	all	-
+id-kemenag	cimahi-2*	id-kemenag-reach.tsv	id.kemenag/1223	-	all	all	-
+id-kemenag	surakarta-2*	id-kemenag-reach.tsv	id.kemenag/1434	-	all	all	-
+id-kemenag	kupang-2*	id-kemenag-reach.tsv	id.kemenag/1922	-	all	all	-
+id-kemenag	cilegon-2*	id-kemenag-reach.tsv	id.kemenag/1105	-	all	all	-
+id-kemenag	manado-2*	id-kemenag-reach.tsv	id.kemenag/2914	-	all	all	-
+id-kemenag	mataram-2*	id-kemenag-reach.tsv	id.kemenag/1810	-	all	all	-
+id-kemenag	bengkulu-2*	id-kemenag-reach.tsv	id.kemenag/0710	-	all	all	-
+id-kemenag	palu-2*	id-kemenag-reach.tsv	id.kemenag/2813	-	all	all	-
+id-kemenag	kotasukabumi-2*	id-kemenag-reach.tsv	id.kemenag/1226	-	all	all	-
+id-kemenag	kendari-2*	id-kemenag-reach.tsv	id.kemenag/2717	-	all	all	-
+id-kemenag	dumai-2*	id-kemenag-reach.tsv	id.kemenag/0411	-	all	all	-
+id-kemenag	ambon-2*	id-kemenag-reach.tsv	id.kemenag/3110	-	all	all	-
+id-kemenag	kotacirebon-2*	id-kemenag-reach.tsv	id.kemenag/1224	-	all	all	-
+id-kemenag	kotapekalongan-2*	id-kemenag-reach.tsv	id.kemenag/1431	-	all	all	-
+id-kemenag	palangkaraya-2*	id-kemenag-reach.tsv	id.kemenag/2214	-	all	all	-
+id-kemenag	kotakediri-2*	id-kemenag-reach.tsv	id.kemenag/1632	-	all	all	-
+id-kemenag	kotategal-2*	id-kemenag-reach.tsv	id.kemenag/1435	-	all	all	-
+id-kemenag	banjarbaru-2*	id-kemenag-reach.tsv	id.kemenag/2112	-	all	all	-
+id-kemenag	binjai-2*	id-kemenag-reach.tsv	id.kemenag/0226	-	all	all	-
+id-kemenag	pematangsiantar-2*	id-kemenag-reach.tsv	id.kemenag/0230	-	all	all	-
+id-kemenag	tarakan-2*	id-kemenag-reach.tsv	id.kemenag/2405	-	all	all	-
+id-kemenag	singkawang-2*	id-kemenag-reach.tsv	id.kemenag/2014	-	all	all	-
+id-kemenag	tanjungpinang-2*	id-kemenag-reach.tsv	id.kemenag/0507	-	all	all	-
+id-kemenag	pangkalpinang-2*	id-kemenag-reach.tsv	id.kemenag/0907	-	all	all	-
+id-kemenag	kotagorontalo-2*	id-kemenag-reach.tsv	id.kemenag/2506	-	all	all	-
+id-kemenag	kabbekasi-2*	id-kemenag-reach.tsv	id.kemenag/1203	-	all	all	-
+id-kemenag	kabbogor-2*	id-kemenag-reach.tsv	id.kemenag/1204	-	all	all	-
+id-kemenag	kabbandung-2*	id-kemenag-reach.tsv	id.kemenag/1201	-	all	all	-
+id-kemenag	kabmalang-2*	id-kemenag-reach.tsv	id.kemenag/1614	-	all	all	-
+id-kemenag	jember-2*	id-kemenag-reach.tsv	id.kemenag/1607	-	all	all	-
+id-kemenag	kabsukabumi-2*	id-kemenag-reach.tsv	id.kemenag/1216	-	all	all	-
+id-kemenag	cianjur-2*	id-kemenag-reach.tsv	id.kemenag/1206	-	all	all	-
+id-kemenag	karawang-2*	id-kemenag-reach.tsv	id.kemenag/1210	-	all	all	-
+id-kemenag	kabcirebon-2*	id-kemenag-reach.tsv	id.kemenag/1207	-	all	all	-
+id-kemenag	sidoarjo-2*	id-kemenag-reach.tsv	id.kemenag/1624	-	all	all	-
+id-kemenag	cilacap-2*	id-kemenag-reach.tsv	id.kemenag/1407	-	all	all	-
+id-kemenag	kabtasikmalaya-2*	id-kemenag-reach.tsv	id.kemenag/1218	-	all	all	-
+id-kemenag	indramayu-2*	id-kemenag-reach.tsv	id.kemenag/1209	-	all	all	-
+id-kemenag	banyumas-2*	id-kemenag-reach.tsv	id.kemenag/1402	-	all	all	-
+id-kemenag	subang-2*	id-kemenag-reach.tsv	id.kemenag/1215	-	all	all	-
+id-kemenag	gresik-2*	id-kemenag-reach.tsv	id.kemenag/1606	-	all	all	-
+id-kemenag	klaten-2*	id-kemenag-reach.tsv	id.kemenag/1414	-	all	all	-
+id-kemenag	jepara-2*	id-kemenag-reach.tsv	id.kemenag/1410	-	all	all	-
+id-kemenag	sleman-2*	id-kemenag-reach.tsv	id.kemenag/1504	-	all	all	-
+id-kemenag	bantul-2*	id-kemenag-reach.tsv	id.kemenag/1501	-	all	all	-
+id-kemenag	kabsemarang-2*	id-kemenag-reach.tsv	id.kemenag/1423	-	all	all	-
+id-kemenag	kudus-2*	id-kemenag-reach.tsv	id.kemenag/1415	-	all	all	-
+id-kemenag	demak-2*	id-kemenag-reach.tsv	id.kemenag/1408	-	all	all	-
+id-kemenag	purwakarta-2*	id-kemenag-reach.tsv	id.kemenag/1214	-	all	all	-
+id-kemenag	sumedang-2*	id-kemenag-reach.tsv	id.kemenag/1217	-	all	all	-
+id-kemenag	kabpasuruan-2*	id-kemenag-reach.tsv	id.kemenag/1620	-	all	all	-
+id-kemenag	kotapasuruan-2*	id-kemenag-reach.tsv	id.kemenag/1636	-	all	all	-
+id-kemenag	kotaprobolinggo-2*	id-kemenag-reach.tsv	id.kemenag/1637	-	all	all	-
+id-kemenag	kotamadiun-2*	id-kemenag-reach.tsv	id.kemenag/1633	-	all	all	-
+id-kemenag	kotablitar-2*	id-kemenag-reach.tsv	id.kemenag/1631	-	all	all	-
+id-kemenag	kotamojokerto-2*	id-kemenag-reach.tsv	id.kemenag/1635	-	all	all	-
+id-kemenag	kotamagelang-2*	id-kemenag-reach.tsv	id.kemenag/1430	-	all	all	-
+id-kemenag	salatiga-2*	id-kemenag-reach.tsv	id.kemenag/1432	-	all	all	-
+id-kemenag	bitung-2*	id-kemenag-reach.tsv	id.kemenag/2912	-	all	all	-
+id-kemenag	lhokseumawe-2*	id-kemenag-reach.tsv	id.kemenag/0121	-	all	all	-
+id-kemenag	ternate-2*	id-kemenag-reach.tsv	id.kemenag/3209	-	all	all	-
+id-kemenag	bontang-2*	id-kemenag-reach.tsv	id.kemenag/2309	-	all	all	-
+id-kemenag	baubau-2*	id-kemenag-reach.tsv	id.kemenag/2716	-	all	all	-
+id-kemenag	parepare-2*	id-kemenag-reach.tsv	id.kemenag/2624	-	all	all	-
+id-kemenag	palopo-2*	id-kemenag-reach.tsv	id.kemenag/2623	-	all	all	-
+id-kemenag	kotabima-2*	id-kemenag-reach.tsv	id.kemenag/1809	-	all	all	-
+id-kemenag	metro-2*	id-kemenag-reach.tsv	id.kemenag/1015	-	all	all	-
+id-kemenag	kabtegal-2*	id-kemenag-reach.tsv	id.kemenag/1426	-	all	all	-
+id-kemenag	situbondo-2*	id-kemenag-reach.tsv	id.kemenag/1625	-	all	all	-
+id-kemenag	banyuwangi-2*	id-kemenag-reach.tsv	id.kemenag/1602	-	all	all	-
+id-kemenag	jombang-2*	id-kemenag-reach.tsv	id.kemenag/1608	-	all	all	-
+id-kemenag	tulungagung-2*	id-kemenag-reach.tsv	id.kemenag/1629	-	all	all	-
+id-kemenag	pati-2*	id-kemenag-reach.tsv	id.kemenag/1417	-	all	all	-
+id-kemenag	pemalang-2*	id-kemenag-reach.tsv	id.kemenag/1419	-	all	all	-
+id-kemenag	boyolali-2*	id-kemenag-reach.tsv	id.kemenag/1405	-	all	all	-
+id-kemenag	bojonegoro-2*	id-kemenag-reach.tsv	id.kemenag/1604	-	all	all	-
+id-kemenag	lamongan-2*	id-kemenag-reach.tsv	id.kemenag/1610	-	all	all	-
+id-kemenag	tuban-2*	id-kemenag-reach.tsv	id.kemenag/1628	-	all	all	-
+id-kemenag	kuningan-2*	id-kemenag-reach.tsv	id.kemenag/1211	-	all	all	-
+id-kemenag	majalengka-2*	id-kemenag-reach.tsv	id.kemenag/1212	-	all	all	-
+id-kemenag	ciamis-2*	id-kemenag-reach.tsv	id.kemenag/1205	-	all	all	-
+id-kemenag	lebak-2*	id-kemenag-reach.tsv	id.kemenag/1101	-	all	all	-
+id-kemenag	pandeglang-2*	id-kemenag-reach.tsv	id.kemenag/1102	-	all	all	-
+id-kemenag	sumenep-2*	id-kemenag-reach.tsv	id.kemenag/1626	-	all	all	-
+id-kemenag	pamekasan-2*	id-kemenag-reach.tsv	id.kemenag/1619	-	all	all	-
+id-kemenag	bangkalan-2*	id-kemenag-reach.tsv	id.kemenag/1601	-	all	all	-
+id-kemenag	nganjuk-2*	id-kemenag-reach.tsv	id.kemenag/1616	-	all	all	-
+id-kemenag	ponorogo-2*	id-kemenag-reach.tsv	id.kemenag/1621	-	all	all	-
+id-kemenag	lumajang-2*	id-kemenag-reach.tsv	id.kemenag/1611	-	all	all	-
+id-kemenag	bondowoso-2*	id-kemenag-reach.tsv	id.kemenag/1605	-	all	all	-
+id-kemenag	sragen-2*	id-kemenag-reach.tsv	id.kemenag/1424	-	all	all	-
+id-kemenag	grobogan-2*	id-kemenag-reach.tsv	id.kemenag/1409	-	all	all	-
+id-kemenag	kabprobolinggo-2*	id-kemenag-reach.tsv	id.kemenag/1622	-	all	all	-
+id-kemenag	kotasorong-2*	id-kemenag-reach.tsv	id.kemenag/3413	-	all	all	-
+# Kemenag's second round of 12 Nov 2026 (KemenagKabkota.kt's round2): each unit's new year read across its circle, as the round's.
+id-kemenag	lomboktimur-2*	id-kemenag-reach.tsv	id.kemenag/1805	-	all	all	-
+id-kemenag	asahan-2*	id-kemenag-reach.tsv	id.kemenag/0201	-	all	all	-
+id-kemenag	lomboktengah-2*	id-kemenag-reach.tsv	id.kemenag/1804	-	all	all	-
+id-kemenag	langkat-2*	id-kemenag-reach.tsv	id.kemenag/0210	-	all	all	-
+id-kemenag	purbalingga-2*	id-kemenag-reach.tsv	id.kemenag/1420	-	all	all	-
+id-kemenag	lampungutara-2*	id-kemenag-reach.tsv	id.kemenag/1002	-	all	all	-
+id-kemenag	blora-2*	id-kemenag-reach.tsv	id.kemenag/1404	-	all	all	-
+id-kemenag	buleleng-2*	id-kemenag-reach.tsv	id.kemenag/1703	-	all	all	-
+id-kemenag	gunungkidul-2*	id-kemenag-reach.tsv	id.kemenag/1502	-	all	all	-
+id-kemenag	sambas-2*	id-kemenag-reach.tsv	id.kemenag/2009	-	all	all	-
+id-kemenag	rembang-2*	id-kemenag-reach.tsv	id.kemenag/1422	-	all	all	-
+id-kemenag	kabbanjar-2*	id-kemenag-reach.tsv	id.kemenag/2102	-	all	all	-
+id-kemenag	polewalimandar-2*	id-kemenag-reach.tsv	id.kemenag/3006	-	all	all	-
+id-kemenag	wajo-2*	id-kemenag-reach.tsv	id.kemenag/2621	-	all	all	-
+id-kemenag	tabanan-2*	id-kemenag-reach.tsv	id.kemenag/1708	-	all	all	-
+id-kemenag	pidie-2*	id-kemenag-reach.tsv	id.kemenag/0116	-	all	all	-
+id-kemenag	oganilir-2*	id-kemenag-reach.tsv	id.kemenag/0808	-	all	all	-
+id-kemenag	lahat-2*	id-kemenag-reach.tsv	id.kemenag/0803	-	all	all	-
+id-kemenag	malukutengah-2*	id-kemenag-reach.tsv	id.kemenag/3105	-	all	all	-
+id-kemenag	labuhanbatu-2*	id-kemenag-reach.tsv	id.kemenag/0207	-	all	all	-
+id-kemenag	kapuas-2*	id-kemenag-reach.tsv	id.kemenag/2205	-	all	all	-
+id-kemenag	kotawaringintimur-2*	id-kemenag-reach.tsv	id.kemenag/2208	-	all	all	-
+id-kemenag	sintang-2*	id-kemenag-reach.tsv	id.kemenag/2012	-	all	all	-
+id-kemenag	luwuutara-2*	id-kemenag-reach.tsv	id.kemenag/2611	-	all	all	-
+id-kemenag	tanjungjabungbarat-2*	id-kemenag-reach.tsv	id.kemenag/0607	-	all	all	-
+id-kemenag	sikka-2*	id-kemenag-reach.tsv	id.kemenag/1915	-	all	all	-
+id-kemenag	jembrana-2*	id-kemenag-reach.tsv	id.kemenag/1705	-	all	all	-
+id-kemenag	sumbabaratdaya-2*	id-kemenag-reach.tsv	id.kemenag/1917	-	all	all	-
+id-kemenag	bangka-2*	id-kemenag-reach.tsv	id.kemenag/0901	-	all	all	-
+id-kemenag	niasselatan-2*	id-kemenag-reach.tsv	id.kemenag/0214	-	all	all	-
+id-kemenag	bengkayang-2*	id-kemenag-reach.tsv	id.kemenag/2001	-	all	all	-
+id-kemenag	karo-2*	id-kemenag-reach.tsv	id.kemenag/0206	-	all	all	-
+id-kemenag	tapanuliutara-2*	id-kemenag-reach.tsv	id.kemenag/0224	-	all	all	-
+id-kemenag	ende-2*	id-kemenag-reach.tsv	id.kemenag/1903	-	all	all	-
+id-kemenag	dairi-2*	id-kemenag-reach.tsv	id.kemenag/0203	-	all	all	-
+id-kemenag	rejanglebong-2*	id-kemenag-reach.tsv	id.kemenag/0708	-	all	all	-
+id-kemenag	sinjai-2*	id-kemenag-reach.tsv	id.kemenag/2616	-	all	all	-
+id-kemenag	manggaraibarat-2*	id-kemenag-reach.tsv	id.kemenag/1909	-	all	all	-
+id-kemenag	timortengahutara-2*	id-kemenag-reach.tsv	id.kemenag/1921	-	all	all	-
+id-kemenag	hulusungaitengah-2*	id-kemenag-reach.tsv	id.kemenag/2105	-	all	all	-
+id-kemenag	poso-2*	id-kemenag-reach.tsv	id.kemenag/2809	-	all	all	-
+id-kemenag	torajautara-2*	id-kemenag-reach.tsv	id.kemenag/2620	-	all	all	-
+id-kemenag	sumbatimur-2*	id-kemenag-reach.tsv	id.kemenag/1919	-	all	all	-
+id-kemenag	sijunjung-2*	id-kemenag-reach.tsv	id.kemenag/0309	-	all	all	-
+id-kemenag	merauke-2*	id-kemenag-reach.tsv	id.kemenag/3315	-	all	all	-
+id-kemenag	hulusungaiutara-2*	id-kemenag-reach.tsv	id.kemenag/2106	-	all	all	-
+id-kemenag	minahasautara-2*	id-kemenag-reach.tsv	id.kemenag/2911	-	all	all	-
+id-kemenag	belu-2*	id-kemenag-reach.tsv	id.kemenag/1902	-	all	all	-
+id-kemenag	dompu-2*	id-kemenag-reach.tsv	id.kemenag/1802	-	all	all	-
+id-kemenag	lubuklinggau-2*	id-kemenag-reach.tsv	id.kemenag/0814	-	all	all	-
+id-kemenag	alor-2*	id-kemenag-reach.tsv	id.kemenag/1901	-	all	all	-
+id-kemenag	puncakjaya-2*	id-kemenag-reach.tsv	id.kemenag/3322	-	all	all	-
+id-kemenag	prabumulih-2*	id-kemenag-reach.tsv	id.kemenag/0817	-	all	all	-
+id-kemenag	bangkabarat-2*	id-kemenag-reach.tsv	id.kemenag/0902	-	all	all	-
+id-kemenag	halmaherautara-2*	id-kemenag-reach.tsv	id.kemenag/3203	-	all	all	-
+id-kemenag	acehbarat-2*	id-kemenag-reach.tsv	id.kemenag/0101	-	all	all	-
+id-kemenag	langsa-2*	id-kemenag-reach.tsv	id.kemenag/0120	-	all	all	-
+id-kemenag	tebingtinggi-2*	id-kemenag-reach.tsv	id.kemenag/0233	-	all	all	-
+id-kemenag	nunukan-2*	id-kemenag-reach.tsv	id.kemenag/2403	-	all	all	-
+id-kemenag	nabire-2*	id-kemenag-reach.tsv	id.kemenag/3317	-	all	all	-
+id-kemenag	kabjayapura-2*	id-kemenag-reach.tsv	id.kemenag/3307	-	all	all	-
+id-kemenag	belitung-2*	id-kemenag-reach.tsv	id.kemenag/0905	-	all	all	-
+id-kemenag	biaknumfor-2*	id-kemenag-reach.tsv	id.kemenag/3302	-	all	all	-
+id-kemenag	baritoutara-2*	id-kemenag-reach.tsv	id.kemenag/2203	-	all	all	-
+id-kemenag	acehbaratdaya-2*	id-kemenag-reach.tsv	id.kemenag/0102	-	all	all	-
+id-kemenag	samosir-2*	id-kemenag-reach.tsv	id.kemenag/0219	-	all	all	-
+id-kemenag	kepulauansangihe-2*	id-kemenag-reach.tsv	id.kemenag/2905	-	all	all	-
+id-kemenag	gunungsitoli-2*	id-kemenag-reach.tsv	id.kemenag/0227	-	all	all	-
+id-kemenag	pagaralam-2*	id-kemenag-reach.tsv	id.kemenag/0815	-	all	all	-
+id-kemenag	sumbawabarat-2*	id-kemenag-reach.tsv	id.kemenag/1808	-	all	all	-
+id-kemenag	lembata-2*	id-kemenag-reach.tsv	id.kemenag/1906	-	all	all	-
+id-kemenag	acehsingkil-2*	id-kemenag-reach.tsv	id.kemenag/0106	-	all	all	-
+id-kemenag	bulungan-2*	id-kemenag-reach.tsv	id.kemenag/2401	-	all	all	-
+id-kemenag	payakumbuh-2*	id-kemenag-reach.tsv	id.kemenag/0317	-	all	all	-
+id-kemenag	kepulauansula-2*	id-kemenag-reach.tsv	id.kemenag/3205	-	all	all	-
+id-kemenag	kotamobagu-2*	id-kemenag-reach.tsv	id.kemenag/2913	-	all	all	-
+id-kemenag	lannyjaya-2*	id-kemenag-reach.tsv	id.kemenag/3311	-	all	all	-
+id-kemenag	belitungtimur-2*	id-kemenag-reach.tsv	id.kemenag/0906	-	all	all	-
+id-kemenag	sungaipenuh-2*	id-kemenag-reach.tsv	id.kemenag/0611	-	all	all	-
+id-kemenag	asmat-2*	id-kemenag-reach.tsv	id.kemenag/3301	-	all	all	-
+id-kemenag	kepulauanaru-2*	id-kemenag-reach.tsv	id.kemenag/3103	-	all	all	-
+id-kemenag	tomohon-2*	id-kemenag-reach.tsv	id.kemenag/2915	-	all	all	-
+id-kemenag	sibolga-2*	id-kemenag-reach.tsv	id.kemenag/0231	-	all	all	-
+id-kemenag	pariaman-2*	id-kemenag-reach.tsv	id.kemenag/0316	-	all	all	-
+id-kemenag	fakfak-2*	id-kemenag-reach.tsv	id.kemenag/3401	-	all	all	-
+id-kemenag	tual-2*	id-kemenag-reach.tsv	id.kemenag/3111	-	all	all	-
+id-kemenag	subulussalam-2*	id-kemenag-reach.tsv	id.kemenag/0123	-	all	all	-
+id-kemenag	telukbintuni-2*	id-kemenag-reach.tsv	id.kemenag/3411	-	all	all	-
+id-kemenag	malinau-2*	id-kemenag-reach.tsv	id.kemenag/2402	-	all	all	-
+id-kemenag	buruselatan-2*	id-kemenag-reach.tsv	id.kemenag/3102	-	all	all	-
+id-kemenag	kotasolok-2*	id-kemenag-reach.tsv	id.kemenag/0319	-	all	all	-
+id-kemenag	sorongselatan-2*	id-kemenag-reach.tsv	id.kemenag/3409	-	all	all	-
+id-kemenag	padangpanjang-2*	id-kemenag-reach.tsv	id.kemenag/0315	-	all	all	-
+id-kemenag	sabang-2*	id-kemenag-reach.tsv	id.kemenag/0122	-	all	all	-
+id-kemenag	manokwariselatan-2*	id-kemenag-reach.tsv	id.kemenag/3404	-	all	all	-
+id-kemenag	ngawi-2*	id-kemenag-reach.tsv	id.kemenag/1617	-	all	all	-
+id-kemenag	sampang-2*	id-kemenag-reach.tsv	id.kemenag/1623	-	all	all	-
+id-kemenag	trenggalek-2*	id-kemenag-reach.tsv	id.kemenag/1627	-	all	all	-
+id-kemenag	sumbawa-2*	id-kemenag-reach.tsv	id.kemenag/1807	-	all	all	-
+id-kemenag	manggarai-2*	id-kemenag-reach.tsv	id.kemenag/1908	-	all	all	-
+id-kemenag	timortengahselatan-2*	id-kemenag-reach.tsv	id.kemenag/1920	-	all	all	-
+id-kemenag	bone-2*	id-kemenag-reach.tsv	id.kemenag/2603	-	all	all	-
+id-kemenag	muna-2*	id-kemenag-reach.tsv	id.kemenag/2713	-	all	all	-
+id-kemenag	banggai-2*	id-kemenag-reach.tsv	id.kemenag/2801	-	all	all	-
+id-kemenag	morowali-2*	id-kemenag-reach.tsv	id.kemenag/2806	-	all	all	-
+id-kemenag	minahasa-2*	id-kemenag-reach.tsv	id.kemenag/2908	-	all	all	-
+id-kemenag	buru-2*	id-kemenag-reach.tsv	id.kemenag/3101	-	all	all	-
+id-kemenag	manokwari-2*	id-kemenag-reach.tsv	id.kemenag/3403	-	all	all	-
+id-kemenag	padangsidempuan-2*	id-kemenag-reach.tsv	id.kemenag/0229	-	all	all	-
+id-kemenag	bungo-2*	id-kemenag-reach.tsv	id.kemenag/0602	-	all	all	-
+id-kemenag	ogankomeringulu-2*	id-kemenag-reach.tsv	id.kemenag/0810	-	all	all	-
+id-kemenag	bireuen-2*	id-kemenag-reach.tsv	id.kemenag/0113	-	all	all	-
+id-kemenag	maros-2*	id-kemenag-reach.tsv	id.kemenag/2612	-	all	all	-
+id-kemenag	kotawaringinbarat-2*	id-kemenag-reach.tsv	id.kemenag/2207	-	all	all	-
+id-kemenag	karimun-2*	id-kemenag-reach.tsv	id.kemenag/0502	-	all	all	-
+id-kemenag	tabalong-2*	id-kemenag-reach.tsv	id.kemenag/2108	-	all	all	-
+id-kemenag	tolitoli-2*	id-kemenag-reach.tsv	id.kemenag/2812	-	all	all	-
+id-kemenag	majene-2*	id-kemenag-reach.tsv	id.kemenag/3001	-	all	all	-
+id-kemenag	pulaumorotai-2*	id-kemenag-reach.tsv	id.kemenag/3207	-	all	all	-
 za-mjc	cape-town-*	za-cape.tsv	index	-	index	all	-
 za-mjc	cape-town-*	za-cape.tsv	za.cape	index	all	all	-
 za-mjc	cape-town-*	za-cape.tsv	za.cape	za.jamiat.shafii	all	month	za-jamiat/cpt-{yyyy}
 ca-toronto	*	ca-toronto.tsv	index	-	index	all	-
 ca-toronto	*	ca-toronto.tsv	ca.toronto	index	all	excused	-
+# IRN is read by hand each December since ruling R189 (sources.tsv: manual), so no capture arrives for these three recipes; they rest here for the day bonnetid.info serves plain tables again.
 no-irn	*	no-irn.tsv	index	-	index	all	-
 # IRN's Oslo and Trondheim calendars are also no.cautious's member rows (no-cautious.tsv, member no.irn, at IRN's own points); Tromsø is not a no.cautious member row.
 # Prove adds a capture only where it holds days the gate does not: the 2026 captures add nothing beside the hand-read off-irn-*-2026.txt rows (a prove dry run of 12 Nov 2026), a new year's capture its row.
@@ -330,3 +770,222 @@ no-irn	*	no-irn.tsv	index	-	index	all	-
 no-irn	oslo-*	no-cautious.tsv	no.cautious	no.irn	59.91273,10.74609	all	-
 no-irn	trondheim-*	no-cautious.tsv	no.cautious	no.irn	63.43049,10.39506	all	-
 us-chicago	*	us-chicago.tsv	us.chicago	index	index	all	-
+# ESA's towns (eg-esa-reach.tsv, ruling R181 of 13 Nov 2026): each monitored town's growing table read across its reach
+# as its own point's rows are, a line per town by the fetcher's key (the town's unit id).
+eg-esa	cairo	eg-esa-reach.tsv	eg.esa/cairo	-	all	all	-
+eg-esa	alexandria	eg-esa-reach.tsv	eg.esa/alexandria	-	all	all	-
+eg-esa	aswan	eg-esa-reach.tsv	eg.esa/aswan	-	all	all	-
+eg-esa	marsa-matruh	eg-esa-reach.tsv	eg.esa/marsa-matruh	-	all	all	-
+eg-esa	el-arish	eg-esa-reach.tsv	eg.esa/el-arish	-	all	all	-
+eg-esa	sallum	eg-esa-reach.tsv	eg.esa/sallum	-	all	all	-
+eg-esa	sidi-barrani	eg-esa-reach.tsv	eg.esa/sidi-barrani	-	all	all	-
+eg-esa	siwa	eg-esa-reach.tsv	eg.esa/siwa	-	all	all	-
+eg-esa	halaib	eg-esa-reach.tsv	eg.esa/halaib	-	all	all	-
+eg-esa	rafah	eg-esa-reach.tsv	eg.esa/rafah	-	all	all	-
+eg-esa	taba	eg-esa-reach.tsv	eg.esa/taba	-	all	all	-
+eg-esa	sharm-el-sheikh	eg-esa-reach.tsv	eg.esa/sharm-el-sheikh	-	all	all	-
+eg-esa	hurghada	eg-esa-reach.tsv	eg.esa/hurghada	-	all	all	-
+eg-esa	kharga	eg-esa-reach.tsv	eg.esa/kharga	-	all	all	-
+eg-esa	mut	eg-esa-reach.tsv	eg.esa/mut	-	all	all	-
+eg-esa	bawiti	eg-esa-reach.tsv	eg.esa/bawiti	-	all	all	-
+eg-esa	luxor	eg-esa-reach.tsv	eg.esa/luxor	-	all	all	-
+eg-esa	quseir	eg-esa-reach.tsv	eg.esa/quseir	-	all	all	-
+eg-esa	port-said	eg-esa-reach.tsv	eg.esa/port-said	-	all	all	-
+eg-esa	el-tor	eg-esa-reach.tsv	eg.esa/el-tor	-	all	all	-
+eg-esa	saint-catherine	eg-esa-reach.tsv	eg.esa/saint-catherine	-	all	all	-
+eg-esa	edfu	eg-esa-reach.tsv	eg.esa/edfu	-	all	all	-
+eg-esa	el-dabaa	eg-esa-reach.tsv	eg.esa/el-dabaa	-	all	all	-
+eg-esa	damietta	eg-esa-reach.tsv	eg.esa/damietta	-	all	all	-
+eg-esa	ras-gharib	eg-esa-reach.tsv	eg.esa/ras-gharib	-	all	all	-
+eg-esa	shalatin	eg-esa-reach.tsv	eg.esa/shalatin	-	all	all	-
+eg-esa	farafra	eg-esa-reach.tsv	eg.esa/farafra	-	all	all	-
+eg-esa	nuweiba	eg-esa-reach.tsv	eg.esa/nuweiba	-	all	all	-
+eg-esa	suez	eg-esa-reach.tsv	eg.esa/suez	-	all	all	-
+eg-esa	dahab	eg-esa-reach.tsv	eg.esa/dahab	-	all	all	-
+# JAKIM's zone towns (my-jakim-cities.tsv, rulings R225-R226): e-solat prints one table for a whole zone, so each
+# new year of a zone's table is read at the own point of every city of the app's list on that zone's list too
+# (`all`: the points the towns file reads that zone at), a line per zone that has such towns. The bare line above
+# still reads every capture at its zone's unit in my-jakim.tsv: these name another gate file, so it applies as before.
+my-jakim	JHR02-2*	my-jakim-cities.tsv	my.jakim/JHR02	-	all	all	-
+my-jakim	JHR03-2*	my-jakim-cities.tsv	my.jakim/JHR03	-	all	all	-
+my-jakim	JHR04-2*	my-jakim-cities.tsv	my.jakim/JHR04	-	all	all	-
+my-jakim	KDH01-2*	my-jakim-cities.tsv	my.jakim/KDH01	-	all	all	-
+my-jakim	KDH02-2*	my-jakim-cities.tsv	my.jakim/KDH02	-	all	all	-
+my-jakim	KDH04-2*	my-jakim-cities.tsv	my.jakim/KDH04	-	all	all	-
+my-jakim	KDH05-2*	my-jakim-cities.tsv	my.jakim/KDH05	-	all	all	-
+my-jakim	KDH06-2*	my-jakim-cities.tsv	my.jakim/KDH06	-	all	all	-
+my-jakim	KTN01-2*	my-jakim-cities.tsv	my.jakim/KTN01	-	all	all	-
+my-jakim	KTN02-2*	my-jakim-cities.tsv	my.jakim/KTN02	-	all	all	-
+my-jakim	MLK01-2*	my-jakim-cities.tsv	my.jakim/MLK01	-	all	all	-
+my-jakim	NGS01-2*	my-jakim-cities.tsv	my.jakim/NGS01	-	all	all	-
+my-jakim	NGS02-2*	my-jakim-cities.tsv	my.jakim/NGS02	-	all	all	-
+my-jakim	NGS03-2*	my-jakim-cities.tsv	my.jakim/NGS03	-	all	all	-
+my-jakim	PHG02-2*	my-jakim-cities.tsv	my.jakim/PHG02	-	all	all	-
+my-jakim	PHG03-2*	my-jakim-cities.tsv	my.jakim/PHG03	-	all	all	-
+my-jakim	PHG04-2*	my-jakim-cities.tsv	my.jakim/PHG04	-	all	all	-
+my-jakim	PLS01-2*	my-jakim-cities.tsv	my.jakim/PLS01	-	all	all	-
+my-jakim	PNG01-2*	my-jakim-cities.tsv	my.jakim/PNG01	-	all	all	-
+my-jakim	PRK01-2*	my-jakim-cities.tsv	my.jakim/PRK01	-	all	all	-
+my-jakim	PRK02-2*	my-jakim-cities.tsv	my.jakim/PRK02	-	all	all	-
+my-jakim	PRK05-2*	my-jakim-cities.tsv	my.jakim/PRK05	-	all	all	-
+my-jakim	PRK06-2*	my-jakim-cities.tsv	my.jakim/PRK06	-	all	all	-
+my-jakim	SBH03-2*	my-jakim-cities.tsv	my.jakim/SBH03	-	all	all	-
+my-jakim	SBH07-2*	my-jakim-cities.tsv	my.jakim/SBH07	-	all	all	-
+my-jakim	SBH08-2*	my-jakim-cities.tsv	my.jakim/SBH08	-	all	all	-
+my-jakim	SBH09-2*	my-jakim-cities.tsv	my.jakim/SBH09	-	all	all	-
+my-jakim	SGR01-2*	my-jakim-cities.tsv	my.jakim/SGR01	-	all	all	-
+my-jakim	SGR02-2*	my-jakim-cities.tsv	my.jakim/SGR02	-	all	all	-
+my-jakim	SGR03-2*	my-jakim-cities.tsv	my.jakim/SGR03	-	all	all	-
+my-jakim	SWK01-2*	my-jakim-cities.tsv	my.jakim/SWK01	-	all	all	-
+my-jakim	SWK02-2*	my-jakim-cities.tsv	my.jakim/SWK02	-	all	all	-
+my-jakim	SWK03-2*	my-jakim-cities.tsv	my.jakim/SWK03	-	all	all	-
+my-jakim	SWK04-2*	my-jakim-cities.tsv	my.jakim/SWK04	-	all	all	-
+my-jakim	SWK05-2*	my-jakim-cities.tsv	my.jakim/SWK05	-	all	all	-
+my-jakim	SWK06-2*	my-jakim-cities.tsv	my.jakim/SWK06	-	all	all	-
+my-jakim	SWK07-2*	my-jakim-cities.tsv	my.jakim/SWK07	-	all	all	-
+my-jakim	SWK08-2*	my-jakim-cities.tsv	my.jakim/SWK08	-	all	all	-
+my-jakim	TRG01-2*	my-jakim-cities.tsv	my.jakim/TRG01	-	all	all	-
+my-jakim	TRG04-2*	my-jakim-cities.tsv	my.jakim/TRG04	-	all	all	-
+my-jakim	WLY01-2*	my-jakim-cities.tsv	my.jakim/WLY01	-	all	all	-
+my-jakim	WLY02-2*	my-jakim-cities.tsv	my.jakim/WLY02	-	all	all	-
+# And the zone towns' imsak rows (my-jakim-cities.tsv reads each town's imsak beside its day's table): a line per zone.
+my-jakim	JHR02-2*-imsak	my-jakim-cities.tsv	my.jakim/JHR02	-	all	all	-
+my-jakim	JHR03-2*-imsak	my-jakim-cities.tsv	my.jakim/JHR03	-	all	all	-
+my-jakim	JHR04-2*-imsak	my-jakim-cities.tsv	my.jakim/JHR04	-	all	all	-
+my-jakim	KDH01-2*-imsak	my-jakim-cities.tsv	my.jakim/KDH01	-	all	all	-
+my-jakim	KDH02-2*-imsak	my-jakim-cities.tsv	my.jakim/KDH02	-	all	all	-
+my-jakim	KDH04-2*-imsak	my-jakim-cities.tsv	my.jakim/KDH04	-	all	all	-
+my-jakim	KDH05-2*-imsak	my-jakim-cities.tsv	my.jakim/KDH05	-	all	all	-
+my-jakim	KDH06-2*-imsak	my-jakim-cities.tsv	my.jakim/KDH06	-	all	all	-
+my-jakim	KTN01-2*-imsak	my-jakim-cities.tsv	my.jakim/KTN01	-	all	all	-
+my-jakim	KTN02-2*-imsak	my-jakim-cities.tsv	my.jakim/KTN02	-	all	all	-
+my-jakim	MLK01-2*-imsak	my-jakim-cities.tsv	my.jakim/MLK01	-	all	all	-
+my-jakim	NGS01-2*-imsak	my-jakim-cities.tsv	my.jakim/NGS01	-	all	all	-
+my-jakim	NGS02-2*-imsak	my-jakim-cities.tsv	my.jakim/NGS02	-	all	all	-
+my-jakim	NGS03-2*-imsak	my-jakim-cities.tsv	my.jakim/NGS03	-	all	all	-
+my-jakim	PHG02-2*-imsak	my-jakim-cities.tsv	my.jakim/PHG02	-	all	all	-
+my-jakim	PHG03-2*-imsak	my-jakim-cities.tsv	my.jakim/PHG03	-	all	all	-
+my-jakim	PHG04-2*-imsak	my-jakim-cities.tsv	my.jakim/PHG04	-	all	all	-
+my-jakim	PLS01-2*-imsak	my-jakim-cities.tsv	my.jakim/PLS01	-	all	all	-
+my-jakim	PNG01-2*-imsak	my-jakim-cities.tsv	my.jakim/PNG01	-	all	all	-
+my-jakim	PRK01-2*-imsak	my-jakim-cities.tsv	my.jakim/PRK01	-	all	all	-
+my-jakim	PRK02-2*-imsak	my-jakim-cities.tsv	my.jakim/PRK02	-	all	all	-
+my-jakim	PRK05-2*-imsak	my-jakim-cities.tsv	my.jakim/PRK05	-	all	all	-
+my-jakim	PRK06-2*-imsak	my-jakim-cities.tsv	my.jakim/PRK06	-	all	all	-
+my-jakim	SBH03-2*-imsak	my-jakim-cities.tsv	my.jakim/SBH03	-	all	all	-
+my-jakim	SBH07-2*-imsak	my-jakim-cities.tsv	my.jakim/SBH07	-	all	all	-
+my-jakim	SBH08-2*-imsak	my-jakim-cities.tsv	my.jakim/SBH08	-	all	all	-
+my-jakim	SBH09-2*-imsak	my-jakim-cities.tsv	my.jakim/SBH09	-	all	all	-
+my-jakim	SGR01-2*-imsak	my-jakim-cities.tsv	my.jakim/SGR01	-	all	all	-
+my-jakim	SGR02-2*-imsak	my-jakim-cities.tsv	my.jakim/SGR02	-	all	all	-
+my-jakim	SGR03-2*-imsak	my-jakim-cities.tsv	my.jakim/SGR03	-	all	all	-
+my-jakim	SWK01-2*-imsak	my-jakim-cities.tsv	my.jakim/SWK01	-	all	all	-
+my-jakim	SWK02-2*-imsak	my-jakim-cities.tsv	my.jakim/SWK02	-	all	all	-
+my-jakim	SWK03-2*-imsak	my-jakim-cities.tsv	my.jakim/SWK03	-	all	all	-
+my-jakim	SWK04-2*-imsak	my-jakim-cities.tsv	my.jakim/SWK04	-	all	all	-
+my-jakim	SWK05-2*-imsak	my-jakim-cities.tsv	my.jakim/SWK05	-	all	all	-
+my-jakim	SWK06-2*-imsak	my-jakim-cities.tsv	my.jakim/SWK06	-	all	all	-
+my-jakim	SWK07-2*-imsak	my-jakim-cities.tsv	my.jakim/SWK07	-	all	all	-
+my-jakim	SWK08-2*-imsak	my-jakim-cities.tsv	my.jakim/SWK08	-	all	all	-
+my-jakim	TRG01-2*-imsak	my-jakim-cities.tsv	my.jakim/TRG01	-	all	all	-
+my-jakim	TRG04-2*-imsak	my-jakim-cities.tsv	my.jakim/TRG04	-	all	all	-
+my-jakim	WLY01-2*-imsak	my-jakim-cities.tsv	my.jakim/WLY01	-	all	all	-
+my-jakim	WLY02-2*-imsak	my-jakim-cities.tsv	my.jakim/WLY02	-	all	all	-
+# Türkiye's 84 il centres (tr-diyanet-reach.tsv, ruling R255 of 14 Nov 2026): every unit's growing table is read across
+# its reach as its own point's rows are, under the same pinned copy as the own row, so the reach still replays every own
+# table. Two lines, as for tr-diyanet.tsv above. The first clones the reach rows that already read an earlier capture
+# of the same key, at each point they stand at; it needs nothing from the monitor's index, which still names nine of
+# the older keys (antalya, bursa, catalca, diyarbakir, gaziantep, izmir, konya, sile, silivri) as bare `tr.diyanet` at
+# a point until the fetcher's next run rewrites it (the fetcher names all 84 by unit since ruling R202). The second
+# reads a capture at `all` the points the reach file reads its unit at, the unit taken from the index: the only way in
+# for the 62 il centres of 12–13 November 2026, whose reach rows stand on tables read by hand and so have no earlier
+# capture to clone; a capture whose index line names no unit is not read by it (the first line reads it). A row both
+# lines call for is planned once. A row is added only for a capture that holds days the point does not hold yet.
+# A new day later than a unit's limit at a point of its reach is left out and the unit demoted (ruling R185) until its
+# limits are measured again (docs/MONITOR.md, "Türkiye's limits"): the 62 il centres of 12–13 November 2026 were
+# measured on their 2026 tables alone.
+tr-diyanet	*	tr-diyanet-reach.tsv	same	*	same	all	-
+tr-diyanet	*	tr-diyanet-reach.tsv	index	-	all	all	-
+# The second trust audit's G26 (14 Nov 2026, ruling R270): the reach rows of every other entry whose measured units reach
+# past their own points. A new capture of a table a unit is checked on at its own point is read at every point of that
+# unit's reach too: a year-named table by the unit at `all` the reach's points, a table the fetcher grows under one key
+# (Habous's months, Amman's, Cape Town's MJC month, Diyanet's Zürich read as FIDS's) by cloning the reach rows that read
+# its earlier capture (`same`).
+ma-habous	*	ma-habous-reach.tsv	same	*	same	all	-
+jo-awqaf	*	jo-awqaf-reach.tsv	same	*	same	all	-
+za-mjc	*	za-mjc-reach.tsv	same	*	same	all	-
+tr-diyanet-europe	*	ch-fids-reach.tsv	same	*	same	all	-
+# Diyanet's European cities joined the gate on 16 Nov 2026 (ruling R293): a new Diyanet city capture is read at every
+# point of its reach by cloning the reach rows that read its earlier capture.
+tr-diyanet-europe	*	tr-diyanet-europe-reach.tsv	same	*	same	all	-
+my-jakim	JHR01-2*	my-jakim-reach.tsv	my.jakim/JHR01	-	all	all	-
+my-jakim	JHR01-2*-imsak	my-jakim-reach.tsv	my.jakim/JHR01	-	all	all	-
+my-jakim	JHR02-2*	my-jakim-reach.tsv	my.jakim/JHR02	-	all	all	-
+my-jakim	JHR02-2*-imsak	my-jakim-reach.tsv	my.jakim/JHR02	-	all	all	-
+my-jakim	KTN01-2*	my-jakim-reach.tsv	my.jakim/KTN01	-	all	all	-
+my-jakim	KTN01-2*-imsak	my-jakim-reach.tsv	my.jakim/KTN01	-	all	all	-
+my-jakim	PHG01-2*	my-jakim-reach.tsv	my.jakim/PHG01	-	all	all	-
+my-jakim	PHG01-2*-imsak	my-jakim-reach.tsv	my.jakim/PHG01	-	all	all	-
+my-jakim	PHG06-2*	my-jakim-reach.tsv	my.jakim/PHG06	-	all	all	-
+my-jakim	PHG06-2*-imsak	my-jakim-reach.tsv	my.jakim/PHG06	-	all	all	-
+my-jakim	PLS01-2*	my-jakim-reach.tsv	my.jakim/PLS01	-	all	all	-
+my-jakim	PLS01-2*-imsak	my-jakim-reach.tsv	my.jakim/PLS01	-	all	all	-
+my-jakim	PNG01-2*	my-jakim-reach.tsv	my.jakim/PNG01	-	all	all	-
+my-jakim	PNG01-2*-imsak	my-jakim-reach.tsv	my.jakim/PNG01	-	all	all	-
+my-jakim	SWK08-2*	my-jakim-reach.tsv	my.jakim/SWK08	-	all	all	-
+my-jakim	SWK08-2*-imsak	my-jakim-reach.tsv	my.jakim/SWK08	-	all	all	-
+my-jakim	WLY01-2*	my-jakim-reach.tsv	my.jakim/WLY01	-	all	all	-
+my-jakim	WLY01-2*-imsak	my-jakim-reach.tsv	my.jakim/WLY01	-	all	all	-
+my-jakim	WLY02-2*	my-jakim-reach.tsv	my.jakim/WLY02	-	all	all	-
+my-jakim	WLY02-2*-imsak	my-jakim-reach.tsv	my.jakim/WLY02	-	all	all	-
+# Every other zone's reach (ruling R287): the other 50 zones, most of them read by hand from e-solat on 13 Nov 2026
+# (archive/tables/manual/my-jakim/, archive/tables/imsak/my-jakim/2026-11-13/), have no earlier capture to clone and
+# no line of their own above. A capture of such a zone (its day's table, then its printed imsak, `-imsak`, which only
+# a pattern so named reads) is read at `all` the reach file's points of the unit the index names, as Türkiye's second
+# reach line is; the bare `*` stands aside for the ten zones named above (Labuan's WLY02 the tenth, since the
+# monitor's capture of its 2027 table on 23 Nov 2026), and a row both imsak lines call for is planned once. Without
+# them a zone's next year would grow its own rows alone and CityUnitsTest would halt prove.
+my-jakim	*	my-jakim-reach.tsv	index	-	all	all	-
+my-jakim	*-imsak	my-jakim-reach.tsv	index	-	all	all	-
+# Ruling R310: each JAKIM zone read across all the ground the app hands it (my-jakim-zones-reach.tsv, ReachAreas.AREAS):
+# a new year of a zone is read at every point of the zone's claim too, by the same lines as its reach rows above.
+my-jakim	JHR01-2*	my-jakim-zones-reach.tsv	my.jakim/JHR01	-	all	all	-
+my-jakim	JHR01-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/JHR01	-	all	all	-
+my-jakim	JHR02-2*	my-jakim-zones-reach.tsv	my.jakim/JHR02	-	all	all	-
+my-jakim	JHR02-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/JHR02	-	all	all	-
+my-jakim	KTN01-2*	my-jakim-zones-reach.tsv	my.jakim/KTN01	-	all	all	-
+my-jakim	KTN01-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/KTN01	-	all	all	-
+my-jakim	PHG01-2*	my-jakim-zones-reach.tsv	my.jakim/PHG01	-	all	all	-
+my-jakim	PHG01-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/PHG01	-	all	all	-
+my-jakim	PHG06-2*	my-jakim-zones-reach.tsv	my.jakim/PHG06	-	all	all	-
+my-jakim	PHG06-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/PHG06	-	all	all	-
+my-jakim	PLS01-2*	my-jakim-zones-reach.tsv	my.jakim/PLS01	-	all	all	-
+my-jakim	PLS01-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/PLS01	-	all	all	-
+my-jakim	PNG01-2*	my-jakim-zones-reach.tsv	my.jakim/PNG01	-	all	all	-
+my-jakim	PNG01-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/PNG01	-	all	all	-
+my-jakim	SWK08-2*	my-jakim-zones-reach.tsv	my.jakim/SWK08	-	all	all	-
+my-jakim	SWK08-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/SWK08	-	all	all	-
+my-jakim	WLY01-2*	my-jakim-zones-reach.tsv	my.jakim/WLY01	-	all	all	-
+my-jakim	WLY01-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/WLY01	-	all	all	-
+my-jakim	WLY02-2*	my-jakim-zones-reach.tsv	my.jakim/WLY02	-	all	all	-
+my-jakim	WLY02-2*-imsak	my-jakim-zones-reach.tsv	my.jakim/WLY02	-	all	all	-
+my-jakim	*	my-jakim-zones-reach.tsv	index	-	all	all	-
+my-jakim	*-imsak	my-jakim-zones-reach.tsv	index	-	all	all	-
+ca-toronto	ift-2*	ca-ift-reach.tsv	ca.ift/ca.ift	-	all	all	-
+ca-toronto	iit-2*	ca-iit-reach.tsv	ca.iit/ca.iit	-	all	all	-
+ca-toronto	mac-2*	ca-mac-reach.tsv	ca.mac/ca.mac	-	all	all	-
+qa-calendarhouse	doha-*-2*	qa-calendarhouse-reach.tsv	qa.calendarhouse/doha	-	all	all	-
+qa-calendarhouse	doha-*-2*	qa-calendarhouse-reach.tsv	qa.calendarhouse/al-khor	-	all	all	-
+# The zones a place of the app takes with no town of the zone's list (my-jakim-cities.tsv since G28, ruling R274): its rows grow with each capture as the towns' do.
+my-jakim	PHG05-2*	my-jakim-cities.tsv	my.jakim/PHG05	-	all	all	-
+my-jakim	PHG06-2*	my-jakim-cities.tsv	my.jakim/PHG06	-	all	all	-
+my-jakim	PHG07-2*	my-jakim-cities.tsv	my.jakim/PHG07	-	all	all	-
+my-jakim	PRK04-2*	my-jakim-cities.tsv	my.jakim/PRK04	-	all	all	-
+my-jakim	SBH02-2*	my-jakim-cities.tsv	my.jakim/SBH02	-	all	all	-
+my-jakim	TRG02-2*	my-jakim-cities.tsv	my.jakim/TRG02	-	all	all	-
+my-jakim	PHG05-2*-imsak	my-jakim-cities.tsv	my.jakim/PHG05	-	all	all	-
+my-jakim	PHG06-2*-imsak	my-jakim-cities.tsv	my.jakim/PHG06	-	all	all	-
+my-jakim	PHG07-2*-imsak	my-jakim-cities.tsv	my.jakim/PHG07	-	all	all	-
+my-jakim	PRK04-2*-imsak	my-jakim-cities.tsv	my.jakim/PRK04	-	all	all	-
+my-jakim	SBH02-2*-imsak	my-jakim-cities.tsv	my.jakim/SBH02	-	all	all	-
+my-jakim	TRG02-2*-imsak	my-jakim-cities.tsv	my.jakim/TRG02	-	all	all	-

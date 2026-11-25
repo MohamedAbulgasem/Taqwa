@@ -15,6 +15,10 @@ dependencies {
     implementation(compose.material3)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.glance.appwidget)
+    // The debug build's watch card gallery (src/debug) gives its Prayer view model a settings store
+    // of its own. DataStore already ships inside :shared at this version; :shared takes it as
+    // `implementation`, so only the debug source set's compiler needs to be shown it.
+    debugImplementation(libs.datastore.preferences)
 }
 
 // ── Store signing ─────────────────────────────────────────────────────────────────
@@ -68,8 +72,8 @@ android {
         applicationId = "world.taqwa.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 45
-        versionName = "1.6.0"
+        versionCode = 46
+        versionName = "1.7.0"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21

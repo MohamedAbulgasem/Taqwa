@@ -5,6 +5,8 @@
 #   (fit).
 # - bik-prishtina.txt: Prishtina's own table (the base less a minute), at the app's Prishtina point,
 #   held out.
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	xk.bik	archive/tables/moral-auth-world/europe/verify/bik-prishtina.txt	S	the towns' sunrise margin is this table's excess over the half minute, and 5 s (Balkans.kt TOWN_SUNRISE, proof 7b)
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/europe/verify/bik-imsak.txt	xk.bik	42.5	21.0	Europe/Belgrade	E S D A M I	daily	standard	fit	the base table, imsak
 archive/tables/moral-auth-world/europe/verify/bik-sabah.txt	xk.bik	42.5	21.0	Europe/Belgrade	F - - - - -	daily	-	fit	the base table, Sabah

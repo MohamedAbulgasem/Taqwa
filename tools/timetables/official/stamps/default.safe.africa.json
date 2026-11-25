@@ -1,0 +1,304 @@
+{
+  "entry": "default.safe.africa",
+  "class": "D (none)",
+  "engineHash": "d15d4c9f2610a3d9",
+  "broken": 0,
+  "places": 11,
+  "first": "2026-01-01",
+  "last": "2026-12-31",
+  "checked": ["2026-01-01..2026-12-31"],
+  "checkedByEvent": {
+    "fajr": ["2026-01-01..2026-12-31"],
+    "sunrise": ["2026-01-01..2026-12-31"],
+    "dhuhr": ["2026-01-01..2026-12-31"],
+    "asrStandard": ["2026-01-01..2026-12-31"],
+    "asrHanafi": ["2026-01-01..2026-12-31"],
+    "maghrib": ["2026-01-01..2026-12-31"],
+    "isha": ["2026-01-01..2026-12-31"],
+    "endOfEating": ["2026-01-01..2026-12-31"]
+  },
+  "placeDays": 4015,
+  "heldOutDays": 4015,
+  "sharedDays": 3285,
+  "tables": 4,
+  "ramadanDays": 330,
+  "outOfOrderDays": 0,
+  "unreadableLines": 0,
+  "repeatedLines": 0,
+  "events": {
+    "fajr": {
+      "checked": 4380,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 4380
+      },
+      "exactShare": 0,
+      "worstLate": 24,
+      "lateLimit": 25,
+      "lateLimitFrom": "entry default.safe.africa",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 4380,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 4380
+      },
+      "exactShare": 0,
+      "worstLate": 6,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry default.safe.africa",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 4380,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 4380
+      },
+      "exactShare": 0,
+      "worstLate": 5,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry default.safe.africa",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 3650,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 397,
+        "3+": 3253
+      },
+      "exactShare": 0,
+      "worstLate": 4,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry default.safe.africa",
+      "overLimit": 0
+    },
+    "asrHanafi": {
+      "checked": 4380,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 605,
+        "3+": 3775
+      },
+      "exactShare": 0,
+      "worstLate": 4,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry default.safe.africa",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 4380,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 174,
+        "3+": 4206
+      },
+      "exactShare": 0,
+      "worstLate": 5,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry default.safe.africa",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 5110,
+      "early": 0,
+      "late": {
+        "0": 0,
+        "1": 9,
+        "2": 981,
+        "3+": 4120
+      },
+      "exactShare": 0,
+      "worstLate": 18,
+      "lateLimit": 19,
+      "lateLimitFrom": "entry default.safe.africa",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 3650,
+      "lateEnd": 0,
+      "late": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3+": 3650
+      },
+      "exactShare": 0,
+      "worstLate": 10,
+      "lateLimit": 11,
+      "lateLimitFrom": "entry default.safe.africa",
+      "overLimit": 0
+    }
+  },
+  "heldOut": {
+    "placeDays": 4015,
+    "ramadanDays": 330,
+    "checkedByEvent": {
+      "fajr": ["2026-01-01..2026-12-31"],
+      "sunrise": ["2026-01-01..2026-12-31"],
+      "dhuhr": ["2026-01-01..2026-12-31"],
+      "asrStandard": ["2026-01-01..2026-12-31"],
+      "asrHanafi": ["2026-01-01..2026-12-31"],
+      "maghrib": ["2026-01-01..2026-12-31"],
+      "isha": ["2026-01-01..2026-12-31"],
+      "endOfEating": ["2026-01-01..2026-12-31"]
+    },
+    "events": {
+      "fajr": {
+        "checked": 4015,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 4015
+        },
+        "exactShare": 0,
+        "worstLate": 24,
+        "lateLimit": 25,
+        "lateLimitFrom": "entry default.safe.africa",
+        "overLimit": 0
+      },
+      "sunrise": {
+        "checked": 4015,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 4015
+        },
+        "exactShare": 0,
+        "worstLate": 6,
+        "lateLimit": 7,
+        "lateLimitFrom": "entry default.safe.africa",
+        "overLimit": 0
+      },
+      "dhuhr": {
+        "checked": 4015,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 4015
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 7,
+        "lateLimitFrom": "entry default.safe.africa",
+        "overLimit": 0
+      },
+      "asrStandard": {
+        "checked": 3650,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 397,
+          "3+": 3253
+        },
+        "exactShare": 0,
+        "worstLate": 4,
+        "lateLimit": 7,
+        "lateLimitFrom": "entry default.safe.africa",
+        "overLimit": 0
+      },
+      "asrHanafi": {
+        "checked": 4015,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 568,
+          "3+": 3447
+        },
+        "exactShare": 0,
+        "worstLate": 4,
+        "lateLimit": 7,
+        "lateLimitFrom": "entry default.safe.africa",
+        "overLimit": 0
+      },
+      "maghrib": {
+        "checked": 4015,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 158,
+          "3+": 3857
+        },
+        "exactShare": 0,
+        "worstLate": 5,
+        "lateLimit": 7,
+        "lateLimitFrom": "entry default.safe.africa",
+        "overLimit": 0
+      },
+      "isha": {
+        "checked": 4015,
+        "early": 0,
+        "late": {
+          "0": 0,
+          "1": 9,
+          "2": 897,
+          "3+": 3109
+        },
+        "exactShare": 0,
+        "worstLate": 18,
+        "lateLimit": 19,
+        "lateLimitFrom": "entry default.safe.africa",
+        "overLimit": 0
+      },
+      "endOfEating": {
+        "checked": 3650,
+        "lateEnd": 0,
+        "late": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 3650
+        },
+        "exactShare": 0,
+        "worstLate": 10,
+        "lateLimit": 11,
+        "lateLimitFrom": "entry default.safe.africa",
+        "overLimit": 0
+      }
+    }
+  },
+  "lateLimits": {
+    "entry default.safe.africa: 7 min": {
+      "reason": "Jamiat's and Darul Ihsan's floors (Dhuhr + 5, Maghrib + 3) with the safety cushion on top: sunrise up to 6 min before the printed one, Dhuhr and Maghrib up to 5 min after it, Asr up to 4 (engine wave W5, safe-default-africa.tsv).",
+      "events": ["sunrise", "dhuhr", "asrStandard", "asrHanafi", "maghrib"]
+    },
+    "entry default.safe.africa: 11 min": {
+      "reason": "The fast begins 2 min before the 19.5° dawn, the earliest convention on the continent: 4 to 9 min before Jamiat's printed sehri, and up to 10 min before Darul Ihsan's Fajr at Dar es Salaam and Zanzibar, whose tables print no sehri (engine wave W5, safe-default-africa.tsv).",
+      "events": ["endOfEating"]
+    },
+    "entry default.safe.africa: 19 min": {
+      "reason": "This region's Isha is the latest convention in use (18° + 2 min); Darul Ihsan prints a Shafi'i Isha at 15° beside it, 14 to 18 min earlier at Dar es Salaam and Zanzibar, and its Hanafi 18° up to 5 min earlier (engine wave W5, safe-default-africa.tsv).",
+      "events": ["isha"]
+    },
+    "entry default.safe.africa: 25 min": {
+      "reason": "This region's Fajr is the latest dawn convention in use in Africa (15°); Darul Ihsan's tables for Dar es Salaam and Zanzibar and Jamiat's for South Africa print an 18° dawn, 15 to 24 min before it (engine wave W5, safe-default-africa.tsv).",
+      "events": ["fajr"]
+    }
+  }
+}

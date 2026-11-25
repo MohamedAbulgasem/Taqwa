@@ -1,0 +1,23 @@
+# Gate points that lie in another country than their entry's, on purpose (rulings R258 and R259, GpsCountryTest).
+# GpsCountryTest resolves every gate point the way a GPS fix is resolved (FixCountry: the nearest app city, and beside
+# it the row's zone's country where that zone says the point may be across a border, the day then held to both) and
+# fails on a point that loses its entry's country that is not listed here, and on a listed point that no longer does.
+# A point listed here is one where that is right: the table is read at a place across the border on purpose. Distances
+# and names only, never a time (ruling R69).
+#
+# lat, lon: the row's point, as the test prints it; entry: the row's entry; country: the nearest app city's country;
+# why: where the point is and why the row stands there.
+lat	lon	entry	country	why
+32.701900	35.303300	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Nazareth (IL, 0.6 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+32.519400	35.153600	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Umm el Faḥm (IL, 0.2 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+32.792200	35.531200	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Tiberias (IL, 0.2 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+32.964600	35.496000	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Safed (IL, 0.0 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+32.497300	35.497300	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Bet She’an (IL, 0.1 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+32.794000	34.989600	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Haifa (IL, 2.3 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+32.928100	35.082000	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Acre (IL, 0.5 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+32.114600	34.976200	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Kafr Qāsim (IL, 0.1 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+32.266200	35.008900	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Eṭ Ṭaiyiba (IL, 0.0 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+31.251800	34.791300	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Beersheba (IL, 0.0 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+32.050400	34.752200	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Jaffa (IL, 0.0 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+31.951000	34.888100	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Lod (IL, 0.5 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table
+31.929300	34.873000	ps.iftaa	IL	inside Israel: the PA Iftaa's table of an Arab town in Israel (a unit for the nearer places in Palestine), at the town (nearest app city Ramla (IL, 1.0 km)); a fix here follows Israel's entry, which safe-default-levant.tsv checks against the same table

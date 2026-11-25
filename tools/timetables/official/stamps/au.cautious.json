@@ -1,9 +1,9 @@
 {
   "entry": "au.cautious",
   "class": "C",
-  "engineHash": "956d5519b3078db9",
+  "engineHash": "65dd27ed7edf8530",
   "broken": 0,
-  "places": 3,
+  "places": 2,
   "first": "2026-06-16",
   "last": "2027-06-05",
   "checked": ["2026-06-16..2026-12-01", "2026-12-03", "2026-12-05..2026-12-31", "2027-01-02..2027-01-30", "2027-02-01..2027-03-01", "2027-03-03..2027-04-29", "2027-05-01..2027-06-05"],
@@ -16,9 +16,11 @@
     "isha": ["2026-06-16..2026-12-01", "2026-12-03", "2026-12-05..2026-12-31", "2027-01-02..2027-01-30", "2027-02-01..2027-03-01", "2027-03-03..2027-04-29", "2027-05-01..2027-06-05"],
     "endOfEating": ["2026-06-16..2026-12-01", "2026-12-03", "2026-12-05..2026-12-31", "2027-01-02..2027-01-30", "2027-02-01..2027-03-01", "2027-03-03..2027-04-29", "2027-05-01..2027-06-05"]
   },
-  "placeDays": 729,
-  "heldOutDays": 729,
-  "ramadanDays": 56,
+  "placeDays": 380,
+  "heldOutDays": 31,
+  "sharedDays": 349,
+  "tables": 1,
+  "ramadanDays": 28,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
@@ -130,16 +132,25 @@
     }
   },
   "heldOut": {
-    "placeDays": 729,
-    "ramadanDays": 56,
+    "placeDays": 31,
+    "ramadanDays": 0,
+    "checkedByEvent": {
+      "fajr": ["2026-09-25..2026-10-25"],
+      "sunrise": ["2026-09-25..2026-10-25"],
+      "dhuhr": ["2026-09-25..2026-10-25"],
+      "asrStandard": ["2026-09-25..2026-10-25"],
+      "maghrib": ["2026-09-25..2026-10-25"],
+      "isha": ["2026-09-25..2026-10-25"],
+      "endOfEating": ["2026-09-25..2026-10-25"]
+    },
     "events": {
       "fajr": {
-        "checked": 729,
+        "checked": 31,
         "early": 0,
         "late": {
           "0": 0,
-          "1": 222,
-          "2": 507,
+          "1": 18,
+          "2": 13,
           "3+": 0
         },
         "exactShare": 0,
@@ -149,96 +160,100 @@
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 729,
+        "checked": 62,
         "lateEnd": 0,
         "late": {
           "0": 0,
-          "1": 89,
-          "2": 4,
-          "3+": 636
+          "1": 59,
+          "2": 3,
+          "3+": 0
         },
         "exactShare": 0,
-        "worstLate": 9,
+        "worstLate": 2,
         "lateLimit": 9,
         "lateLimitFrom": "entry au.cautious",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 729,
+        "checked": 31,
         "early": 0,
         "late": {
-          "0": 84,
-          "1": 186,
-          "2": 304,
-          "3+": 155
+          "0": 0,
+          "1": 6,
+          "2": 18,
+          "3+": 7
         },
-        "exactShare": 0.1152,
-        "worstLate": 4,
+        "exactShare": 0,
+        "worstLate": 3,
         "lateLimit": 4,
         "lateLimitFrom": "entry au.cautious",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 729,
+        "checked": 31,
         "early": 0,
         "late": {
-          "0": 72,
-          "1": 58,
-          "2": 48,
-          "3+": 551
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 31
         },
-        "exactShare": 0.0988,
-        "worstLate": 18,
+        "exactShare": 0,
+        "worstLate": 14,
         "lateLimit": 18,
         "lateLimitFrom": "entry au.cautious",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 729,
+        "checked": 62,
         "early": 0,
         "late": {
           "0": 0,
-          "1": 51,
-          "2": 42,
-          "3+": 636
+          "1": 41,
+          "2": 21,
+          "3+": 0
         },
         "exactShare": 0,
-        "worstLate": 9,
+        "worstLate": 2,
         "lateLimit": 9,
         "lateLimitFrom": "entry au.cautious",
         "overLimit": 0
       },
       "isha": {
-        "checked": 729,
+        "checked": 31,
         "early": 0,
         "late": {
-          "0": 338,
-          "1": 232,
-          "2": 16,
-          "3+": 143
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3+": 31
         },
-        "exactShare": 0.4636,
+        "exactShare": 0,
         "worstLate": 10,
         "lateLimit": 10,
         "lateLimitFrom": "entry au.cautious",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 729,
+        "checked": 45,
         "lateEnd": 0,
         "late": {
-          "0": 29,
-          "1": 652,
-          "2": 48,
+          "0": 0,
+          "1": 30,
+          "2": 15,
           "3+": 0
         },
-        "exactShare": 0.0398,
+        "exactShare": 0,
         "worstLate": 2,
         "lateLimit": 2,
         "lateLimitFrom": "entry au.cautious",
         "overLimit": 0
       }
     }
+  },
+  "replays": {
+    "places": 1,
+    "placeDays": 349
   },
   "members": {
     "au.lma": {

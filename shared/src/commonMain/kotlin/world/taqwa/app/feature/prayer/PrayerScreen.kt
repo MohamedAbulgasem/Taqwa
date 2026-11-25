@@ -1,6 +1,15 @@
 package world.taqwa.app.feature.prayer
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import kotlin.time.Duration
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -157,6 +166,21 @@ fun PrayerScreen(
     onMatchMyMosque: () -> Unit = {},
     /** A one-time card was answered, by either of its actions. */
     onAnswerCard: (OneTimeCard) -> Unit = {},
+    /**
+     * Home's watch card, above the Qibla card in the one-time card's slot ([HomeWatchCard]): what it
+     * shows. Nothing by default, and never beside a one-time card or in a launch that showed one.
+     */
+    watchCard: WatchCardUi = WatchCardUi.Hidden,
+    /** The watch card's tap: its step asked of the watch. */
+    onOpenWatchCard: () -> Unit = {},
+    /** The watch card's x, with how long its undo line stays for this reader ([undoWindow]). */
+    onDismissWatchCard: (window: Duration) -> Unit = {},
+    /** Undo, on the line the watch card's x leaves in its place for a while. */
+    onUndoWatchCard: () -> Unit = {},
+    /** Any finger, pen or mouse put down on Home, and any scroll: the watch card is put in only before the first. */
+    onHomeTouched: () -> Unit = {},
+    /** A finger, pen or mouse button put down on Home (true), and the last one lifted (false): the undo line never folds under one. */
+    onHomePressed: (pressed: Boolean) -> Unit = {},
 ) {
     val colors = LocalTaqwaColors.current
     val actions = ReadyActions(
@@ -167,12 +191,40 @@ fun PrayerScreen(
         onOpenAboutTimes = onOpenAboutTimes,
         onMatchMyMosque = onMatchMyMosque,
         onAnswerCard = onAnswerCard,
+        onOpenWatchCard = onOpenWatchCard,
+        onDismissWatchCard = onDismissWatchCard,
+        onUndoWatchCard = onUndoWatchCard,
+        onHomeTouched = onHomeTouched,
     )
-    Box(Modifier.fillMaxSize().background(colors.background)) {
+    val touched by rememberUpdatedState(onHomeTouched)
+    val pressed by rememberUpdatedState(onHomePressed)
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(colors.background)
+            // Every touch on Home, seen before anything under it and taken from none of them: the
+            // watch card is put in only before the first, so the Qibla card never moves under a thumb.
+            // Then the last finger's lift, seen after Home's own buttons have had it (the Final pass),
+            // so an Undo pressed as its line's time runs out is taken before the line folds.
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+                    touched()
+                    pressed(true)
+                    try {
+                        do {
+                            val event = awaitPointerEvent(PointerEventPass.Final)
+                        } while (event.changes.any { it.pressed })
+                    } finally {
+                        pressed(false)
+                    }
+                }
+            },
+    ) {
         when (state) {
             PrayerUiState.Loading -> Unit
             PrayerUiState.NeedsLocation -> NeedsLocationBody(onChooseCity, onOpenLocationSettings)
-            is PrayerUiState.Ready -> ReadyBody(state, actions, exactAlarmsOff)
+            is PrayerUiState.Ready -> ReadyBody(state, actions, exactAlarmsOff, watchCard)
         }
     }
 }
@@ -186,6 +238,10 @@ private class ReadyActions(
     val onOpenAboutTimes: () -> Unit,
     val onMatchMyMosque: () -> Unit,
     val onAnswerCard: (OneTimeCard) -> Unit,
+    val onOpenWatchCard: () -> Unit,
+    val onDismissWatchCard: (Duration) -> Unit,
+    val onUndoWatchCard: () -> Unit,
+    val onHomeTouched: () -> Unit,
 )
 
 @Composable
@@ -193,6 +249,7 @@ private fun ReadyBody(
     state: PrayerUiState.Ready,
     actions: ReadyActions,
     exactAlarmsOff: Boolean,
+    watchCard: WatchCardUi,
 ) {
     val zone = rememberZone(state.location.timeZoneId)
     val format = LocalPlatformFormat.current
@@ -212,9 +269,9 @@ private fun ReadyBody(
             // the timeline below it, which is the right order for a page you read top to bottom.
             // Sideways there is no room for that order — the ring alone would fill the screen and
             // push every prayer time off the bottom — so the two halves sit side by side instead.
-            LandscapeBody(state, zone, format, maxWidth, maxHeight, actions, exactAlarmsOff, openClockSheet)
+            LandscapeBody(state, zone, format, maxWidth, maxHeight, actions, exactAlarmsOff, openClockSheet, watchCard)
         } else {
-            PortraitBody(state, zone, format, actions, exactAlarmsOff, openClockSheet)
+            PortraitBody(state, zone, format, actions, exactAlarmsOff, openClockSheet, watchCard)
         }
     }
 }
@@ -228,8 +285,11 @@ private fun PortraitBody(
     actions: ReadyActions,
     exactAlarmsOff: Boolean,
     onOpenClockSheet: () -> Unit,
+    watchCard: WatchCardUi,
 ) {
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    val scroll = rememberScrollState()
+    ReportScrolls(scroll, actions.onHomeTouched)
+    Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
         Column(Modifier.contentWidth()) {
             CityAndDates(state, actions)
 
@@ -249,7 +309,7 @@ private fun PortraitBody(
             }
             Spacer(Modifier.height(36.dp))
 
-            TimesAndNotes(state, zone, format, actions)
+            TimesAndNotes(state, zone, format, actions, watchCard)
 
             QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, actions.onOpenQibla)
             if (exactAlarmsOff) {
@@ -277,6 +337,7 @@ private fun LandscapeBody(
     actions: ReadyActions,
     exactAlarmsOff: Boolean,
     onOpenClockSheet: () -> Unit,
+    watchCard: WatchCardUi,
 ) {
     // The ring gets whatever its own half can spare: never bigger than upright, and small enough
     // that the city and the date above it still fit above the fold on a short sideways screen.
@@ -293,15 +354,17 @@ private fun LandscapeBody(
                 Countdown(state, zone, format, diameter = ring)
             }
         }
+        val scroll = rememberScrollState()
+        ReportScrolls(scroll, actions.onHomeTouched)
         Column(
-            Modifier.weight(1f).fillMaxHeight().contentWidth().verticalScroll(rememberScrollState()),
+            Modifier.weight(1f).fillMaxHeight().contentWidth().verticalScroll(scroll),
         ) {
             Spacer(Modifier.height(16.dp))
             if (state.clockWarning != null) {
                 ClockLine(onClick = onOpenClockSheet, horizontalPadding = Gutter)
                 Spacer(Modifier.height(12.dp))
             }
-            TimesAndNotes(state, zone, format, actions)
+            TimesAndNotes(state, zone, format, actions, watchCard)
             QiblaCard(state.qiblaBearingDegrees, state.qiblaDistanceKm, format, actions.onOpenQibla)
             if (exactAlarmsOff) {
                 Spacer(Modifier.height(14.dp))
@@ -468,11 +531,13 @@ internal val SourceLabelPad = 6.dp
  * What sits between the prayer list and the Qibla card, each only where it applies (spec §2.1):
  * the source line ("Cautious times ›", "Published method ›", "Calculated by Taqwa ›"), only when
  * the source label could not fit the card's edge, and, on a polar day, the line that says some times
- * follow a nearby latitude (both open About these times), then the one-time card due this launch.
- * The exact-alarms card keeps its place under the Qibla card.
+ * follow a nearby latitude (both open About these times), then the one-time card due this launch,
+ * or in its place, in a launch that showed none, Home's watch card ([WatchCardSlot]) with the same
+ * gaps: one card per launch, a once-only card first. The exact-alarms card keeps its place under the
+ * Qibla card.
  */
 @Composable
-private fun UnderTheList(state: PrayerUiState.Ready, actions: ReadyActions, sourceLine: SourceLabel?) {
+private fun UnderTheList(state: PrayerUiState.Ready, actions: ReadyActions, sourceLine: SourceLabel?, watchCard: WatchCardUi) {
     val about = stringResource(Res.string.prayer_about_these_times)
     val anyLine = sourceLine != null || state.polar
     if (anyLine) Spacer(Modifier.height(2.dp))
@@ -513,6 +578,34 @@ private fun UnderTheList(state: PrayerUiState.Ready, actions: ReadyActions, sour
         Spacer(Modifier.height(14.dp))
     } else {
         Spacer(Modifier.height(if (anyLine) 2.dp else 14.dp))
+        if (!state.oneTimeCardThisLaunch) {
+            WatchCardSlot(
+                card = watchCard,
+                // Under a line the one-time card has 6 dp above it: the 2 above, and 4 more.
+                extraTop = if (anyLine) 4.dp else 0.dp,
+                horizontalPadding = Gutter,
+                onOpen = actions.onOpenWatchCard,
+                onDismiss = actions.onDismissWatchCard,
+                onUndo = actions.onUndoWatchCard,
+            )
+        }
+    }
+}
+
+/**
+ * Each scroll of [scroll], by a finger, a wheel or a screen reader, as a touch on Home
+ * ([PrayerScreen]'s onHomeTouched): one in progress, or the page moved, which an accessibility
+ * scroll does without ever showing one in progress.
+ */
+@Composable
+private fun ReportScrolls(scroll: ScrollState, onScrolled: () -> Unit) {
+    val report by rememberUpdatedState(onScrolled)
+    LaunchedEffect(scroll) {
+        var at = scroll.value
+        snapshotFlow { scroll.isScrollInProgress to scroll.value }.collect { (moving, value) ->
+            if (moving || value != at) report()
+            at = value
+        }
     }
 }
 
@@ -599,7 +692,7 @@ private fun Countdown(
  * (a long language at a large text size on a narrow phone) it becomes a line under the list.
  */
 @Composable
-private fun TimesAndNotes(state: PrayerUiState.Ready, zone: TimeZone, format: PlatformFormat, actions: ReadyActions) {
+private fun TimesAndNotes(state: PrayerUiState.Ready, zone: TimeZone, format: PlatformFormat, actions: ReadyActions, watchCard: WatchCardUi) {
     val place = state.cityDisplayName ?: stringResource(Res.string.prayer_current_location)
     val language = uiLanguage()
     val source = sourceLabelRes(state.whose)?.let { res ->
@@ -622,7 +715,7 @@ private fun TimesAndNotes(state: PrayerUiState.Ready, zone: TimeZone, format: Pl
         val body = subcompose(SourceBodySlot) {
             Column {
                 TimelineCard(state, zone, format, source = if (onEdge) source else null, onOpenAboutTimes = actions.onOpenAboutTimes)
-                UnderTheList(state, actions, sourceLine = if (onEdge) null else source)
+                UnderTheList(state, actions, sourceLine = if (onEdge) null else source, watchCard = watchCard)
             }
         }.first().measure(constraints)
         layout(body.width, body.height) { body.place(0, 0) }

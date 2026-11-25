@@ -6,7 +6,6 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.v2.runComposeUiTest
-import platform.Foundation.NSArgumentDomain
 import platform.Foundation.NSLocale
 import platform.Foundation.NSProcessInfo
 import platform.Foundation.NSUserDefaults
@@ -28,9 +27,10 @@ import kotlin.time.Instant
  * `UiLanguage.ENGLISH` fails. The time is the test's own, so only the name and the comma come from
  * the language.
  *
- * Each case swaps `AppleLanguages` in this process's argument domain, where `-AppleLanguages (ar)`
- * on a command line lands. `NSLocale.preferredLanguages`, and so the resources' language, follows
- * it on iOS (the name in each script shows it took), and it is never written down, so it ends with
+ * Each case swaps `AppleLanguages` in this process's argument domain ([inLanguage], shared with
+ * the watch card's suites), where `-AppleLanguages (ar)` on a command line lands.
+ * `NSLocale.preferredLanguages`, and so the resources' language, follows it on iOS (the name in
+ * each script shows it took), and it is never written down, so it ends with
  * the case or at worst with the process. Not `NSUserDefaults.setObject`: that goes to the
  * preferences file named for this test binary (`test.kexe.plist`, the same for all three modules
  * on the simulator), its removal can miss the disk even with `synchronize()`, and the next test
@@ -41,19 +41,6 @@ import kotlin.time.Instant
 class PrayerRowLanguageTest {
 
     private val asr = TimelineRow(Prayer.ASR, Instant.parse("2026-10-16T13:45:00Z"), PrayerStatus.UPCOMING)
-
-    private inline fun <T> inLanguage(tag: String, block: () -> T): T {
-        val defaults = NSUserDefaults.standardUserDefaults
-        val arguments = defaults.volatileDomainForName(NSArgumentDomain)
-        defaults.removeVolatileDomainForName(NSArgumentDomain)
-        defaults.setVolatileDomain(arguments + (APPLE_LANGUAGES to listOf(tag)), forName = NSArgumentDomain)
-        try {
-            return block()
-        } finally {
-            defaults.removeVolatileDomainForName(NSArgumentDomain)
-            defaults.setVolatileDomain(arguments, forName = NSArgumentDomain)
-        }
-    }
 
     // Not TaqwaTheme: its system-bar effects crash the simulator test process.
     @Composable
@@ -107,9 +94,5 @@ class PrayerRowLanguageTest {
             inLanguage(tag) { assertEquals(tag, NSLocale.preferredLanguages.first()) }
             assertEquals(before, NSLocale.preferredLanguages)
         }
-    }
-
-    private companion object {
-        const val APPLE_LANGUAGES = "AppleLanguages"
     }
 }

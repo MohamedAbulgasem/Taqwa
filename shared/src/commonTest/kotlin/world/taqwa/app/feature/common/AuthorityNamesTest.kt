@@ -8,9 +8,13 @@ import kotlin.test.assertTrue
 
 class AuthorityNamesTest {
 
-    /** Every key the screens can be handed: each entry's short name and each cautious member's. */
-    private val registryKeys: Set<String> =
-        Registry.entries.flatMap { entry -> listOf(entry.shortNameKey) + entry.members.map { it.nameKey } }.toSet()
+    /**
+     * Every key the screens can be handed: each entry's short name, each cautious member's, and the body a calculated
+     * entry is on the safe side of.
+     */
+    private val registryKeys: Set<String> = Registry.entries.flatMap { entry ->
+        listOfNotNull(entry.shortNameKey, entry.safeSideOfKey) + entry.members.map { it.nameKey }
+    }.toSet()
 
     @Test
     fun everyNameTheRegistryUsesHasAString() {

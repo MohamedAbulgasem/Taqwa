@@ -8,14 +8,14 @@ import world.taqwa.app.quran.textAfter
 import kotlin.random.Random
 
 /**
- * Fills the widget pool mirror (design spec §4) from the Quran database: reads the hundred
+ * Fills the widget pool mirror (design spec §4) from the Quran database: reads the 365
  * [AyahPool.REFS] ayahs and the active translation, then writes an [AyahPoolMirror] and — the
  * first time only — a rotation seed. Stays in `shared` rather than `:widgetcore` because it needs
  * [QuranSource]; the mirror it produces is all either widget process ever reads.
  */
 object AyahPoolMirrorWriter {
     /**
-     * Reads the hundred pool ayahs and the [settings] translation, writes the mirror and, once per
+     * Reads the 365 pool ayahs and the [settings] translation, writes the mirror and, once per
      * install, the seed. Returns the mirror written.
      *
      * [format] is asked one question — what a `1` looks like — and the answer is recorded in the

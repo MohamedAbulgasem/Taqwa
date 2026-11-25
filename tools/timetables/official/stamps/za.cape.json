@@ -1,7 +1,7 @@
 {
   "entry": "za.cape",
   "class": "C",
-  "engineHash": "272671c8d5ce9008",
+  "engineHash": "8648d63eb72b3a33",
   "broken": 0,
   "places": 1,
   "first": "2026-09-01",
@@ -18,6 +18,7 @@
   },
   "placeDays": 91,
   "heldOutDays": 91,
+  "tables": 3,
   "ramadanDays": 0,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
@@ -72,12 +73,12 @@
       "checked": 91,
       "early": 0,
       "late": {
-        "0": 21,
-        "1": 70,
+        "0": 11,
+        "1": 80,
         "2": 0,
         "3+": 0
       },
-      "exactShare": 0.2308,
+      "exactShare": 0.1209,
       "worstLate": 1,
       "lateLimit": 1,
       "lateLimitFrom": "class C",
@@ -132,6 +133,15 @@
   "heldOut": {
     "placeDays": 91,
     "ramadanDays": 0,
+    "checkedByEvent": {
+      "fajr": ["2026-09-01..2026-11-30"],
+      "sunrise": ["2026-09-01..2026-11-30"],
+      "dhuhr": ["2026-09-01..2026-11-30"],
+      "asrStandard": ["2026-09-01..2026-11-30"],
+      "maghrib": ["2026-09-01..2026-11-30"],
+      "isha": ["2026-09-01..2026-11-30"],
+      "endOfEating": ["2026-09-01..2026-11-30"]
+    },
     "events": {
       "fajr": {
         "checked": 91,
@@ -182,12 +192,12 @@
         "checked": 91,
         "early": 0,
         "late": {
-          "0": 21,
-          "1": 70,
+          "0": 11,
+          "1": 80,
           "2": 0,
           "3+": 0
         },
-        "exactShare": 0.2308,
+        "exactShare": 0.1209,
         "worstLate": 1,
         "lateLimit": 1,
         "lateLimitFrom": "class C",

@@ -12,6 +12,11 @@ data class TaqwaColors(
     val textSecondary: Color,
     val textTertiary: Color,
     val accent: Color,
+    /**
+     * Amber words on a card, 4.5:1 or better: the watch card's action. Light is a deeper amber
+     * than [accent], which is 3.4:1 on white at 14 sp; dark's accent already reads at that.
+     */
+    val accentText: Color,
     val ring: Color,
 )
 
@@ -23,6 +28,7 @@ val LightColors = TaqwaColors(
     textSecondary = Color(0xFF6F6E62),
     textTertiary = Color(0xFFA5A498),
     accent = Color(0xFFB5820B),
+    accentText = Color(0xFF946A0A),
     ring = Color(0xFFE3A21C),
 )
 
@@ -34,6 +40,7 @@ val DarkColors = TaqwaColors(
     textSecondary = Color(0xFF8C948F),
     textTertiary = Color(0xFF5A625D),
     accent = Color(0xFFF0B429),
+    accentText = Color(0xFFF0B429),
     ring = Color(0xFFF0B429),
 )
 
@@ -57,3 +64,15 @@ val PreviewWallpaper = Color(0xFF9C8F73)
  * drawn on it is [DarkColors]' own, so it matches the dark theme's ink.
  */
 val PreviewLockScreen = Color(0xFF22262A)
+
+/**
+ * The real watch in Home's watch card (its 52 dp drawing): the case, its black screen and the
+ * mihrab's arch on the Taqwa face. Not theme roles, for the reason [PreviewWallpaper] is not: they
+ * stand for a real object, a dark watch wearing the face, which is the same in light and dark. The
+ * face's own ink and amber are [DarkColors]' (the face is dark on every watch).
+ */
+object WatchDrawing {
+    val case = Color(0xFF2B2F2D)
+    val screen = Color(0xFF000000)
+    val arch = Color(0xFF6A716C)
+}

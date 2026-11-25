@@ -84,7 +84,7 @@ PY
 put_back() {
     echo "prove.sh: $1; putting back what prove changed" >&2
     git checkout -- tools/timetables/official/gate tools/timetables/official/stamps "$PROOF_STAMPS" "$GOLDEN" 2>/dev/null
-    git clean -fq -- tools/timetables/official/stamps 2>/dev/null
+    git clean -fq -- tools/timetables/official/stamps 'tools/timetables/official/gate/*-envelope.tsv' 2>/dev/null
     if [ -f "$OUT/proof.json" ]; then
         # The pinned copies prove wrote are removed, and the report says why nothing it added stands.
         "$PY" - "$OUT/proof.json" "$OFFICIAL" "$1" <<'PY'
@@ -115,10 +115,18 @@ echo "== prove"
 args=("-Pofficial=$OFFICIAL" "-Preport=$OUT/proof.json")
 [ -n "$DATE" ] && args+=("-Pdate=$DATE")
 if [ ${#ONLY[@]} -gt 0 ]; then args+=("-Ponly=$(IFS=,; echo "${ONLY[*]}")"); fi
-gradle prove "${args[@]}"
+# Its errors stream to the log as they come (a prove stopped by the workflow's time limit still shows them) and are
+# kept for the heap's note below (ruling R280).
+gradle prove "${args[@]}" 2> >(tee "$TMP/prove.err" >&2)
 code=$?
+wait $! 2>/dev/null
 if [ $code -ne 0 ]; then
-    echo "prove.sh: prove could not run (exit $code); nothing changed" >&2
+    heap=""
+    # Ruling R280 (the second audit's G17): a prove whose JVM ran out of heap says so, not only the log.
+    if grep -q 'OutOfMemoryError' "$TMP/prove.err"; then
+        heap="; its JVM ran out of heap (java.lang.OutOfMemoryError; the heaps are set in tools/timetables/build.gradle.kts, ruling R280)"
+    fi
+    echo "prove.sh: prove could not run (exit $code)$heap; nothing changed" >&2
     exit 2
 fi
 added="$("$PY" -c 'import json, sys; print("true" if json.load(open(sys.argv[1], encoding="utf-8")).get("changed") else "false")' "$OUT/proof.json" 2>/dev/null)"
@@ -128,6 +136,19 @@ if [ "$added" != true ]; then
     exit 0
 fi
 
+# The second trust audit's G24 (14 Nov 2026): a new year appended to a group file with units must be replayed at the
+# riding places too. The envelope's promise-only rows are written from the group files; where this proof changed what they
+# would be, they are written again and the gate is run over them (promise-only rows are in no stamp, so no stamp moves).
+echo "== the envelope rows"
+if ! gradle checkEnvelopeRows > "$TMP/envelope.log" 2>&1; then
+    gradle generateEnvelopeRows || put_back "generateEnvelopeRows failed"
+    envelopes="$(git status --porcelain -- tools/timetables/official/gate | sed -n 's#^.. tools/timetables/official/gate/\(.*-envelope\)\.tsv$#\1#p' | paste -sd, -)"
+    if [ -n "$envelopes" ]; then
+        gradle gate "-Pofficial=$OFFICIAL" "-PgateGroup=$envelopes" -Pstamps=false || put_back "the envelope rows broke a promise"
+    fi
+    gradle checkEnvelopeRows || put_back "checkEnvelopeRows still names a file after generateEnvelopeRows"
+fi
+
 echo "== ProofStamps.kt"
 gradle generateProofStamps || put_back "generateProofStamps failed"
 
@@ -135,8 +156,10 @@ echo "== the golden vector (must not move: prove never changes the engine)"
 gradle generateGoldenVector "-Pout=$TMP/GoldenVectorData.kt" || put_back "generateGoldenVector failed"
 cmp -s "$TMP/GoldenVectorData.kt" "$GOLDEN" || put_back "the golden vector moved: the engine is not the one the gate files were proven with; stop and look"
 
+# Ruling R185: a "@demoted" line this run wrote is its own finding, kept and committed with the green
+# rows beside it — only the monitor's run may pass over it; the release scripts never do.
 echo "== checkStamps"
-gradle checkStamps || put_back "checkStamps failed"
+gradle checkStamps -PallowDemoted=true || put_back "checkStamps failed"
 
 echo "== the tools' tests, with the archive"
 gradle jvmTest "-Pofficial=$OFFICIAL" || put_back "the tools' tests failed"

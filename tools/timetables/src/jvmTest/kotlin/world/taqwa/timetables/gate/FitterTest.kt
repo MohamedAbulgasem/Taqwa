@@ -1,5 +1,6 @@
 package world.taqwa.timetables.gate
 
+import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.timetables.TestPaths
 import java.io.File
@@ -65,17 +66,25 @@ class FitterTest {
         assertTrue(fajr.broken.any { it.startsWith(fit.events.getValue(Event.FAJR).decidedBy.toString()) }, fajr.broken.toString())
     }
 
-    /** The same for an end: two seconds more than the safety above the fitted sunrise margin is a late end. */
+    /**
+     * The same for an end: two seconds more than the safety above the fitted end-of-eating margin is a late end. (The
+     * sunrise was the end this test held until ruling R265: the real sun at the place now caps it, so a sunrise margin
+     * past the fit no longer reaches the gate as a late end where the print is on or after the sun, as MUIS's is.)
+     */
     @Test
-    fun `a sunrise margin above the fitted one plus its safety is a late end on the deciding day`() {
+    fun `an end of eating margin above the fitted one plus its safety is a late end on the deciding day`() {
         val fit = Fitter(root, manifest).fit("sg.muis")
-        val margin = fit.margins.getValue(Event.SUNRISE) + (Fitter.SAFETY + 2)
-        val result = Gate(root, change = { it.copy(margins = it.margins.copy(sunrise = margin)) }).evaluate(fitRows)
-        val sunrise = result.entries.getValue("sg.muis").event(Event.SUNRISE)
-        assertTrue(sunrise.lateEnd >= 1, result.report())
-        assertTrue(sunrise.broken.any { it.startsWith(fit.events.getValue(Event.SUNRISE).decidedBy.toString()) }, sunrise.broken.toString())
-        val atFitted = Gate(root, change = { it.copy(margins = it.margins.copy(sunrise = fit.margins.getValue(Event.SUNRISE))) }).evaluate(fitRows)
-        assertEquals(0, atFitted.entries.getValue("sg.muis").event(Event.SUNRISE).lateEnd)
+        val margin = fit.margins.getValue(Event.END_OF_EATING) + (Fitter.SAFETY + 2)
+        // Fajr held well after its print so that the end of eating, never after it, may follow its own margin.
+        val later = { m: TimetableMethod -> m.copy(margins = m.margins.copy(fajr = m.margins.fajr + 600)) }
+        val result = Gate(root, change = { later(it).copy(endOfEatingMarginSeconds = margin) }).evaluate(fitRows)
+        val eating = result.entries.getValue("sg.muis").event(Event.END_OF_EATING)
+        assertTrue(eating.lateEnd >= 1, result.report())
+        assertTrue(eating.broken.any { it.startsWith(fit.events.getValue(Event.END_OF_EATING).decidedBy.toString()) }, eating.broken.toString())
+        val atFitted = Gate(root, change = { later(it).copy(endOfEatingMarginSeconds = fit.margins.getValue(Event.END_OF_EATING)) }).evaluate(fitRows)
+        assertEquals(0, atFitted.entries.getValue("sg.muis").event(Event.END_OF_EATING).lateEnd)
+        val sunrise = Gate(root, change = { it.copy(margins = it.margins.copy(sunrise = fit.margins.getValue(Event.SUNRISE) + 120)) }).evaluate(fitRows)
+        assertEquals(0, sunrise.entries.getValue("sg.muis").event(Event.SUNRISE).lateEnd, "the real sun caps the sunrise")
     }
 
     /**

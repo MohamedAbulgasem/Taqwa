@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import world.taqwa.app.city.WithdrawnCities
 import world.taqwa.app.design.ThemeMode
 import world.taqwa.app.domain.AdhanVoice
 import world.taqwa.app.domain.AsrMadhab
@@ -159,6 +160,13 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
     val cautiousCardSeen: Flow<Boolean> =
         store.data.map { it[SettingsKeys.PRAYER_CARD_CAUTIOUS_SEEN] ?: false }
 
+    /**
+     * Whether Home's watch card was retired by its x: one flag for every watch and both of its
+     * steps, for good, cleared only by the Undo that follows the x. Settings › Watch never reads it.
+     */
+    val homeWatchCardDismissed: Flow<Boolean> =
+        store.data.map { it[SettingsKeys.PRAYER_CARD_WATCH_DISMISSED] ?: false }
+
     val notificationSettings: Flow<NotificationSettings> = store.data.map { p ->
         NotificationSettings(
             enabled = p[SettingsKeys.NOTIFICATIONS_ENABLED] ?: true,
@@ -197,12 +205,18 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
      * The zone is read through [ZoneIds.resolvable]: a city whose zone is newer than the phone's
      * time zone data is stored as picked and read as a zone the phone can parse, with the picked
      * one beside it ([GeoLocation.pickedTimeZoneId]) for the Location screen and for [setLocation].
+     *
+     * A location picked from a row the city list has since withdrawn ([WithdrawnCities]) reads as
+     * none: the row's point was not its town's, so the times there are another place's, and every
+     * reader of this flow (the Prayer screen, the alarms, the widgets, the watch) must ask for the
+     * place again rather than go on showing them under the town's name.
      */
     val location: Flow<GeoLocation?> = store.data.map { p ->
         val lat = p[SettingsKeys.LOCATION_LAT]
         val lon = p[SettingsKeys.LOCATION_LON]
         val tz = p[SettingsKeys.LOCATION_TZ]
         if (lat == null || lon == null || tz == null) null
+        else if (WithdrawnCities.picked(p[SettingsKeys.LOCATION_CITY_ID], p[SettingsKeys.LOCATION_CITY], lat, lon)) null
         else GeoLocation(
             latitude = lat,
             longitude = lon,
@@ -212,6 +226,8 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             cityId = p[SettingsKeys.LOCATION_CITY_ID],
             region = p[SettingsKeys.LOCATION_REGION],
             pickedTimeZoneId = tz,
+            alsoCountryCode = p[SettingsKeys.LOCATION_ALSO_COUNTRY],
+            alsoRegion = p[SettingsKeys.LOCATION_ALSO_REGION],
         )
     }
 
@@ -532,6 +548,10 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
         store.edit { it[SettingsKeys.PRAYER_CARD_CAUTIOUS_SEEN] = value }
     }
 
+    suspend fun setHomeWatchCardDismissed(value: Boolean) {
+        store.edit { it[SettingsKeys.PRAYER_CARD_WATCH_DISMISSED] = value }
+    }
+
     /**
      * The read path's own entry into [migratePrayerSettingsIfNeeded]. [current] — the
      * [Preferences] [prayerSettings]'s own `map` was just handed by `store.data` — is used only as
@@ -626,6 +646,12 @@ class SettingsRepository(private val store: DataStore<Preferences>) {
             if (cityId == null) it.remove(SettingsKeys.LOCATION_CITY_ID) else it[SettingsKeys.LOCATION_CITY_ID] = cityId
             val region = location.region
             if (region == null) it.remove(SettingsKeys.LOCATION_REGION) else it[SettingsKeys.LOCATION_REGION] = region
+            // The second country goes with the fix that found it (ruling R259): a city picked, or a fix whose zone
+            // agrees with its nearest city, clears it.
+            val also = location.alsoCountryCode
+            if (also == null) it.remove(SettingsKeys.LOCATION_ALSO_COUNTRY) else it[SettingsKeys.LOCATION_ALSO_COUNTRY] = also
+            val alsoRegion = location.alsoRegion.takeIf { also != null }
+            if (alsoRegion == null) it.remove(SettingsKeys.LOCATION_ALSO_REGION) else it[SettingsKeys.LOCATION_ALSO_REGION] = alsoRegion
             it.remove(SettingsKeys.LOCATION_BACKFILLED)
         }
     }

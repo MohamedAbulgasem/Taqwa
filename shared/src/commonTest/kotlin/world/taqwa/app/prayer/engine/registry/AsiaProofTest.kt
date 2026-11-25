@@ -46,8 +46,13 @@ class AsiaProofTest {
         // Fitted (task 7f, pk-karachi.tsv): never early against the Banuri Daimi timetable and
         // Dawat-e-Islami's Karachi AJAX. A single Asr margin covers both the Standard and Hanafi
         // columns the Daimi table prints, so it is the larger (later) of the two fits.
-        assertEquals(71, method.margins.asr)
-        assertEquals(-26, method.endOfEatingMarginSeconds)
+        val fitted = assertNotNull(r.entry.method)
+        assertEquals(71, fitted.margins.asr)
+        assertEquals(-26, fitted.endOfEatingMarginSeconds)
+        // Ruling R190 (13 Nov 2026): within Karachi the later of that fit and Dawat-e-Islami's Karachi card holds every
+        // start, and the earlier the end of eating.
+        assertTrue(method.margins.asr >= fitted.margins.asr && method.margins.maghrib >= fitted.margins.maghrib)
+        assertTrue(method.endOfEatingMarginSeconds <= fitted.endOfEatingMarginSeconds)
     }
 
     @Test
@@ -226,13 +231,16 @@ class AsiaProofTest {
     }
 
     @Test
-    fun `bishkek resolves to the kyrgyz default with fitted margins`() {
+    fun `bishkek resolves to the muftiate's bishkek table with its rebuilt method`() {
         val r = resolve(42.8746, 74.5698, "Asia/Bishkek", "KG")
         assertEquals("kg.default", r.entry.id)
+        assertEquals("bishkek", r.unitId)
+        assertEquals(EntryClass.B, r.entryClass)
         val method = assertNotNull(r.method)
         near(18.0, method.fajrAngle, "fajr")
         near(16.0, method.ishaDegrees(), "isha")
-        // The Muftiate's Maghrib runs well past sunset (task 7f, kg-default.tsv: about 7 min).
-        assertTrue(method.margins.maghrib > 300, "Bishkek maghrib margin: ${method.margins.maghrib}")
+        // The Muftiate's Maghrib is its own sunset + 7 on every day of every locality (kg-default.tsv, 12 Nov 2026).
+        assertEquals(EventOffsets(maghrib = 7), method.authorityMinutes)
+        assertEquals(2023, method.fixedTableYear)
     }
 }

@@ -77,10 +77,14 @@
     <!-- The card the ⓘ after the date opens (spec §2.1): whose times these are, by the entry's class. %1$s is the timetable's short name, %2$s the place. -->
     <string name="prayer_whose_checked_title">%1$s timetable</string>
     <string name="prayer_whose_checked_body">%1$s’s times for %2$s, reproduced by Taqwa and checked against its published timetable.</string>
+    <string name="prayer_whose_checked_copy_body">%1$s’s times for %2$s, reproduced by Taqwa and checked against %3$s’s copy of its published timetable.</string>
+    <string name="prayer_whose_checked_part_body">%1$s’s times for %2$s, reproduced by Taqwa and checked against its published timetable, partly in %3$s’s copy of it.</string>
     <string name="prayer_whose_unchecked_title">%1$s method, not yet fully checked</string>
     <string name="prayer_whose_unchecked_body">Taqwa calculates the times for %2$s by the %1$s method, with a safety margin.</string>
     <string name="prayer_whose_cautious_body">Mosques here follow different timetables, so Taqwa shows each prayer once they have all begun it.</string>
+    <string name="prayer_whose_border_body">This place may be on either side of a border, so Taqwa shows each prayer once both countries’ timetables have begun it.</string>
     <string name="prayer_whose_calculated_body">No local timetable is known here, so Taqwa calculates these times on the safe side.</string>
+    <string name="prayer_whose_calculated_beside_body">Taqwa holds only part of the timetable %1$s publishes, so it calculates these times on the safe side of that part.</string>
     <!-- The link to About these times; the screen adds the chevron. -->
     <string name="prayer_about_these_times">About these times</string>
     <!-- Screen-reader labels (spec §2.4): %1$s names the times ("Times by Diyanet", "Cautious times"), %2$s the place. -->
@@ -100,6 +104,15 @@
     <string name="prayer_card_sunni_body">In Shia (Ja’fari) practice, Maghrib and iftar are later.</string>
     <string name="prayer_match_my_mosque">Match my mosque</string>
     <string name="prayer_card_ok">OK</string>
+    <!-- Home's watch card (1.7.0): the offer of Settings › Watch above the Qibla card. -->
+    <string name="prayer_watch_title_install">Taqwa for your watch</string>
+    <string name="prayer_watch_install_on">Install on %1$s</string>
+    <string name="prayer_watch_title_face">Taqwa is on your watch</string>
+    <string name="prayer_watch_try_again">Try again</string>
+    <string name="prayer_watch_about">The next prayer and its countdown on your watch face.</string>
+    <string name="prayer_watch_dismiss">Dismiss</string>
+    <string name="prayer_watch_dismissed">Set up your watch any time in Settings.</string>
+    <string name="prayer_watch_undo">Undo</string>
     <!-- The clock line above the ring (spec §3.9) and its sheet: %1$s the place whose clocks changed, %2$s the date of the change.
          "changed": a place that moved its clocks once (Morocco, Kazakhstan); "kept": one that stopped turning them back, so from
          that date it keeps one time all year (British Columbia, Syria, Paraguay...). -->
@@ -163,7 +176,7 @@
     <string name="settings_not_set">Not set</string>
     <string name="settings_notifications_off">Off</string>
     <string name="settings_notifications_on_count">%1$s on</string>
-    <string name="settings_version_value">1.6.0</string>
+    <string name="settings_version_value">1.7.0</string>
 
     <!-- About screen (privacy spec §6). "Taqwa" is the product name and stays in Latin script in
          both locales, as on the icon. -->
@@ -411,8 +424,8 @@
     <string name="adjust_confirm_title">Show %1$s before %2$s?</string>
     <string name="adjust_confirm_body">A prayer prayed before its time must be repeated. Only do this if your mosque’s timetable is earlier.</string>
     <string name="adjust_confirm_body_maghrib">A prayer prayed before its time must be repeated, and a fast broken before it must be made up. Only do this if your mosque’s timetable is earlier.</string>
-    <string name="adjust_strong_body">Taqwa’s %1$s is at most %2$s after %3$s, so %4$s moves it before that time. A prayer prayed before its time must be repeated. Only do this if your mosque’s timetable is this much earlier.</string>
-    <string name="adjust_strong_body_maghrib">Taqwa’s %1$s is at most %2$s after %3$s, so %4$s moves it before that time. A prayer prayed before its time must be repeated, and a fast broken before it must be made up. Only do this if your mosque’s timetable is this much earlier.</string>
+    <string name="adjust_strong_body">Taqwa’s %1$s can be very close to %2$s, so %3$s may move it before that time. A prayer prayed before its time must be repeated. Only do this if your mosque’s timetable is this much earlier.</string>
+    <string name="adjust_strong_body_maghrib">Taqwa’s %1$s can be very close to %2$s, so %3$s may move it before that time. A prayer prayed before its time must be repeated, and a fast broken before it must be made up. Only do this if your mosque’s timetable is this much earlier.</string>
     <string name="adjust_keep">Keep %1$s</string>
     <string name="adjust_use">Use %1$s</string>
     <string name="adjust_note">Moves a time by up to an hour from the timetable’s. Use it only when your mosque’s board differs.</string>
@@ -465,36 +478,55 @@
     <string name="about_method_fajr_curve">dawn (Fajr) at a twilight angle that changes through the year, between %1$s° and %2$s° below the horizon</string>
     <string name="about_method_isha_curve">nightfall (Isha) at a twilight angle that changes through the year, between %1$s° and %2$s° below the horizon</string>
     <string name="about_method_isha_after_maghrib">nightfall (Isha) %1$s minutes after Maghrib</string>
+    <string name="about_method_isha_floor">Isha never less than %1$s minutes after Maghrib</string>
+    <string name="about_method_dhuhr_floor">Dhuhr never before %1$s</string>
+    <string name="about_method_asr_floor">Asr never before %1$s</string>
+    <string name="about_method_eating_before_fajr">the end of eating at least %1$s minutes before Fajr</string>
+    <string name="about_method_eating_angle">the end of eating at %1$s° below the horizon</string>
+    <string name="about_method_eating_angle_beside">the end of eating at %1$s° below the horizon or at %2$s’s for the city, whichever is earlier, and sunrise never after %2$s’s</string>
     <string name="about_method_minutes_note">its own minutes (%1$s)</string>
     <string name="about_method_rounding_note">and each start rounded up to the next minute (sunrise and the end of eating down)</string>
     <string name="about_method_daily_sun">the sun’s position taken once a day</string>
     <string name="about_method_horizon_dip">its own horizon, set lower for elevation and haze</string>
     <string name="about_how_checked">How it was checked</string>
     <string name="about_stat_days_at_places">days at %1$s places</string>
+    <!-- The same tile where the stamp holds one place (the second audit's G11: "days at 1 places"); no figure, as "one" is the word. -->
+    <string name="about_stat_days_at_one_place">days at one place</string>
     <string name="about_stat_never_before">starts before %1$s’s</string>
+    <string name="about_stat_never_before_copy">starts before %1$s’s in %2$s’s copy</string>
+    <string name="about_stat_never_before_part">starts before %1$s’s, partly in %2$s’s copy</string>
     <string name="about_stat_minutes_value">%1$s min</string>
     <string name="about_stat_at_most_after">at most after</string>
     <string name="about_checked_through">Checked against %1$s’s published timetable through %2$s.</string>
+    <string name="about_checked_through_copy">Checked against %3$s’s copy of %1$s’s published timetable, not %1$s’s own pages, through %2$s.</string>
+    <string name="about_checked_through_part">Checked against %1$s’s published timetable through %2$s, partly in %3$s’s copy of it rather than %1$s’s own pages.</string>
+    <string name="about_not_compared_after">The days after it are not compared yet, so Taqwa shows them as the published method.</string>
     <string name="about_not_measured_unit">Not measured for %1$s.</string>
     <string name="about_checked_so_far_with_data">Checked on %1$s days so far: never before %2$s’s, up to %3$s minutes after.</string>
+    <string name="about_checked_so_far_with_data_copy">Checked on %1$s days so far against %4$s’s copy of %2$s’s timetable: never before it, up to %3$s minutes after.</string>
+    <string name="about_checked_so_far_with_data_part">Checked on %1$s days so far against %2$s’s timetable, partly in %4$s’s copy of it: never before it, up to %3$s minutes after.</string>
     <string name="about_checked_so_far_without_data">Taqwa has not yet compared them with %1$s’s own timetable.</string>
-    <!-- About at Tromsø (ruling R82), after "Checked on … days so far": what of IRN's Makkah-time calendar Taqwa does not follow. %1$s is the authority's short name. -->
-    <string name="about_not_followed_irn_tromso">%1$s’s Makkah-time Fajr is not followed from late April to mid-May and from late July to mid-August, when it falls after sunrise, nor its sunrise under the midnight sun; Maghrib never comes before the real sunset.</string>
+    <!-- About at Tromsø (rulings R82, R302, R315 and R319: most such nights hold Maghrib and Isha before the next Fajr, with their alerts, R292), after "Checked on … days so far": what of IRN's Makkah-time calendar Taqwa does not follow. %1$s is the authority's short name. -->
+    <string name="about_not_followed_irn_tromso">%1$s’s Makkah-time Fajr is not followed from late April to mid-May and from late July to mid-August, when it falls after sunrise, nor its sunrise under the midnight sun; Maghrib never comes before the real sunset. On the few nights around the midnight sun when the sun sets for only a few minutes, Maghrib and Isha come before the next Fajr on most of them, with their alerts; on the shortest, Isha is shown at the next Fajr, with no alert, and on the very shortest Maghrib and Isha come just after the next sunrise, with no alert.</string>
     <string name="about_authority_method_title">%1$s method</string>
     <string name="about_authority_unchecked_body">%1$s publishes the prayer times for %2$s. Taqwa calculates them the way %1$s does, with a safety margin.</string>
     <!-- About, not yet fully checked, for a convention most mosques follow with no authority behind it (spec §6.2 b): %1$s its name, %2$s the place. -->
     <string name="about_majority_unchecked_body">Most mosques in %2$s follow the %1$s method. Taqwa calculates the times by it, with a safety margin.</string>
     <string name="about_nearby_heading">Timetables some local mosques follow instead</string>
     <string name="about_cautious_body">Mosques in %1$s follow different timetables in good faith, and none is followed by most. Taqwa combines %2$s: each prayer once all have begun it.</string>
+    <string name="about_border_body">%1$s is near a border, and this phone’s location and time zone point to different countries. Taqwa combines %2$s: each prayer once all have begun it. If you know which side you are on, choose that country’s timetable in Settings.</string>
     <!-- About, cautious times (ruling R155's far-north guard, spec §3.6): shown only on a day another timetable's Maghrib is later than the one shown because a high-latitude rule sets it rather than the sun (Diyanet's five-hour winter day in the far north, a time borrowed on a polar day). %1$s the timetable whose Maghrib from the sun (its sunset plus its own minutes) is shown, %2$s the timetable(s) whose Maghrib is later; at Trondheim in December both can be Diyanet. "Set by a high-latitude rule" echoes the "Set by rule" pill and the "High latitude rule" setting. -->
     <string name="about_cautious_maghrib_guard">Maghrib is the exception today: it follows the sun, as %1$s calculates it, rather than the later Maghrib of %2$s, set by a high-latitude rule.</string>
     <!-- The same, on a day the sun does not set at the place (a polar day or a polar night), when only the most-followed timetable's own Maghrib counts. %1$s the most-followed timetable's short name, %2$s the timetable(s) whose Maghrib is later. -->
     <string name="about_cautious_maghrib_no_sunset">Maghrib is the exception today, as there is no sunset here: it follows %1$s, the most-followed timetable, rather than the later Maghrib of %2$s.</string>
+    <!-- About, cautious times (ruling R314): shown where a member's method carries IRN's Tromsø clock rule (R302), for the nights so short that Isha, or Maghrib and Isha, can fall at or after the next Fajr, when the alert is skipped. -->
+    <string name="about_cautious_short_nights">On the few nights around the midnight sun when the sun sets for only a few minutes, Maghrib and Isha come before the next Fajr on most of them, with their alerts; on the shortest of those nights, Isha, or Maghrib and Isha, may come at or after the next Fajr, with no alert.</string>
     <string name="about_which_decides">Which timetable decides each time today</string>
     <!-- About, cautious times (rulings R100, R105, R111 and R112, site parity): the proof tiles and sentence a cautious place shows — "0" / "starts before the timetable that decides it" beside "days at N places" (about_stat_days_at_places), then the sentence. "The timetable that decides it" is the one the table above names for each time (the latest to begin it; on a far-north guard day, for Maghrib, the one whose time from the sun is shown, or the most-followed where the sun does not set), which is what the gate checks a start against — never "any of them": on such a day another timetable's Maghrib is later. No date: a cautious stamp's last date is one member's, not every member's. -->
     <string name="about_stat_never_before_decider">starts before the timetable that decides it</string>
     <string name="about_cautious_checked">Checked against the timetables followed here.</string>
     <string name="about_calculated_body">Taqwa found no official Sunni timetable for %1$s, so it calculates one on the safe side: %2$s.</string>
+    <string name="about_calculated_beside_body">Taqwa holds only part of the timetable %1$s publishes, too little to show it as checked. So for %2$s it calculates the times on the safe side of what it holds: %3$s.</string>
     <string name="about_asr_heading">Asr</string>
     <string name="about_asr_known">%1$s: %3$s, because most mosques in %2$s follow it.</string>
     <string name="about_asr_unknown">%1$s: %3$s, the later time, because %2$s’s majority school is not known. You can change it in Settings.</string>
@@ -539,6 +571,8 @@
     <string name="authority_bik">BIK Kosovo</string>
     <string name="authority_cape_calendar">Cape community calendar</string>
     <string name="authority_chicago">Chicago 18°/15°</string>
+    <string name="authority_cosim">COSIM</string>
+    <string name="authority_council_ulama_tj">Tajikistan’s Council of Ulama</string>
     <string name="authority_dar_al_fatwa">Dar al-Fatwa</string>
     <string name="authority_diyanet">Diyanet</string>
     <string name="authority_diyanet_europe">Diyanet Europe</string>
@@ -581,7 +615,7 @@
     <string name="authority_muhammadiyah">Muhammadiyah</string>
     <string name="authority_muis">MUIS</string>
     <string name="authority_oman_awqaf">Oman Awqaf</string>
-    <string name="authority_pa_iftaa">Dar al-Iftaa</string>
+    <string name="authority_pa_iftaa">Palestinian Dar al-Iftaa</string>
     <string name="authority_qatar_calendar">Qatar Calendar House</string>
     <string name="authority_qmdb">Kazakh Muftiate</string>
     <string name="authority_sudan_fiqh">Sudan Fiqh Academy</string>

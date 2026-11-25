@@ -41,10 +41,30 @@ data class MonitorTable(
 ) {
     val id: String get() = "$source/$key"
 
+    /**
+     * The capture was read from a republisher's mirror, not the authority's own site: its fetcher
+     * says so at the end of [name] (JAKIM's zones when e-solat fails, `jakim.py`). Such a table is
+     * checked like any other, and proves as much as the gate finds in it; but a fault in it is not
+     * known to be the authority's, so it neither demotes an entry ([Prove]) nor counts as the
+     * monitor watching the authority ([MonthByMonth]).
+     */
+    val mirror: Boolean get() = name.trimEnd().endsWith(MIRROR_MARK)
+
     /** Everything the check depends on but the engine: the content and how it is read. */
     val metadata: String
         get() = listOf(hash, path, lat, lon, zone, clock, cc, entry, survey, columns, format, school).joinToString("|")
 }
+
+/** How a fetcher ends the name of a table it read from a republisher's mirror ([MonitorTable.mirror]). */
+const val MIRROR_MARK = "(mirror)"
+
+/**
+ * How a fetcher ends the key of a printed imsak it keeps beside a day's table (ruling R284, the second audit's G25):
+ * `<key>-imsak`, two columns, the printed Subuh and the imsak, the layout of the hand read-backs under
+ * `archive/tables/imsak/<source>/<capture>/<key>.txt` (JAKIM's and Kemenag's). Such a capture is read by its own recipe
+ * lines alone ([Recipe.matches]) and holds or is held by rows that read ends alone ([Prove]).
+ */
+const val IMSAK_KEY = "-imsak"
 
 object MonitorIndex {
     val HEADER = listOf(

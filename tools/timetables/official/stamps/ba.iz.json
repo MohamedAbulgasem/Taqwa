@@ -1,7 +1,7 @@
 {
   "entry": "ba.iz",
   "class": "B",
-  "engineHash": "3c674b3b4418ab02",
+  "engineHash": "9faeea632b01bd07",
   "broken": 0,
   "places": 3,
   "first": "2026-01-01",
@@ -18,239 +18,178 @@
   },
   "placeDays": 2190,
   "heldOutDays": 0,
+  "tables": 6,
   "ramadanDays": 177,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 2192,
+      "checked": 51146,
       "early": 0,
       "late": {
-        "0": 2108,
-        "1": 76,
-        "2": 8,
-        "3+": 0
+        "0": 36914,
+        "1": 12664,
+        "2": 1494,
+        "3+": 74
       },
-      "exactShare": 0.9617,
-      "worstLate": 2,
-      "lateLimit": 2,
-      "lateLimitFrom": "class B",
+      "exactShare": 0.7217,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "unit banja-luka, unit bihac, unit sarajevo",
       "overLimit": 0
     },
     "sunrise": {
-      "checked": 2192,
+      "checked": 51146,
       "lateEnd": 0,
       "late": {
-        "0": 1181,
-        "1": 941,
-        "2": 70,
-        "3+": 0
+        "0": 19932,
+        "1": 25612,
+        "2": 5420,
+        "3+": 182
       },
-      "exactShare": 0.5388,
-      "worstLate": 2,
-      "lateLimit": 2,
-      "lateLimitFrom": "class B",
+      "exactShare": 0.3897,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "unit banja-luka, unit bihac, unit sarajevo",
       "overLimit": 0
     },
     "dhuhr": {
-      "checked": 2192,
+      "checked": 51146,
       "early": 0,
       "late": {
-        "0": 1890,
-        "1": 302,
-        "2": 0,
+        "0": 32820,
+        "1": 17610,
+        "2": 716,
         "3+": 0
       },
-      "exactShare": 0.8622,
-      "worstLate": 1,
+      "exactShare": 0.6417,
+      "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
       "overLimit": 0
     },
     "asrStandard": {
-      "checked": 2192,
+      "checked": 51146,
       "early": 0,
       "late": {
-        "0": 816,
-        "1": 1076,
-        "2": 296,
-        "3+": 4
+        "0": 11482,
+        "1": 23816,
+        "2": 13428,
+        "3+": 2420
       },
-      "exactShare": 0.3723,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class B, unit banja-luka, unit bihac",
+      "exactShare": 0.2245,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit banja-luka, unit bihac, unit sarajevo",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 2192,
+      "checked": 51146,
       "early": 0,
       "late": {
-        "0": 1101,
-        "1": 963,
-        "2": 124,
-        "3+": 4
+        "0": 17143,
+        "1": 25563,
+        "2": 7928,
+        "3+": 512
       },
-      "exactShare": 0.5023,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class B, unit banja-luka, unit bihac",
+      "exactShare": 0.3352,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit banja-luka, unit bihac, unit sarajevo",
       "overLimit": 0
     },
     "isha": {
-      "checked": 2192,
+      "checked": 51146,
       "early": 0,
       "late": {
-        "0": 2126,
-        "1": 52,
-        "2": 14,
-        "3+": 0
+        "0": 38694,
+        "1": 11100,
+        "2": 1260,
+        "3+": 92
       },
-      "exactShare": 0.9699,
-      "worstLate": 2,
-      "lateLimit": 2,
-      "lateLimitFrom": "class B",
+      "exactShare": 0.7565,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "unit banja-luka, unit bihac, unit sarajevo",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 2192,
+      "checked": 51146,
       "lateEnd": 0,
       "late": {
-        "0": 635,
-        "1": 1525,
-        "2": 26,
-        "3+": 6
+        "0": 8485,
+        "1": 34340,
+        "2": 7275,
+        "3+": 1046
       },
-      "exactShare": 0.2897,
-      "worstLate": 3,
-      "lateLimit": 3,
-      "lateLimitFrom": "class B, unit banja-luka, unit bihac",
+      "exactShare": 0.1659,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "unit banja-luka, unit bihac, unit sarajevo",
       "overLimit": 0
     }
   },
   "heldOut": {
     "placeDays": 0,
     "ramadanDays": 0,
-    "events": {
-      "fajr": {
-        "checked": 2,
-        "early": 0,
-        "late": {
-          "0": 2,
-          "1": 0,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 1,
-        "worstLate": 0,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
-        "overLimit": 0
-      },
-      "sunrise": {
-        "checked": 2,
-        "lateEnd": 0,
-        "late": {
-          "0": 1,
-          "1": 1,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.5,
-        "worstLate": 1,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
-        "overLimit": 0
-      },
-      "dhuhr": {
-        "checked": 2,
-        "early": 0,
-        "late": {
-          "0": 2,
-          "1": 0,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 1,
-        "worstLate": 0,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
-        "overLimit": 0
-      },
-      "asrStandard": {
-        "checked": 2,
-        "early": 0,
-        "late": {
-          "0": 2,
-          "1": 0,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 1,
-        "worstLate": 0,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
-        "overLimit": 0
-      },
-      "maghrib": {
-        "checked": 2,
-        "early": 0,
-        "late": {
-          "0": 1,
-          "1": 1,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.5,
-        "worstLate": 1,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
-        "overLimit": 0
-      },
-      "isha": {
-        "checked": 2,
-        "early": 0,
-        "late": {
-          "0": 2,
-          "1": 0,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 1,
-        "worstLate": 0,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
-        "overLimit": 0
-      },
-      "endOfEating": {
-        "checked": 2,
-        "lateEnd": 0,
-        "late": {
-          "0": 1,
-          "1": 1,
-          "2": 0,
-          "3+": 0
-        },
-        "exactShare": 0.5,
-        "worstLate": 1,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
-        "overLimit": 0
-      }
-    }
+    "events": {}
+  },
+  "replays": {
+    "places": 67,
+    "placeDays": 48910
   },
   "lateLimits": {
     "class B: 2 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+      "events": ["dhuhr"]
     },
-    "unit banja-luka: 3 min": {
-      "reason": "IZ BiH prints this town as Sarajevo plus a whole-minute offset for each month, which drifts from the sun within the month; the app follows the month's offset on the safe side, up to 3 min from the printed time.",
-      "events": ["asrStandard", "maghrib", "endOfEating"]
+    "unit banja-luka: 3 min (fajr)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["fajr", "isha"]
     },
-    "unit bihac: 3 min": {
-      "reason": "IZ BiH prints this town as Sarajevo plus a whole-minute offset for each month, which drifts from the sun within the month; the app follows the month's offset on the safe side, up to 3 min from the printed time.",
-      "events": ["asrStandard", "maghrib", "endOfEating"]
+    "unit banja-luka: 3 min (sunrise)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["sunrise"]
+    },
+    "unit banja-luka: 4 min (asrStandard)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["asrStandard", "maghrib"]
+    },
+    "unit banja-luka: 4 min (endOfEating)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["endOfEating"]
+    },
+    "unit bihac: 3 min (fajr)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["fajr", "isha"]
+    },
+    "unit bihac: 3 min (sunrise)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["sunrise"]
+    },
+    "unit bihac: 4 min (asrStandard)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["asrStandard", "maghrib"]
+    },
+    "unit bihac: 4 min (endOfEating)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["endOfEating"]
+    },
+    "unit sarajevo: 3 min (fajr)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["fajr", "maghrib", "isha"]
+    },
+    "unit sarajevo: 3 min (sunrise)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["sunrise"]
+    },
+    "unit sarajevo: 4 min (asrStandard)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["asrStandard"]
+    },
+    "unit sarajevo: 4 min (endOfEating)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["endOfEating"]
     }
   },
   "units": {
@@ -270,116 +209,128 @@
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "isha"]
+          "events": ["dhuhr"]
         },
-        "unit banja-luka: 3 min": {
-          "reason": "IZ BiH prints this town as Sarajevo plus a whole-minute offset for each month, which drifts from the sun within the month; the app follows the month's offset on the safe side, up to 3 min from the printed time.",
-          "events": ["asrStandard", "maghrib", "endOfEating"]
+        "unit banja-luka: 3 min (fajr)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["fajr", "isha"]
+        },
+        "unit banja-luka: 3 min (sunrise)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["sunrise"]
+        },
+        "unit banja-luka: 4 min (asrStandard)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["asrStandard", "maghrib"]
+        },
+        "unit banja-luka: 4 min (endOfEating)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["endOfEating"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 730,
+          "checked": 16790,
           "early": 0,
           "late": {
-            "0": 692,
-            "1": 36,
-            "2": 2,
-            "3+": 0
+            "0": 12210,
+            "1": 4144,
+            "2": 418,
+            "3+": 18
           },
-          "exactShare": 0.9479,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.7272,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit banja-luka",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 730,
+          "checked": 16790,
           "lateEnd": 0,
           "late": {
-            "0": 368,
-            "1": 330,
-            "2": 32,
-            "3+": 0
+            "0": 6272,
+            "1": 8536,
+            "2": 1908,
+            "3+": 74
           },
-          "exactShare": 0.5041,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.3736,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit banja-luka",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 730,
+          "checked": 16790,
           "early": 0,
           "late": {
-            "0": 630,
-            "1": 100,
-            "2": 0,
+            "0": 11074,
+            "1": 5608,
+            "2": 108,
             "3+": 0
           },
-          "exactShare": 0.863,
-          "worstLate": 1,
+          "exactShare": 0.6596,
+          "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 730,
+          "checked": 16790,
           "early": 0,
           "late": {
-            "0": 262,
-            "1": 346,
-            "2": 120,
-            "3+": 2
+            "0": 4019,
+            "1": 7848,
+            "2": 4311,
+            "3+": 612
           },
-          "exactShare": 0.3589,
-          "worstLate": 3,
-          "lateLimit": 3,
+          "exactShare": 0.2394,
+          "worstLate": 4,
+          "lateLimit": 4,
           "lateLimitFrom": "unit banja-luka",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 730,
+          "checked": 16790,
           "early": 0,
           "late": {
-            "0": 336,
-            "1": 334,
-            "2": 58,
-            "3+": 2
+            "0": 5350,
+            "1": 8374,
+            "2": 2858,
+            "3+": 208
           },
-          "exactShare": 0.4603,
+          "exactShare": 0.3186,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit banja-luka",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 16790,
+          "early": 0,
+          "late": {
+            "0": 12984,
+            "1": 3456,
+            "2": 320,
+            "3+": 30
+          },
+          "exactShare": 0.7733,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "unit banja-luka",
           "overLimit": 0
         },
-        "isha": {
-          "checked": 730,
-          "early": 0,
-          "late": {
-            "0": 702,
-            "1": 22,
-            "2": 6,
-            "3+": 0
-          },
-          "exactShare": 0.9616,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
-          "overLimit": 0
-        },
         "endOfEating": {
-          "checked": 730,
+          "checked": 16790,
           "lateEnd": 0,
           "late": {
-            "0": 206,
-            "1": 508,
-            "2": 14,
-            "3+": 2
+            "0": 2688,
+            "1": 11622,
+            "2": 2176,
+            "3+": 304
           },
-          "exactShare": 0.2822,
-          "worstLate": 3,
-          "lateLimit": 3,
+          "exactShare": 0.1601,
+          "worstLate": 4,
+          "lateLimit": 4,
           "lateLimitFrom": "unit banja-luka",
           "overLimit": 0
         }
@@ -401,116 +352,128 @@
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "isha"]
+          "events": ["dhuhr"]
         },
-        "unit bihac: 3 min": {
-          "reason": "IZ BiH prints this town as Sarajevo plus a whole-minute offset for each month, which drifts from the sun within the month; the app follows the month's offset on the safe side, up to 3 min from the printed time.",
-          "events": ["asrStandard", "maghrib", "endOfEating"]
+        "unit bihac: 3 min (fajr)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["fajr", "isha"]
+        },
+        "unit bihac: 3 min (sunrise)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["sunrise"]
+        },
+        "unit bihac: 4 min (asrStandard)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["asrStandard", "maghrib"]
+        },
+        "unit bihac: 4 min (endOfEating)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["endOfEating"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 730,
+          "checked": 17520,
           "early": 0,
           "late": {
-            "0": 698,
-            "1": 26,
-            "2": 6,
-            "3+": 0
+            "0": 12548,
+            "1": 4408,
+            "2": 522,
+            "3+": 42
           },
-          "exactShare": 0.9562,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.7162,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit bihac",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 730,
+          "checked": 17520,
           "lateEnd": 0,
           "late": {
-            "0": 358,
-            "1": 336,
-            "2": 36,
-            "3+": 0
+            "0": 6476,
+            "1": 8908,
+            "2": 2052,
+            "3+": 84
           },
-          "exactShare": 0.4904,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.3696,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit bihac",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 730,
+          "checked": 17520,
           "early": 0,
           "late": {
-            "0": 628,
-            "1": 102,
-            "2": 0,
+            "0": 11312,
+            "1": 6096,
+            "2": 112,
             "3+": 0
           },
-          "exactShare": 0.8603,
-          "worstLate": 1,
+          "exactShare": 0.6457,
+          "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 730,
+          "checked": 17520,
           "early": 0,
           "late": {
-            "0": 262,
-            "1": 344,
-            "2": 122,
-            "3+": 2
+            "0": 3869,
+            "1": 7929,
+            "2": 4729,
+            "3+": 993
           },
-          "exactShare": 0.3589,
-          "worstLate": 3,
-          "lateLimit": 3,
+          "exactShare": 0.2208,
+          "worstLate": 4,
+          "lateLimit": 4,
           "lateLimitFrom": "unit bihac",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 730,
+          "checked": 17520,
           "early": 0,
           "late": {
-            "0": 336,
-            "1": 330,
-            "2": 62,
-            "3+": 2
+            "0": 5452,
+            "1": 8658,
+            "2": 3162,
+            "3+": 248
           },
-          "exactShare": 0.4603,
+          "exactShare": 0.3112,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit bihac",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 17520,
+          "early": 0,
+          "late": {
+            "0": 13580,
+            "1": 3562,
+            "2": 328,
+            "3+": 50
+          },
+          "exactShare": 0.7751,
           "worstLate": 3,
           "lateLimit": 3,
           "lateLimitFrom": "unit bihac",
           "overLimit": 0
         },
-        "isha": {
-          "checked": 730,
-          "early": 0,
-          "late": {
-            "0": 706,
-            "1": 16,
-            "2": 8,
-            "3+": 0
-          },
-          "exactShare": 0.9671,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
-          "overLimit": 0
-        },
         "endOfEating": {
-          "checked": 730,
+          "checked": 17520,
           "lateEnd": 0,
           "late": {
-            "0": 208,
-            "1": 508,
-            "2": 10,
-            "3+": 4
+            "0": 2920,
+            "1": 12134,
+            "2": 2128,
+            "3+": 338
           },
-          "exactShare": 0.2849,
-          "worstLate": 3,
-          "lateLimit": 3,
+          "exactShare": 0.1667,
+          "worstLate": 4,
+          "lateLimit": 4,
           "lateLimitFrom": "unit bihac",
           "overLimit": 0
         }
@@ -532,113 +495,129 @@
       "broken": 0,
       "lateLimits": {
         "class B: 2 min": {
-          "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+          "events": ["dhuhr"]
+        },
+        "unit sarajevo: 3 min (fajr)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["fajr", "maghrib", "isha"]
+        },
+        "unit sarajevo: 3 min (sunrise)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 3 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["sunrise"]
+        },
+        "unit sarajevo: 4 min (asrStandard)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["asrStandard"]
+        },
+        "unit sarajevo: 4 min (endOfEating)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["endOfEating"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 732,
+          "checked": 16836,
           "early": 0,
           "late": {
-            "0": 718,
-            "1": 14,
-            "2": 0,
-            "3+": 0
+            "0": 12156,
+            "1": 4112,
+            "2": 554,
+            "3+": 14
           },
-          "exactShare": 0.9809,
-          "worstLate": 1,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.722,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit sarajevo",
           "overLimit": 0
         },
         "sunrise": {
-          "checked": 732,
+          "checked": 16836,
           "lateEnd": 0,
           "late": {
-            "0": 455,
-            "1": 275,
-            "2": 2,
-            "3+": 0
+            "0": 7184,
+            "1": 8168,
+            "2": 1460,
+            "3+": 24
           },
-          "exactShare": 0.6216,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.4267,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit sarajevo",
           "overLimit": 0
         },
         "dhuhr": {
-          "checked": 732,
+          "checked": 16836,
           "early": 0,
           "late": {
-            "0": 632,
-            "1": 100,
-            "2": 0,
+            "0": 10434,
+            "1": 5906,
+            "2": 496,
             "3+": 0
           },
-          "exactShare": 0.8634,
-          "worstLate": 1,
+          "exactShare": 0.6197,
+          "worstLate": 2,
           "lateLimit": 2,
           "lateLimitFrom": "class B",
           "overLimit": 0
         },
         "asrStandard": {
-          "checked": 732,
+          "checked": 16836,
           "early": 0,
           "late": {
-            "0": 292,
-            "1": 386,
-            "2": 54,
-            "3+": 0
+            "0": 3594,
+            "1": 8039,
+            "2": 4388,
+            "3+": 815
           },
-          "exactShare": 0.3989,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.2135,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit sarajevo",
           "overLimit": 0
         },
         "maghrib": {
-          "checked": 732,
+          "checked": 16836,
           "early": 0,
           "late": {
-            "0": 429,
-            "1": 299,
-            "2": 4,
-            "3+": 0
+            "0": 6341,
+            "1": 8531,
+            "2": 1908,
+            "3+": 56
           },
-          "exactShare": 0.5861,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.3766,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit sarajevo",
           "overLimit": 0
         },
         "isha": {
-          "checked": 732,
+          "checked": 16836,
           "early": 0,
           "late": {
-            "0": 718,
-            "1": 14,
-            "2": 0,
-            "3+": 0
+            "0": 12130,
+            "1": 4082,
+            "2": 612,
+            "3+": 12
           },
-          "exactShare": 0.9809,
-          "worstLate": 1,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.7205,
+          "worstLate": 3,
+          "lateLimit": 3,
+          "lateLimitFrom": "unit sarajevo",
           "overLimit": 0
         },
         "endOfEating": {
-          "checked": 732,
+          "checked": 16836,
           "lateEnd": 0,
           "late": {
-            "0": 221,
-            "1": 509,
-            "2": 2,
-            "3+": 0
+            "0": 2877,
+            "1": 10584,
+            "2": 2971,
+            "3+": 404
           },
-          "exactShare": 0.3019,
-          "worstLate": 2,
-          "lateLimit": 2,
-          "lateLimitFrom": "class B",
+          "exactShare": 0.1709,
+          "worstLate": 4,
+          "lateLimit": 4,
+          "lateLimitFrom": "unit sarajevo",
           "overLimit": 0
         }
       }

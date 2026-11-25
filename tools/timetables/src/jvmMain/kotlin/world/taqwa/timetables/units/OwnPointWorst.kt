@@ -47,11 +47,32 @@ object OwnPointWorst {
      * for their own points became units (`tablesAtTheirPoints`), each with the app's own points beside them, and the three
      * cautious groups whose recorded limits that audit raised for the app's points beside their tables (Sydney's sunrise
      * 9, Dublin's Maghrib 3, Lille's Isha 4: the fix round of 11 Oct 2026), so their own tables' rows keep their own worst.
+     * And since 13 Nov 2026 ESA's towns (ruling R181): 28 towns' limits went to 3 for their reaches, and each town's own
+     * rows, read at the town's own point, keep the 1 or 2 min they read there.
+     * Dawat-e-Islami's city cards for Pakistan and India joined them with ruling R190 (13 Nov 2026).
+     * And since the zone round of 13 Nov 2026 (ruling R227) JAKIM's zones and the towns of its zone lists
+     * (my-jakim.tsv, my-jakim-cities.tsv): a zone's recorded limit is as wide as its farthest town needs, and each
+     * zone point and each town keeps its own worst here.
+     * And since 14 Nov 2026 Oman's localities and Türkiye's districts (om-mara.tsv, tr-diyanet.tsv; rulings R254 and
+     * R255): a unit's recorded limits are now its whole reach's worst (Bahla's 3, a Turkish il centre's 2 to 4), and each
+     * own-point row keeps the minute or two it reads at the place its table is printed for.
+     * And since the second trust audit's G26 (ruling R270, the review of 15 Nov 2026) every group whose units' limits
+     * `ReachLimits.kt` raised to their reach's worst: there a unit's limit is far wider than its own point reads (Kazan's
+     * Fajr 135 where its own table reads 2, Brussels's 16 where it reads 9), so without its own worst here an engine
+     * change up to the reach's figure at the city itself would pass the gate and every test. And since ruling R297 London
+     * Unified's and MUIS's, whose limits `ReachLimits.kt` raised to the worst of the area each claims. And since the final
+     * audit of 18 Nov 2026 (its minors, with rulings R318 to R321) Norway's IRN and Bahrain's Supreme Council, whose limits
+     * `ReachLimits.kt` raised with rulings R302 and R304 (IRN's reach) and R307 (Bahrain's cell) and which had stayed out.
      */
     val GROUPS = listOf(
         "sa-ummalqura", "kz-qmdb", "us-isna", "ca-isna", "ca-cautious", "us-chicago", "in-karachi", "uz-board", "xk-bik",
         "pk-karachi", "kg-default", "gb-wifaqul", "ps-gaza", "lb-fatwa", "sy-awqaf", "iq-sunni",
-        "au-cautious", "ie-cautious", "tr-diyanet-europe",
+        "au-cautious", "ie-cautious", "tr-diyanet-europe", "eg-esa", "pk-dawateislami", "in-dawateislami",
+        "my-jakim", "my-jakim-cities", "om-mara", "tr-diyanet",
+        "ma-habous", "bd-ifb", "dz-marw", "ru-dumrt", "tn-inm", "za-jamiat", "bn-mora", "ae-iacad", "qa-calendarhouse",
+        "jo-awqaf", "ps-iftaa", "ly-awqaf", "za-cape", "ru-dumrf", "ba-iz", "al-kmsh", "ie-ifi", "ie-icci", "fr-gmp",
+        "be-emb", "at-iggo", "ch-fids", "ca-toronto", "au-lma", "nz-fianz", "gb-london-lupt", "sg-muis",
+        "no-irn", "bh-council",
     )
 
     /** The events in the file's order. */
@@ -63,7 +84,15 @@ object OwnPointWorst {
         String.format(Locale.ROOT, "%.6f", row.lat), String.format(Locale.ROOT, "%.6f", row.lon),
     ).joinToString("\t")
 
+    /**
+     * The groups' rows that read a start. A row of an end alone (JAKIM's printed imsak, Perlis's read as the end of
+     * eating) is no row here: the gate reads an end only beside a row reading a start at its point, so it cannot be
+     * measured on its own, and its unit's limit holds it.
+     */
     fun rows(manifest: GateManifest): List<GateRow> = manifest.only(groups = GROUPS.toSet()).rows
+        .filter { row -> row.columns.any { cell -> cell.any { it.key in STARTS } } }
+
+    private val STARTS = setOf("fajr", "dhuhr", "asrStandard", "asrHanafi", "maghrib", "isha")
 
     /** Each row's worst lateness per event, every row on its own. */
     fun measure(roots: OfficialRoots, manifest: GateManifest, threads: Int = 4): Map<String, Map<String, Int>> {

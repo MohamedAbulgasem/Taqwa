@@ -471,7 +471,7 @@ Each subtask owns exactly: its `engine/registry/authorities/<Group>.kt`, its `to
 2. Run `Fitter.fit` on the fit rows; set the margins (seconds) in the method; run the gate on all rows.
 3. If held-out rows are early, widen the margin by the observed excess plus 5 s, re-run, and note it in proof.md (the spec's rule: never tune on the holdout silently).
 4. Set the entry's class from the result (A: ≤1 min late everywhere measured; B: ≤2 or an unverified unit/season; D_AUTHORITY otherwise) and write the stamp.
-5. Add a commonTest for the authority with at most a few committed data points where the data is open (MUIS, DUM RT, LUPT) or already public in the spec (Diyanet İstanbul 26 Sep 2026).
+5. Add a commonTest for the authority with at most a few committed data points where the data is open (MUIS, DUM RT, LUPT) or already public in the spec (a day of Diyanet's İstanbul table).
 
 Subtasks:
 - **7a Saudi Arabia, Gulf, Egypt:** Umm al-Qura (bias, Asr factor, lag dates, Ramadan 120), IACAD Dubai (fit over 2026–2029 mapped dates), Dubai Rural, Hatta, Qatar (Doha zone, Maghrib +3 all year, later of calendar and API), Kuwait, Bahrain (east/west points), Oman (DAILY_0H_UT, +5, up), ESA (19.5/17.5, NOON_SHADOW Asr, ESA points, 2025+ data only).

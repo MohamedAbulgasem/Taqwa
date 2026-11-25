@@ -1,7 +1,7 @@
 {
   "entry": "sd.ministry",
   "class": "D (authority)",
-  "engineHash": "6dd2e7eca1ae8910",
+  "engineHash": "6b95069b5bf053c5",
   "broken": 0,
   "places": 1,
   "first": "2022-04-02",
@@ -17,6 +17,7 @@
   },
   "placeDays": 30,
   "heldOutDays": 0,
+  "tables": 1,
   "ramadanDays": 30,
   "outOfOrderDays": 0,
   "unreadableLines": 0,

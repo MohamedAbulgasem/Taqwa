@@ -5,7 +5,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import world.taqwa.app.prayer.engine.registry.Place
+import world.taqwa.app.prayer.engine.registry.TimedEvent
+import world.taqwa.app.prayer.engine.registry.data.ReachLimits
 import world.taqwa.timetables.gate.GateManifest
+import world.taqwa.timetables.units.ReachRows
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -49,8 +52,9 @@ class ProvenTest {
         return listOf(start..next.minus(1, DateTimeUnit.DAY), next..next.plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY))
     }
 
+    /** A city's verdict, every measured reach figure accepted ([AcceptedReach]): the R270 hold has its own cases below. */
     private fun verdict(city: City, first: LocalDate = sep1, with: Map<String, Stamp> = stamps) =
-        Proven.verdict(timetable.source(city, first).effective, place(city), with, months(first))
+        Proven.verdict(timetable.source(city, first).effective, place(city), with, months(first), AcceptedReach.ALL)
 
     /** The committed stamp of [entry] with [edit] applied to its parsed JSON (numbers are Longs). */
     @Suppress("UNCHECKED_CAST")
@@ -101,14 +105,79 @@ class ProvenTest {
         assertIs<Verdict.Published>(v)
         // The M25 unit's worst over the starts (Fajr and Isha), at their limit: prove keeps no row over it.
         assertEquals(5, v.atMost)
-        // 4,015 days at 11 places, checked through 31 December 2026, on 12 October 2026; more as prove holds
-        // LUPT's next months (the LPT API, monthly).
-        assertTrue(v.stamp.placeDays >= 4015, v.stamp.placeDays.toString())
-        assertTrue(v.stamp.places >= 11, v.stamp.places.toString())
+        // LUPT's year, counted once where the table is first read (ruling R214: the ten points of the M25's reach
+        // replay it and add no day; 4,015 days at 11 places before that), checked through 31 December 2026; more as
+        // prove holds LUPT's next year.
+        assertTrue(v.stamp.placeDays >= 365, v.stamp.placeDays.toString())
+        assertTrue(v.stamp.places >= 1, v.stamp.places.toString())
         assertTrue(v.through >= LocalDate(2026, 12, 31), v.through.toString())
         assertEquals(false, v.stamp.cautious)
         assertEquals(months(sep1), v.months) // September and October, both checked
         assertNull(v.nextUnchecked)
+    }
+
+    @Test fun aTimetableOrUnitTheMonitorDemotedHasNoPage() {
+        // Ruling R185: the stamp carries prove's @demoted line; the page waits for the failing days to be proven.
+        fun london(vararg lines: Map<String, String>) = stamps + ("gb.london.lupt" to stamp("gb.london.lupt") { it["demoted"] = lines.toList() })
+        val whole = verdict(london, with = london(mapOf("since" to "2027-01-12", "reason" to "fajr early on 3 place-days")))
+        assertIs<Verdict.Held>(whole)
+        assertEquals("gb.london.lupt was demoted by the monitor on 2027-01-12", whole.reason)
+        // The place's own unit (London's M25 unit carries the entry's id).
+        val unit = verdict(london, with = london(mapOf("unit" to "gb.london.lupt", "since" to "2027-01-19", "reason" to "r")))
+        assertIs<Verdict.Held>(unit)
+        assertEquals("gb.london.lupt's unit gb.london.lupt was demoted by the monitor on 2027-01-19", unit.reason)
+        // Another unit's demotion holds no page here.
+        assertIs<Verdict.Published>(verdict(london, with = london(mapOf("unit" to "elsewhere", "since" to "2027-01-19", "reason" to "r"))))
+    }
+
+    @Test fun aUnitReadOverTheCeilingHasAPageOnlyAsFarAsTheOwnerRuled() {
+        // Ruling R270: a unit whose reach was measured over ReachRows.CEILING has no page until the owner rules on its
+        // figures; ruling R291 accepted Kazan's (DUM RT's white-night onset), event by event. The rule, by the map given.
+        val kazan = city("kazan-russia", "RU", 55.78874, 49.12214, "Europe/Moscow", "Tatarstan Republic")
+        val resolution = timetable.source(kazan, sep1).effective
+        fun at(ruled: Map<String, Map<TimedEvent, Int>>) = Proven.verdict(resolution, place(kazan), stamps, months(sep1), ruled)
+        val over = ReachLimits.MINUTES.getValue("ru.dumrt").getValue("kazan").filterValues { it > ReachRows.CEILING }
+        assertTrue(TimedEvent.FAJR in over && TimedEvent.ISHA in over, over.toString())
+        val (fajr, isha) = over.getValue(TimedEvent.FAJR) to over.getValue(TimedEvent.ISHA)
+        for (ruled in listOf(
+            emptyMap(),
+            // one event ruled a minute under its figure
+            mapOf("ru.dumrt/kazan" to over + (TimedEvent.FAJR to fajr - 1)),
+            // every event ruled but Isha, even at a value past Isha's figure (a ruling is per event, not per unit)
+            mapOf("ru.dumrt/kazan" to over - TimedEvent.ISHA + (TimedEvent.FAJR to maxOf(fajr, isha))),
+            // another unit's ruling
+            mapOf("ru.dumrt/elsewhere" to over),
+        )) {
+            val held = at(ruled)
+            assertIs<Verdict.Held>(held, ruled.toString())
+            assertTrue(held.reason.startsWith("ru.dumrt's unit kazan reads ") && held.reason.endsWith("until the owner rules (R270)"), held.reason)
+        }
+        assertTrue("isha $isha min" in (at(mapOf("ru.dumrt/kazan" to over - TimedEvent.ISHA)) as Verdict.Held).reason)
+        // Each event accepted at its figure, the unit's reach holds no page back (whatever else the page waits for).
+        val accepted = at(mapOf("ru.dumrt/kazan" to over))
+        assertTrue(accepted !is Verdict.Held || "R270" !in accepted.reason, accepted.toString())
+        // And the standing rulings name its unit (R291); DocumentTest holds the committed page.
+        assertTrue("ru.dumrt/kazan" in ReachRows.RULED, ReachRows.RULED.keys.toString())
+    }
+
+    @Test fun anEntryWithNoUnitsReadOverTheCeilingHasNoPageUntilTheOwnerRules() {
+        // Ruling R298: MUIS has no units, and its area's measured worst is keyed by its own id. A figure made up here past
+        // the ceiling holds Singapore's page, the notice naming the entry, until a ruling accepts it event by event.
+        val singapore = city("singapore", "SG", 1.28967, 103.85007, "Asia/Singapore")
+        val resolution = timetable.source(singapore, sep1).effective
+        assertNull(resolution.unitId)
+        val over = mapOf(TimedEvent.FAJR to ReachRows.CEILING + 1)
+        val minutes = ReachLimits.MINUTES + ("sg.muis" to mapOf("sg.muis" to over))
+        fun at(ruled: Map<String, Map<TimedEvent, Int>>) = Proven.verdict(resolution, place(singapore), stamps, months(sep1), ruled, minutes)
+        val held = at(emptyMap())
+        assertIs<Verdict.Held>(held)
+        assertEquals(
+            "sg.muis (no units) reads fajr ${ReachRows.CEILING + 1} min across its reach, over the ${ReachRows.CEILING}-min ceiling, " +
+                "until the owner rules (R270)",
+            held.reason,
+        )
+        val accepted = at(mapOf("sg.muis/sg.muis" to over))
+        assertTrue(accepted !is Verdict.Held || "R270" !in accepted.reason, accepted.toString())
     }
 
     @Test fun tripoliIsHeldForItsClass() {
@@ -195,8 +264,9 @@ class ProvenTest {
         assertIs<Verdict.Published>(v)
         assertTrue(v.stamp.cautious)
         assertNull(v.atMost)
-        // 1,400 on 2 October 2026; the weekly monitor's prove only adds rows (docs/MONITOR.md).
-        assertTrue(v.stamp.placeDays >= 1400, v.stamp.placeDays.toString())
+        // The members' year at the first mosque's point, counted once (ruling R214; 1,400 with the same tables replayed
+        // at the other mosques' points); the weekly monitor's prove only adds rows (docs/MONITOR.md).
+        assertTrue(v.stamp.placeDays >= 350, v.stamp.placeDays.toString())
     }
 
     @Test fun torontoShowsOctoberAndNovemberWithIftsFaultDaysExcused() {
@@ -535,6 +605,53 @@ class ProvenTest {
         val expected = GateManifest.load(official.resolve("gate")).rows.size
         assertTrue(expected > 0)
         assertEquals(expected, ProofTotals.gateRows(official))
+    }
+
+    /**
+     * "Published tables" counts publications, not gate rows and not files (rulings R214 and R247, finding F32): a
+     * table replayed at other points of its unit's reach, or by an envelope row, is still one table; so is a table
+     * captured again on a later date, or cut in two halves for the fit; a table's imsak side file is none, and a
+     * hand-kept promise file's calculator table is no published table. The rule, held on the gate as it stands: as
+     * many tables as the distinct publications the ordinary rows read, never more than their distinct files, and
+     * Egypt's reach rows add none (each replays a table eg-esa.tsv already reads at the town's own point).
+     */
+    @Test fun thePublishedTablesAreTheDistinctPublicationsTheGateReadsNotItsRowsOrFiles() {
+        val rows = GateManifest.load(official.resolve("gate")).rows
+        val ordinary = rows.filter { !it.promiseOnly }
+        val tables = ProofTotals.gateTables(official)
+        assertEquals(ordinary.mapNotNull { ProofTotals.tableKey(it.path) }.toSet().size, tables)
+        val files = ordinary.map { it.path }.toSet()
+        assertTrue(tables in 1..files.size, "$tables tables of ${files.size} files")
+        // The files only promise-only rows read (the Moonsighting Committee's calculator tables, R247) add no table.
+        val promised = rows.filter { it.promiseOnly }.map { it.path }.toSet() - files
+        assertEquals(tables, ProofTotals.gateTables(GateManifest(ordinary)), "${promised.size} promise-only files")
+        val replays = rows.filter { it.source.endsWith("-reach.tsv") }
+        assertTrue(replays.isNotEmpty())
+        // Egypt's reach rows read no table its own-point rows do not.
+        val own = rows.filter { it.source == "eg-esa.tsv" }.map { it.path }.toSet()
+        val reach = rows.filter { it.source == "eg-esa-reach.tsv" }.map { it.path }.toSet()
+        assertTrue(own.isNotEmpty() && own.containsAll(reach), "eg-esa-reach.tsv replays only eg-esa.tsv's tables")
+    }
+
+    /** One publication, one key: a later capture, a half and an imsak side file add no table; another town's file does. */
+    @Test fun aLaterCaptureAHalfAndAnImsakSideFileAreNoTablesOfTheirOwn() {
+        val key = ProofTotals::tableKey
+        assertEquals(key("archive/tables/pinned/tr-diyanet/2026-10-05/ankara.txt"), key("archive/tables/pinned/tr-diyanet/2026-11-02/ankara.txt"))
+        assertEquals(key("archive/tables/held/tr-diyanet/adiyaman-2026-11-12.txt"), key("archive/tables/held/tr-diyanet/adiyaman-2026-11-19.txt"))
+        assertEquals(key("archive/tables/split/ift-2026-h1.txt"), key("archive/tables/split/ift-2026-h2.txt"))
+        assertEquals(null, key("archive/tables/imsak/my-jakim/2026-09-28/SGR01-2026.txt"))
+        // Another town, another year and another authority are tables of their own.
+        val distinct = listOf(
+            "archive/tables/pinned/tr-diyanet/2026-10-05/ankara.txt",
+            "archive/tables/pinned/tr-diyanet/2026-10-05/konya.txt",
+            "archive/tables/pinned/my-jakim/2026-11-01/JHR01-2026.txt",
+            "archive/tables/pinned/my-jakim/2026-11-01/JHR01-2027.txt",
+            "archive/tables/pinned/tr-diyanet-europe/2026-10-05/ankara.txt",
+            "open/RU-DUMRT/dumrt-2026-kazan.txt",
+        )
+        assertEquals(distinct.size, distinct.map { key(it) }.toSet().size)
+        // A year in a name is no capture date, and a name is kept whole where nothing closes it.
+        assertEquals("open/RU-DUMRT/dumrt-2026-kazan.txt", key("open/RU-DUMRT/dumrt-2026-kazan.txt"))
     }
 
     @Test fun theSurveyCalendarsAreCountedFromEveryCalendarsFile() {

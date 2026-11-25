@@ -1,0 +1,59 @@
+# Ruling R247 (13 Nov 2026, the audit's finding F18, and its review of 14 Nov): the Moonsighting Committee's own tables
+# for the Americas' far latitudes, held to the promise alone (a `-promise.tsv` file, GateRow.promiseOnly: an early start
+# or a late end breaks the gate; no late limit applies, the days are in no stamp and the tables are in no count of
+# published tables). Kept by hand: `generateEnvelopeRows` neither writes nor removes this file.
+#
+# What the tables are: the output of the Committee's calculator (moonsighting.com, praytable.php, method 0 "shafaq
+# general", Asr Standard) for a point and a year, each file's first line its address. They are a calculator's tables,
+# not a timetable any community there is known to follow: no mosque, council or ministry of Patagonia, Tierra del
+# Fuego, Magallanes, the Falklands or Saint-Pierre publishes one that the archive holds. That is why they are
+# promise-only and not the region's own rows: the lateness against them (the region's Isha up to 172 min after the
+# Committee's in midsummer, its end of eating up to 129 min before the Committee's Fajr) is the region's design, never
+# a figure these places follow.
+#
+# Why they are held all the same: the Committee's is the one published high-latitude rule in wide use in the Americas,
+# and before R247 the region's 15° Fajr came before the Ushuaia table's Fajr on 243 of 365 days, by up to 96 min (the
+# nights the 15° sign returns near the middle of the night) and by up to about 9 min through the winter. A start before
+# the only published reference for a place is closed, not listed away: from 43.5° of latitude
+# (Generic.AMERICAS_FAR_LATITUDE) the region's day takes the Committee's day at the place's own point beside it
+# (Generic.americasAt), each start the later.
+#
+# What these rows prove, and what they do not: the day that stands beside the region's is the app's MODEL of the
+# Committee's rule (the engine's "Other > Moonsighting Committee" method), not the Committee's figures. The rows check
+# that model, inside the region's day, against the Committee's calculator at ten points of the band and one at sea. They
+# do not prove what any community there follows.
+#
+# Splits. Fit, tables the band or the model beside it was built on: Ushuaia 2026 (the band), and Puerto Williams, Isla
+# Hornos and the Drake Passage at 58° S (fetched 11 Oct 2026 by the round that settled the model's seventh of the night
+# from 55° S on these very tables; the review of 14 Nov 2026 found the first two marked `test`, which they are not).
+# Test, tables fetched on 14 Nov 2026 after the band and the model stood, by the review's request, and not looked at
+# before: Comodoro Rivadavia (45.9° S), Río Gallegos (51.6° S), Punta Arenas (53.2° S), Stanley (51.7° S), Saint-Pierre
+# (46.8° N), 2026 and 2027 each; Gobernador Costa (44.0° S) and Paso de Indios (43.9° S), the two sides of the latitude
+# where the Committee's dawn first passes the region's, 2026; and Ushuaia 2027, the year of Ramadan 1448 at the
+# farthest town. All thirteen read green on the first run, with the band's edge at 44° and again at 43.5°.
+#
+# Not here, and why: the Committee's tables for Orcadas (60.7° S) and Esperanza (63.4° S), archive/tables/manual/mcw/
+# 2026-10-11/. Both are Antarctic bases, and Antarctica (AQ) is no country of this region: a place there is shown the
+# world default (default.safe, 18° throughout), whose Fajr is before the Committee's on every day of 2026 there (by 18
+# to 165 min at Orcadas, 12 to 183 at Esperanza, measured against the model). Read as rows of this region they are green,
+# so the band's model holds to 63° S; but a row here would prove a day no place there is shown. Inside the Antarctic
+# Circle the band is not proven (in the polar day at 67.6° S the region's day beside the model's started Fajr before
+# it), so Antarctica was not moved into this region on the review's night: it is a question for the owner (BUILD-LOG).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/manual/mcw/2026-10-11/ushuaia-2026.txt	default.safe.americas	-54.81084	-68.31591	America/Argentina/Ushuaia	F+E S D A M I	daily	standard	fit	Argentina (Ushuaia) 2026, the Moonsighting Committee's calculator at the app's point; promise only (R247)
+archive/tables/manual/mcw/2026-10-11/puertowilliams-2026.txt	default.safe.americas	-54.9341	-67.6109	America/Punta_Arenas	F+E S D A M I	daily	standard	fit	Chile (Puerto Williams) 2026, the Moonsighting Committee's calculator; promise only (R247)
+archive/tables/manual/mcw/2026-10-11/islahornos-2026.txt	default.safe.americas	-55.97	-67.27	America/Punta_Arenas	F+E S D A M I	daily	standard	fit	Chile (Isla Hornos) 2026, the Moonsighting Committee's calculator beyond its 55°; promise only (R247)
+archive/tables/manual/mcw/2026-10-11/drake58-2026.txt	default.safe.americas	-58.0	-65.0	America/Punta_Arenas	F+E S D A M I	daily	standard	fit	The Drake Passage at 58° S 2026, a point at sea at the latitude of the South Sandwich Islands (GS), the band's farthest land; the Moonsighting Committee's calculator; promise only (R247)
+archive/tables/manual/mcw/2026-11-14/comodororivadavia-2026.txt	default.safe.americas	-45.86413	-67.49656	America/Argentina/Catamarca	F+E S D A M I	daily	standard	test	Argentina (Comodoro Rivadavia) 2026, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/comodororivadavia-2027.txt	default.safe.americas	-45.86413	-67.49656	America/Argentina/Catamarca	F+E S D A M I	daily	standard	test	Argentina (Comodoro Rivadavia) 2027, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/riogallegos-2026.txt	default.safe.americas	-51.62261	-69.21813	America/Argentina/Rio_Gallegos	F+E S D A M I	daily	standard	test	Argentina (Río Gallegos) 2026, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/riogallegos-2027.txt	default.safe.americas	-51.62261	-69.21813	America/Argentina/Rio_Gallegos	F+E S D A M I	daily	standard	test	Argentina (Río Gallegos) 2027, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/puntaarenas-2026.txt	default.safe.americas	-53.15483	-70.91129	America/Punta_Arenas	F+E S D A M I	daily	standard	test	Chile (Punta Arenas) 2026, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/puntaarenas-2027.txt	default.safe.americas	-53.15483	-70.91129	America/Punta_Arenas	F+E S D A M I	daily	standard	test	Chile (Punta Arenas) 2027, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/stanley-2026.txt	default.safe.americas	-51.69382	-57.85701	Atlantic/Stanley	F+E S D A M I	daily	standard	test	Falkland Islands (Stanley) 2026, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/stanley-2027.txt	default.safe.americas	-51.69382	-57.85701	Atlantic/Stanley	F+E S D A M I	daily	standard	test	Falkland Islands (Stanley) 2027, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/saintpierre-2026.txt	default.safe.americas	46.78091	-56.17196	America/Miquelon	F+E S D A M I	daily	standard	test	Saint-Pierre and Miquelon (Saint-Pierre) 2026, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/saintpierre-2027.txt	default.safe.americas	46.78091	-56.17196	America/Miquelon	F+E S D A M I	daily	standard	test	Saint-Pierre and Miquelon (Saint-Pierre) 2027, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/gobernadorcosta-2026.txt	default.safe.americas	-44.04969	-70.59809	America/Argentina/Catamarca	F+E S D A M I	daily	standard	test	Argentina (Gobernador Costa) 2026, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/pasodeindios-2026.txt	default.safe.americas	-43.86335	-69.04561	America/Argentina/Catamarca	F+E S D A M I	daily	standard	test	Argentina (Paso de Indios) 2026, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood
+archive/tables/manual/mcw/2026-11-14/ushuaia-2027.txt	default.safe.americas	-54.81084	-68.31591	America/Argentina/Ushuaia	F+E S D A M I	daily	standard	test	Argentina (Ushuaia) 2027, the Moonsighting Committee's calculator at this point; promise only (R247), fetched 14 Nov 2026 after the band stood

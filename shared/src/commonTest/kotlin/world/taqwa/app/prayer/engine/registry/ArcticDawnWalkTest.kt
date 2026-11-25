@@ -57,11 +57,14 @@ class ArcticDawnWalkTest {
     private fun startOf(epochSeconds: Double) = Instant.fromEpochSeconds(ceil(epochSeconds / 60.0).toLong() * 60)
     private fun endOf(epochSeconds: Double) = Instant.fromEpochSeconds(floor(epochSeconds / 60.0).toLong() * 60)
 
-    /** The member's own Fajr dawn at the sky's point on [date] (its angle that day, with its bias), or null where the sun does not reach it. */
+    /**
+     * The member's own Fajr dawn at the sky's point on [date] (its angle that day, with its bias), as a start reads it, or null
+     * where the sun does not reach it.
+     */
     private fun realDawn(method: TimetableMethod, sky: Sky, date: LocalDate): Double? {
         val angle = (method.fajrAngleByDayOfYear?.get(curveSlot(date)) ?: method.fajrAngle) + method.twilightDipDeg
         val bias = method.fajrDeclinationBias?.at(date.dayOfYear, LocalDate(date.year, 12, 31).dayOfYear) ?: 0.0
-        return sky.altitudeTime(date, -angle, morning = true, biasDeg = bias)
+        return sky.crossing(date, -angle, morning = true, biasDeg = bias)?.start
     }
 
     private fun walk(spot: Spot): List<Walked> {
@@ -91,7 +94,8 @@ class ArcticDawnWalkTest {
                     members = resolution.members.zip(days).mapIndexed { i, (member, day) -> Member(member.id, member.method, day, memberSkies[i].second) }
                     raw = Cautious.combine(days, mostFollowed, DayPipeline.realSunset(resolution.point, date, zone))
                 }
-                Walked(date, raw, Invariants.repair(raw), members)
+                // The day shown: the real sun's floors and caps at the user's point (rulings R180 and R265), then the repair.
+                Walked(date, raw, Invariants.repair(DayPipeline.onRealSun(raw, resolution.point, date, zone, resolution.entry.school)), members)
             }
             .toList()
     }
@@ -147,10 +151,10 @@ class ArcticDawnWalkTest {
                 // member whose Fajr is shown (R90 (a): its own sunrise). Where another member's sun
                 // model rises earlier (the week the sun stops setting), that is recorded.
                 val shownFajrMembers = w.members.filter { it.day.fajr == shown.fajr }
-                shownFajrMembers.mapNotNull { it.sky.sunrise(w.date) }.minOrNull()?.let { real ->
+                shownFajrMembers.mapNotNull { it.sky.sunrise(w.date)?.end }.minOrNull()?.let { real ->
                     if (shown.sunrise > endOf(real)) fail("sunrise ${shown.sunrise.clock()} after the sun's ${endOf(real).clock()}")
                 }
-                w.members.mapNotNull { it.sky.sunrise(w.date) }.minOrNull()?.let { real ->
+                w.members.mapNotNull { it.sky.sunrise(w.date)?.end }.minOrNull()?.let { real ->
                     val late = (shown.sunrise - endOf(real)).inWholeMinutes
                     if (late > 0) {
                         sunriseAfterOtherSun++

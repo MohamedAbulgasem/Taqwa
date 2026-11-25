@@ -53,8 +53,11 @@ Horaires du moteur propre à Taqwa ; qibla par la bibliothèque Adhan ; Coran du
 (Plan 5 Task 10's cut, which makes room for the wrist paragraph within Play's 4,000 characters, for Mohamed's approval: it replaces P5.9's: the line of interface languages is left out too, which the App Store lists itself, beside P5.9's own cuts (the opening's last sentence, the Mushaf and recitation bullets in fewer words, and the website and support lines left out); and, as French needs more room: the high-latitude rules join the methods bullet, the 24- or 12-hour clock the Jumu'ah bullet, the (i) bullet says in fewer words that it shows whose times these are and how they are checked, the bookmarks, recitation and adhkar bullets and the sources line are shorter, the trust section's first bullet keeps only what the opening does not already say (no account, no adverts), and the wrist paragraph is written in French's shorter listing style.)
 
 ### Release notes (500)
-Nouveautés de la 1.6.0 :
-• Taqwa sur votre montre : un cadran, des complications et une carte, le tasbih et la qibla, sur les montres Wear OS comme la Galaxy Watch
+Nouveautés de la 1.7.0 :
+• Les horaires de prière sont comparés au calendrier publié dans bien plus d’endroits, dont la Turquie, l’Égypte, le Maroc, l’Algérie, la Malaisie, l’Indonésie, le Bangladesh et le Pakistan
+• Près d’une frontière, les horaires basés sur votre position peuvent maintenant tenir compte des calendriers des deux pays
+• Le widget « Verset du jour » compte désormais 365 versets, un par jour de l’année
+• Une carte sur l’écran Prière vous aide à configurer Taqwa sur votre montre
 
 ## App Store
 
@@ -122,8 +125,10 @@ Horaires du moteur propre à Taqwa ; qibla par la bibliothèque Adhan ; Coran du
 (Its own text since 1.6.0, as each store names only its own watch (App Store Review Guideline 2.3.10): the Play full description above, with the Apple Watch paragraph in place of the Wear OS one, and Apple in place of Google in the bullet after the location one.)
 
 ### What's new (4000)
-Nouveautés de la 1.6.0 :
-• Taqwa sur votre Apple Watch : la prochaine prière dans vos complications, le tasbih avec la Digital Crown, et la qibla
+Nouveautés de la 1.7.0 :
+• Les horaires de prière sont comparés au calendrier publié dans bien plus d’endroits, dont la Turquie, l’Égypte, le Maroc, l’Algérie, la Malaisie, l’Indonésie, le Bangladesh et le Pakistan
+• Près d’une frontière, les horaires basés sur votre position peuvent maintenant tenir compte des calendriers des deux pays
+• Le widget « Verset du jour » compte désormais 365 versets, un par jour de l’année
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Les horaires là où vous êtes

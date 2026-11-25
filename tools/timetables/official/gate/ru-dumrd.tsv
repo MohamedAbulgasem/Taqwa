@@ -1,0 +1,11 @@
+# Dagestan, DUM RD (islamdag.ru; restricted: archive only): the one month held, Makhachkala, September 2026, the
+# capture the research fitted the method on (Fajr about 18° + 3, sunrise − 3, Dhuhr + 5, Shafi'i Asr + 3,
+# Maghrib + 5, Isha 15°, and 60 s more on every time because the localities' points are not published; Russia.kt).
+# Fit: nothing is held out, as RU-DUMRT's single town and kg.default's single day. Its columns are the page's
+# own (Фаджр, Восход, Зухр, Аср, Магриб, Иша; archive/code/.../parse_islamdag.py); no imsak is printed, so the
+# Fajr is also checked as the end of eating (F+E), the stricter reading. Checked at the app's own Makhachkala
+# point (cities.csv), about 250 m from the capture's own coordinates. The file sits in the centralasia folder
+# by a filing slip only (proof/7f-asia.md, concern 2): it is Dagestan's, printed in Moscow time, Dagestan's
+# civil clock. Engine wave W5 (18 Oct 2026, ruling R135).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/centralasia/off_mkh.txt	ru.dumrd	42.97782	47.50027	Europe/Moscow	F+E S D A M I	daily	standard	fit	Makhachkala, September 2026 (islamdag.ru), the month the method was fitted on

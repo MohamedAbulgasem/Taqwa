@@ -35,6 +35,8 @@ import world.taqwa.app.feature.qibla.keepsScreenOn
 import world.taqwa.app.feature.recitation.rememberSurahName
 import world.taqwa.app.feature.tasbeeh.TasbeehScreen
 import world.taqwa.app.feature.tasbeeh.TasbeehViewModel
+import world.taqwa.app.feature.prayer.FollowWatchCard
+import world.taqwa.app.feature.prayer.HomeWatchCard
 import world.taqwa.app.feature.prayer.PrayerScreen
 import world.taqwa.app.feature.prayer.PrayerUiState
 import world.taqwa.app.feature.prayer.PrayerViewModel
@@ -68,6 +70,8 @@ internal fun PrayerRoute(
     navigator: Navigator,
     notificationSettingsState: State<NotificationSettings>,
     exactAlarmsAllowedState: State<Boolean>,
+    /** Home's watch card, held by App for the app's composition and read here while Home is in front. */
+    watchCard: HomeWatchCard,
 ) {
     val notificationSettings by notificationSettingsState
     val exactAlarmsAllowed by exactAlarmsAllowedState
@@ -105,7 +109,7 @@ internal fun PrayerRoute(
     // tab cancels this via composition alone, but the activity being merely
     // stopped (screen off, Home pressed) does not tear down the composable —
     // it stays composed and a plain LaunchedEffect would keep ticking, writing
-    // the widget mirror once a minute, for as long as the process lives.
+    // the widget mirror once or more a minute, for as long as the process lives.
     // repeatOnLifecycle suspends the block on STOP and restarts it on the next
     // START, so the tick truly runs only while the Prayer screen is showing.
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -129,6 +133,11 @@ internal fun PrayerRoute(
         }
     }
 
+    // Home's watch card (1.7.0): the watch read each time Home comes to the front, never elsewhere,
+    // and never where no card can show: without a place, or in a launch that showed a one-time card.
+    FollowWatchCard(watchCard, state)
+    val watchCardUi by watchCard.card.collectAsState()
+
     PrayerScreen(
         state = state,
         onChooseCity = { navigator.push(Screen.CitySearch) },
@@ -143,6 +152,12 @@ internal fun PrayerRoute(
         onOpenAboutTimes = { navigator.push(Screen.AboutTimes) },
         onMatchMyMosque = { navigator.push(Screen.MatchMyMosque) },
         onAnswerCard = { card -> scope.launch { viewModel.answerOneTimeCard(card) } },
+        watchCard = watchCardUi,
+        onOpenWatchCard = watchCard::open,
+        onDismissWatchCard = watchCard::dismiss,
+        onUndoWatchCard = watchCard::undo,
+        onHomeTouched = watchCard::touched,
+        onHomePressed = watchCard::pressed,
     )
 }
 

@@ -6,9 +6,11 @@ import kotlin.test.assertTrue
 
 class AyahPoolTest {
 
+    // One ayah for each day of a year, so a round within which no ayah repeats lasts a year (spec
+    // §3, "Amended 19 November 2026").
     @Test
-    fun hasAHundredEntries() {
-        assertEquals(100, AyahPool.REFS.size)
+    fun hasAYearOfEntries() {
+        assertEquals(365, AyahPool.REFS.size)
     }
 
     @Test

@@ -53,8 +53,11 @@ Namaz vakitleri Taqwa’nın kendi motoruyla hesaplanır; Kıble yönü Adhan k�
 (Plan 5 Task 10's cut, which makes room for the wrist paragraph within Play's 4,000 characters, for Mohamed's approval: the website and support lines are left out, since both stores show them in their own fields, and so is the line of interface languages, which the App Store lists itself; and the Mushaf bullet says the same in fewer words; and, as Turkish needs more room: the high-latitude rules join the methods bullet, the 24- or 12-hour clock the Jumu'ah bullet, and the trust section's first bullet keeps only what the opening does not already say (no account, no adverts). Since 1.5.0's longer notification bullet (main, merged at MM4), the methods bullet ends its list with 'vb.' for 've daha fazlası'.)
 
 ### Release notes (500)
-1.6.0 sürümündeki yenilikler:
-• Taqwa saatinizde: saat yüzü, komplikasyonlar ve kutucuk, tesbih ve Kıble; Galaxy Watch gibi Wear OS saatlerde
+1.7.0 sürümündeki yenilikler:
+• Namaz vakitleri artık yayımlanan takvimle çok daha fazla yerde karşılaştırılıyor; aralarında Türkiye, Mısır, Fas, Cezayir, Malezya, Endonezya, Bangladeş ve Pakistan var
+• Sınıra yakın yerlerde, konumunuza göre belirlenen vakitler artık iki ülkenin takvimini de dikkate alabiliyor
+• “Günün ayeti” widget’ında artık 365 ayet var, yılın her günü için bir tane
+• Namaz ekranındaki bir kart, Taqwa’yı saatinize kurmanıza yardımcı oluyor
 
 ## App Store
 
@@ -122,8 +125,10 @@ Namaz vakitleri Taqwa’nın kendi motoruyla hesaplanır; Kıble yönü Adhan k�
 (Its own text since 1.6.0, as each store names only its own watch (App Store Review Guideline 2.3.10): the Play full description above, with the Apple Watch paragraph in place of the Wear OS one, and Apple in place of Google in the bullet after the location one.)
 
 ### What's new (4000)
-1.6.0 sürümündeki yenilikler:
-• Taqwa Apple Watch’unuzda: komplikasyonlarınızda sonraki namaz, Digital Crown ile tesbih ve Kıble
+1.7.0 sürümündeki yenilikler:
+• Namaz vakitleri artık yayımlanan takvimle çok daha fazla yerde karşılaştırılıyor; aralarında Türkiye, Mısır, Fas, Cezayir, Malezya, Endonezya, Bangladeş ve Pakistan var
+• Sınıra yakın yerlerde, konumunuza göre belirlenen vakitler artık iki ülkenin takvimini de dikkate alabiliyor
+• “Günün ayeti” widget’ında artık 365 ayet var, yılın her günü için bir tane
 
 ## Screenshot captions (her biri tek kısa satır, çerçeveli ekran görüntüsünün üstünde)
 1. Bulunduğunuz yerin namaz vakti

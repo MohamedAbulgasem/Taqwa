@@ -22,9 +22,9 @@ import backup  # noqa: E402
 import fetch  # noqa: E402
 from fetch import CADENCES, INDEX_HEADER, Store, due, skip_reason  # noqa: E402
 from fetchers import diyanet, egypt, irn, jakim, jordan, kemenag, london, masjidal, mawaqit, mjc, morocco, muis, qatar, qmdb, toronto  # noqa: E402
-from fetchers import ummalqura, ummalqura_cities  # noqa: E402
+from fetchers import muftiyat_kg, ummalqura, ummalqura_cities  # noqa: E402
 from prove_tests import Attention, Handoff, Proof, RecipesCatalogue, Workflow  # noqa: E402,F401  (prove's half: proof.py, recipes.tsv, the workflow)
-from guard_tests import QmdbGuard, TzdbGuard  # noqa: E402,F401  (the run's footing: the JDK's tz database, QMDB answering two ways)
+from guard_tests import HeapGuard, QmdbGuard, TzdbGuard  # noqa: E402,F401  (the run's footing: the JDK's tz database, QMDB answering two ways)
 
 
 class Times(unittest.TestCase):
@@ -405,7 +405,8 @@ class Parsers(unittest.TestCase):
             bad[d] = bad[d][:4] + ["06" + bad[d][4][2:]] + bad[d][5:]   # Maghrib twelve hours off, six days running
         bad["2027-05-10"] = bad["2027-05-10"][:3] + ["13" + bad["2027-05-10"][3][2:]] + bad["2027-05-10"][4:]  # Asr an hour early
         bad["2027-05-30"] = ["13" + bad["2027-05-30"][0][2:]] + bad["2027-05-30"][1:]  # Fajr after noon
-        clean, notes, dropped = jakim.slips(bad)
+        clean, notes, dropped, standing = jakim.slips(bad)
+        self.assertEqual({}, standing)
         self.assertEqual(set(), dropped)
         self.assertEqual(["-"] * 6, [clean[d][4] for d in ("2027-05-20", "2027-05-21", "2027-05-22", "2027-05-23", "2027-05-24", "2027-05-25")])
         self.assertEqual("-", clean["2027-05-10"][3])
@@ -416,13 +417,45 @@ class Parsers(unittest.TestCase):
         self.assertFalse(any(re.search(r"\d{1,2}:\d{2}", n) for n in notes), "a note never carries a printed time")
         changed = {(d, c) for d in rows for c in range(6) if clean[d][c] != rows[d][c]}
         self.assertEqual(8, len(changed), "nothing else is touched")
-        self.assertEqual((rows, [], set()), jakim.slips(rows), "a clean table passes as it is")
+        self.assertEqual((rows, [], set(), {}), jakim.slips(rows), "a clean table passes as it is")
         # A day still out of order once its slips are out is left out whole.
         close = {d: v[:3] + ["13" + v[3][2:], "13:" + f"{int(v[3][3:]) + 20:02d}"] + v[5:] for d, v in rows.items()}
         close["2027-05-15"] = close["2027-05-15"][:4] + ["13:" + f"{int(close['2027-05-15'][3][3:]) - 5:02d}"] + close["2027-05-15"][5:]
-        clean, notes, dropped = jakim.slips(close)
+        clean, notes, dropped, _ = jakim.slips(close)
         self.assertEqual({"2027-05-15"}, dropped)
         self.assertEqual(["-"] * 6, clean["2027-05-15"], "every cell '-', so the merge cannot keep an earlier capture's row for it")
+        # A run of days out of line with the days either side in two or more columns, though far inside an hour
+        # (SBH09's shape of 28-31 March 2026), is NEVER left out (ruling R228 as its review round left it: a later
+        # print dropped is an early start listed away): every cell stays as printed, and the run is handed back
+        # with its direction and minutes. One column alone out of line is nothing (a table that steps keeps its
+        # days), nor is a table whose every column steps for good by less.
+        run = dict(rows)
+        for d in ("2027-05-18", "2027-05-19", "2027-05-20", "2027-05-21"):
+            v = run[d]
+            run[d] = [v[0][:3] + f"{int(v[0][3:]) + 10:02d}", v[1][:3] + f"{int(v[1][3:]) + 10:02d}", v[2], v[3][:3] + f"{int(v[3][3:]) + 18:02d}", v[4], v[5]]
+        tidy, said, out, standing = jakim.slips(run)
+        self.assertEqual(set(), out, "an out-of-line day is never left out")
+        self.assertEqual([], said)
+        self.assertEqual(run, tidy, "every cell as printed")
+        self.assertEqual(["2027-05-18", "2027-05-19", "2027-05-20", "2027-05-21"], sorted(standing))
+        self.assertTrue(standing["2027-05-18"].startswith("printed Fajr about 1"), standing)
+        self.assertIn("Asr about 1", standing["2027-05-18"])
+        self.assertIn("min later", standing["2027-05-18"])
+        self.assertNotIn("earlier", standing["2027-05-18"])
+        self.assertFalse(any(re.search(r"\d{1,2}:\d{2}", n) for n in standing.values()), "never a printed time")
+        before = dict(rows)
+        for d in ("2027-05-18", "2027-05-19"):
+            v = before[d]
+            before[d] = [v[0][:3] + f"{int(v[0][3:]) - 9:02d}", v[1], v[2], v[3][:3] + f"{int(v[3][3:]) - 9:02d}", v[4], v[5]]
+        tidy, said, out, standing = jakim.slips(before)
+        self.assertEqual((before, [], set()), (tidy, said, out), "an earlier print is kept as printed too")
+        self.assertIn("min earlier", standing["2027-05-19"])
+        self.assertNotIn("later", standing["2027-05-19"])
+        one = dict(rows)
+        one["2027-05-19"] = one["2027-05-19"][:3] + [one["2027-05-19"][3][:3] + f"{int(one['2027-05-19'][3][3:]) + 18:02d}"] + one["2027-05-19"][4:]
+        self.assertEqual((one, [], set(), {}), jakim.slips(one), "one column out of line alone is kept, and is nothing to rule")
+        step = {d: ([c[:3] + f"{int(c[3:]) + 5:02d}" for c in v] if "2027-05-15" <= d <= "2027-05-27" else v) for d, v in rows.items()}
+        self.assertEqual((step, [], set(), {}), jakim.slips(step), "a table that steps by less keeps its days")
         # Through the store, the day's earlier row in the live file is replaced, not kept.
         t = Table("WLY02-2027", "Labuan", None, None, "Asia/Kuching", "MY", "F+E S D A M I")
         t.rows = {d: list(v) for d, v in close.items()}
@@ -436,6 +469,38 @@ class Parsers(unittest.TestCase):
             store.record("my-jakim", again)
             held = read_table_rows(os.path.join(root, "archive", "tables", "monitor", "my-jakim", "WLY02-2027.txt"))
             self.assertEqual(["-"] * 6, held["2027-05-15"])
+        finally:
+            shutil.rmtree(root)
+
+    def test_jakim_out_of_line_days_are_kept_and_raised_unless_the_engine_holds_them(self):
+        # An invented year (ruling R69): a slow ramp, then four days two columns later than the days either
+        # side. In a zone and on days whose starts the engine holds to the print it is a note; anywhere else an
+        # error, so a human rules it. Either way every cell is written as printed and no message carries a time.
+        self.assertEqual({"SBH09": ("2026-03-28", "2026-03-31")}, jakim.HELD_AS_PRINTED)
+        self.assertTrue(all(z in {zone for zone, _, _ in jakim.ZONES} for z in jakim.HELD_AS_PRINTED))
+        self.assertTrue(jakim.held_as_printed("SBH09", "2026-03-28") and jakim.held_as_printed("SBH09", "2026-03-31"))
+        self.assertFalse(jakim.held_as_printed("SBH09", "2026-03-27") or jakim.held_as_printed("SBH09", "2026-04-01"))
+        self.assertFalse(jakim.held_as_printed("SBH08", "2026-03-28") or jakim.held_as_printed("SBH09", "2027-03-28"))
+        rows = {}
+        for i in range(40):
+            d = (dt.date(2026, 3, 10) + dt.timedelta(days=i)).isoformat()
+            rows[d] = [f"0{h}:{10 + i // 4:02d}" for h in (1, 2)] + [f"1{h}:{10 + i // 4:02d}" for h in (2, 4, 6, 8)]
+        for d in ("2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31"):
+            v = rows[d]
+            rows[d] = [v[0][:3] + f"{int(v[0][3:]) + 10:02d}", v[1], v[2], v[3][:3] + f"{int(v[3][3:]) + 18:02d}", v[4], v[5]]
+        root = tempfile.mkdtemp("monitor-jakim-line")
+        try:
+            for zone, errors, notes in (("SBH09", 0, 1), ("SBH08", 1, 0)):
+                ctx = Context("my-jakim", root, dt.date(2026, 11, 13), lambda line: None, root, http=FakeHttp([]))
+                t = Table(f"{zone}-2026", zone, None, None, "Asia/Kuching", "MY", "F+E S D A M I")
+                self.assertEqual(40, jakim.checked(ctx, t, rows, f"{zone} 2026", zone))
+                self.assertEqual(rows["2026-03-29"], t.rows["2026-03-29"], "kept as printed")
+                self.assertEqual((errors, notes), (len(ctx.errors), len(ctx.notes)), (ctx.errors, ctx.notes))
+                said = (ctx.errors + ctx.notes)[0]
+                self.assertIn("kept as printed", said)
+                self.assertIn("2026-03-28 printed Fajr about 10 min later, Asr about 18 min later than the days either side", said)
+                self.assertIn("for a human to rule (4)" if errors else "held by the engine (4)", said)
+                self.assertIsNone(re.search(r"\d{1,2}:\d{2}", said), "never a printed time")
         finally:
             shutil.rmtree(root)
 
@@ -476,17 +541,21 @@ class Parsers(unittest.TestCase):
             tables = {t.key: t for t in jakim.fetch(ctx)}
         finally:
             shutil.rmtree(root)
-        self.assertEqual(13, len(posted))
+        self.assertEqual(60, len(jakim.ZONES), "every zone of e-solat's list: the first thirteen, the 37 of the zone round of 13 Nov 2026, the ten of its review round")
+        self.assertEqual(len(jakim.ZONES), len({z for z, _, _ in jakim.ZONES}), "no zone twice")
+        self.assertEqual(len(jakim.ZONES), len(posted))
         self.assertEqual({"datestart": "2027-01-01", "dateend": "2027-12-31"}, posted[0][1])
         self.assertEqual(365, len(tables["WLY02-2027"].rows))
         self.assertIn("period=duration", tables["WLY02-2027"].source_line)
+        self.assertIn("(POST, its date-range form", tables["WLY02-2027"].source_line, "the year ahead is a POST and its source line says so")
+        self.assertNotIn("POST", tables["WLY02-2026"].source_line, "the current year is a plain GET")
         self.assertNotIn("SGR01-2027", tables)
         self.assertNotIn("SBH07-2027", tables)
         self.assertIn("(mirror)", tables["SBH01-2027"].name)
         self.assertEqual(12 * 28, len(tables["SBH01-2027"].rows))
         self.assertEqual([], ctx.errors)
         self.assertTrue(any("2027 not published yet for SGR01, SBH07" in n for n in ctx.notes), ctx.notes)
-        self.assertEqual(13 + 12 + 1, len(http.urls), "e-solat's year for each zone, then the mirror for the two zones e-solat failed")
+        self.assertEqual(len(jakim.ZONES) + 12 + 1, len(http.urls), "e-solat's year for each zone, then the mirror for the two zones e-solat failed")
 
     def test_muis(self):
         self.assertEqual("05:44", muis.h24("5:44", 0))
@@ -596,10 +665,6 @@ class Parsers(unittest.TestCase):
         self.assertEqual(10, len(date))
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class Politeness(unittest.TestCase):
     """The client without a network: a fake urlopen, no waits (review I5 the key, M3 the breaker and the budget)."""
 
@@ -657,6 +722,67 @@ class Politeness(unittest.TestCase):
         with self.assertRaises(FetchError):
             http.get("https://b.example/1")
         self.assertEqual(5, len(self.calls))
+
+    def test_the_shipped_interval_between_requests_is_at_least_two_seconds(self):
+        # The rule (13 November 2026): one request at a time, at least 2 s apart, whatever the host. setUp saved the
+        # shipped constant before zeroing it for the other tests; the source is read too, so no test's override hides it.
+        self.assertGreaterEqual(self._interval, 2.0)
+        with open(os.path.join(HERE, "common.py"), encoding="utf-8") as f:
+            source = f.read()
+        shipped = [line for line in source.splitlines() if line.startswith("MIN_INTERVAL =")]
+        self.assertEqual(1, len(shipped))
+        self.assertGreaterEqual(float(shipped[0].split("=")[1].split("#")[0]), 2.0)
+        # A fetcher's own gap is never a way under it: the one written down today is no shorter.
+        self.assertGreaterEqual(muftiyat_kg.KG_GAP, self._interval)
+
+    def test_a_fetcher_can_ask_for_a_longer_gap_and_never_a_shorter(self):
+        slept = []
+        common.time.sleep = slept.append
+        common.MIN_INTERVAL = 2.0
+        self.fake(lambda url: common.urllib.error.HTTPError(url, 404, "no", {}, None))
+        http = Http(self.lines.append)
+        for gap in (None, 3.0, 0.5, 0):
+            http._last = common.time.monotonic()
+            with self.assertRaises(FetchError):
+                http.get("https://a.example/1", gap=gap)
+        self.assertEqual(4, len(slept))
+        for need, got in zip((2.0, 3.0, 2.0, 2.0), slept):
+            self.assertLessEqual(got, need)
+            self.assertGreater(got, need - 0.2)
+
+    def test_the_curl_fallback_is_a_second_request_and_waits_its_interval(self):
+        # The review of 14 November 2026: where Python's TLS stack cannot reach a site, the same request goes through
+        # curl. That is a second request to the site, so it waits like any other, is counted, and the next waits from it.
+        slept = []
+        common.time.sleep = slept.append
+        common.MIN_INTERVAL = 2.0
+        ran = []
+
+        class Done:
+            returncode = 0
+            stdout = b"body\n200"
+            stderr = b""
+
+        def run(cmd, **kw):
+            ran.append(cmd)
+            return Done()
+
+        self.addCleanup(setattr, common.subprocess, "run", common.subprocess.run)
+        common.subprocess.run = run
+        for outcome in (lambda url: common.urllib.error.URLError(common.ssl.SSLError("handshake")), lambda url: common.ssl.SSLError("handshake")):
+            del slept[:], ran[:]
+            self.fake(outcome)
+            http = Http(self.lines.append)
+            http._last = common.time.monotonic()
+            self.assertEqual(b"body", http.get("https://a.example/1", gap=3.0))
+            self.assertEqual(1, len(ran))
+            self.assertEqual(2, http.requests)
+            self.assertEqual(2, len(slept))
+            for got in slept:
+                self.assertLessEqual(got, 3.0)
+                self.assertGreater(got, 2.8)
+            # The next request waits from the curl one, not from the attempt before it.
+            self.assertLess(common.time.monotonic() - http._last, 0.5)
 
     def test_the_run_budget_stops_every_request_once_spent(self):
         self.fake(lambda url: common.urllib.error.URLError("unreachable"))
@@ -900,18 +1026,399 @@ class MoreParsers(unittest.TestCase):
         self.assertNotIn("(new)", str([c[1] for c in diyanet.EUROPE]))
 
 
+class KyrgyzCalendar(unittest.TestCase):
+    """muftiyat_kg's calendar page, invented: its locality checked, and only a whole year accepted (the review of 12 Nov 2026)."""
+
+    @staticmethod
+    def page(point_id, year, skip=()):
+        first = dt.date(year, 1, 1)
+        days = []
+        for i in range((dt.date(year + 1, 1, 1) - first).days):
+            date = (first + dt.timedelta(days=i)).isoformat()
+            if date not in skip:
+                days.append({"date": date, "fajr": "05:00", "sunrise": "06:30", "dhuhr": "12:30", "asr": "16:00",
+                             "sunset": "18:30", "maghrib": "18:37", "isha": "20:00"})
+        return f'<select><option selected value="{point_id}">x</option></select>\n<script>days = {json.dumps(days)};\n</script>'.encode()
+
+    def test_a_whole_year_of_its_own_locality(self):
+        self.assertEqual(365, len(muftiyat_kg.parse_calendar(self.page(7, 2027), 7, 2027)))
+        self.assertEqual(366, len(muftiyat_kg.parse_calendar(self.page(7, 2028), 7, 2028)))
+        with self.assertRaises(FetchError):
+            muftiyat_kg.parse_calendar(self.page(8, 2027), 7, 2027)
+
+    def test_a_cut_short_year_is_refused(self):
+        with self.assertRaisesRegex(FetchError, "364 days of 2027's 365, 2027-12-31"):
+            muftiyat_kg.parse_calendar(self.page(7, 2027, skip={"2027-12-31"}), 7, 2027)
+        with self.assertRaises(FetchError):
+            muftiyat_kg.parse_calendar(self.page(7, 2027, skip={"2027-06-15"}), 7, 2027)
+
+
+class KyrgyzFetch(unittest.TestCase):
+    """muftiyat_kg's run against canned answers: each page asked with its own locality's cookie on a plain GET, and
+    no faster than the fetcher's own gap, which is never below 2 s."""
+
+    def test_each_page_carries_its_locality_and_the_gap(self):
+        listing = json.dumps([{"id": 1, "title": "r", "locations": [{"id": p[0], "title": p[2]} for p in muftiyat_kg.POINTS]}]).encode()
+        http = FakeHttp([(muftiyat_kg.LIST_URL, listing), ("https://muftiyat.kg/kg/calendar/", FetchError("no page"))])
+        root = tempfile.mkdtemp("monitor-kg")
+        self.addCleanup(shutil.rmtree, root)
+        lines = []
+        ctx = Context(muftiyat_kg.SOURCE, root, dt.date(2026, 11, 13), lines.append, os.path.join(root, "monitor"), http=http)
+        self.assertEqual([], muftiyat_kg.fetch(ctx))
+        self.assertGreaterEqual(muftiyat_kg.KG_GAP, 2.0)
+        pages = [(u, g, h) for u, g, h in zip(http.urls, http.gaps, http.sent) if "/calendar/?" in u]
+        self.assertEqual(2 * len(muftiyat_kg.POINTS), len(pages))
+        self.assertTrue(all(g == muftiyat_kg.KG_GAP for _, g, _ in pages))
+        cookies = [h["Cookie"] for _, _, h in pages]
+        self.assertEqual([f"point={p[0]}" for p in muftiyat_kg.POINTS] * 2, cookies)
+        self.assertTrue(all(set(h) == {"Cookie"} for _, _, h in pages), "one header, the locality, and nothing else")
+
+
+class UnreadFormat(unittest.TestCase):
+    """Ruling R281 (the second audit's G19): a fetcher whose answers came back in a format it cannot read fails, never
+    'ok' with no table. Every time invented, in a 12-hour notation no fetcher reads (never a printed time)."""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp("monitor-unread")
+        self.addCleanup(shutil.rmtree, self.root)
+
+    def ctx(self, source, http, today=dt.date(2026, 11, 16)):
+        return Context(source, self.root, today, lambda line: None, os.path.join(self.root, "monitor"), http=http)
+
+    @staticmethod
+    def esolat_year(y, cell):
+        return json.dumps({"status": "OK!", "serverTime": "x", "prayerTime": [
+            {"date": (dt.date(y, 1, 1) + dt.timedelta(days=i)).strftime("%d-%b-%Y").replace("May", "Mei"),
+             "fajr": cell(1), "syuruk": cell(2), "dhuhr": cell(13), "asr": cell(14), "maghrib": cell(15), "isha": cell(16)}
+            for i in range(365)]}).encode()
+
+    def test_jakim_fails_when_no_cell_can_be_read(self):
+        def am_pm(h):
+            return f"{(h - 1) % 12 + 1}:01 {'am' if h < 12 else 'pm'}"
+        http = FakeHttp([(jakim.ESOLAT, self.esolat_year(2026, am_pm))])
+        ctx = self.ctx(jakim.SOURCE, http, today=dt.date(2026, 6, 1))
+        self.assertEqual([], jakim.fetch(ctx))
+        self.assertEqual(len(jakim.ZONES), len(http.urls))
+        self.assertEqual(2 * len(jakim.ZONES), len(ctx.errors), "each zone: its unread days, and no day read")
+        self.assertTrue(all("not a time" in e or "no day of the answer could be read" in e for e in ctx.errors), ctx.errors[:2])
+        self.assertIn("WLY01 2026: 365 of 365 days have a cell that is not a time (the first 2026-01-01)", "\n".join(ctx.errors))
+        self.assertFalse(any(TIME_SHAPE.search(e) for e in ctx.errors), "no printed time in a message (ruling R69)")
+
+    def test_jakim_takes_the_days_it_can_read_and_errs_for_the_rest(self):
+        body = json.loads(self.esolat_year(2026, lambda h: f"{h:02d}:01:00"))
+        body["prayerTime"][40]["maghrib"] = "3:01 pm"
+        http = FakeHttp([(jakim.ESOLAT, json.dumps(body).encode())])
+        ctx = self.ctx(jakim.SOURCE, http, today=dt.date(2026, 6, 1))
+        tables = {t.key: t for t in jakim.fetch(ctx)}
+        self.assertEqual(364, len(tables["WLY01-2026"].rows))
+        self.assertNotIn("2026-02-10", tables["WLY01-2026"].rows)
+        self.assertIn("WLY01 2026: 1 of 365 days have a cell that is not a time (the first 2026-02-10): "
+                      "e-solat's format may have changed; those days are not taken", ctx.errors)
+        self.assertEqual(len(jakim.ZONES), len(ctx.errors), "one error a zone, and no table refused whole")
+
+    def test_the_kyrgyz_muftiate_fails_when_a_cell_cannot_be_read(self):
+        listing = json.dumps([{"id": 1, "title": "r", "locations": [{"id": p[0], "title": p[2]} for p in muftiyat_kg.POINTS]}]).encode()
+
+        class Http(FakeHttp):
+            def get(self, url, headers=None, data=None, timeout=None, retries=1, gap=None):
+                if "/calendar/?" in url:
+                    self.urls.append(url)
+                    pid = int(headers["Cookie"].split("=")[1])
+                    year = int(url.rsplit("-", 1)[1])
+                    page = KyrgyzCalendar.page(pid, year).decode()
+                    if pid == muftiyat_kg.POINTS[0][0]:
+                        page = page.replace('"maghrib": "18:37"', '"maghrib": "6:37 PM"', 1)
+                    elif pid == muftiyat_kg.POINTS[1][0]:
+                        page = page.replace('"18:37"', '"6:37 PM"').replace('"05:00"', '"5:00 AM"')
+                    return page.encode()
+                return super().get(url, headers=headers, data=data, timeout=timeout, retries=retries, gap=gap)
+        http = Http([(muftiyat_kg.LIST_URL, listing)])
+        ctx = self.ctx(muftiyat_kg.SOURCE, http)
+        tables = {t.key for t in muftiyat_kg.fetch(ctx)}
+        first, second = muftiyat_kg.POINTS[0], muftiyat_kg.POINTS[1]
+        self.assertNotIn(f"{first[1]}-2026", tables, "a year with one unread day is not filed in part: the held year stands")
+        self.assertNotIn(f"{second[1]}-2027", tables)
+        self.assertIn(f"{muftiyat_kg.POINTS[2][1]}-2026", tables)
+        self.assertIn(f"{first[2]} 2026: 1 of 365 days could not be read (a cell that is not a time): the Muftiate's page may have changed; the year is not taken", ctx.errors)
+        self.assertIn(f"{second[2]} 2027: 365 of 365 days could not be read (a cell that is not a time): the Muftiate's page may have changed; the year is not taken", ctx.errors)
+        self.assertEqual(4, len(ctx.errors), ctx.errors)
+
+    def test_run_source_fails_a_fetcher_that_read_nothing_it_was_given(self):
+        import types
+
+        def fetch_nothing(ctx):
+            ctx.made += 3
+            for d in ("2026-11-01", "2026-11-02", "2026-11-03"):
+                ctx.note(f"town {d}: cell 1 is not a time")
+            return []
+
+        def fetch_not_yet(ctx):
+            ctx.made += 1
+            ctx.note("2027 not published yet")
+            return []
+        out = {}
+        for name, fn in (("fakeunread", fetch_nothing), ("fakenotyet", fetch_not_yet)):
+            module = types.ModuleType("fetchers." + name)
+            module.fetch = fn
+            sys.modules["fetchers." + name] = module
+            try:
+                ctx = self.ctx("src", FakeHttp([]))
+                out[name] = fetch.run_source({"source": "src", "fetcher": name}, Store(self.root, os.path.join(self.root, "monitor"), dt.date(2026, 11, 16)), ctx)
+            finally:
+                del sys.modules["fetchers." + name]
+        status, message, requests, statuses = out["fakeunread"]
+        self.assertEqual(("failed", 3, {}), (status, requests, statuses))
+        self.assertIn("no table from 3 requests: 3 answers had a cell that is not a time (the source's format may have changed)", message)
+        self.assertEqual("ok", out["fakenotyet"][0], "a source with nothing new and nothing unread is still ok")
+
+
+class PrintedImsak(unittest.TestCase):
+    """Ruling R284 (the second audit's G25): JAKIM's and Kemenag's fetchers keep the printed imsak beside each table as
+    its own capture, `<key>-imsak`, [Subuh, imsak]; kept as printed, an imsak far before its Subuh raised for a human,
+    one after it '-' and an error, one at it kept (Perlis prints no precaution). Every time invented."""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp("monitor-imsak")
+        self.addCleanup(shutil.rmtree, self.root)
+
+    @staticmethod
+    def before(t, minutes):
+        h, m = (int(x) for x in t.split(":")[:2])
+        total = h * 60 + m - minutes
+        return f"{total // 60:02d}:{total % 60:02d}"
+
+    def esolat_year(self, y, imsak=10, odd=None):
+        """A whole year with an imsak `imsak` minutes before Subuh; `odd` {day index: minutes before Subuh}."""
+        rows = []
+        for i in range(365 if y % 4 else 366):
+            date = dt.date(y, 1, 1) + dt.timedelta(days=i)
+            fajr = f"05:{i % 50 + 10:02d}:00"
+            rows.append({"date": date.strftime("%d-%b-%Y").replace("May", "Mei"), "imsak": self.before(fajr, (odd or {}).get(i, imsak)) + ":00",
+                         "fajr": fajr, "syuruk": "07:00:00", "dhuhr": "13:00:00", "asr": "16:00:00", "maghrib": "19:00:00", "isha": "20:00:00"})
+        return json.dumps({"status": "OK!", "serverTime": "x", "prayerTime": rows}).encode()
+
+    def test_jakim_keeps_each_zones_imsak_beside_its_table(self):
+        # Perlis's pattern: its imsak at its Subuh on most days, a minute before it on some (my-jakim.tsv: no precaution).
+        perlis = self.esolat_year(2026, imsak=0, odd={i: 1 for i in range(0, 365, 3)})
+        answers = [(jakim.ESOLAT + "PLS01", perlis), (jakim.ESOLAT + "WLY01", self.esolat_year(2026, odd={40: 20, 41: -1}))]
+        answers += [(jakim.ESOLAT + z, self.esolat_year(2026)) for z, _, _ in jakim.ZONES if z not in ("PLS01", "WLY01")]
+        ctx = Context(jakim.SOURCE, self.root, dt.date(2026, 1, 15), lambda line: None, self.root, http=FakeHttp(answers))
+        tables = {t.key: t for t in jakim.fetch(ctx)}
+        self.assertEqual(2 * len(jakim.ZONES), len(tables))
+        wly = tables["WLY01-2026-imsak"]
+        self.assertEqual(("- Im", "my.jakim/WLY01", 365), (wly.columns, wly.entry, len(wly.rows)))
+        pls = tables["PLS01-2026-imsak"]
+        self.assertEqual("- E", pls.columns, "Perlis's imsak is read as its end of eating, as my-jakim.tsv reads it")
+        self.assertEqual(365, sum(1 for r in pls.rows.values() if r[1] != "-"), "an imsak at its Subuh is kept, never an error")
+        self.assertEqual(pls.rows["2026-01-02"][0], pls.rows["2026-01-02"][1])
+        self.assertEqual([tables["WLY01-2026"].rows["2026-01-01"][0], "05:00"], wly.rows["2026-01-01"])
+        # A day printed 20 min before Subuh is kept as printed and raised; one after Subuh is left '-' and raised.
+        self.assertEqual(self.before(wly.rows["2026-02-10"][0], 20), wly.rows["2026-02-10"][1])
+        self.assertEqual("-", wly.rows["2026-02-11"][1])
+        self.assertEqual(["WLY01 2026 imsak: 1 imsak cell not a time or after Subuh (the first 2026-02-11), left '-'",
+                          "WLY01 2026 imsak: imsak printed more than 15 min before Subuh on 1 day (the first 2026-02-10, up to 20 min), "
+                          "kept as printed, for a human to rule"], ctx.errors)
+        self.assertFalse(any(TIME_SHAPE.search(e) for e in ctx.errors))
+        # The same days once past are notes: the year is read every run, and a past day raised every week would bury
+        # what is coming.
+        later = Context(jakim.SOURCE, self.root, dt.date(2026, 6, 1), lambda line: None, self.root, http=FakeHttp(answers))
+        jakim.fetch(later)
+        self.assertEqual([], later.errors)
+        self.assertIn("WLY01 2026 imsak: imsak printed more than 15 min before Subuh on 1 day (the first 2026-02-10, up to 20 min), "
+                      "kept as printed, for a human to rule (past days)", later.notes)
+
+    def test_jakims_whole_year_ahead_replaces_a_mirrors_year(self):
+        year_ahead = self.esolat_year(2027)
+
+        class Http(FakeHttp):
+            def get(self, url, headers=None, data=None, timeout=None, retries=1, gap=None):
+                if url.startswith(jakim.ESOLAT_DURATION):
+                    self.urls.append(url)
+                    return year_ahead
+                return super().get(url, headers=headers, data=data, timeout=timeout, retries=retries, gap=gap)
+        answers = [(jakim.ESOLAT + z, self.esolat_year(2026)) for z, _, _ in jakim.ZONES]
+        ctx = Context(jakim.SOURCE, self.root, dt.date(2026, 11, 16), lambda line: None, self.root, http=Http(answers))
+        tables = {t.key: t for t in jakim.fetch(ctx)}
+        self.assertFalse(tables["WLY01-2027"].merge, "e-solat's whole year is the capture, never merged into a mirror's")
+        self.assertFalse(tables["WLY01-2027-imsak"].merge)
+        self.assertTrue(getattr(tables["WLY01-2026"], "merge", True), "the current year still merges (a page's days kept)")
+        # Stored over a mirror's year: the live file is e-solat's alone, and its name says so.
+        store = Store(self.root, os.path.join(self.root, "monitor"), dt.date(2026, 11, 16))
+        mirror = Table("WLY01-2027", "Kuala Lumpur WLY01 2027 (mirror)", None, None, "Asia/Kuala_Lumpur", "MY", "F+E S D A M I",
+                       rows={"2027-01-01": ["01:00"] * 6, "2028-01-01": ["01:00"] * 6})
+        store.record("my-jakim", mirror)
+        store.record("my-jakim", tables["WLY01-2027"])
+        live = read_table_rows(os.path.join(self.root, "archive", "tables", "monitor", "my-jakim", "WLY01-2027.txt"))
+        self.assertEqual(365, len(live))
+        self.assertNotIn("2028-01-01", live)
+        self.assertNotIn("(mirror)", store.data["tables"]["my-jakim/WLY01-2027"]["name"])
+
+    def test_a_partial_year_ahead_merged_over_held_days_keeps_the_mirrors_mark(self):
+        whole = json.loads(self.esolat_year(2027))
+        part = dict(whole, prayerTime=whole["prayerTime"][:200])
+        broken = json.loads(self.esolat_year(2027))
+        broken["prayerTime"][9]["dhuhr"] = "x"  # 365 days answered, 364 taken: a held day must not be erased
+
+        def run(body, held):
+            root = tempfile.mkdtemp("monitor-imsak-part")
+            self.addCleanup(shutil.rmtree, root)
+            if held:
+                store = Store(root, os.path.join(root, "monitor"), dt.date(2026, 11, 16))
+                store.record("my-jakim", Table("WLY01-2027", "Kuala Lumpur WLY01 2027 (mirror)", None, None, "Asia/Kuala_Lumpur", "MY",
+                                               "F+E S D A M I", rows={"2027-12-31": ["01:00"] * 6}))
+
+            class Http(FakeHttp):
+                def get(self, url, headers=None, data=None, timeout=None, retries=1, gap=None):
+                    if url.startswith(jakim.ESOLAT_DURATION):
+                        return json.dumps(body).encode() if "WLY01" in url else self.year
+                    return super().get(url, headers=headers, data=data, timeout=timeout, retries=retries, gap=gap)
+            http = Http([(jakim.ESOLAT + z, self.esolat_year(2026)) for z, _, _ in jakim.ZONES])
+            http.year = self.esolat_year(2027)
+            ctx = Context(jakim.SOURCE, root, dt.date(2026, 11, 16), lambda line: None, root, http=http)
+            return {t.key: t for t in jakim.fetch(ctx)}, ctx
+        tables, ctx = run(part, held=True)
+        t = tables["WLY01-2027"]
+        self.assertTrue(t.merge)
+        self.assertTrue(t.name.endswith("(mirror)"), "merged over held days, the capture may hold the mirror's")
+        self.assertTrue(tables["WLY01-2027-imsak"].name.endswith("(mirror)"))
+        self.assertIn("WLY01 2027: e-solat printed 200 days of the year; merged over the days held, it keeps the mirror's mark", ctx.notes)
+        self.assertFalse(tables["JHR01-2027"].name.endswith("(mirror)"), "a whole year is e-solat's own")
+        tables, _ = run(part, held=False)
+        self.assertFalse(tables["WLY01-2027"].name.endswith("(mirror)"), "nothing held: the capture is e-solat's alone")
+        tables, _ = run(broken, held=True)
+        self.assertTrue(tables["WLY01-2027"].merge, "a day not taken leaves the held one standing")
+
+    def test_the_imsak_recipes_read_the_keys_the_fetchers_write(self):
+        # recipes.tsv's `-imsak` lines against the keys jakim.py and kemenag.py write (Recipe.matches: a glob, and only a
+        # pattern ending `-imsak` reads such a key), so the first real capture is planned, not left unread.
+        import fnmatch
+        with open(os.path.join(HERE, "..", "official", "monitor", "recipes.tsv"), encoding="utf-8") as f:
+            lines = [l.rstrip("\n").split("\t") for l in f if l.strip() and not l.startswith("#")][1:]
+        imsak = [(c[0], c[1]) for c in lines if c[1].endswith("-imsak")]
+        for zone, _, _ in jakim.ZONES:
+            self.assertTrue(any(s == jakim.SOURCE and fnmatch.fnmatchcase(f"{zone}-2027-imsak", pat) for s, pat in imsak), zone)
+        places = {p[0] for p in kemenag.PLACES}
+        kem = [pat for s, pat in imsak if s == kemenag.SOURCE]
+        self.assertEqual(18, len(kem))
+        for pat in kem:
+            self.assertIn(pat[:-len("-*-imsak")], places, pat)
+            self.assertTrue(fnmatch.fnmatchcase(pat[:-len("-*-imsak")] + "-2027-imsak", pat))
+        for s, pat in imsak:
+            self.assertFalse(fnmatch.fnmatchcase("WLY01-2027", pat) or fnmatch.fnmatchcase("jakarta-2027", pat), pat)
+
+    def kemenag_reply(self, name, year, month, odd=None):
+        body = json.loads(kemenag_reply(name, year, month))
+        for x in body["data"]["jadwal"]:
+            d = int(x["date"][-2:])
+            x["imsak"] = self.before(x["subuh"], (odd or {}).get(d, 10))
+        return json.dumps(body).encode()
+
+    def test_kemenag_keeps_each_places_imsak_beside_its_table(self):
+        key, cid, name = kemenag.PLACES[0][:3]
+        special = {(cid, 2026, 11): self.kemenag_reply(name, 2026, 11, odd={5: 25, 25: 25}), (cid, 2026, 12): self.kemenag_reply(name, 2026, 12)}
+        http = KemenagHttp(special)
+        ctx = Context(kemenag.SOURCE, self.root, dt.date(2026, 11, 16), [].append, os.path.join(self.root, "monitor"), http=http)
+        tables = {t.key: t for t in kemenag.fetch(ctx)}
+        imsak = tables[f"{key}-2026-imsak"]
+        self.assertEqual(("- Im", 61), (imsak.columns, len(imsak.rows)))
+        self.assertEqual([tables[f"{key}-2026"].rows["2026-11-01"][0], self.before(tables[f"{key}-2026"].rows["2026-11-01"][0], 10)], imsak.rows["2026-11-01"])
+        self.assertEqual(self.before(imsak.rows["2026-11-25"][0], 25), imsak.rows["2026-11-25"][1], "kept as printed")
+        self.assertIn(f"{name} 2026-11 imsak: imsak printed more than 15 min before Subuh on 1 day (the first 2026-11-25, up to 25 min), "
+                      "kept as printed, for a human to rule", ctx.errors)
+        self.assertIn(f"{name} 2026-11 imsak: imsak printed more than 15 min before Subuh on 1 day (the first 2026-11-05, up to 25 min), "
+                      "kept as printed, for a human to rule (past days)", ctx.notes)
+        # The other places' answers print no imsak ('-'): no imsak capture for them.
+        self.assertEqual(1, sum(1 for k in tables if k.endswith("-imsak")))
+
+
+class EgyptFetch(unittest.TestCase):
+    """egypt's run against canned answers: every city ESA's daily page prints that is a unit is kept, the 30
+    Dar al-Ifta republishes and the 48 ESA alone prints (finding F25: the 48 were read and thrown away), and
+    nothing is asked but plain GETs of the two authorities' own pages. Invented times."""
+
+    TIMES = "4:41 ص 6:08 ص 11:39 ص 2:41 م 5:02 م 6:21 م"
+
+    def daily(self, names, date="2027-01-09"):
+        head = "<p>المدينة التاريخ الميلادي التاريخ الهجري فجر شروق ظهر عصر مغرب عشاء "
+        return (head + " ".join(f"{n} {date} 1 شعبان 1448 {self.TIMES}" for n in names) + "</p>").encode("utf-8")
+
+    def run_fetch(self, esa_page, darifta=None):
+        month = ("<div>مواقيت الصلاة خلال الشهر اليوم الفجر الشروق الظهر العصر المغرب العشاء "
+                 "08 يناير 2027 م 5:19 ص 6:51 ص 12:02 م 2:53 م 5:13 م 6:35 م</div>").encode("utf-8")
+        http = PlainHttp([(egypt.DARIFTA, month if darifta is None else darifta), (egypt.ESA, esa_page)])
+        root = tempfile.mkdtemp("monitor-eg")
+        self.addCleanup(shutil.rmtree, root)
+        ctx = Context(egypt.SOURCE, root, dt.date(2027, 1, 9), [].append, os.path.join(root, "monitor"), http=http)
+        return http, ctx, {t.key: t for t in egypt.fetch(ctx)}
+
+    def test_the_48_cities_esa_alone_prints_are_kept(self):
+        self.assertEqual(48, len(egypt.ESA_CITIES))
+        towns, only = [u for u, _ in egypt.TOWNS], [u for u, _ in egypt.ESA_CITIES]
+        self.assertEqual(len(towns) + 48, len(set(towns) | set(only)), "a unit is in one list alone")
+        self.assertEqual(len(towns) + 48, len(set(egypt.esa_units().values())), "every unit has a name ESA's page is read by")
+        names = [n for _, n in egypt.TOWNS] + [n for _, n in egypt.ESA_CITIES]
+        http, ctx, tables = self.run_fetch(self.daily(names))
+        self.assertEqual([], ctx.errors)
+        self.assertEqual([], ctx.notes)
+        self.assertEqual(sorted(towns + only), sorted(tables))
+        for unit in only:
+            t = tables[unit]
+            self.assertEqual(f"eg.esa/{unit}", t.entry)
+            self.assertEqual(["2027-01-09"], sorted(t.rows), unit)
+            self.assertEqual(["04:41", "06:08", "11:39", "14:41", "17:02", "18:21"], list(t.rows["2027-01-09"]))
+            self.assertEqual(["esa-2027-01-09.html"], [n for n, _ in t.raw])
+            self.assertIn(egypt.ESA, t.source_line)
+            self.assertNotIn("Dar al-Ifta", t.source_line)
+        # A town of the 30 holds its month table and the page's day beside it.
+        self.assertEqual(["2027-01-08", "2027-01-09"], sorted(tables["cairo"].rows))
+
+    def test_nothing_is_asked_but_plain_gets_of_the_two_pages(self):
+        names = [n for _, n in egypt.TOWNS] + [n for _, n in egypt.ESA_CITIES]
+        http, _, _ = self.run_fetch(self.daily(names))
+        self.assertEqual(len(egypt.TOWNS) + 1, http.requests, "a request a Dar al-Ifta town and ESA's page once: none for the 48")
+        self.assertEqual([egypt.ESA], [u for u in http.urls if not u.startswith(egypt.DARIFTA)])
+        self.assertTrue(all(d is None for d in http.posted), "no request carries a body")
+        self.assertTrue(all(not h for h in http.sent), "no request carries a header of its own")
+        self.assertTrue(all("?" not in u for u in http.urls if u.startswith("https://www.esa.gov.eg/")), "ESA's page is asked for as it stands")
+
+    def test_esa_spelling_of_the_48_is_folded(self):
+        by = egypt.esa_units()
+        self.assertEqual("6th-of-october", by[egypt.norm_city("6أكتوبر")])
+        self.assertEqual("beni-suef", by[egypt.norm_city("بني سويف")])
+        self.assertEqual("ismailia", by[egypt.norm_city("الاسماعيلية")])
+        self.assertEqual("mut", by[egypt.norm_city("موط (الداخلة )")])
+
+    def test_a_city_with_no_unit_is_named_and_a_silent_one_is_an_error(self):
+        names = [n for _, n in egypt.TOWNS] + [n for u, n in egypt.ESA_CITIES if u != "tanta"] + ["مدينة لا وحدة لها"]
+        _, ctx, tables = self.run_fetch(self.daily(names))
+        self.assertNotIn("tanta", tables)
+        self.assertEqual(47, len([u for u, _ in egypt.ESA_CITIES if u in tables]))
+        self.assertEqual(["ESA's daily page printed no row for 1 of its own cities: tanta"], ctx.errors)
+        self.assertEqual(["ESA's page lists 1 cities the gate has no unit for (not kept): مدينة لا وحدة لها"], ctx.notes)
+
+    def test_a_page_that_cannot_be_had_keeps_the_towns_and_says_so(self):
+        _, ctx, tables = self.run_fetch(FetchError("HTTP 503"))
+        self.assertEqual(sorted(u for u, _ in egypt.TOWNS), sorted(tables))
+        self.assertEqual(1, len(ctx.errors))
+        self.assertIn("ESA's daily page", ctx.errors[0])
+
+
 class FakeHttp:
     """A client that answers from a table of URL -> body (bytes) or an exception, for fetchers under test."""
 
     def __init__(self, answers):
         self.answers = answers
         self.urls = []
+        self.gaps = []  # the gap each request asked for
+        self.sent = []  # the headers each request carried
         self.requests = 0
         self.owner = None
 
-    def get(self, url, headers=None, data=None, timeout=None, retries=1):
+    def get(self, url, headers=None, data=None, timeout=None, retries=1, gap=None):
         self.urls.append(url)
         self.requests += 1
+        self.gaps.append(gap)
+        self.sent.append(headers)
         for prefix, answer in self.answers:
             if url.startswith(prefix):
                 if isinstance(answer, Exception):
@@ -924,6 +1431,18 @@ class FakeHttp:
 
     def json(self, url, **kw):
         return json.loads(self.get(url, **kw).decode("utf-8", "replace"))
+
+
+class PlainHttp(FakeHttp):
+    """FakeHttp that also remembers the body each request carried (None on a plain GET)."""
+
+    def __init__(self, answers):
+        super().__init__(answers)
+        self.posted = []
+
+    def get(self, url, headers=None, data=None, timeout=None, retries=1, gap=None):
+        self.posted.append(data)
+        return super().get(url, headers=headers, data=data, timeout=timeout, retries=retries, gap=gap)
 
 
 class RoundTwo(unittest.TestCase):
@@ -1717,9 +2236,9 @@ class HijriMonth(unittest.TestCase):
 
 
 class HabousPlaces(unittest.TestCase):
-    """The Morocco fetcher's ten units and its 29 edge cities, read from Habous's month files (since
-    November 2026, the old city pages answer 404): each place must carry the name its old page showed, is
-    read at the app's city point as ma.habous, and has its row in ma-habous.tsv at that very point."""
+    """The Morocco fetcher's places, read from Habous's month files (since November 2026, the old city pages
+    answer 404): every unit of ma.habous and no other place, each under the name its ville id has carried,
+    read at its own unit (rulings R195-R199), with its rows in ma-habous.tsv at that unit."""
 
     @staticmethod
     def month_file(year, month, names=None, fuseau="GMT", cols=None, short=()):
@@ -1728,9 +2247,9 @@ class HabousPlaces(unittest.TestCase):
         days = calendar.monthrange(year, month)[1]
         names = dict(names or {})
         villes = []
-        for _, _, ville in morocco.CITIES:
-            villes.append((ville, morocco.CITY_LABELS[ville]))
-        for key, name, ville, label, lat, lon, zone in morocco.EDGE_PLACES:
+        for key, name, ville, label in morocco.PLACES:
+            villes.append((ville, label))
+        for key, name, ville, label, unit in morocco.SECOND_TABLES:
             villes.append((ville, label))
         villes.append((999, "مكان آخر"))
         data = {"annee": year, "mois": month, "fuseau": fuseau, "cols": cols or list(morocco.FILE_COLUMNS), "villes": [
@@ -1757,19 +2276,26 @@ class HabousPlaces(unittest.TestCase):
             shutil.rmtree(root)
         return ctx, tables, http.urls
 
-    def test_the_month_files_are_read_at_the_apps_points_and_an_id_naming_another_place_is_left_out(self):
+    def test_the_month_files_are_read_at_each_unit_and_an_id_naming_another_place_is_left_out(self):
         nov, dec = morocco.MONTH_FILE.format(y=2026, m=11), morocco.MONTH_FILE.format(y=2026, m=12)
         ctx, tables, urls = self.run_fetch({nov: self.month_file(2026, 11, names={104: "فاس"}),  # Marrakesh's id naming Fes
                                             dec: self.month_file(2026, 12)})
         self.assertEqual([nov, dec], urls, "two requests a run: the current month and the next")
-        self.assertEqual(10 + 29, len(tables))
+        self.assertEqual(len(morocco.PLACES) + len(morocco.SECOND_TABLES), len(tables), "every unit, and Agoudal's second table")
+        self.assertEqual({f"ma.habous/{key}" for key, _, _, _ in morocco.PLACES}, {t.entry for t in tables.values()}, "each at its own unit")
+        self.assertEqual({(None, None, "UTC", "F+E S D A M I")}, {(t.lat, t.lon, t.clock, t.columns) for t in tables.values()},
+                         "no table at a point of its own: the unit's point answers")
         self.assertEqual(("2026-12-01", "2026-12-31"), (tables["marrakesh"].first(), tables["marrakesh"].last()),
                          "the month whose file names another place at Marrakesh's id is left out, the other kept")
         self.assertTrue(any("Marrakesh: ville 104 names another place in 2026-11" in e for e in ctx.errors), ctx.errors)
         unit, fes, boujdour = tables["rabat"], tables["fes"], tables["boujdour"]
         self.assertEqual(("ma.habous/rabat", None, None, "Africa/Casablanca", "UTC"), (unit.entry, unit.lat, unit.lon, unit.zone, unit.clock))
-        self.assertEqual(("ma.habous", 34.03313, -5.00028, "Africa/Casablanca", "MA", "UTC", "F+E S D A M I"),
-                         (fes.entry, fes.lat, fes.lon, fes.zone, fes.cc, fes.clock, fes.columns))
+        self.assertEqual(("ma.habous/fes", None, None, "Africa/Casablanca", "MA", "UTC", "F+E S D A M I"),
+                         (fes.entry, fes.lat, fes.lon, fes.zone, fes.cc, fes.clock, fes.columns),
+                         "a city once read at the app's point keeps its key and is read at its unit")
+        second = tables["agoudal-midelt"]
+        self.assertEqual(("ma.habous/agoudal", None, None), (second.entry, second.lat, second.lon), "Agoudal's second table against Agoudal's unit")
+        self.assertEqual(61, len(second.rows))
         self.assertEqual(("Africa/El_Aaiun", "EH"), (boujdour.zone, boujdour.cc))
         self.assertEqual(61, len(fes.rows))
         self.assertEqual(("2026-11-01", "2026-12-31"), (fes.first(), fes.last()))
@@ -1782,7 +2308,7 @@ class HabousPlaces(unittest.TestCase):
         ctx, tables, _ = self.run_fetch({nov: self.month_file(2026, 11), dec: FetchError(f"HTTP 404 from {dec}")})
         self.assertEqual([], ctx.errors)
         self.assertTrue(any("2026-12 not posted yet" in n for n in ctx.notes), ctx.notes)
-        self.assertEqual(39, len(tables))
+        self.assertEqual(len(morocco.PLACES) + len(morocco.SECOND_TABLES), len(tables))
         self.assertEqual("2026-11-30", tables["casablanca"].last())
         ctx, tables, _ = self.run_fetch({nov: FetchError(f"HTTP 404 from {nov}"), dec: FetchError(f"HTTP 404 from {dec}")})
         self.assertEqual({}, tables)
@@ -1805,7 +2331,7 @@ class HabousPlaces(unittest.TestCase):
         self.assertTrue(any("columns are not the six expected" in e for e in ctx.errors), ctx.errors)
         ctx, tables, _ = self.run_fetch({nov: self.month_file(2026, 11, short=(58,)), dec: no_dec})
         self.assertNotIn("casablanca", tables)
-        self.assertEqual(38, len(tables))
+        self.assertEqual(len(morocco.PLACES) + len(morocco.SECOND_TABLES) - 1, len(tables))
         self.assertTrue(any("Casablanca: 2026-11's file does not hold the whole month" in e for e in ctx.errors), ctx.errors)
         ctx, tables, _ = self.run_fetch({nov: b"<html>Just a moment...</html>", dec: no_dec})
         self.assertEqual({}, tables)
@@ -1813,18 +2339,44 @@ class HabousPlaces(unittest.TestCase):
         ctx, tables, _ = self.run_fetch({nov: self.month_file(2026, 10), dec: no_dec})
         self.assertTrue(any("the file holds 2026-10" in e for e in ctx.errors), ctx.errors)
 
-    def test_every_edge_place_has_its_row_in_the_gate_at_its_own_point(self):
+    def test_the_places_are_the_registrys_units_and_each_has_its_rows_in_the_gate(self):
+        """A unit the fetcher does not read is a timetable nobody checks as it is printed (ruling R185's
+        condition), so the list is held to the registry's (HabousCities.kt) both ways."""
+        kotlin = os.path.join(HERE, "..", "..", "..", "shared", "src", "commonMain", "kotlin", "world", "taqwa", "app", "prayer", "engine",
+                              "registry", "data", "HabousCities.kt")
+        with open(kotlin, encoding="utf-8") as f:
+            text = f.read()
+        line = r'^\s+city\((\d+), "([a-z0-9-]+)", "([^"]+)",.*\), // (.+)$'
+        # Habous's units are HabousCities.cities alone: its `spain` list (Sebta and Melilla, ruling R261) is read the same
+        # way but is no unit of Morocco's, rides beside Spain's safe default, and is read by hand (sources.tsv's
+        # ma-habous-spain, ruling R288), so the fetcher must not read it.
+        cities, spain = text.split("val spain", 1) if "val spain" in text else (text, "")
+        units = re.findall(line, cities, re.M)
+        self.assertTrue(len(units) > 150, len(units))
+        spain_villes = {int(v) for v, _, _, _ in re.findall(line, spain, re.M)}
+        self.assertEqual({24, 40}, spain_villes)
+        self.assertFalse(spain_villes & {p[2] for p in morocco.PLACES + [t[:4] for t in morocco.SECOND_TABLES]})
+        # The unit, its name, and Habous's own name for the place (the comment on its line), which a run holds the
+        # file's to: the registry's record of whose table a unit reads is the one the monitor checks.
+        self.assertEqual(sorted((int(ville), unit, name, label) for ville, unit, name, label in units),
+                         sorted((ville, key, name, label) for key, name, ville, label in morocco.PLACES))
+        keys = [p[0] for p in morocco.PLACES] + [p[0] for p in morocco.SECOND_TABLES]
+        villes = [p[2] for p in morocco.PLACES] + [p[2] for p in morocco.SECOND_TABLES]
+        self.assertEqual(len(keys), len(set(keys)), "one table per key")
+        self.assertEqual(len(villes), len(set(villes)), "one table per ville id")
+        self.assertTrue(all(label.strip() == label and label for _, _, _, label in morocco.PLACES))
+        for key, name, ville, label, unit in morocco.SECOND_TABLES:
+            self.assertIn(unit, [p[0] for p in morocco.PLACES], key)
+        self.assertTrue(set(morocco.ZONES) <= {p[0] for p in morocco.PLACES})
         gate = os.path.join(HERE, "..", "official", "gate", "ma-habous.tsv")
         with open(gate, encoding="utf-8") as f:
             lines = [line.rstrip("\n").split("\t") for line in f if line.strip() and not line.startswith("#")]
-        header, rows = lines[0], [dict(zip(lines[0], r)) for r in lines[1:]]
-        self.assertIn("lat", header)
-        at = {(r["entry"], float(r["lat"]), float(r["lon"]), r["zone"], r["clock"], r["columns"]) for r in rows if r["lat"]}
-        for key, name, ville, label, lat, lon, zone in morocco.EDGE_PLACES:
-            self.assertIn(("ma.habous", lat, lon, zone, "UTC", "F+E S D A M I"), at, key)
-        self.assertEqual(29, len(morocco.EDGE_PLACES))
-        self.assertEqual(len(morocco.EDGE_PLACES), len({p[2] for p in morocco.EDGE_PLACES} | set()), "one place per ville id")
-        self.assertFalse({p[2] for p in morocco.EDGE_PLACES} & {c[2] for c in morocco.CITIES}, "no unit city twice")
+        rows = [dict(zip(lines[0], r)) for r in lines[1:]]
+        at = {(r["entry"], r["zone"], r["clock"], r["columns"]) for r in rows if not r["lat"]}
+        for key, name, ville, label in morocco.PLACES:
+            self.assertIn((f"ma.habous/{key}", morocco.ZONES.get(key, "Africa/Casablanca"), "UTC", "F+E S D A M I"), at, key)
+        held_out = {r["entry"] for r in rows if not r["lat"] and r["split"] == "test"}
+        self.assertEqual(set(), {f"ma.habous/{key}" for key, _, _, _ in morocco.PLACES} - held_out, "every unit has a held-out row of its own")
 
 
 class Tls(unittest.TestCase):
@@ -2012,6 +2564,9 @@ class Catalogue(unittest.TestCase):
             self.assertIn(r["cadence"], CADENCES, r["source"])
             self.assertTrue(r["fetcher"] == "manual" or r["fetcher"] in fetchers, r["source"])
             self.assertRegex(r["next_expected"], r"^(-|\d{4}-\d{2}(-\d{2})?)$", r["source"])
+            if r["fetcher"] == "manual":
+                # The audit's F27: a source read by hand is raised by its date alone, so it always carries one.
+                self.assertNotEqual("-", r["next_expected"], f"{r['source']}: a manual source with no date is never raised")
             self.assertFalse(any(TIME_SHAPE.search(v) for v in r.values()), f"{r['source']}: no printed time in the catalogue (ruling R69)")
         mine = [r for r in rows if r["source"] == "za-mjc"]
         self.assertEqual(1, len(mine))
@@ -2026,6 +2581,21 @@ class Catalogue(unittest.TestCase):
         self.assertEqual("ma-habous", morocco.SOURCE)
         self.assertEqual("habous.gov.ma.pem", common.EXTRA_CA["www.habous.gov.ma"])
         self.assertTrue(os.path.isfile(os.path.join(common.CERTS, common.EXTRA_CA["www.habous.gov.ma"])))
+
+    def test_the_hand_read_editions_this_line_rests_on_are_asked_before_ramadan_1448(self):
+        # The second audit's G22: tj.default, ci.default and pk.karachi/in.karachi were built on hand-read editions
+        # (the Council of Ulama, COSIM, Dawat-e-Islami's cards) and are class D, so no Ramadan horizon asks for them;
+        # each is a manual source whose next edition is due before Ramadan 1448 begins (about 8 Feb 2027).
+        rows = {r["source"]: r for r in fetch.read_sources(fetch.SOURCES_TSV)}
+        for source, entries in (("tj-council", ["tj.default"]), ("ci-cosim", ["ci.default"]), ("pk-dawateislami", ["pk.karachi", "in.karachi"])):
+            r = rows[source]
+            self.assertEqual(("manual", "manual"), (r["fetcher"], r["cadence"]), source)
+            for entry in entries:
+                self.assertIn(entry, r["entries"], source)
+            due = r["next_expected"] if len(r["next_expected"]) == 10 else r["next_expected"] + "-01"
+            self.assertLessEqual(due, "2027-02-07", f"{source}: asked before Ramadan 1448")
+        self.assertEqual("default.safe.americas", rows["mcw-far-south"]["entries"])
+        self.assertLessEqual(rows["mcw-far-south"]["next_expected"], "2027-12", "2028's calculator read before 2027 ends")
 
 
 # bonnetid.info as it has been since late September 2026: a searchable city list instead of a select,
@@ -2489,3 +3059,244 @@ class Masjidal(unittest.TestCase):
         self.assertEqual(92, len(tables[0].rows))
         self.assertEqual(1, len(ctx.errors))
         self.assertIn("Masjid DarusSalam, Lombard, IL: HTTP 500", ctx.errors[0])
+
+
+def kemenag_times(date, shift=0):
+    """Invented: a function of the day of the month alone."""
+    m = date.day + shift
+    return [f"04:{m:02d}", f"05:{m:02d}", f"11:{m:02d}", f"15:{m:02d}", f"17:{m:02d}", f"19:{m:02d}"]
+
+
+def kemenag_reply(name, year, month, days=None, shifted=None, cell=None):
+    """myQuran's answer for a month: every day unless `days` lists them; `shifted` {day: minutes} moves a day's times;
+    `cell` puts that text in every cell."""
+    jadwal = []
+    for d in (range(1, calendar.monthrange(year, month)[1] + 1) if days is None else days):
+        date = dt.date(year, month, d)
+        times = kemenag_times(date, (shifted or {}).get(d, 0))
+        jadwal.append(dict(zip(kemenag.KEYS, [cell] * 6 if cell else times), date=date.isoformat(), imsak="-"))
+    return json.dumps({"status": True, "data": {"id": 1, "lokasi": name.upper(), "daerah": "X", "jadwal": jadwal}}).encode()
+
+
+class KemenagHttp:
+    """Answers every month asked with the invented table of the place the id names; `special` gives another answer
+    (bytes or an exception) for an (id, year, month)."""
+
+    def __init__(self, special=None):
+        self.special = special or {}
+        self.names = {p[1]: p[2] for p in kemenag.PLACES}
+        self.asked = []  # (id, year, month)
+        self.plain = True  # every request a bare GET: no header, no body
+        self.gaps = []  # the gap each request asked for
+        self.owner = None
+
+    def get(self, url, headers=None, data=None, timeout=None, retries=1, gap=None, jar=None):
+        self.plain = self.plain and headers is None and data is None and jar is None and url.startswith(kemenag.BASE + "/")
+        self.gaps.append(gap)
+        cid, year, month = url[len(kemenag.BASE) + 1:].split("/")
+        at = (cid, int(year), int(month))
+        self.asked.append(at)
+        answer = self.special.get(at)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer if answer is not None else kemenag_reply(self.names[cid], at[1], at[2])
+
+
+class KemenagFetch(unittest.TestCase):
+    """The Kemenag fetcher's run against canned answers (audit findings F23, F24, F28): what the round holds is held,
+    the next year comes a few places a run, an answer that is not the month asked is an error, a place nothing was
+    read for is raised, and held months are read again in rotation, a changed held day noted."""
+
+    def setUp(self):
+        self.root = tempfile.mkdtemp("monitor-kemenag")
+        self.addCleanup(shutil.rmtree, self.root)
+        self.ids = {p[0]: p[1] for p in kemenag.PLACES}
+
+    def run_on(self, today, special=None):
+        http = KemenagHttp(special)
+        ctx = Context(kemenag.SOURCE, self.root, today, [].append, os.path.join(self.root, "monitor"), http=http)
+        tables = {t.key: t for t in kemenag.fetch(ctx)}
+        self.assertTrue(http.plain, "every request is a bare GET of the schedule's own address")
+        for text in ctx.errors + ctx.notes:
+            self.assertIsNone(TIME_SHAPE.search(text), text)
+        return http, ctx, tables
+
+    def hold(self, folder, key, year, months=range(1, 13), shifted=None):
+        """A held table of `key`'s year: the invented one, `shifted` {(month, day): minutes} aside."""
+        lines = ["# invented"]
+        for month in months:
+            for d in range(1, calendar.monthrange(year, month)[1] + 1):
+                date = dt.date(year, month, d)
+                lines.append(" ".join([date.isoformat()] + kemenag_times(date, (shifted or {}).get((month, d), 0))))
+        write_atomic(os.path.join(self.root, *folder, f"{key}-{year}.txt"), "\n".join(lines) + "\n")
+
+    def a_week_that_reads_again(self, year, month, start):
+        """The first day on or after `start` on which the rotation reads (year, month) again."""
+        day = start
+        while kemenag.reread_months(day, [(year, month)]) != [(year, month)]:
+            day += dt.timedelta(days=1)
+        return day
+
+    def beyond_the_rotation(self, http, today, year):
+        """What was asked of `year` besides the month the rotation reads again on `today`."""
+        again = set(kemenag.reread_months(today, [(year, m) for m in range(1, 13)]))
+        return [a for a in http.asked if a[1] == year and (a[1], a[2]) not in again]
+
+    MONITOR = ("archive", "tables", "monitor", kemenag.SOURCE)
+
+    def test_a_run_reads_the_month_and_the_next_for_every_place(self):
+        http, ctx, tables = self.run_on(dt.date(2026, 6, 10))
+        self.assertEqual(2 * len(kemenag.PLACES), len(http.asked))
+        self.assertEqual({(2026, 6), (2026, 7)}, {(y, m) for _, y, m in http.asked})
+        self.assertEqual(([], []), (ctx.errors, ctx.notes))
+        self.assertEqual(len(kemenag.PLACES), len(tables))
+        self.assertEqual({61}, {len(t.rows) for t in tables.values()})
+
+    def test_every_request_is_a_bare_get_no_faster_than_one_in_two_seconds(self):
+        # Hundreds of requests in a row at a republisher's free API: each asks the client for the fetcher's own gap,
+        # which the client never shortens and which is never below two seconds.
+        self.assertGreaterEqual(kemenag.KEMENAG_GAP, 2.0)
+        for today in (dt.date(2026, 6, 10), dt.date(2026, 11, 13)):
+            http, _, _ = self.run_on(today)
+            self.assertTrue(http.plain)
+            self.assertTrue(http.asked)
+            self.assertEqual({kemenag.KEMENAG_GAP}, set(http.gaps))
+            self.assertEqual(len(http.asked), len(http.gaps))
+
+    def test_a_month_the_round_holds_is_held(self):
+        ctx = Context(kemenag.SOURCE, self.root, dt.date(2026, 11, 13), [].append, os.path.join(self.root, "monitor"), http=KemenagHttp())
+        self.assertFalse(kemenag.month_held(ctx, "jepara", 2027, 2))
+        self.hold(kemenag.ROUND, "jepara", 2027, months=[1, 2])
+        self.assertTrue(kemenag.month_held(ctx, "jepara", 2027, 2))
+        self.assertFalse(kemenag.month_held(ctx, "jepara", 2027, 3))
+        self.hold(self.MONITOR, "jepara", 2027, months=[3])
+        self.assertTrue(kemenag.month_held(ctx, "jepara", 2027, 3), "the monitor's own months count beside the round's")
+        self.assertTrue(kemenag.month_held(ctx, "jepara", 2027, 1))
+        self.assertFalse(kemenag.month_held(ctx, "jepara", 2028, 1))
+
+    def test_the_next_year_is_not_fetched_again_where_the_round_holds_it(self):
+        keys = [p[0] for p in kemenag.PLACES]
+        for key in keys[:-3]:
+            self.hold(kemenag.ROUND, key, 2027)
+        today = dt.date(2026, 11, 13)
+        http, ctx, tables = self.run_on(today)
+        again = set(kemenag.reread_months(today, [(2027, m) for m in range(1, 13)]))
+        filled = {}
+        for cid, year, month in http.asked:
+            if year == 2027 and (year, month) not in again:
+                filled.setdefault(cid, set()).add(month)
+        self.assertEqual({self.ids[k] for k in keys[-3:]}, set(filled), "only the places that lack the year are asked for it")
+        self.assertEqual(2 * len(keys) + 3 * 12 + len(again) * (len(keys) - 3), len(http.asked))
+        self.assertEqual([], ctx.errors)
+        self.assertEqual({365}, {len(tables[f"{k}-2027"].rows) for k in keys[-3:]})
+
+    def test_a_year_new_to_every_place_comes_a_few_places_a_run(self):
+        keys = [p[0] for p in kemenag.PLACES]
+        self.assertLessEqual(kemenag.BACKFILL_PLACES * 12, 300, "a run's share of a new year stays a few minutes")
+        http, ctx, tables = self.run_on(dt.date(2026, 11, 13))
+        asked = [a for a in http.asked if a[1] == 2027]
+        self.assertEqual(kemenag.BACKFILL_PLACES * 12, len(asked))
+        self.assertEqual(len(asked), len(set(asked)), "the month that probes the year is not asked twice")
+        self.assertEqual({self.ids[k] for k in keys[:kemenag.BACKFILL_PLACES]}, {a[0] for a in asked})
+        self.assertEqual([], ctx.errors)
+        left = len(keys) - kemenag.BACKFILL_PLACES
+        self.assertTrue(any(f"2027: {left} more places" in n for n in ctx.notes), ctx.notes)
+        # What a run fetched is held on the next, which goes on with the places after them.
+        for key in keys[:kemenag.BACKFILL_PLACES]:
+            self.hold(self.MONITOR, key, 2027)
+        http, ctx, tables = self.run_on(dt.date(2026, 11, 13))
+        filled = {a[0] for a in self.beyond_the_rotation(http, dt.date(2026, 11, 13), 2027)}
+        self.assertEqual({self.ids[k] for k in keys[kemenag.BACKFILL_PLACES:2 * kemenag.BACKFILL_PLACES]}, filled)
+        # Before October the next year is not asked for, and a year not yet published is a note, asked once.
+        http, ctx, tables = self.run_on(dt.date(2026, 9, 13))
+        self.assertEqual([], self.beyond_the_rotation(http, dt.date(2026, 9, 13), 2027))
+        first = kemenag.PLACES[kemenag.BACKFILL_PLACES]
+        http, ctx, tables = self.run_on(dt.date(2026, 10, 13), {(first[1], 2027, 1): FetchError("HTTP 404")})
+        self.assertEqual([(first[1], 2027, 1)], self.beyond_the_rotation(http, dt.date(2026, 10, 13), 2027))
+        self.assertEqual([], ctx.errors)
+        self.assertTrue(any("2027 not published yet" in n for n in ctx.notes), ctx.notes)
+
+    def test_an_answer_that_is_not_the_month_asked_is_an_error(self):
+        short, empty, other, unread, shapeless, fine = kemenag.PLACES[:6]
+        special = {
+            (short[1], 2026, 6): kemenag_reply(short[2], 2026, 6, days=range(1, 21)),
+            (empty[1], 2026, 6): kemenag_reply(empty[2], 2026, 6, days=[]),
+            (empty[1], 2026, 7): kemenag_reply(empty[2], 2026, 7, days=[]),
+            (other[1], 2026, 6): kemenag_reply(other[2], 2026, 5),
+            (unread[1], 2026, 6): kemenag_reply(unread[2], 2026, 6, cell="soon"),
+            (unread[1], 2026, 7): FetchError("HTTP 500"),
+            (shapeless[1], 2026, 7): json.dumps({"status": True, "data": ["x"]}).encode(),
+        }
+        http, ctx, tables = self.run_on(dt.date(2026, 6, 10), special)
+        self.assertEqual(sorted([
+            f"{short[2]} 2026-06: the answer holds 20 of the month's 30 days",
+            f"{empty[2]}: no rows this run (2026-06: the answer holds 0 of the month's 30 days; 2026-07: the answer holds 0 of the month's 31 days)",
+            f"{other[2]} 2026-06: the answer holds 0 of the month's 30 days and 31 that are not the month's",
+            f"{unread[2]}: no rows this run (2026-06: no day of the answer could be read; 2026-07: HTTP 500)",
+            f"{shapeless[2]} 2026-07: the answer is not in the shape of a month's schedule",
+        ]), sorted(ctx.errors))
+        # Never part of a month for the whole of it: the short month adds no day, the other months stand.
+        self.assertEqual(31, len(tables[f"{short[0]}-2026"].rows))
+        self.assertEqual(31, len(tables[f"{other[0]}-2026"].rows))
+        self.assertEqual(30, len(tables[f"{shapeless[0]}-2026"].rows))
+        self.assertNotIn(f"{empty[0]}-2026", tables)
+        self.assertNotIn(f"{unread[0]}-2026", tables)
+        self.assertEqual(61, len(tables[f"{fine[0]}-2026"].rows))
+        self.assertEqual(len(kemenag.PLACES) - 2, len(tables))
+
+    def test_check_month_takes_the_whole_month_and_nothing_else(self):
+        whole = {f"2028-02-{d:02d}": [] for d in range(1, 30)}
+        kemenag.check_month(whole, 2028, 2)
+        for rows in ({}, dict(list(whole.items())[:-1]), {**whole, "2028-03-01": []}, {d.replace("2028", "2027"): [] for d in whole}):
+            with self.assertRaises(FetchError):
+                kemenag.check_month(rows, 2028, 2)
+
+    def test_every_month_held_is_read_again_once_in_the_cycle(self):
+        months = [(y, m) for y in (2026, 2027, 2028) for m in range(1, 13)]
+        start = dt.date(2026, 11, 13)
+        read = [kemenag.reread_months(start + dt.timedelta(weeks=w), months) for w in range(kemenag.REREAD_WEEKS)]
+        self.assertEqual(sorted(months), sorted(m for week in read for m in week), "each month once in the cycle")
+        self.assertTrue(all(len(week) <= 1 for week in read), "never two months in one run")
+        self.assertEqual(read[0], kemenag.reread_months(start + dt.timedelta(weeks=kemenag.REREAD_WEEKS), months))
+        self.assertEqual([], kemenag.reread_months(start, []))
+
+    def test_a_month_held_beyond_the_next_is_read_again_and_a_changed_day_noted(self):
+        keys = [p[0] for p in kemenag.PLACES]
+        moved, gone = kemenag.PLACES[4], kemenag.PLACES[7]
+        for key in keys:
+            self.hold(kemenag.ROUND, key, 2027)
+        today = self.a_week_that_reads_again(2027, 3, dt.date(2026, 1, 1))
+        self.assertTrue(today < dt.date(2026, 10, 1), "a week of the cycle before the next year's own turn")
+        # As held: every place asked once more, nothing kept.
+        http, ctx, tables = self.run_on(today)
+        self.assertEqual(3 * len(keys), len(http.asked))
+        self.assertEqual({(2027, 3)}, {(y, m) for _, y, m in http.asked if y == 2027})
+        self.assertEqual(([], []), (ctx.errors, ctx.notes))
+        self.assertEqual({2026}, {int(k[-4:]) for k in tables})
+        # Two days of one place read otherwise today, and another place's answer fails.
+        special = {(moved[1], 2027, 3): kemenag_reply(moved[2], 2027, 3, shifted={5: 1, 9: -1}), (gone[1], 2027, 3): FetchError("HTTP 500")}
+        http, ctx, tables = self.run_on(today, special)
+        self.assertEqual([f"{moved[2]} 2027-03: 2 held days changed (the first 2027-03-05); the table now holds what was read today"], ctx.notes)
+        self.assertEqual([f"{gone[2]} 2027-03, read again: HTTP 500"], ctx.errors)
+        kept = tables[f"{moved[0]}-2027"]
+        self.assertEqual(31, len(kept.rows))
+        self.assertEqual(kemenag_times(dt.date(2027, 3, 5), 1), kept.rows["2027-03-05"])
+        self.assertEqual([f"{moved[0]}-2027-03.json"], [name for name, _ in kept.raw])
+        self.assertEqual([f"{moved[0]}-2027"], [k for k in tables if k.endswith("-2027")])
+        # Once the monitor holds what was read, the next run has nothing to note.
+        self.hold(self.MONITOR, moved[0], 2027, months=[3], shifted={(3, 5): 1, (3, 9): -1})
+        http, ctx, tables = self.run_on(today, {(moved[1], 2027, 3): special[(moved[1], 2027, 3)]})
+        self.assertEqual(([], []), (ctx.errors, ctx.notes))
+
+    def test_a_held_day_of_the_month_itself_that_changed_is_noted(self):
+        place = kemenag.PLACES[0]
+        self.hold(kemenag.ROUND, place[0], 2026, shifted={(6, 10): 2})
+        http, ctx, tables = self.run_on(dt.date(2026, 6, 10))
+        self.assertEqual([f"{place[2]} 2026-06: 1 held day changed (the first 2026-06-10); the table now holds what was read today"], ctx.notes)
+        self.assertEqual(kemenag_times(dt.date(2026, 6, 10)), tables[f"{place[0]}-2026"].rows["2026-06-10"])
+
+
+# Last in the file: every class above it is defined before the tests run (the review round of 13 Nov 2026
+# found this block in the middle of the file, so `python3 tests.py` ran only the classes above it).
+if __name__ == "__main__":
+    unittest.main()

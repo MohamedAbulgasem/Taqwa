@@ -7,6 +7,8 @@
 # - dumrt-2026-<town>.txt: every column of the xlsx for the other 18 unit towns (end of sahur, mosque
 #   Fajr, sunrise, zenith, Zuhr, Asr, Maghrib, Isha); the mosque Fajr and the zenith are not checked.
 # Fit on Kazan, whose table the margins are fitted on; the 18 other towns held out.
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	ru.dumrt	open/RU-DUMRT/dumrt-2026-*	*	the margins are Kazan's fit widened by the excess these 18 towns' tables showed (Russia.kt, proof 7b): they pass by construction
 path	entry	lat	lon	zone	columns	format	school	split	note
 open/RU-DUMRT/off_kzn.txt	ru.dumrt/kazan			Europe/Moscow	F+E S - A M I	daily	hanafi	fit	Kazan 2026
 open/RU-DUMRT/off_kzn_mosque.txt	ru.dumrt/kazan			Europe/Moscow	- - D - - -	daily	-	fit	Kazan 2026, the printed Zuhr

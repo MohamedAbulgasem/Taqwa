@@ -6,6 +6,7 @@ import world.taqwa.timetables.gate.DateRun
 import world.taqwa.timetables.gate.Ramadan
 import world.taqwa.timetables.gate.StampSummary
 import world.taqwa.timetables.gate.UnitSummary
+import world.taqwa.timetables.gate.unchecked
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -88,6 +89,90 @@ class HorizonsTest {
         val stamps = fresh.map { if (it.entryId == "no.irn") it.copy(last = LocalDate(2026, 12, 31)) else it }
         assertTrue(Horizons.check(LocalDate(2026, 10, 31), stamps, uqLast, changes).none { "IRN" in it.title })
         assertEquals(1, Horizons.check(LocalDate(2026, 11, 1), stamps, uqLast, changes).count { "IRN" in it.title })
+    }
+
+    @Test
+    fun `a dated notice is raised from its date until the proof holds its days with nothing broken`() {
+        val notice = DatedNotice(
+            "aa.one", LocalDate(2027, 12, 1), DateRun(LocalDate(2028, 2, 29), LocalDate(2028, 3, 1)), listOf("maghrib", "fajr"),
+            "aa.one needs its leap day", "why", "what to do", "horizon:aa-one:leap",
+        )
+        fun on(day: String, stamps: List<StampSummary>) =
+            Horizons.check(LocalDate.parse(day), stamps, uqLast, changes, dated = listOf(notice)).filter { it.key == notice.key }
+        fun with(aaOne: StampSummary?) = fresh.filter { it.entryId != "aa.one" } + listOfNotNull(aaOne)
+
+        // Proven only to the day before the second of its days: not held.
+        val short = with(stamp("aa.one", "A", "2025-01-01", "2028-02-29"))
+        assertTrue(on("2027-11-30", short).isEmpty())
+        val raised = on("2027-12-01", short).single()
+        assertEquals(Kind.HORIZON, raised.kind)
+        assertEquals("aa.one needs its leap day", raised.title)
+        assertEquals("what to do", raised.next)
+        assertTrue("at every unit for maghrib, fajr with nothing broken (not held now; proven through 2028-02-29)" in raised.details.last(), raised.details.last())
+        // It does not go away when the day has come and gone: only the proof ends it.
+        assertEquals(1, on("2028-03-05", short).size)
+        assertTrue("(no stamp now)" in on("2028-03-05", with(null)).single().details.last())
+        assertTrue("held now, but the stamp is red" in on("2028-03-05", with(stamp("aa.one", "A", "2025-01-01", "2028-12-31", broken = 1))).single().details.last())
+        assertEquals(1, on("2028-03-05", with(stamp("aa.one", "A", "2025-01-01", "2028-12-31", checked = runs("2025-01-01..2028-02-28", "2028-03-01..2028-12-31")))).size)
+        assertTrue(on("2027-12-01", fresh).isEmpty())
+        assertTrue(on("2028-03-05", fresh).isEmpty())
+    }
+
+    @Test
+    fun `a dated notice is ended only by every unit's own days of each of its events, never by the entry's days as a whole`() {
+        // The review of 13 Nov 2026: one place's row through the leap day, or another event's, silenced the notice.
+        val notice = DatedNotice(
+            "aa.one", LocalDate(2027, 12, 1), DateRun(LocalDate(2028, 2, 29), LocalDate(2028, 3, 1)), listOf("maghrib", "fajr"),
+            "aa.one needs its leap day", "why", "what to do", "horizon:aa-one:leap",
+        )
+        fun on(aaOne: StampSummary) = Horizons.check(LocalDate(2028, 1, 10), fresh.filter { it.entryId != "aa.one" } + aaOne, uqLast, changes, dated = listOf(notice))
+            .filter { it.key == notice.key }
+        val through2028 = runs("2025-01-01..2028-12-31")
+        val through2027 = runs("2025-01-01..2027-12-31")
+        // The entry's own runs hold the days (one unit reaches them); the other unit does not: still raised, naming it.
+        val oneUnit = stamp("aa.one", "A", "2025-01-01", "2028-12-31", units = listOf(unit("north", "North", through2028), unit("south", "South", through2027)))
+        assertTrue(oneUnit.checked.unchecked(notice.days.from, notice.days.to).isEmpty())
+        assertEquals(listOf("south"), notice.short(oneUnit))
+        assertTrue("not held now at 1 of 2 units: south; proven through 2028-12-31" in on(oneUnit).single().details.last(), on(oneUnit).single().details.last())
+        // Every unit holds the days, but one of them for Maghrib alone: Fajr is asked for too.
+        val oneEvent = stamp(
+            "aa.one", "A", "2025-01-01", "2028-12-31",
+            units = listOf(unit("north", "North", through2028), UnitSummary("south", "South", through2028, mapOf("maghrib" to through2028, "fajr" to through2027))),
+        )
+        assertEquals(listOf("south"), notice.short(oneEvent))
+        assertEquals(1, on(oneEvent).size)
+        // Both units, both events: done.
+        val all = stamp("aa.one", "A", "2025-01-01", "2028-12-31", units = listOf(unit("north", "North", through2028), unit("south", "South", through2028)))
+        assertTrue(notice.short(all).isEmpty())
+        assertTrue(on(all).isEmpty())
+        // A stamp that keeps no units is read by its own runs by event; one that keeps no event's runs holds nothing.
+        val bare = StampSummary("aa.one", setOf("A"), LocalDate(2025, 1, 1), LocalDate(2028, 12, 31), 0, through2028, emptyList(), emptyMap())
+        assertEquals(listOf("the entry"), notice.short(bare))
+    }
+
+    @Test
+    fun `kyrgyzstan's leap day of 2028 is a notice from the first of december 2027`() {
+        val notice = Horizons.DATED.single { it.entryId == "kg.default" }
+        assertEquals(LocalDate(2027, 12, 1), notice.from)
+        assertTrue(LocalDate(2028, 2, 29) in notice.days && LocalDate(2028, 3, 1) in notice.days)
+        assertTrue("29 Feb 2028" in notice.what, notice.what)
+        // The shift lasts the year and is not Maghrib's and Isha's alone: the notice asks for Fajr and the end of eating too.
+        assertEquals(setOf("fajr", "endOfEating", "maghrib", "isha"), notice.events.toSet())
+        assertTrue("to the year's end" in notice.why && "not yet computed" in notice.why, notice.why)
+        // With the built-in list: quiet the day before, one item on the day, held by a proof of every unit through 2028.
+        fun kg(last: String, vararg units: UnitSummary): List<StampSummary> {
+            val runs = runs("2026-01-01..$last")
+            val events = notice.events.associateWith { runs }
+            return fresh + StampSummary("kg.default", setOf("B"), LocalDate(2026, 1, 1), LocalDate.parse(last), 0, runs, units.toList(), events)
+        }
+        fun kgUnit(id: String, last: String) = runs("2026-01-01..$last").let { r -> UnitSummary(id, id, r, notice.events.associateWith { r }) }
+        val kg2027 = kg("2027-12-31", kgUnit("bishkek", "2027-12-31"), kgUnit("osh", "2027-12-31"))
+        assertTrue(Horizons.check(LocalDate(2027, 11, 30), kg2027, uqLast, changes).none { it.key == notice.key })
+        assertEquals(1, Horizons.check(LocalDate(2027, 12, 1), kg2027, uqLast, changes).count { it.key == notice.key })
+        val bishkekOnly = kg("2028-12-31", kgUnit("bishkek", "2028-12-31"), kgUnit("osh", "2027-12-31"))
+        assertEquals(1, Horizons.check(LocalDate(2027, 12, 1), bishkekOnly, uqLast, changes).count { it.key == notice.key })
+        val kg2028 = kg("2028-12-31", kgUnit("bishkek", "2028-12-31"), kgUnit("osh", "2028-12-31"))
+        assertTrue(Horizons.check(LocalDate(2027, 12, 1), kg2028, uqLast, changes).none { it.key == notice.key })
     }
 
     @Test

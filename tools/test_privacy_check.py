@@ -404,12 +404,13 @@ class M3(unittest.TestCase):
     """Mohamed's answer, 31 October 2026 (the ledger's "M3 GIVEN"): "M3 approved, with your two
     suggested tweaks (the opening and the backups sentence)." Every row is approved; the two
     sentences are his in English and carry the same meaning in the six other languages; and the
-    suite runs the strict gate, which fails on any row still awaiting."""
+    suite runs the strict gate, which fails on any row still awaiting. The backups sentence names
+    the ayah widget's pool, 365 since 19 November 2026 (a hundred when he approved it)."""
 
     OPENING = "If you add Taqwa to your watch, its data may travel over the internet too, encrypted, as below."
     DRAFTED_OPENING = "A watch you add Taqwa to may be reached over the internet too, encrypted, as below."
     CACHES = ("the only files of Taqwa's own that are backed up are the widgets' small caches, the upcoming"
-              " prayer times and the hundred ayahs the daily-ayah widget rotates through, neither of which"
+              " prayer times and the 365 ayahs the daily-ayah widget rotates through, neither of which"
               " contains your location.")
     DROPPED = "and that backup is encrypted by Apple and never visible to us"
 

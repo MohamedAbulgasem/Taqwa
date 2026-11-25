@@ -1,0 +1,44 @@
+# Engine wave W5 (18 Oct 2026, rulings R136–R138): the regional safe default for Europe without an authority or a
+# mosque survey (`default.safe.europe`, Generic.kt; spec §6.2 c: Spain, Portugal, Italy, Malta, Luxembourg,
+# Andorra, San Marino, the Vatican, Gibraltar), gated for the first time, as a stress test only: no table is held
+# for any country it serves, so it is checked against the nearest real calendars, France's and Germany's (each
+# has its own cautious entry and a survey; neither is routed here), at latitudes the region itself serves (36° to
+# 50° N; Luxembourg, at 49.6°, is its northernmost country): Paris's three (Drancy, Al-Amel, the Grande Mosquée),
+# Lyon's Abou Bakr, two of Marseille's, two of Munich's and Frankfurt's Masjid Indonesia, each at its own point.
+# Berlin's three calendars were measured on the first pass and left out (ruling R139: a region's stress rows run at
+# the latitudes it serves): at 52.5° N, north of every place the region serves, even the 15° twilight is missing in
+# summer, so each cell there is one substitution rule against another, not a finding about the region; their
+# figures are in BUILD-LOG (W5) for the owner. Every row is held out.
+#
+# What the rows show is the cost of the region's design (its late limits, Generic.kt, europeLateLimits): Fajr 7 to
+# 37 min after the 15° to 18° dawns these calendars print (this region's Fajr is the 12° to 13° family's, the
+# latest in wide European use) and up to 56 min after Munich's Diyanet calendar in summer, whose seasonal takdir
+# holds its dawn early; Isha 13 to 60 min after their 12° to 17° one (this region's is the 18° + 2 min) and up to
+# 144 min after it in summer north of about 45°, where the 18° dusk comes near midnight or, when the sun no longer
+# reaches it, is set by the 1986 proportion; the end of eating (the 18° dawn − 2 min) 12 to 60 min before their
+# Fajr and up to 134 min before it in those summers; and the floors (Paris's Dhuhr + 5 and Maghrib + 4) plus the
+# cushion on the rest (Dhuhr up to 9 min after, Maghrib up to 8, Asr up to 6, sunrise up to 6 before).
+#
+# Masked cells, each a limit of the fallback for the owner (BUILD-LOG, W5), never an exception added quietly:
+# - Munich's IGMG calendar (Diyanet's method): sunrise, Asr and Maghrib are not checked. Diyanet's temkin
+#   (sunrise − 7, Asr + 4, Maghrib + 7) is deeper than this region's floors on each: its sunrise a minute or two
+#   before the region's on 349 days (a late end), its Asr up to 3 min after on 312 days and its Maghrib up to 2 min
+#   after on 121 days (starts before Diyanet's). The same definitional difference safe-default.tsv masks for
+#   İstanbul; Diyanet's mosques in Italy or Luxembourg would see it, which is the owner's §6.2 c question.
+# - Frankfurt's Masjid Indonesia (a 20° dawn, Kemenag's conventions): Fajr, sunrise, Asr and Maghrib are not
+#   checked. In June the 20° dawn is missing at 50° N and the calendar's substitute Fajr comes after this
+#   region's real 12° dawn, by up to 11 min on 39 days (a start before the calendar's; the one finding that could
+#   reach a served place, Luxembourg, 0.5° further south); its sunrise is printed a minute or two before this
+#   region's on 346 days (a late end), its Asr up to 3 min after on 301 days and its Maghrib up to 2 min after on
+#   122 days, its own precaution minutes deeper than the region's floors. Its end of eating, Dhuhr and Isha are
+#   checked.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/ukfr/fr_drancy.txt	default.safe.europe	48.8418	2.3556	Europe/Paris	F+E S D A M I	daily	standard	test	France (Drancy) 2026, stress test
+archive/tables/moral-auth-world/ukfr/fr_alamel.txt	default.safe.europe	48.8418	2.3556	Europe/Paris	F+E S D A M I	daily	standard	test	France (Al-Amel) 2026, stress test
+archive/tables/moral-auth-world/ukfr/split-7g/gmp-2026-jan-sep.txt	default.safe.europe	48.8418	2.3556	Europe/Paris	F+E S D A M I	daily	standard	test	France (Grande Mosquée de Paris) January to September 2026, stress test
+archive/tables/fr-mawaqit/aboubakr69003.txt	default.safe.europe	45.7570348	4.8438032	Europe/Paris	F+E S D A M I	daily	standard	test	France (Abou Bakr, Lyon) 2026, Mawaqit, stress test
+archive/tables/fr-mawaqit/consolat-marseille-13015-france.txt	default.safe.europe	43.3465558	5.3468972	Europe/Paris	F+E S D A M I	daily	standard	test	France (Consolat, Marseille) 2026, Mawaqit, stress test
+archive/tables/fr-mawaqit/mosquee-al-taqwa-marseille-13002-france.txt	default.safe.europe	43.3027042	5.3738762	Europe/Paris	F+E S D A M I	daily	standard	test	France (Al Taqwa, Marseille) 2026, Mawaqit, stress test
+archive/tables/de-mawaqit/eyup-sultan-camii-munich-81673-germany.txt	default.safe.europe	48.130194328991	11.615743339062	Europe/Berlin	F+E - D - - I	daily	standard	test	Germany (IGMG Berg am Laim, Munich) 2026, Mawaqit, Diyanet's method, stress test; sunrise, Asr and Maghrib not checked (see header)
+archive/tables/de-mawaqit/rahma-moschee-msjd-lrhm-munich-81549-germany.txt	default.safe.europe	48.1017	11.5989	Europe/Berlin	F+E S D A M I	daily	standard	test	Germany (Rahma, Munich) 2026, Mawaqit, stress test
+archive/tables/de-mawaqit/masjid-indonesia-frankfurt-frankfurt-60599-germany.txt	default.safe.europe	50.1033708	8.7023687	Europe/Berlin	E - D - - I	daily	standard	test	Germany (Masjid Indonesia, Frankfurt) 2026, Mawaqit, stress test; Fajr, sunrise, Asr and Maghrib not checked (see header)

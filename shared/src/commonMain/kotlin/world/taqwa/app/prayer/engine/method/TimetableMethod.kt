@@ -125,6 +125,36 @@ sealed interface EndOfEating {
 }
 
 /**
+ * What a printed imsak ([TimetableMethod.imsakMinutesBeforeFajr] minutes before it) is counted back from
+ * (the JAKIM imsak round of 12 Nov 2026). Either way it is an end: never after the authority's printed imsak.
+ */
+sealed interface ImsakFrom {
+    /**
+     * The authority's dawn as an end, the dawn the end of eating hangs off: the earliest over the points an end is
+     * read at, its Fajr minutes and [TimetableMethod.endOfEatingMarginSeconds], rounded down. Where the authority
+     * prints its Fajr for the same point the end of eating is read at, this is its imsak to the minute.
+     */
+    data object Dawn : ImsakFrom
+
+    /**
+     * The authority's Fajr as it prints it: the dawn at the points the starts are read at, the latest (a unit's own
+     * point and [TimetableMethod.startPoints]), with its Fajr minutes and [marginSeconds], rounded up as an authority
+     * rounds its Fajr; then less the minutes. For an authority that prints its imsak as its own printed Fajr less the
+     * minutes and its Fajr for a point later than the one its fast is read at (JAKIM: each zone's Subuh for its latest
+     * point, its imsak that Subuh − 10), where [Dawn] would put the imsak minutes before the print.
+     *
+     * [marginSeconds] is the imsak's own, fitted as an end on the printed Fajr less the minutes (`Fitter`: never
+     * after it), not the Fajr's start margin, which keeps the Fajr shown never early and so up to the class's
+     * minutes after the print: an imsak hung off the Fajr shown would be as late. The end of eating keeps its own
+     * dawn ([TimetableMethod.endOfEating]): this moves the precaution alone. A table's point riding beside the user's
+     * still bounds it (DayComputer's point 7: never after the table's own imsak); at a unit's edge
+     * ([world.taqwa.app.prayer.engine.registry.atEdge]), where the table's point is not known, it is [Dawn] again,
+     * as the margin was fitted at the table's point alone; a polar day counts it back from the dawn as an end.
+     */
+    data class PrintedFajr(val marginSeconds: Int) : ImsakFrom
+}
+
+/**
  * What changes on the authority's Ramadan dates besides an [IshaRule.AfterMaghrib]'s own minutes.
  * [ishaFloorMinutesAfterMaghrib] is for an [IshaRule.Angle]: on the entry's Ramadan dates, Isha is
  * never earlier than the shown Maghrib plus these minutes — a floor added on top of the angle, not a
@@ -141,11 +171,37 @@ data class RamadanRule(val maghribExtraSeconds: Int = 0, val ishaFloorMinutesAft
  * the later, sunrise, sunset, the end of eating, imsak and every end the earlier. Unlike [TimetableMethod.envelopePoints],
  * which read the method's one set of curves at every point, each day keeps its own: the user's own day is exactly what
  * it was without the table, and the table's exactly its own, so nothing is later than the later of the two needs.
+ *
+ * [after], when set, is the last date the day does not ride: it is beside the method's own only on the dates after it
+ * (ruling R231 as revised: Algeria's fitted seats after the last day of the calendar they were fitted on, each start
+ * a whole minute later and each end a whole minute earlier until the next calendar is read). Null rides every date.
  */
-data class Alongside(val point: GeoPoint, val method: TimetableMethod) {
+data class Alongside(val point: GeoPoint, val method: TimetableMethod, val after: LocalDate? = null) {
     init {
         require(method.alongside.isEmpty()) { "${method.id}: a day alongside carries no day alongside of its own" }
     }
+
+    /** Whether this day rides beside the method's own on [date] ([after]). */
+    fun rides(date: LocalDate): Boolean = after == null || date > after
+}
+
+/**
+ * Days an authority's own table prints minutes after the days around them, held as printed (ruling R228 as the review
+ * round of 13 Nov 2026 left it: a later print is never left out of the proof, so a start is never before it). From
+ * [from] to [to] each start shown is [starts] seconds later, on top of the method's margins. Only the starts move: the
+ * sunrise, the end of eating and the imsak stay where the sun puts them, since an end is never moved later to meet a
+ * print, so on these days they come before the print by about as much.
+ */
+data class PrintedLater(val from: LocalDate, val to: LocalDate, val starts: EventOffsets) {
+    init {
+        require(from <= to) { "a held run of days ends no earlier than it begins ($from..$to)" }
+        require(starts.sunrise == 0) { "the sunrise is an end: it is never held later ($from..$to)" }
+        require(listOf(starts.fajr, starts.dhuhr, starts.asr, starts.maghrib, starts.isha).all { it >= 0 }) {
+            "a held day's starts are only ever later ($from..$to)"
+        }
+    }
+
+    operator fun contains(date: LocalDate): Boolean = date >= from && date <= to
 }
 
 /**
@@ -221,9 +277,18 @@ sealed interface HighLatRule {
  * - [authorityMinutes] are the authority's own offsets (Diyanet's temkin); [margins] are ours, in
  *   seconds, fitted to reproduce its minutes and rounding.
  * - [fixedDhuhrLocalMinutes]: Dhuhr is never before this local time (minutes after midnight).
+ * - [fixedAsrLocalMinutes]: Asr, in either school, is never before this local time (minutes after midnight), as
+ *   [fixedDhuhrLocalMinutes] is for Dhuhr: COSIM prints Côte d'Ivoire's Asr at a conventional 16:00 (the safe defaults
+ *   lane, 12 Nov 2026). It holds a start only: Dhuhr still ends at the Standard Asr the sky gives (the trust audit's
+ *   F2, 13 Nov 2026).
+ * - [ishaFloorMinutesAfterMaghrib]: on every date, an [IshaRule.Angle]'s Isha is never earlier than the shown Maghrib
+ *   plus these minutes, a floor on top of the angle as [RamadanRule.ishaFloorMinutesAfterMaghrib] is on the Ramadan
+ *   dates (the later of the two where both are set): Tajikistan's Council of Ulama prints Khufton at Shom + 90 on
+ *   every day held (the safe defaults lane, 12 Nov 2026).
  * - [fajrAfterDawnMinutes]: the Fajr shown begins this long after the dawn (Kosovo: imsak + 20).
- * - [imsakMinutesBeforeFajr]: the printed imsak, an end: the authority's dawn (its Fajr minutes
- *   and [endOfEatingMarginSeconds], rounded down) less these minutes.
+ * - [imsakMinutesBeforeFajr]: the printed imsak, an end: what [imsakFrom] counts it back from less
+ *   these minutes; by default ([ImsakFrom.Dawn]) the authority's dawn (its Fajr minutes and
+ *   [endOfEatingMarginSeconds], rounded down), with [ImsakFrom.PrintedFajr] its Fajr as it prints it.
  * - [fajrAngleByDayOfYear] / [ishaAngleByDayOfYear]: 366 angles, one per month and day at
  *   [curveSlot] (29 February is slot 59 in every year), replacing [fajrAngle] / an
  *   [IshaRule.Angle]'s degrees (London Unified).
@@ -255,6 +320,9 @@ sealed interface HighLatRule {
  * - [fixedTableOwnDawn]: under [fixedTableYear], the dawn is also the date's own: Fajr never before,
  *   and the end of eating and imsak never after, what the method gives on the date's own sun (IZ
  *   BiH's edge, where no table is held and Taqwa keeps the real dawn, spec §10.8).
+ * - [printedLater]: days the authority's own table prints after the days around them, each start held to the print,
+ *   never before it ([PrintedLater]; JAKIM's SBH09 on 28 to 31 March 2026). Only for a method whose starts are all
+ *   the margins' own: no clock rule, no day held around its Dhuhr, no DUM RT summer rule and no fixed table year.
  *
  * The arrays compare by reference in [equals]; methods are registry singletons.
  */
@@ -274,9 +342,12 @@ data class TimetableMethod(
     val dayRule: DayRule = DayRule.SAME_DAY,
     val ramadan: RamadanRule? = null,
     val fixedDhuhrLocalMinutes: Int? = null,
+    val fixedAsrLocalMinutes: Int? = null,
+    val ishaFloorMinutesAfterMaghrib: Int? = null,
     val endOfEating: EndOfEating = EndOfEating.SameAsFajrDawn,
     val endOfEatingMarginSeconds: Int = 0,
     val imsakMinutesBeforeFajr: Int? = null,
+    val imsakFrom: ImsakFrom = ImsakFrom.Dawn,
     val fajrAfterDawnMinutes: Int = 0,
     val highLatitude: HighLatRule = HighLatRule.Standard,
     val startPoints: List<GeoPoint> = emptyList(),
@@ -294,8 +365,13 @@ data class TimetableMethod(
     val fixedTableYear: Int? = null,
     val fixedTableOwnDawn: Boolean = false,
     val alongside: List<Alongside> = emptyList(),
+    val printedLater: List<PrintedLater> = emptyList(),
 ) {
     init {
+        require(
+            printedLater.isEmpty() || (clockRule == null && dayAroundDhuhrMinutes == null && fixedTableYear == null &&
+                highLatitude !is HighLatRule.DumRtSummer),
+        ) { "$id: printedLater holds the starts the margins alone set" }
         require(dayAroundDhuhrMinutes == null || dayAroundDhuhrMinutes in 1 until 12 * 60) {
             "$id: dayAroundDhuhrMinutes is half a day's minimum length, under 12 hours"
         }
@@ -311,6 +387,12 @@ data class TimetableMethod(
         require(monthlyOffsets == null || monthlyOffsets.values.all { it.size == 12 }) {
             "$id: monthlyOffsets need 12 values per prayer"
         }
+        require(ishaFloorMinutesAfterMaghrib == null || (isha is IshaRule.Angle && ishaFloorMinutesAfterMaghrib > 0)) {
+            "$id: ishaFloorMinutesAfterMaghrib is a floor on an angle Isha, in minutes after Maghrib"
+        }
+        require(fixedAsrLocalMinutes == null || fixedAsrLocalMinutes in 0 until 24 * 60) {
+            "$id: fixedAsrLocalMinutes is a local time of day"
+        }
         require(fixedDhuhrLocalMinutes == null || fixedDhuhrLocalMinutes in 0 until 24 * 60) {
             "$id: fixedDhuhrLocalMinutes is a local time of day"
         }
@@ -321,6 +403,9 @@ data class TimetableMethod(
                 ),
         ) {
             "$id: a fixed table's year reads no other date's rules (Ramadan, day, clock, phase year)"
+        }
+        require(imsakFrom == ImsakFrom.Dawn || imsakMinutesBeforeFajr != null) {
+            "$id: imsakFrom says what an imsak is counted back from; the method shows none (imsakMinutesBeforeFajr)"
         }
         require(fixedTableYear == null || fixedPointMode != FixedPointMode.TABLE) {
             "$id: a fixed table's day is held to the date's own sunset, not a table point's carried by a printed figure"

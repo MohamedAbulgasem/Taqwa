@@ -33,6 +33,13 @@
 @excuse	ca.toronto	ca.mac	*	2026-03-28	fault	left out with IFT's fault day
 @excuse	ca.toronto	ca.mac	*	2026-11-01..2026-11-06	fault	left out with IFT's fault days
 @excuse	ca.toronto	ca.mac	*	2026-11-28..2026-11-30	fault	left out with IFT's fault days
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	ca.ift	archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	*	each margin was widened by the held-out half's excess, which comes to the fit over the whole year (proof 7g)
+@fitted	ca.iit	archive/tables/moral-auth-world/namerica/canada/split-7g/iit-2026-h2.txt	*	each margin was widened by the held-out half's excess, which comes to the fit over the whole year (proof 7g)
+@fitted	ca.mac	archive/tables/moral-auth-world/namerica/canada/split-7g/mac-2026-h2.txt	*	each margin was widened by the held-out half's excess, which comes to the fit over the whole year (proof 7g)
+@fitted	ca.ift	archive/tables/pinned/ca-toronto/2026-10-02/ift-2026.txt	*	the same 2026 table as the two halves above, the monitor's capture of it: the whole year the margins are fitted on
+@fitted	ca.iit	archive/tables/pinned/ca-toronto/2026-10-02/iit-2026.txt	*	the same 2026 table as the two halves above, the monitor's capture of it: the whole year the margins are fitted on
+@fitted	ca.mac	archive/tables/pinned/ca-toronto/2026-10-02/mac-2026.txt	*	the same 2026 table as the two halves above, the monitor's capture of it: the whole year the margins are fitted on
 path	entry	lat	lon	zone	columns	format	school	split	note	member
 archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h1.txt	ca.ift/ca.ift			America/Toronto	F+E S D A M I	daily	hanafi	fit	IFT January-June 2026
 archive/tables/moral-auth-world/namerica/canada/split-7g/ift-2026-h2.txt	ca.ift/ca.ift			America/Toronto	F+E S D A M I	daily	hanafi	test	IFT July-December 2026

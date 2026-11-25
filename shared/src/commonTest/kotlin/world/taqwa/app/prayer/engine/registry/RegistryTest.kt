@@ -11,6 +11,7 @@ import kotlinx.datetime.toInstant
 import world.taqwa.app.hijri.TabularHijriCalendar
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.astro.altitudeTime
 import world.taqwa.app.prayer.engine.day.DayComputer
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.EndOfEating
@@ -21,12 +22,14 @@ import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.method.curveSlot
 import world.taqwa.app.prayer.engine.registry.authorities.Diyanet
 import world.taqwa.app.prayer.engine.registry.authorities.TwilightCurves
+import world.taqwa.app.prayer.engine.registry.data.DiyanetBesideDistricts
 import world.taqwa.app.prayer.engine.registry.data.EndOfEatingDawns
 import world.taqwa.app.prayer.engine.registry.data.UmmAlQuraDates
 import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertSame
@@ -108,14 +111,14 @@ class RegistryTest {
         assertNull(esenyurt.unitName)
         assertEquals(EntryClass.D_AUTHORITY, esenyurt.entryClass)
         // Rulings R103 and R106: beyond Kota Jakarta's 8 km core (DKI's own boundary) the edge, with its allowance for
-        // an unknown seat, replaces R46's reach unit: Depok and Bekasi, which print their own tables, get the edge.
-        for ((lat, lon) in listOf(-6.4 to 106.81861, -6.2349 to 106.9896)) { // Depok, Bekasi
+        // an unknown seat, replaces R46's reach unit: Depok and Bekasi, which print their own tables, never get
+        // Jakarta's. Since the round of 12 Nov 2026 each city's own point is its own kota's unit (KemenagKabkota).
+        for ((lat, lon, own) in listOf(Triple(-6.4, 106.81861, "Kota Depok"), Triple(-6.2349, 106.9896, "Kota Bekasi"))) {
             val r = resolve(lat, lon, "Asia/Jakarta", "ID")
-            assertNull(r.unitName)
-            near(-2.0, assertNotNull(r.method).horizonDeg, "edge horizon")
-            assertNull(r.method!!.fixedPoint)
-            assertFalse(r.measured)
-            assertEquals(EntryClass.D_AUTHORITY, r.entryClass)
+            assertEquals(own, r.unitName)
+            assertEquals(GeoPoint(lat, lon), assertNotNull(r.method).fixedPoint)
+            assertTrue(r.measured)
+            assertEquals(EntryClass.B, r.entryClass)
         }
         near(-1.0, jakarta.method!!.horizonDeg, "core horizon")
         val eastOfJakarta = resolve(-6.21462, 107.39, "Asia/Jakarta", "ID")
@@ -133,16 +136,243 @@ class RegistryTest {
 
     @Test
     fun `a turkish district outside the checked ones is diyanet's method at the user's point`() {
-        val r = resolve(37.87135, 32.48464, "Europe/Istanbul", "TR") // Konya
+        // Alanya, 130 km from Antalya's point (every il's centre has been a unit since 13 Nov 2026, ruling R200).
+        val r = resolve(36.54375, 31.99982, "Europe/Istanbul", "TR")
         assertEquals("tr.diyanet", r.entry.id)
         assertNull(r.unitName)
         assertFalse(r.measured)
         assertEquals(EntryClass.D_AUTHORITY, r.entryClass)
         assertEquals(AboutTemplate.AUTHORITY_UNCHECKED, r.about)
-        near(37.87135, r.point.lat, "lat")
+        near(36.54375, r.point.lat, "lat")
         val method = assertNotNull(r.method)
         assertEquals(60, method.margins.fajr)
         assertEquals(-60, method.margins.sunrise)
+    }
+
+    @Test
+    fun `the nine districts of 12 november 2026 are units at the app's points and the edge beyond 15 km`() {
+        // Ruling R140: İzmir, Bursa, Antalya, Konya, Gaziantep, Diyarbakır and İstanbul's Çatalca, Şile and Silivri,
+        // each at the app's own point for the city (cities.csv), class A and measured there, the point riding as the
+        // fixed point (R15); 16 km south, beyond the 15 km reach, the edge as before.
+        val nine = listOf(
+            Triple("9560", "İzmir", GeoPoint(38.41273, 27.13838)),
+            Triple("9335", "Bursa", GeoPoint(40.19559, 29.06013)),
+            Triple("9225", "Antalya", GeoPoint(36.90812, 30.69556)),
+            Triple("9676", "Konya", GeoPoint(37.87135, 32.48464)),
+            Triple("9479", "Gaziantep", GeoPoint(37.05944, 37.3825)),
+            Triple("9402", "Diyarbakır", GeoPoint(37.91363, 40.21721)),
+            Triple("9538", "Çatalca", GeoPoint(41.14073, 28.45967)),
+            Triple("9547", "Şile", GeoPoint(41.17891, 29.61085)),
+            Triple("9548", "Silivri", GeoPoint(41.07393, 28.24644)),
+        )
+        for ((id, name, point) in nine) {
+            val r = resolve(point.lat, point.lon, "Europe/Istanbul", "TR")
+            assertEquals("tr.diyanet", r.entry.id, name)
+            assertEquals(id, r.unitId, name)
+            assertEquals(name, r.unitName)
+            assertEquals(point, r.unitPoint, name)
+            assertEquals(point, assertNotNull(r.method).fixedPoint, name)
+            assertTrue(r.measured, name)
+            assertEquals(EntryClass.A, r.entryClass, name)
+            assertEquals(15.0, Units.of("tr.diyanet")!!.unit(id).radiusKm, name)
+            val beyond = resolve(point.lat - 16.0 / 111.19, point.lon, "Europe/Istanbul", "TR")
+            assertNull(beyond.unitName, "$name 16 km south")
+            assertEquals(EntryClass.D_AUTHORITY, beyond.entryClass, "$name 16 km south")
+            assertEquals(60, assertNotNull(beyond.method).margins.fajr, "$name 16 km south")
+        }
+        // Çatalca's and Silivri's reaches overlap (their points are 19 km apart): the nearer unit holds the place and
+        // the other's point rides beside it (R142), so no start is before either table nor any end after it.
+        val catalca = GeoPoint(41.14073, 28.45967)
+        val silivri = GeoPoint(41.07393, 28.24644)
+        val nearSilivri = resolve(41.09, 28.33, "Europe/Istanbul", "TR")
+        assertEquals("Silivri", nearSilivri.unitName)
+        assertEquals(listOf(catalca), assertNotNull(nearSilivri.method).envelopePoints)
+        val nearCatalca = resolve(41.12, 28.40, "Europe/Istanbul", "TR")
+        assertEquals("Çatalca", nearCatalca.unitName)
+        assertEquals(listOf(silivri), assertNotNull(nearCatalca.method).envelopePoints)
+        // Beyond the other's reach, the unit's point alone.
+        assertEquals(emptyList<GeoPoint>(), assertNotNull(resolve(41.07393, 28.24644, "Europe/Istanbul", "TR").method).envelopePoints)
+        // Esenyurt, 25 km west of İstanbul's point and 22 km from Çatalca's, is still the edge.
+        assertNull(resolve(41.02697, 28.67732, "Europe/Istanbul", "TR").unitName)
+    }
+
+    @Test
+    fun `the districts beside the nine ride beside them near their border and nowhere else`() {
+        // Ruling R171: Güzelbahçe's table rides beside İzmir's on İzmir's western rim, not at İzmir's own point.
+        val units = Units.of("tr.diyanet")!!
+        val rim = resolve(38.37422, 26.97942, "Europe/Istanbul", "TR")
+        assertEquals("9560", rim.unitId)
+        assertEquals(listOf(GeoPoint(38.35, 26.88)), assertNotNull(rim.method).envelopePoints)
+        assertEquals(emptyList<GeoPoint>(), assertNotNull(resolve(38.41273, 27.13838, "Europe/Istanbul", "TR").method).envelopePoints)
+        // Aksu's rides on Antalya's eastern side, but stops 2 km short of Antalya's point (13.9 km from Aksu's).
+        assertEquals(emptyList<GeoPoint>(), assertNotNull(resolve(36.90812, 30.69556, "Europe/Istanbul", "TR").method).envelopePoints)
+        val nearAksu = resolve(36.94, 30.80, "Europe/Istanbul", "TR")
+        assertEquals("9225", nearAksu.unitId)
+        assertEquals(listOf(GeoPoint(36.95, 30.84)), assertNotNull(nearAksu.method).envelopePoints)
+        // Konya's Selçuklu, Meram and Karatay share its town and ride across it.
+        assertEquals(
+            setOf(GeoPoint(37.90, 32.47), GeoPoint(37.88, 32.47), GeoPoint(37.88, 32.49)),
+            assertNotNull(resolve(37.87135, 32.48464, "Europe/Istanbul", "TR").method).envelopePoints.toSet(),
+        )
+        // The districts are no units: Menemen's own town, 23 km from İzmir's point, is still the edge.
+        assertNull(resolve(38.60754, 27.06938, "Europe/Istanbul", "TR").unitName)
+        assertTrue(Diyanet.besideDistricts("9560").none { units.units.any { u -> u.id == it.id } })
+        // Their minutes after a table are each unit's recorded exceptions, as the gate measured them and no figure of
+        // the code's: İzmir's and Bursa's beside their districts, and Şile's, with no district within reach, across
+        // its own reach alone (ruling R255).
+        assertTrue(Diyanet.besideDistricts("9547").isEmpty())
+        for (id in listOf("9560", "9335", "9547")) {
+            assertEquals(DiyanetBesideDistricts.late[id].orEmpty(), units.unit(id).lateLimits.associate { it.minutes to it.events }, id)
+        }
+    }
+
+    @Test
+    fun `every il's centre is a diyanet unit at its own point`() {
+        // Ruling R200: the 81 il centres and İstanbul's Çatalca, Şile and Silivri, each a class A unit measured on its
+        // own table, its point riding as the fixed point (R15) and no two sharing an IlceID or a point.
+        val units = Units.of("tr.diyanet")!!.units
+        assertEquals(84, units.size)
+        assertEquals(units.size, units.map { it.id }.toSet().size)
+        assertEquals(units.size, units.map { it.point }.toSet().size)
+        for (unit in units) {
+            val r = resolve(unit.point.lat, unit.point.lon, "Europe/Istanbul", "TR")
+            assertEquals("tr.diyanet", r.entry.id, unit.name)
+            assertEquals(unit.id, r.unitId, unit.name)
+            assertEquals(unit.point, assertNotNull(r.method).fixedPoint, unit.name)
+            assertTrue(r.measured, unit.name)
+            assertEquals(EntryClass.A, r.entryClass, unit.name)
+            // A reach is 15 km, Adana's 20, and İstanbul's and Ankara's their class's minute east to west (R40).
+            assertTrue(unit.radiusKm in 15.0..21.5, "${unit.name} ${unit.radiusKm}")
+        }
+    }
+
+    @Test
+    fun `the districts beside every unit ride near their own point and stop short of the unit's`() {
+        // Ruling R201: a district with a table of its own whose point is within a unit's reach and 15 km more (or
+        // whose own town is inside the reach, R204) rides beside that unit, within 15 km of its own point, and its
+        // disc stops 2 km short of the unit's point unless the two share a town (5 km, or by name, R204): there the
+        // unit's table alone is the town's. No such district is a unit.
+        val units = Units.of("tr.diyanet")!!
+        val ids = units.units.map { it.id }.toSet()
+        val towns = DiyanetBesideDistricts.districts.associate { it.id to it.town }
+        var pairs = 0
+        for (unit in units.units) {
+            val atUnit = assertNotNull(resolve(unit.point.lat, unit.point.lon, "Europe/Istanbul", "TR").method).envelopePoints
+            val shared = mutableListOf<GeoPoint>()
+            for (d in Diyanet.besideDistricts(unit.id)) {
+                pairs++
+                val km = distanceKm(unit.point, d.point)
+                assertFalse(d.id in ids, "${d.name} beside ${unit.name}")
+                val townInside = towns[d.id]?.let { distanceKm(unit.point, it) <= unit.radiusKm } ?: false
+                assertTrue(km <= unit.radiusKm + 15.0 || townInside, "${d.name} beside ${unit.name}: $km km")
+                assertTrue(d.radiusKm <= 15.0, "${d.name} beside ${unit.name}")
+                if (km <= 5.0 || d.id in DiyanetBesideDistricts.sharedTown[unit.id].orEmpty()) {
+                    shared += d.point
+                    assertEquals(15.0, d.radiusKm, "${d.name} beside ${unit.name}")
+                } else {
+                    assertTrue(d.radiusKm <= km - 2.0 + 1e-9, "${d.name} beside ${unit.name}: ${d.radiusKm} of $km km")
+                    assertFalse(d.point in atUnit, "${d.name} at ${unit.name}'s own point")
+                }
+                // Where the unit holds the district's own point, the district's point rides there.
+                val own = resolve(d.point.lat, d.point.lon, "Europe/Istanbul", "TR")
+                if (own.unitId == unit.id) assertTrue(d.point in assertNotNull(own.method).envelopePoints, "${d.name} in ${unit.name}")
+            }
+            assertTrue(atUnit.containsAll(shared), "${unit.name}'s own town")
+            // More than the class's minute is allowed only as the gate measured it, across the unit's reach and beside
+            // the districts and units that ride there (rulings R201 and R255): each limit is the unit's recorded one,
+            // never a figure of the code's, and no event stands under two limits.
+            assertTrue(unit.lateLimits.all { it.minutes > 1 }, unit.name)
+            assertEquals(DiyanetBesideDistricts.late[unit.id].orEmpty(), unit.lateLimits.associate { it.minutes to it.events }, unit.name)
+            assertEquals(unit.lateLimits.sumOf { it.events.size }, unit.lateLimits.flatMap { it.events }.toSet().size, unit.name)
+        }
+        assertTrue(pairs > 0)
+        // İstanbul and Ankara are held to the same rule: Küçükçekmece's point rides in İstanbul's west.
+        val west = resolve(41.0, 28.76, "Europe/Istanbul", "TR")
+        assertEquals("9541", west.unitId)
+        assertTrue(Diyanet.besideDistricts("9541").first { it.name == "Küçükçekmece" }.point in assertNotNull(west.method).envelopePoints)
+    }
+
+    @Test
+    fun `a district rides wherever the user is nearer to its point or its town than to the unit's`() {
+        // Ruling R204: the disc of R201 stops 2 km short of the unit's point on every side, so it left a district's far
+        // side and flanks on the unit's table alone. Wherever a place the unit holds is within 15 km of the district's
+        // point and nearer to it than to the unit's, the district rides; only the unit's own town stays clear (R203).
+        val units = Units.of("tr.diyanet")!!
+        var checked = 0
+        for (unit in units.units) {
+            val clear = Diyanet.towns[unit.id]
+            for (d in Diyanet.besideDistricts(unit.id)) {
+                val dLat = unit.point.lat - d.point.lat
+                val dLon = unit.point.lon - d.point.lon
+                val places = listOf(
+                    // Just on the district's side of half way, beyond its point, and to its north and south.
+                    GeoPoint(d.point.lat + 0.45 * dLat, d.point.lon + 0.45 * dLon),
+                    GeoPoint(d.point.lat - 0.1 * dLat, d.point.lon - 0.1 * dLon),
+                    GeoPoint(d.point.lat + 0.06, d.point.lon),
+                    GeoPoint(d.point.lat - 0.06, d.point.lon),
+                )
+                for (at in places) {
+                    val toDistrict = distanceKm(at, d.point)
+                    if (toDistrict > 15.0 || toDistrict >= distanceKm(at, unit.point)) continue
+                    if (clear != null && distanceKm(at, clear) <= 2.0) continue
+                    val r = resolve(at.lat, at.lon, "Europe/Istanbul", "TR")
+                    if (r.unitId != unit.id) continue
+                    checked++
+                    assertTrue(d.point in assertNotNull(r.method).envelopePoints, "${d.name} beside ${unit.name} at $at")
+                }
+            }
+        }
+        assertTrue(checked > 100, "$checked places")
+        // A district's own town where it lies away from the fitted point: every one the unit holds has the district's
+        // table riding (Atakum's town is 16 km from the point its table fits and 5 km from Samsun's).
+        var towns = 0
+        for (district in DiyanetBesideDistricts.districts) {
+            val town = district.town ?: continue
+            assertTrue(distanceKm(town, district.point) > 2.0, district.name)
+            val r = resolve(town.lat, town.lon, "Europe/Istanbul", "TR")
+            val unit = units.units.firstOrNull { it.id == r.unitId } ?: continue
+            if (distanceKm(town, unit.point) <= 2.0) continue
+            towns++
+            assertTrue(district.point in assertNotNull(r.method).envelopePoints, "${district.name}'s town in ${unit.name}")
+        }
+        assertTrue(towns > 0)
+        // A district that shares its unit's town by name rides across it, at the unit's own point too.
+        for ((unitId, shared) in DiyanetBesideDistricts.sharedTown) {
+            val unit = units.unit(unitId)
+            val atUnit = assertNotNull(resolve(unit.point.lat, unit.point.lon, "Europe/Istanbul", "TR").method).envelopePoints
+            val points = Diyanet.besideDistricts(unitId).filter { it.id in shared }.map { it.point }
+            assertEquals(shared.size, points.size, unit.name)
+            assertTrue(atUnit.containsAll(points), unit.name)
+        }
+    }
+
+    @Test
+    fun `in a unit's own town as the app places it no neighbouring district rides`() {
+        // Ruling R203: a unit that stands at Diyanet's computing point names the app's own point for its city, and
+        // within 2 km of that point the unit's table rides alone, as within 2 km of the unit's own point (R171).
+        val units = Units.of("tr.diyanet")!!
+        assertTrue(Diyanet.towns.isNotEmpty())
+        for ((id, town) in Diyanet.towns) {
+            val unit = units.unit(id)
+            // The same town, another point: a unit at the app's point needs no entry.
+            assertTrue(distanceKm(unit.point, town) > 0.05 && distanceKm(unit.point, town) <= 5.0, unit.name)
+            val neighbours = Diyanet.besideDistricts(id)
+                .filter { distanceKm(unit.point, it.point) > 5.0 && it.id !in DiyanetBesideDistricts.sharedTown[id].orEmpty() }
+                .map { it.point }
+            // The town's point and a kilometre and a half from it to the north, south, east and west.
+            for ((dLat, dLon) in listOf(0.0 to 0.0, 0.0135 to 0.0, -0.0135 to 0.0, 0.0 to 0.017, 0.0 to -0.017)) {
+                val at = GeoPoint(town.lat + dLat, town.lon + dLon)
+                assertTrue(distanceKm(at, town) <= 2.0, unit.name)
+                val r = resolve(at.lat, at.lon, "Europe/Istanbul", "TR")
+                assertEquals(id, r.unitId, unit.name)
+                assertTrue(assertNotNull(r.method).envelopePoints.none { it in neighbours }, "${unit.name} at $at")
+            }
+        }
+        // Beyond the town the neighbours ride as everywhere: Başakşehir's table 3 km west of the app's İstanbul.
+        val istanbul = Diyanet.towns.getValue("9541")
+        val west = resolve(istanbul.lat, istanbul.lon - 0.036, "Europe/Istanbul", "TR")
+        assertEquals("9541", west.unitId)
+        assertTrue(Diyanet.besideDistricts("9541").first { it.name == "Başakşehir" }.point in assertNotNull(west.method).envelopePoints)
     }
 
     @Test
@@ -163,11 +393,14 @@ class RegistryTest {
 
     @Test
     fun `a malaysian place outside the fitted zones is later than any fitted zone`() {
-        val kapit = resolve(1.99546, 112.93254, "Asia/Kuching", "MY")
-        assertEquals("my.jakim", kapit.entry.id)
-        assertFalse(kapit.measured)
-        assertEquals(EntryClass.D_AUTHORITY, kapit.entryClass)
-        val edge = assertNotNull(kapit.method)
+        // Selangau, Sarawak: a city of the app's list no zone's list of districts names, beyond every listed town's
+        // reach (JakimZoneCities.unattached; Kapit, here until the zone round of 13 Nov 2026, is SWK04's town now).
+        val selangau = resolve(2.52477, 112.32543, "Asia/Kuching", "MY")
+        assertEquals("my.jakim", selangau.entry.id)
+        assertNull(selangau.unitId)
+        assertFalse(selangau.measured)
+        assertEquals(EntryClass.D_AUTHORITY, selangau.entryClass)
+        val edge = assertNotNull(selangau.method)
         for (unit in Units.of("my.jakim")!!.units) {
             val m = unit.method ?: continue
             assertTrue(edge.margins.fajr >= m.margins.fajr, "${unit.id} fajr")
@@ -195,11 +428,17 @@ class RegistryTest {
 
     @Test
     fun `a kemenag place far from the fitted units takes the deepest horizon and claims nothing`() {
-        val r = resolve(-8.49958, 140.40613, "Asia/Jayapura", "ID") // Merauke
+        // Timika (Kab. Mimika), whose app point lies about 25 km from the regency seat's: no unit of its own.
+        val r = resolve(-4.61407, 136.67679, "Asia/Jayapura", "ID")
         assertEquals("id.kemenag", r.entry.id)
         near(-2.0, assertNotNull(r.method).horizonDeg, "horizon")
         assertFalse(r.measured)
         assertNull(r.unitName)
+        // Merauke, the far place this test held before the second round of 12 Nov 2026, is now its regency's own unit.
+        val merauke = resolve(-8.49958, 140.40613, "Asia/Jayapura", "ID")
+        assertEquals("Kab. Merauke", merauke.unitName)
+        assertTrue(merauke.measured)
+        assertEquals(EntryClass.B, merauke.entryClass)
     }
 
     @Test
@@ -233,7 +472,7 @@ class RegistryTest {
     }
 
     @Test
-    fun `a kemenag unit reaches only its own kab or kota and every neighbouring place keeps the edge`() {
+    fun `a kemenag unit reaches only its own kab or kota and every neighbouring place keeps the edge or its own unit`() {
         // Ruling R103: Kemenag prints one table per kabupaten/kota and a user follows their own, so a unit's circle
         // stays inside its own boundary. The app's own places in the neighbouring kabupaten resolve to the edge.
         val neighbours = listOf(
@@ -254,10 +493,7 @@ class RegistryTest {
             val zone = if (lon > 114.0) "Asia/Makassar" else "Asia/Jakarta"
             val r = resolve(lat, lon, zone, "ID")
             assertEquals("id.kemenag", r.entry.id)
-            assertNull(r.unitName, name)
-            near(-2.0, assertNotNull(r.method).horizonDeg, "$name horizon")
-            assertFalse(r.measured, name)
-            assertEquals(EntryClass.D_AUTHORITY, r.entryClass, name)
+            assertOwnUnitOrEdge(name, r)
         }
         // Ruling R106: the app's own places in the former Jabodetabek reach (beyond DKI's 8 km core, within 55 km of
         // Jakarta's point) take the edge, never a Jakarta unit; Kota Bogor's own point keeps its own unit.
@@ -277,10 +513,8 @@ class RegistryTest {
         )
         for ((name, lat, lon) in reach) {
             val r = resolve(lat, lon, "Asia/Jakarta", "ID")
-            assertNull(r.unitName, name)
-            assertNull(assertNotNull(r.method).fixedPoint, name)
-            near(-2.0, r.method!!.horizonDeg, "$name horizon")
-            assertEquals(EntryClass.D_AUTHORITY, r.entryClass, name)
+            assertNotEquals("Kota Jakarta", r.unitName, name)
+            assertOwnUnitOrEdge(name, r)
         }
         assertEquals("Kota Bogor", resolve(-6.59444, 106.78917, "Asia/Jakarta", "ID").unitName)
         assertNull(Units.of("id.kemenag")!!.units.firstOrNull { it.id == "1301-reach" }, "R46's reach unit is closed (R106)")
@@ -295,6 +529,37 @@ class RegistryTest {
             fun e3(degrees: Double) = kotlin.math.round(degrees * 1000.0) / 1000.0
             assertEquals(unit.name, resolve(e3(unit.point.lat), e3(unit.point.lon), zone, "ID").unitName, "${unit.id} at three decimals")
             assertTrue(unit.radiusKm >= 0.1, "${unit.id} radius ${unit.radiusKm}")
+        }
+    }
+
+    /**
+     * The app's places pinned beside a Kemenag unit's boundary that lie inside their own kab/kota's unit of the round
+     * of 12 Nov 2026 (each circle inside its own kab/kota, rulings R103/R113): the place keeps its own table, never a
+     * neighbour's. Every other pinned place keeps the edge.
+     */
+    private val ownKabkota = mapOf<String, String>(
+        "Melati (Sleman)" to "Kab. Sleman",
+        "Bekasi" to "Kota Bekasi",
+        "Cikarang (Kab. Bekasi)" to "Kab. Bekasi",
+        "Depok" to "Kota Depok",
+        "Cibinong (Kab. Bogor)" to "Kab. Bogor",
+        "Tangerang" to "Kota Tangerang",
+        "South Tangerang" to "Kota Tangerang Selatan",
+        "Karawang" to "Kab. Karawang",
+    )
+
+    private fun assertOwnUnitOrEdge(name: String, r: Resolution) {
+        val own = ownKabkota[name]
+        assertEquals(own, r.unitName, name)
+        if (own == null) {
+            assertNull(assertNotNull(r.method).fixedPoint, name)
+            near(-2.0, r.method!!.horizonDeg, "$name horizon")
+            assertFalse(r.measured, name)
+            assertEquals(EntryClass.D_AUTHORITY, r.entryClass, name)
+        } else {
+            assertTrue(r.measured, name)
+            assertEquals(EntryClass.B, r.entryClass, name)
+            assertEquals(Units.of("id.kemenag")!!.units.first { it.name == own }.point, r.method!!.fixedPoint, name)
         }
     }
 
@@ -521,7 +786,7 @@ class RegistryTest {
     @Test
     fun `the syrian awqaf's two damascus samples are one table so each unit reads the other's point for its starts`() {
         // The fix round of 11 Oct 2026: with the nearest sample alone, the app's Jaramana (in the Umayyad Mosque's unit, within
-        // the imsakiya's reach) came a minute before the imsakiya's Fajr on a day and its Isha on another.
+        // the imsakiya's reach) came before the imsakiya's Fajr and Isha.
         val imsakiya = GeoPoint(33.5138, 36.2765)
         val umayyad = GeoPoint(33.5116, 36.3064)
         val jaramana = resolve(33.4862, 36.34614, "Asia/Damascus", "SY")
@@ -626,14 +891,21 @@ class RegistryTest {
     }
 
     @Test
-    fun `oran and tamanrasset are measured and stay class d on their fitted seats`() {
-        for ((lat, lon) in listOf(35.69906 to -0.63588, 22.785 to 5.52278)) {
+    fun `tamanrasset and oran's band are measured and stay class d on their fitted seats`() {
+        // Arzew, 33 km out of Oran's seat, and the seat itself where the place's region is not known: the fitted band.
+        for ((lat, lon) in listOf(35.85 to -0.3167, 35.69906 to -0.63588, 22.785 to 5.52278)) {
             val r = resolve(lat, lon, "Africa/Algiers", "DZ")
             assertEquals("dz.marw", r.entry.id)
             assertTrue(r.measured)
             assertEquals(EntryClass.D_AUTHORITY, r.entryClass)
             assertEquals(AboutTemplate.AUTHORITY_UNCHECKED, r.about)
         }
+        // In Oran's wilaya by its region, the seat's own fitted day (rulings R219 and R230): measured, and class D too.
+        val oran = Registry.resolve(Place(35.69906, -0.63588, "Africa/Algiers", "DZ", admin1 = "Oran"))
+        assertEquals("31", oran.unitId)
+        assertEquals(EntryClass.D_AUTHORITY, oran.entryClass)
+        assertEquals(AboutTemplate.AUTHORITY_UNCHECKED, oran.about)
+        assertTrue(oran.measured)
         val algiers = resolve(36.73225, 3.08746, "Africa/Algiers", "DZ")
         assertEquals(EntryClass.B, algiers.entryClass)
         assertTrue(algiers.measured)
@@ -660,6 +932,31 @@ class RegistryTest {
         assertEquals("Brunei-Muara", known.unitName)
         assertEquals(0, assertNotNull(known.method).authorityMinutes.fajr)
         assertEquals("Tutong", resolve(4.88333, 114.83333, "Asia/Brunei", "BN").unitName)
+    }
+
+    @Test
+    fun `a brunei district is given only within its own circle`() {
+        // Ruling R309, on made-up places. At sea north of Tutong, 63 km from Bandar Seri Begawan, past Brunei-Muara's 60 km:
+        // a phone there whose nearest city is in Brunei-Muara is given the nearest district whose circle holds it, Tutong.
+        val sea = Registry.resolve(Place(5.33, 114.58, "Asia/Brunei", "BN", admin1 = "Brunei-Muara District"))
+        assertEquals("Tutong", sea.unitName)
+        assertEquals(1, assertNotNull(sea.method).authorityMinutes.fajr)
+        // Past every district's circle: the set's edge, no district and no table point, as beyond Brunei before.
+        val far = Registry.resolveEntry(Registry.byId("bn.mora")!!, Place(5.95, 114.90, "Asia/Brunei", "BN", admin1 = "Brunei-Muara District"))
+        assertNull(far.unitName)
+        assertNull(assertNotNull(far.method).fixedPoint)
+        assertFalse(far.measured)
+        // Wherever a district is given, by any region or none, its own circle holds the place.
+        val units = assertNotNull(Units.of("bn.mora"))
+        val regions = listOf(null, "Belait District", "Tutong District", "Brunei-Muara District", "Temburong District")
+        var given = 0
+        for (i in 0..60) for (j in 0..60) for (region in regions) {
+            val place = Place(4.0 + i * 0.04, 113.8 + j * 0.04, "Asia/Brunei", "BN", admin1 = region)
+            val unit = units.unitFor(place) ?: continue
+            given++
+            assertTrue(distanceKm(GeoPoint(place.lat, place.lon), unit.point) <= unit.radiusKm, "${unit.id} at ${place.lat},${place.lon} ($region)")
+        }
+        assertTrue(given > 1000, "only $given places given a district")
     }
 
     @Test
@@ -948,7 +1245,7 @@ class RegistryTest {
         // The city-point audit of 10–11 Oct 2026 (tablesAtTheirPoints): an entry computed at the user's own point whose
         // tables became units keeps its own method beyond every reach, exactly as before the units.
         val ownMethodBeyond = setOf(
-            "us.isna", "ca.isna", "in.karachi", "uz.board", "xk.bik", "pk.karachi", "kg.default", "gb.wifaqul",
+            "us.isna", "ca.isna", "uz.board", "xk.bik", "gb.wifaqul",
             "ps.gaza.awqaf", "lb.fatwa", "sy.awqaf", "iq.sunni",
         )
         var checked = 0
@@ -956,8 +1253,35 @@ class RegistryTest {
             val base = entry.method ?: continue
             val units = Units.of(entry.id) ?: continue
             val edge = units.outside(GeoPoint(0.0, 0.0))
+            if (entry.id == "pk.karachi" || entry.id == "in.karachi") {
+                // Rulings R192 and R194 (13 Nov 2026): Dawat-e-Islami prints a card for every Pakistani and Indian town and
+                // the cards held are later than the method, so beyond the cards a place takes the latest margin any held
+                // card asks (SouthAsia.pakistanBeyondCards, indiaBeyondCards): never earlier than its own method's, the end
+                // of eating at SAFE_END or lower.
+                assertTrue(edge.margins.fajr >= base.margins.fajr && edge.margins.dhuhr >= base.margins.dhuhr, entry.id)
+                assertTrue(edge.margins.asr >= base.margins.asr && edge.margins.maghrib >= base.margins.maghrib, entry.id)
+                assertTrue(edge.margins.isha >= base.margins.isha && edge.margins.sunrise <= base.margins.sunrise, entry.id)
+                assertTrue(edge.endOfEatingMarginSeconds <= minOf(base.endOfEatingMarginSeconds, SAFE_END), entry.id)
+                continue
+            }
             if (entry.id in ownMethodBeyond) {
                 assertSame(base, edge, "${entry.id}: its own method beyond every reach")
+                continue
+            }
+            if (entry.id == "ci.default" || entry.id == "tj.default") {
+                // Not an authority's edge: Côte d'Ivoire's and Tajikistan's calculated times, their own method with the
+                // printed town figure of COSIM or of the Council of Ulama riding beside the user's point
+                // (Generic.coteDIvoireAt, Generic.tajikistanAt), margins untouched.
+                assertEquals(base, edge.copy(startPoints = emptyList(), endPoints = emptyList(), endsBoundAtUserPoint = false), entry.id)
+                continue
+            }
+            if (entry.id == "ma.habous") {
+                // Ruling R199: every Habous place is a unit on its own margins, so the national sunrise margin is the
+                // edge's already and the rule below would move the end by nothing. The edge ends eating a minute before
+                // the national margin, as its four starts are a minute after theirs, and never above SAFE_END.
+                assertEquals(0, edge.margins.sunrise - base.margins.sunrise, edge.id)
+                assertEquals(minOf(base.endOfEatingMarginSeconds - 60, SAFE_END), edge.endOfEatingMarginSeconds, edge.id)
+                checked++
                 continue
             }
             assertEquals(

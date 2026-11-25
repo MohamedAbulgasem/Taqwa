@@ -60,9 +60,10 @@ import world.taqwa.app.resources.prayer_about_a11y
 import world.taqwa.app.resources.prayer_about_these_times
 import world.taqwa.app.resources.prayer_times_by
 import world.taqwa.app.resources.prayer_whose_a11y
+import world.taqwa.app.resources.prayer_whose_border_body
+import world.taqwa.app.resources.prayer_whose_calculated_beside_body
 import world.taqwa.app.resources.prayer_whose_calculated_body
 import world.taqwa.app.resources.prayer_whose_cautious_body
-import world.taqwa.app.resources.prayer_whose_checked_body
 import world.taqwa.app.resources.prayer_whose_checked_title
 import world.taqwa.app.resources.prayer_whose_unchecked_body
 import world.taqwa.app.resources.prayer_whose_unchecked_title
@@ -71,15 +72,36 @@ import kotlin.math.max
 /**
  * Whose times the Prayer screen shows (spec §2.1): the timetable the day follows, by its short
  * name's key, and how sure Taqwa is of it at this place. The effective entry's, so a timetable the
- * user chose is the one named.
+ * user chose is the one named. [republisher] is whose copy of the timetable it was checked against, where that
+ * was not the authority's own pages ([world.taqwa.app.prayer.engine.registry.RegistryEntry.republisher]).
+ * [safeSideOfKey] is the body whose part-held timetable a calculated day is on the safe side of
+ * (`Resolution.safeSideOfKey`: a body's own table riding beside the day there, Habous's at Ceuta and Melilla, ruling
+ * R285, else `RegistryEntry.safeSideOfKey`), which the card then names rather than say no timetable is known.
+ * [partlyRepublisher] is whose copy some of the place's own checked tables were read from (`Resolution.partlyRepublisher`,
+ * ruling R276), which the card then names as "partly in … copy"; where the copy's years are known (JAKIM's mirrored
+ * zones), the card names the copy on those years' days and the authority's own pages on the others (ruling R278).
  */
-data class WhoseTimes(val shortNameKey: String, val entryClass: EntryClass) {
+data class WhoseTimes(
+    val shortNameKey: String,
+    val entryClass: EntryClass,
+    val republisher: String? = null,
+    val safeSideOfKey: String? = null,
+    val partlyRepublisher: String? = null,
+    val border: Boolean = false,
+) {
 
     /** Cautious times: the screen may show the cautious card. */
     val cautious: Boolean get() = entryClass == EntryClass.C
 
     companion object {
-        fun of(day: EngineDay): WhoseTimes = WhoseTimes(day.effectiveEntry.shortNameKey, day.effective.entryClass)
+        /** The card is a sentence about [day]'s own date, so its copy is that date's ([Resolution.wholeCopyOn], ruling R278). */
+        fun of(day: EngineDay): WhoseTimes = WhoseTimes(
+            day.effectiveEntry.shortNameKey, day.effective.entryClass,
+            republisher = day.effective.wholeCopyOn(day.day.date), safeSideOfKey = day.effective.safeSideOfKey,
+            partlyRepublisher = day.effective.partlyCopyOn(day.day.date),
+            // A place that may be on either side of a border, held to both countries' timetables (ruling R259).
+            border = day.effective.sides.isNotEmpty(),
+        )
     }
 }
 
@@ -100,10 +122,17 @@ private fun whoseTitle(whose: WhoseTimes): String {
 private fun whoseSentence(whose: WhoseTimes, place: String): String {
     val name = isolated(authorityShortName(whose.shortNameKey))
     return when (whose.entryClass) {
-        EntryClass.A, EntryClass.B -> stringResource(Res.string.prayer_whose_checked_body, name, isolated(place))
-        EntryClass.C -> stringResource(Res.string.prayer_whose_cautious_body)
+        EntryClass.A, EntryClass.B -> when (val copy = CheckedClaim.copyName(whose.republisher, whose.partlyRepublisher)) {
+            null -> stringResource(CheckedClaim.WHOSE_BODY.sentence(null), name, isolated(place))
+            else -> stringResource(
+                CheckedClaim.WHOSE_BODY.sentence(whose.republisher, whose.partlyRepublisher), name, isolated(place), isolated(copy),
+            )
+        }
+        EntryClass.C -> stringResource(if (whose.border) Res.string.prayer_whose_border_body else Res.string.prayer_whose_cautious_body)
         EntryClass.D_AUTHORITY -> stringResource(Res.string.prayer_whose_unchecked_body, name, isolated(place))
-        EntryClass.D_NONE -> stringResource(Res.string.prayer_whose_calculated_body)
+        EntryClass.D_NONE -> whose.safeSideOfKey?.let { body ->
+            stringResource(Res.string.prayer_whose_calculated_beside_body, isolated(authorityShortName(body)))
+        } ?: stringResource(Res.string.prayer_whose_calculated_body)
     }
 }
 

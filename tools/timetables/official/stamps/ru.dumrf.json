@@ -1,7 +1,7 @@
 {
   "entry": "ru.dumrf",
   "class": "D (authority)",
-  "engineHash": "b4995d5a8a69b097",
+  "engineHash": "7ddb39e168ea5ce9",
   "broken": 0,
   "places": 1,
   "first": "2025-05-01",
@@ -18,113 +18,114 @@
   },
   "placeDays": 107,
   "heldOutDays": 0,
+  "tables": 1,
   "ramadanDays": 0,
   "outOfOrderDays": 0,
-  "unreadableLines": 13,
+  "unreadableLines": 312,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 107,
+      "checked": 2568,
       "early": 0,
       "late": {
-        "0": 34,
-        "1": 21,
-        "2": 15,
-        "3+": 37
+        "0": 440,
+        "1": 339,
+        "2": 278,
+        "3+": 1511
       },
-      "exactShare": 0.3178,
+      "exactShare": 0.1713,
+      "worstLate": 11,
+      "lateLimit": 11,
+      "lateLimitFrom": "unit moscow",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 2568,
+      "lateEnd": 0,
+      "late": {
+        "0": 313,
+        "1": 1149,
+        "2": 439,
+        "3+": 667
+      },
+      "exactShare": 0.1219,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "unit moscow",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 2568,
+      "early": 0,
+      "late": {
+        "0": 1231,
+        "1": 517,
+        "2": 486,
+        "3+": 334
+      },
+      "exactShare": 0.4794,
       "worstLate": 4,
       "lateLimit": 4,
       "lateLimitFrom": "unit moscow",
       "overLimit": 0
     },
-    "sunrise": {
-      "checked": 107,
-      "lateEnd": 0,
-      "late": {
-        "0": 21,
-        "1": 75,
-        "2": 11,
-        "3+": 0
-      },
-      "exactShare": 0.1963,
-      "worstLate": 2,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
-      "overLimit": 0
-    },
-    "dhuhr": {
-      "checked": 107,
-      "early": 0,
-      "late": {
-        "0": 93,
-        "1": 14,
-        "2": 0,
-        "3+": 0
-      },
-      "exactShare": 0.8692,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
-      "overLimit": 0
-    },
     "asrStandard": {
-      "checked": 107,
+      "checked": 2568,
       "early": 0,
       "late": {
-        "0": 92,
-        "1": 15,
-        "2": 0,
-        "3+": 0
+        "0": 942,
+        "1": 607,
+        "2": 462,
+        "3+": 557
       },
-      "exactShare": 0.8598,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
-      "overLimit": 0
-    },
-    "maghrib": {
-      "checked": 107,
-      "early": 0,
-      "late": {
-        "0": 69,
-        "1": 38,
-        "2": 0,
-        "3+": 0
-      },
-      "exactShare": 0.6449,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
-      "overLimit": 0
-    },
-    "isha": {
-      "checked": 107,
-      "early": 0,
-      "late": {
-        "0": 49,
-        "1": 18,
-        "2": 23,
-        "3+": 17
-      },
-      "exactShare": 0.4579,
+      "exactShare": 0.3668,
       "worstLate": 5,
       "lateLimit": 5,
       "lateLimitFrom": "unit moscow",
       "overLimit": 0
     },
+    "maghrib": {
+      "checked": 2568,
+      "early": 0,
+      "late": {
+        "0": 855,
+        "1": 690,
+        "2": 345,
+        "3+": 678
+      },
+      "exactShare": 0.3329,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "unit moscow",
+      "overLimit": 0
+    },
+    "isha": {
+      "checked": 2568,
+      "early": 0,
+      "late": {
+        "0": 573,
+        "1": 284,
+        "2": 399,
+        "3+": 1312
+      },
+      "exactShare": 0.2231,
+      "worstLate": 13,
+      "lateLimit": 13,
+      "lateLimitFrom": "unit moscow",
+      "overLimit": 0
+    },
     "endOfEating": {
-      "checked": 107,
+      "checked": 2568,
       "lateEnd": 0,
       "late": {
-        "0": 31,
-        "1": 23,
-        "2": 14,
-        "3+": 39
+        "0": 420,
+        "1": 334,
+        "2": 259,
+        "3+": 1555
       },
-      "exactShare": 0.2897,
-      "worstLate": 4,
-      "lateLimit": 4,
+      "exactShare": 0.1636,
+      "worstLate": 13,
+      "lateLimit": 13,
       "lateLimitFrom": "unit moscow",
       "overLimit": 0
     }
@@ -134,20 +135,33 @@
     "ramadanDays": 0,
     "events": {}
   },
+  "replays": {
+    "places": 23,
+    "placeDays": 2461
+  },
   "lateLimits": {
-    "class D (authority): 3 min": {
-      "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
-    },
-    "unit moscow: 4 min (endOfEating)": {
-      "reason": "The end of suhur is DUM RF's own printed dawn, which from May to August moves by up to a quarter of a degree of the sun a day; the app takes the earliest of the neighbouring days (rulings R28, R39), up to 4 min before the printed time (May and late July to mid-August).",
-      "events": ["endOfEating"]
-    },
-    "unit moscow: 4 min (fajr)": {
-      "reason": "From May to August DUM RF's Fajr is sunrise − 0.30 of the night, when the sun stands up to a quarter of a degree higher or lower than the day before; the app takes the latest of the neighbouring days so that it holds in every year of the leap cycle (ruling R28), up to 4 min after the printed time (May, and late July to mid-August).",
-      "events": ["fajr"]
+    "unit moscow: 4 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["dhuhr"]
     },
     "unit moscow: 5 min": {
-      "reason": "From May to August DUM RF's Isha is sunset + a fraction of the night that it steps every few days (0.25 in early May, 0.30 in June, 0.25 again by August); between its held days the app takes the largest fraction within three days and the latest of the neighbouring days (ruling R28), up to 5 min after the printed time (early and mid-May).",
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["asrStandard", "maghrib"]
+    },
+    "unit moscow: 6 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["sunrise"]
+    },
+    "unit moscow: 11 min": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 11 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["fajr"]
+    },
+    "unit moscow: 13 min (endOfEating)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 13 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+      "events": ["endOfEating"]
+    },
+    "unit moscow: 13 min (isha)": {
+      "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 13 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
       "events": ["isha"]
     }
   },
@@ -167,125 +181,134 @@
       },
       "broken": 0,
       "lateLimits": {
-        "class D (authority): 3 min": {
-          "events": ["sunrise", "dhuhr", "asrStandard", "maghrib"]
-        },
-        "unit moscow: 4 min (endOfEating)": {
-          "reason": "The end of suhur is DUM RF's own printed dawn, which from May to August moves by up to a quarter of a degree of the sun a day; the app takes the earliest of the neighbouring days (rulings R28, R39), up to 4 min before the printed time (May and late July to mid-August).",
-          "events": ["endOfEating"]
-        },
-        "unit moscow: 4 min (fajr)": {
-          "reason": "From May to August DUM RF's Fajr is sunrise − 0.30 of the night, when the sun stands up to a quarter of a degree higher or lower than the day before; the app takes the latest of the neighbouring days so that it holds in every year of the leap cycle (ruling R28), up to 4 min after the printed time (May, and late July to mid-August).",
-          "events": ["fajr"]
+        "unit moscow: 4 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 4 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["dhuhr"]
         },
         "unit moscow: 5 min": {
-          "reason": "From May to August DUM RF's Isha is sunset + a fraction of the night that it steps every few days (0.25 in early May, 0.30 in June, 0.25 again by August); between its held days the app takes the largest fraction within three days and the latest of the neighbouring days (ruling R28), up to 5 min after the printed time (early and mid-May).",
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 5 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["asrStandard", "maghrib"]
+        },
+        "unit moscow: 6 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 6 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["sunrise"]
+        },
+        "unit moscow: 11 min": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 11 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["fajr"]
+        },
+        "unit moscow: 13 min (endOfEating)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 13 min before it on some days, and never after it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
+          "events": ["endOfEating"]
+        },
+        "unit moscow: 13 min (isha)": {
+          "reason": "This place's table, read across the place's reach (the ground around the point it is printed for that follows it), was measured up to 13 min after it on some days, and never before it: toward the edge of the reach the user's own sun, and the tables that ride beside this one, decide the time shown (ruling R270).",
           "events": ["isha"]
         }
       },
       "events": {
         "fajr": {
-          "checked": 107,
+          "checked": 2568,
           "early": 0,
           "late": {
-            "0": 34,
-            "1": 21,
-            "2": 15,
-            "3+": 37
+            "0": 440,
+            "1": 339,
+            "2": 278,
+            "3+": 1511
           },
-          "exactShare": 0.3178,
+          "exactShare": 0.1713,
+          "worstLate": 11,
+          "lateLimit": 11,
+          "lateLimitFrom": "unit moscow",
+          "overLimit": 0
+        },
+        "sunrise": {
+          "checked": 2568,
+          "lateEnd": 0,
+          "late": {
+            "0": 313,
+            "1": 1149,
+            "2": 439,
+            "3+": 667
+          },
+          "exactShare": 0.1219,
+          "worstLate": 6,
+          "lateLimit": 6,
+          "lateLimitFrom": "unit moscow",
+          "overLimit": 0
+        },
+        "dhuhr": {
+          "checked": 2568,
+          "early": 0,
+          "late": {
+            "0": 1231,
+            "1": 517,
+            "2": 486,
+            "3+": 334
+          },
+          "exactShare": 0.4794,
           "worstLate": 4,
           "lateLimit": 4,
           "lateLimitFrom": "unit moscow",
           "overLimit": 0
         },
-        "sunrise": {
-          "checked": 107,
-          "lateEnd": 0,
-          "late": {
-            "0": 21,
-            "1": 75,
-            "2": 11,
-            "3+": 0
-          },
-          "exactShare": 0.1963,
-          "worstLate": 2,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
-          "overLimit": 0
-        },
-        "dhuhr": {
-          "checked": 107,
-          "early": 0,
-          "late": {
-            "0": 93,
-            "1": 14,
-            "2": 0,
-            "3+": 0
-          },
-          "exactShare": 0.8692,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
-          "overLimit": 0
-        },
         "asrStandard": {
-          "checked": 107,
+          "checked": 2568,
           "early": 0,
           "late": {
-            "0": 92,
-            "1": 15,
-            "2": 0,
-            "3+": 0
+            "0": 942,
+            "1": 607,
+            "2": 462,
+            "3+": 557
           },
-          "exactShare": 0.8598,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
-          "overLimit": 0
-        },
-        "maghrib": {
-          "checked": 107,
-          "early": 0,
-          "late": {
-            "0": 69,
-            "1": 38,
-            "2": 0,
-            "3+": 0
-          },
-          "exactShare": 0.6449,
-          "worstLate": 1,
-          "lateLimit": 3,
-          "lateLimitFrom": "class D (authority)",
-          "overLimit": 0
-        },
-        "isha": {
-          "checked": 107,
-          "early": 0,
-          "late": {
-            "0": 49,
-            "1": 18,
-            "2": 23,
-            "3+": 17
-          },
-          "exactShare": 0.4579,
+          "exactShare": 0.3668,
           "worstLate": 5,
           "lateLimit": 5,
           "lateLimitFrom": "unit moscow",
           "overLimit": 0
         },
+        "maghrib": {
+          "checked": 2568,
+          "early": 0,
+          "late": {
+            "0": 855,
+            "1": 690,
+            "2": 345,
+            "3+": 678
+          },
+          "exactShare": 0.3329,
+          "worstLate": 5,
+          "lateLimit": 5,
+          "lateLimitFrom": "unit moscow",
+          "overLimit": 0
+        },
+        "isha": {
+          "checked": 2568,
+          "early": 0,
+          "late": {
+            "0": 573,
+            "1": 284,
+            "2": 399,
+            "3+": 1312
+          },
+          "exactShare": 0.2231,
+          "worstLate": 13,
+          "lateLimit": 13,
+          "lateLimitFrom": "unit moscow",
+          "overLimit": 0
+        },
         "endOfEating": {
-          "checked": 107,
+          "checked": 2568,
           "lateEnd": 0,
           "late": {
-            "0": 31,
-            "1": 23,
-            "2": 14,
-            "3+": 39
+            "0": 420,
+            "1": 334,
+            "2": 259,
+            "3+": 1555
           },
-          "exactShare": 0.2897,
-          "worstLate": 4,
-          "lateLimit": 4,
+          "exactShare": 0.1636,
+          "worstLate": 13,
+          "lateLimit": 13,
           "lateLimitFrom": "unit moscow",
           "overLimit": 0
         }

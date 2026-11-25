@@ -718,7 +718,7 @@ method, whose Fajr is the earlier. R39's 18° dawn came up to 114 min before the
   south (0.1° steps), the reach's south (0.03°) and its south-east, nor a ring of 32 points 25 and 50 km
   around the mosque (2026 to 2029). At the reach's edge the end comes at most 9 s after the rule's exact
   moment, before its minute.
-- **The margin.** The end margin fitted on January to September is +54 s (decided 28 January). adhan2's
+- **The margin.** The end margin fitted on January to September is +54 s. adhan2's
   Moonsighting Committee Fajr at the mosque's point matches 271 of those 273 rows to the minute. Run for
   every year from 2025 to 2048 on the mosque's own dawns alone, it allowed at most +19 s (+20 was late on
   20 June 2028): a table's depressions carry its minute rounding, and the leap cycle moves it. The margin
@@ -1719,7 +1719,7 @@ that rule's own dawn read as an end (`TwilightCurves.fajrAsEnd`), not R39's 18°
   instead widens each slot over the day either side, which would cost up to 4 min more in July and
   August.
 
-The end margin, +21 s, is fitted on January to June (decided 11 February, an 18° day). It gives 0 late
+The end margin, +21 s, is fitted on January to June. It gives 0 late
 ends on July to December. Against adhan2's run of the code at the ICCI's point it gives none in any year
 from 2025 to 2048: that run allows up to +27 s in every one of those years (+27 to +30 by year; +28 is
 late in 2025, 2026, 2031 and others), so +21 keeps 6 s in hand, the Fitter's 5 s safety and a second.

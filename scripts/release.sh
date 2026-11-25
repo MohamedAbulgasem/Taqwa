@@ -15,7 +15,8 @@
 # token for another face) is never left at those paths.
 #
 # In order, stopping at the first failure:
-#   1. scripts/check-versions.sh, and the prayer-time stamps (spec §5, ruling R86);
+#   1. scripts/check-versions.sh, the prayer-time stamps (spec §5, ruling R86) and the envelope rows
+#      (the second trust audit's G24);
 #   2. scripts/face-gate.sh;
 #   3. the signed face, build/face-release/watchface-release-signed.apk, which Mohamed signs with
 #      scripts/release-face.sh: it exists, its one certificate is the pin, and it is the current
@@ -43,7 +44,8 @@
 #   - it skips the keystore.properties check and passes -Ptaqwa.unsignedRelease=true to every build
 #     of the root project it makes, step 3's face and step 4's four, as tools/watchface/validate.sh
 #     does to the face gate's builds, so neither module reads keystore.properties, present or not
-#     (step 1's tools/timetables checkStamps is a build of its own, which reads none);
+#     (step 1's tools/timetables checkStamps and checkEnvelopeRows are builds of their own, which
+#     read none);
 #   - before signing anything it requires both APKs and both AABs unsigned: a signed one stops it
 #     ("the release build was signed: taqwa.unsignedRelease is not honoured");
 #   - it signs them with ~/.android/debug.keystore into build/release-dry-run/*-DRY-RUN.{aab,apk},
@@ -173,17 +175,40 @@ if $DRY_RUN; then
     echo "release.sh: DRY RUN: no upload key, the outputs signed with the debug key, the face pinned to $PIN_FILE"
 fi
 
-# --- 1. The versions and the stamps -------------------------------------------------------------
+# --- 1. The versions, the stamps and the envelope rows ------------------------------------------
 
-step "1. The versions and the prayer-time stamps"
+step "1. The versions, the prayer-time stamps and the envelope rows"
 bash scripts/check-versions.sh || refuse "the versions disagree (above): scripts/bump-version.sh writes them"
 # Spec §5 / ruling R86: refuse to build on a stale or red prayer-time stamp. The Ramadan build
 # (ruling R146) runs as TAQWA_RAMADAN=<Hijri year> scripts/release.sh, e.g. 1448: it then also
-# refuses an A/B unit whose Fajr, end of eating and Maghrib were not each checked on every day of
-# that Ramadan (ruling R148), unless the gate has demoted it.
-if ! ./gradlew -q -p tools/timetables checkStamps ${TAQWA_RAMADAN:+-Pramadan="$TAQWA_RAMADAN"}; then
-    refuse "a prayer-time stamp is stale or red, or its Ramadan is not proven (see above). Refresh it first:" \
-        "./gradlew -p tools/timetables gate, then ./gradlew -p tools/timetables generateProofStamps."
+# refuses an A/B unit whose Fajr, end of eating and Maghrib (and its imsak where a table prints one)
+# were not each held out and checked on every day of that Ramadan (rulings R148 and R246: a day
+# held only in a table the method was fitted to does not count), unless the gate has demoted it, or
+# the entry is covered under O4
+# (ruling R185: method proven on the months held and on a Ramadan before, the monitor fetching the
+# authority's own site with every fetched day in the gate, demoted by the monitor on the first
+# failing day) — which is read from the archive's checkout (TAQWA_OFFICIAL, else the archive link
+# under tools/timetables/official). Any build refuses an entry the monitor has demoted (a
+# "@demoted" gate line) until it is looked at, and (-Prelease=true) any build is refused while a
+# reach proof is owed: a unit left out of its entry's reach rows, or an entry whose reach rows are
+# pending, where About's figure is known to be too low (ReachRows.outstanding, never early), an entry
+# whose measured units have no reach spec, or a reach limit over 4 min the owner has not ruled on
+# (ruling R270, the second trust audit of 14 Nov 2026).
+# Without TAQWA_RAMADAN the check still prints, and never fails for, one line naming the entries
+# not yet proven for the coming Ramadan (ruling R246).
+if ! ./gradlew -q -p tools/timetables checkStamps -Prelease=true ${TAQWA_RAMADAN:+-Pramadan="$TAQWA_RAMADAN"} ${TAQWA_OFFICIAL:+-Pofficial="$TAQWA_OFFICIAL"}; then
+    refuse "a prayer-time stamp is stale, red or demoted, its Ramadan is not proven, or a reach proof is owed (see above)." \
+        "For a stamp, refresh it first: ./gradlew -p tools/timetables gate, then ./gradlew -p tools/timetables generateProofStamps."
+fi
+
+# The second trust audit's G24 (14 Nov 2026): checkEnvelopeRows is one of the checks of a release (docs/MONITOR.md).
+# The envelope's promise-only rows replay each table printed for its own point at the app's cities its reach holds; they
+# are a pure function of the gate's group files and fall behind when prove appends a year to a group file with units
+# (us-chicago-envelope.tsv was 517 rows behind for 12 days). scripts/prove.sh now writes them after each proof; this
+# refuses a release cut from a tree where they are stale all the same.
+if ! ./gradlew -q -p tools/timetables checkEnvelopeRows; then
+    refuse "an envelope file is not what generateEnvelopeRows would write (see above): run ./gradlew -p tools/timetables" \
+        "generateEnvelopeRows, then the gate, and commit."
 fi
 N="$(sed -n 's/^ *versionName = "\([^"]*\)" *$/\1/p' "$PHONE_GRADLE")"
 C="$(sed -n 's/^ *versionCode = \([0-9]*\) *$/\1/p' "$PHONE_GRADLE")"

@@ -400,6 +400,12 @@ def run_source(row, store, ctx):
     except Exception as e:  # a fetcher's failure is a finding, never a crash of the run
         ctx.error(f"{type(e).__name__}: {e}")
         ctx.log(scrub(traceback.format_exc()))
+    # Ruling R281 (the second audit's G19): a fetcher that asked and got answers, filed no table and reported no error,
+    # but noted cells that are not a time, read nothing it was given: a change of format, never "ok".
+    unread = sum(1 for n in ctx.notes if "not a time" in n)
+    if not tables and not ctx.errors and ctx.requests and unread:
+        ctx.error(f"no table from {ctx.requests} request{'s' if ctx.requests != 1 else ''}: {unread} answer{'s' if unread != 1 else ''} "
+                  "had a cell that is not a time (the source's format may have changed)")
     statuses = {}
     for t in tables:
         if not isinstance(t, Table) or not t.rows:

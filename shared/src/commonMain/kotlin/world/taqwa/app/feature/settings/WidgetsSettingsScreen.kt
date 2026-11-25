@@ -33,7 +33,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -86,7 +85,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -100,6 +98,7 @@ import world.taqwa.app.design.TaqwaColors
 import world.taqwa.app.design.TaqwaText
 import world.taqwa.app.design.screenReaderRunning
 import world.taqwa.app.design.components.CardDivider
+import world.taqwa.app.design.components.FocusOnceHeard
 import world.taqwa.app.design.components.TaqwaPrimaryButton
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.domain.WidgetBackground
@@ -805,26 +804,6 @@ private fun StepList(
     }
     if (focusFirstStep) FocusOnceHeard(firstStep, onFocusMoved)
 }
-
-/**
- * Moves focus to [requester]'s node a moment after it appears. Android's accessibility bridge
- * tells a screen reader that focus has moved only to a node it has already seen, and it looks for
- * new nodes at most every 100 ms; asked at once, focus moved without TalkBack hearing of it, and
- * TalkBack put its own on the Back button instead (seen on the emulator, review round 2). Then
- * [onMoved], so the screen forgets the tap that asked for it.
- */
-@Composable
-private fun FocusOnceHeard(requester: FocusRequester, onMoved: () -> Unit) {
-    val moved by rememberUpdatedState(onMoved)
-    LaunchedEffect(requester) {
-        delay(NewNodeHeardMs)
-        requester.requestFocus()
-        moved()
-    }
-}
-
-/** Long enough for the bridge's next look for new nodes, and short enough to follow the tap. */
-private const val NewNodeHeardMs = 250L
 
 /** The step number's disc at the default text size, and the size of the digit in it. */
 private val StepDisc = 22.dp

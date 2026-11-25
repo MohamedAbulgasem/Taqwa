@@ -78,12 +78,33 @@ data class GateRow(
      * an early start, a late end or a day out of order breaks the gate as anywhere, but the lateness against a table the
      * place does not follow is not the place's figure: it is recorded in no unit, held to no late limit and kept out of
      * the members' checked days and Maghrib gaps (those are the place's own tables' to say).
+     *
+     * A `<group>-promise.tsv` file's rows are held the same way (ruling R247): a table kept by hand that no place is known
+     * to follow, a calculator's own table for a point, say, replayed at that point so that no start comes before it. It
+     * is no published timetable of the entry's: in no stamp, in no count of published tables, and never written or
+     * removed by `generateEnvelopeRows`.
      */
-    val promiseOnly: Boolean get() = source.endsWith(PROMISE_ONLY_SUFFIX)
+    val promiseOnly: Boolean get() = source.endsWith(PROMISE_ONLY_SUFFIX) || source.endsWith(HAND_PROMISE_SUFFIX)
+
+    /**
+     * A row of a `<group>-reach.tsv` file: a unit's own table replayed at a point of its reach
+     * (`generateReachRows`). Such a row is never the row a table's days are counted at while a row of
+     * another file reads the same table ([Counted], ruling R214).
+     */
+    val reach: Boolean get() = source.endsWith(REACH_SUFFIX)
+
+    /** A row that reads ends alone (a printed imsak, an end of eating): it checks them and adds no place-day. */
+    val endsOnly: Boolean get() = columns.flatten().let { events -> events.isNotEmpty() && events.none { it.isStart } }
 
     companion object {
-        /** The file-name ending of the promise-only gate files ([promiseOnly]). */
+        /** The file-name ending of the generated promise-only gate files, the envelope's ([promiseOnly]). */
         const val PROMISE_ONLY_SUFFIX = "-envelope.tsv"
+
+        /** The file-name ending of the promise-only gate files kept by hand ([promiseOnly], ruling R247). */
+        const val HAND_PROMISE_SUFFIX = "-promise.tsv"
+
+        /** The file-name ending of the reach rows' gate files ([reach]). */
+        const val REACH_SUFFIX = "-reach.tsv"
     }
 }
 
@@ -125,8 +146,78 @@ data class Excuse(
 }
 
 /**
- * Every gate row, from the `official/gate/<group>.tsv` files; [sources] are the files read, and
- * [excuses] their `@excuse` lines (ruling R117). An exception to a late limit is not the gate
+ * One `@demoted` line of a gate file (ruling R185): the monitor's record that [entry], a checked
+ * timetable (class A or B), broke a promise in a capture of its authority's own site — at its
+ * authority unit [unit], or, with no unit, the entry as a whole ([since] is the day `prove` found
+ * it; [reason] says what in words: dates, counts and minutes only, never a printed time, ruling
+ * R69). `prove` writes the line by itself on the first failing day, in the gate file the failing
+ * row would have joined; the gate carries it into the entry's stamp, and from there the website
+ * holds the city pages of the unit (of the whole entry, without one) back (`Proven`), a Ramadan no
+ * longer counts the entry as covered, and no release is cut while the registry still calls the
+ * entry a checked timetable (`CheckStamps`). A person removes the line only with the failing days
+ * proven (the method refitted, their rows in the gate and green; or the authority's own misprint
+ * recorded and the corrected table's rows green), or leaves it standing with the registry's class
+ * lowered.
+ *
+ *     @demoted  <entry>[/<unit>]  <yyyy-mm-dd>  <reason>
+ */
+data class Demotion(val source: String, val line: Int, val entry: String, val unit: String?, val since: LocalDate, val reason: String) {
+    val where: String get() = "$source:$line"
+
+    /** "entry" or "entry/unit", as the line spells it. */
+    val target: String get() = if (unit == null) entry else "$entry/$unit"
+
+    /** This line already says what [other] would: the same unit, or the entry as a whole. */
+    fun covers(entry: String, unit: String?): Boolean = this.entry == entry && (this.unit == null || this.unit == unit)
+}
+
+/**
+ * One `@fitted` line of a gate file (ruling R214, the sweep of finding F20): a margin of [entry] (at its unit [unit], or
+ * wherever it is read) was set on [events] of the table at [path] — every table whose path fits it, where it holds a
+ * `*` — though the rows reading it are marked `test`: the first fit left a held-out day early, and the margin was
+ * widened to that row's excess, or the margin was read off every table held. Such a cell passes by construction, so it
+ * is a fit cell in every figure shown ([Counted]); the row stays `test` for the events no margin was set on, which is
+ * why this is a line of its own and not the row's split. [reason] says which margin and when, in words. A line that no
+ * test row answers is a mistake, and refused.
+ *
+ * **A derived table is held out only where what it was made from is** (the review round of 14 Nov 2026). The archive
+ * holds tables no authority printed as they stand: a perpetual table assigned to another year's dates, a town's table
+ * made of the capital's plus the town's printed minutes. Each prints numbers its source printed, so where a margin was
+ * fitted on the source, a `@fitted` line names the derived table too: its days check the engine against another year's
+ * sun or another town's, and show in the days checked, never among the days the margins did not see.
+ *
+ *     @fitted  <entry>[/<unit>]  <path | pattern with one *>  <events: F S D A As Ah M I E Im, or *>  <reason>
+ */
+data class FittedOn(
+    val source: String,
+    val line: Int,
+    val entry: String,
+    val unit: String?,
+    val path: String,
+    val events: Set<Event>,
+    val reason: String,
+) {
+    val where: String get() = "$source:$line"
+
+    /**
+     * Whether the line names [row]'s table: the entry's (the unit's, when one is named), by path, or by a pattern with one
+     * `*` standing for any run of characters (a prefix where it ends the pattern; a folder's `*-2027.txt` is every town's
+     * table of that year).
+     */
+    fun names(row: GateRow): Boolean {
+        if (row.entry != entry || (unit != null && row.unit != unit)) return false
+        val star = path.indexOf('*')
+        if (star < 0) return row.path == path
+        val head = path.substring(0, star)
+        val tail = path.substring(star + 1)
+        return row.path.length >= head.length + tail.length && row.path.startsWith(head) && row.path.endsWith(tail)
+    }
+}
+
+/**
+ * Every gate row, from the `official/gate/<group>.tsv` files; [sources] are the files read,
+ * [excuses] their `@excuse` lines (ruling R117), [demotions] their `@demoted` lines (ruling R185) and [fitted] their
+ * `@fitted` lines (ruling R214). An exception to a late limit is not the gate
  * file's to make: it lives with its registry entry or unit (ruling R37, `LateLimit`), so that the
  * gate proves and About states the same number.
  */
@@ -134,6 +225,8 @@ data class GateManifest(
     val rows: List<GateRow>,
     val sources: List<String> = rows.map { it.source }.distinct(),
     val excuses: List<Excuse> = emptyList(),
+    val demotions: List<Demotion> = emptyList(),
+    val fitted: List<FittedOn> = emptyList(),
 ) {
 
     /**
@@ -154,6 +247,12 @@ data class GateManifest(
             sources = sources.filter { groups.isEmpty() || it.removeSuffix(".tsv") in groups },
             excuses = excuses.filter { excuse ->
                 (groups.isEmpty() || excuse.source.removeSuffix(".tsv") in groups) && (entries.isEmpty() || excuse.entry in entries)
+            },
+            demotions = demotions.filter { d ->
+                (groups.isEmpty() || d.source.removeSuffix(".tsv") in groups) && (entries.isEmpty() || d.entry in entries)
+            },
+            fitted = fitted.filter { f ->
+                (groups.isEmpty() || f.source.removeSuffix(".tsv") in groups) && (entries.isEmpty() || f.entry in entries)
             },
         )
     }
@@ -189,18 +288,23 @@ data class GateManifest(
         fun load(dir: File): GateManifest {
             val files = dir.listFiles { f -> f.isFile && f.name.endsWith(".tsv") }?.sortedBy { it.name } ?: emptyList()
             val parsed = files.map { parse(it.name, it.readText()) }
-            return GateManifest(parsed.flatMap { it.rows }, files.map { it.name }, parsed.flatMap { it.excuses })
+            return GateManifest(
+                parsed.flatMap { it.rows }, files.map { it.name }, parsed.flatMap { it.excuses }, parsed.flatMap { it.demotions },
+                parsed.flatMap { it.fitted },
+            )
         }
 
         /**
-         * One gate file. Blank lines and `#` comments are skipped, and `@excuse` lines read as
-         * [Excuse]s wherever they stand; the first other line is the header. Every problem is
+         * One gate file. Blank lines and `#` comments are skipped, and `@excuse`, `@demoted` and `@fitted` lines
+         * read as [Excuse]s, [Demotion]s and [FittedOn]s wherever they stand; the first other line is the header. Every problem is
          * reported at once, with its line.
          */
         fun parse(source: String, text: String): GateManifest {
             val problems = mutableListOf<String>()
             val rows = mutableListOf<GateRow>()
             val excuses = mutableListOf<Excuse>()
+            val demotions = mutableListOf<Demotion>()
+            val fitted = mutableListOf<FittedOn>()
             var header: List<String>? = null
             var headerOk = false
             text.lines().forEachIndexed { index, raw ->
@@ -212,6 +316,8 @@ data class GateManifest(
                     cells[0] == "@lateLimit" ->
                         problems += "$where: a late-limit exception lives with its registry entry or unit (ruling R37: LateLimit)"
                     cells[0] == EXCUSE -> excuse(cells, source, line, problems)?.let(excuses::add)
+                    cells[0] == DEMOTED -> demotion(cells, source, line, problems)?.let(demotions::add)
+                    cells[0] == FITTED -> fittedOn(cells, source, line, problems)?.let(fitted::add)
                     cells[0].startsWith("@") -> problems += "$where: unknown directive ${cells[0]}"
                     header == null -> {
                         val missing = HEADER - cells.toSet()
@@ -238,8 +344,64 @@ data class GateManifest(
                     }
                 }
             }
+            // A demotion names an entry this file has rows for: a line for an entry spelt wrongly would demote nothing.
+            for (d in demotions) {
+                if (rows.none { it.entry == d.entry }) problems += "${d.where}: $DEMOTED names ${d.entry}, which has no row in $source"
+            }
+            // A fitted line names a held-out cell of this file: one that names nothing would lower no figure, silently.
+            for (f in fitted) {
+                if (rows.none { row -> row.split == Split.TEST && f.names(row) && row.columns.flatten().any { it in f.events } }) {
+                    problems += "${f.where}: $FITTED names no test row of $source reading those events at ${f.path}"
+                }
+            }
             if (problems.isNotEmpty()) throw GateError(problems)
-            return GateManifest(rows, listOf(source), excuses)
+            return GateManifest(rows, listOf(source), excuses, demotions, fitted)
+        }
+
+        /** The directive of a [FittedOn] line. */
+        const val FITTED = "@fitted"
+
+        private fun fittedOn(cells: List<String>, source: String, line: Int, problems: MutableList<String>): FittedOn? {
+            val where = "$source:$line"
+            if (cells.size != 5 || cells.any { it.isEmpty() }) {
+                return null.also { problems += "$where: $FITTED <entry>[/<unit>] <path or pattern with one *> <events or *> <reason>" }
+            }
+            val entry = cells[1].substringBefore('/')
+            val unit = cells[1].substringAfter('/', "").ifEmpty { null }
+            if (entry.isEmpty() || cells[1].endsWith("/")) return null.also { problems += "$where: $FITTED names '${cells[1]}' (<entry> or <entry>/<unit>)" }
+            if (cells[2].count { it == '*' } > 1) return null.also { problems += "$where: $FITTED pattern '${cells[2]}' holds more than one *" }
+            val events = if (cells[3] == "*") {
+                Event.entries.toSet()
+            } else {
+                cells[3].split(' ').filter { it.isNotEmpty() }.flatMap { token ->
+                    when (token) {
+                        "A" -> listOf(Event.ASR_STANDARD, Event.ASR_HANAFI)
+                        else -> listOf(TOKENS[token] ?: return null.also { problems += "$where: event '$token' (${TOKENS.keys.joinToString(" ")}, A or *)" })
+                    }
+                }.toSet()
+            }
+            return FittedOn(source, line, entry, unit, cells[2], events, cells[4])
+        }
+
+        /** The directive of a [Demotion] line. */
+        const val DEMOTED = "@demoted"
+
+        /** A [Demotion] as its gate file's line. */
+        fun demotedLine(entry: String, unit: String?, since: LocalDate, reason: String): String =
+            listOf(DEMOTED, if (unit == null) entry else "$entry/$unit", since.toString(), reason.replace('\t', ' ').replace('\n', ' ').trim())
+                .joinToString("\t")
+
+        private fun demotion(cells: List<String>, source: String, line: Int, problems: MutableList<String>): Demotion? {
+            val where = "$source:$line"
+            if (cells.size != 4 || cells.any { it.isEmpty() }) {
+                return null.also { problems += "$where: $DEMOTED <entry>[/<unit>] <yyyy-mm-dd> <reason>" }
+            }
+            val since = runCatching { LocalDate.parse(cells[2]) }.getOrNull()
+                ?: return null.also { problems += "$where: date '${cells[2]}' (yyyy-mm-dd)" }
+            val entry = cells[1].substringBefore('/')
+            val unit = cells[1].substringAfter('/', "").ifEmpty { null }
+            if (entry.isEmpty() || cells[1].endsWith("/")) return null.also { problems += "$where: $DEMOTED names '${cells[1]}' (<entry> or <entry>/<unit>)" }
+            return Demotion(source, line, entry, unit, since, cells[3])
         }
 
         /** The directive of an [Excuse] line. */

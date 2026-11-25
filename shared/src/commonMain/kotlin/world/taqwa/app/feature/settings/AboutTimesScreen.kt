@@ -31,9 +31,11 @@ import world.taqwa.app.design.components.CardDivider
 import world.taqwa.app.design.components.drawChevron
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.feature.common.authorityShortName
+import world.taqwa.app.feature.prayer.CheckedClaim
 import world.taqwa.app.feature.prayer.formatClock
 import world.taqwa.app.i18n.LocalPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
+import world.taqwa.app.i18n.isolated
 import world.taqwa.app.i18n.isolatedClock
 import world.taqwa.app.i18n.localizedPrayerName
 import world.taqwa.app.i18n.schoolDisplayName
@@ -45,9 +47,11 @@ import world.taqwa.app.prayer.engine.PrayerEngine
 import world.taqwa.app.prayer.engine.astro.SunModel
 import world.taqwa.app.prayer.engine.day.PrayerDay
 import world.taqwa.app.prayer.engine.method.AsrSchool
+import world.taqwa.app.prayer.engine.method.EndOfEating
 import world.taqwa.app.prayer.engine.method.IshaRule
 import world.taqwa.app.prayer.engine.method.TimetableMethod
 import world.taqwa.app.prayer.engine.registry.AboutTemplate
+import world.taqwa.app.prayer.engine.registry.CheckedDays
 import world.taqwa.app.prayer.engine.registry.EntryClass
 import world.taqwa.app.prayer.engine.registry.Member
 import world.taqwa.app.prayer.engine.registry.Place
@@ -65,21 +69,27 @@ import world.taqwa.app.resources.about_asr_known
 import world.taqwa.app.resources.about_asr_unknown
 import world.taqwa.app.resources.about_authority_method_title
 import world.taqwa.app.resources.about_authority_unchecked_body
+import world.taqwa.app.resources.about_border_body
+import world.taqwa.app.resources.about_calculated_beside_body
 import world.taqwa.app.resources.about_calculated_body
 import world.taqwa.app.resources.about_cautious_body
 import world.taqwa.app.resources.about_cautious_checked
 import world.taqwa.app.resources.about_cautious_maghrib_guard
 import world.taqwa.app.resources.about_cautious_maghrib_no_sunset
+import world.taqwa.app.resources.about_cautious_short_nights
 import world.taqwa.app.resources.about_check_mosque_body
 import world.taqwa.app.resources.about_check_mosque_heading
-import world.taqwa.app.resources.about_checked_so_far_with_data
 import world.taqwa.app.resources.about_checked_so_far_without_data
-import world.taqwa.app.resources.about_checked_through
 import world.taqwa.app.resources.about_how_checked
 import world.taqwa.app.resources.about_how_reproduces
 import world.taqwa.app.resources.about_if_fasting
 import world.taqwa.app.resources.about_majority_unchecked_body
+import world.taqwa.app.resources.about_method_asr_floor
 import world.taqwa.app.resources.about_method_daily_sun
+import world.taqwa.app.resources.about_method_dhuhr_floor
+import world.taqwa.app.resources.about_method_eating_angle
+import world.taqwa.app.resources.about_method_eating_angle_beside
+import world.taqwa.app.resources.about_method_eating_before_fajr
 import world.taqwa.app.resources.about_method_fajr_angle
 import world.taqwa.app.resources.about_method_fajr_curve
 import world.taqwa.app.resources.about_method_horizon_dip
@@ -87,16 +97,18 @@ import world.taqwa.app.resources.about_method_intro
 import world.taqwa.app.resources.about_method_isha_after_maghrib
 import world.taqwa.app.resources.about_method_isha_angle
 import world.taqwa.app.resources.about_method_isha_curve
+import world.taqwa.app.resources.about_method_isha_floor
 import world.taqwa.app.resources.about_method_minutes_note
 import world.taqwa.app.resources.about_method_rounding_note
 import world.taqwa.app.resources.about_nearby_heading
 import world.taqwa.app.resources.about_not_affiliated
+import world.taqwa.app.resources.about_not_compared_after
 import world.taqwa.app.resources.about_not_followed_irn_tromso
 import world.taqwa.app.resources.about_not_measured_unit
 import world.taqwa.app.resources.about_stat_at_most_after
+import world.taqwa.app.resources.about_stat_days_at_one_place
 import world.taqwa.app.resources.about_stat_days_at_places
 import world.taqwa.app.resources.about_stat_minutes_value
-import world.taqwa.app.resources.about_stat_never_before
 import world.taqwa.app.resources.about_stat_never_before_decider
 import world.taqwa.app.resources.about_stop_eating
 import world.taqwa.app.resources.about_sunni_body
@@ -132,7 +144,11 @@ sealed interface AboutTimesUiState {
 
     /** [date] is the day About is read on: the "checked through" date is the end of the checked run holding it ([checkedThrough]). */
     data class AuthorityChecked(override val resolution: Resolution, val stamp: ProofStamp?, val date: LocalDate) : AboutTimesUiState
-    data class AuthorityUnchecked(override val resolution: Resolution, val stamp: ProofStamp?) : AboutTimesUiState
+    /**
+     * [date] is the day About is read on: where a checked authority is shown as its published method because no run holds
+     * that day ([Resolution.checkedClass], ruling R275), About says through when it was checked ([checkedThrough]).
+     */
+    data class AuthorityUnchecked(override val resolution: Resolution, val stamp: ProofStamp?, val date: LocalDate? = null) : AboutTimesUiState
 
     /**
      * [combined] is the members' own days combined ([DayPipeline.day]/[world.taqwa.app.prayer.engine.day.Cautious]),
@@ -174,7 +190,7 @@ fun aboutTimesUiState(engineDay: EngineDay, place: Place, date: LocalDate, hijri
     val resolution = engineDay.effective
     return when (resolution.about) {
         AboutTemplate.AUTHORITY_CHECKED -> AboutTimesUiState.AuthorityChecked(resolution, ProofStamps.of(resolution.entry.id), date)
-        AboutTemplate.AUTHORITY_UNCHECKED -> AboutTimesUiState.AuthorityUnchecked(resolution, ProofStamps.of(resolution.entry.id))
+        AboutTemplate.AUTHORITY_UNCHECKED -> AboutTimesUiState.AuthorityUnchecked(resolution, ProofStamps.of(resolution.entry.id), date)
         AboutTemplate.CAUTIOUS -> {
             val zone = TimeZone.of(place.zoneId)
             val days = DayPipeline.members(resolution, date, zone, engineDay.school, hijriOffsetDays)
@@ -272,23 +288,46 @@ private fun AuthorityCheckedContent(
         SectionBody(stringResource(Res.string.about_not_measured_unit, unitLabel))
     } else {
         val atMost = checkedAtMostMinutes(resolution, place, stamp)
+        val republisher = resolution.entry.republisher
+        // The tiles count the whole entry's days, so a copy any of them was read from is named (ruling R276); the date
+        // line is the place's own run, so its own tables decide.
+        val entryCopy = CheckedClaim.copyName(republisher, resolution.entry.partlyRepublisher)
+        val placeCopy = CheckedClaim.copyName(republisher, resolution.partlyRepublisher)
         StatTilesRow(
             tiles = listOf(
                 format.localizedDigits(stamp.placeDays) to
-                    stringResource(Res.string.about_stat_days_at_places, format.localizedDigits(stamp.places)),
-                format.localizedDigits(0) to stringResource(Res.string.about_stat_never_before, authority),
+                    daysAtPlaces(stamp.places, format),
+                // Whose copy the comparison was with, where the tables were not read from the authority's own pages.
+                format.localizedDigits(0) to when (entryCopy) {
+                    null -> stringResource(CheckedClaim.NEVER_BEFORE.sentence(null), authority)
+                    else -> stringResource(
+                        CheckedClaim.NEVER_BEFORE.sentence(republisher, resolution.entry.partlyRepublisher), authority, isolated(entryCopy),
+                    )
+                },
                 stringResource(Res.string.about_stat_minutes_value, format.localizedDigits(atMost)) to
                     stringResource(Res.string.about_stat_at_most_after),
             ),
         )
         checkedThrough(resolution, stamp, state.date)?.let { through ->
+            val date = format.longDate(LocalDate.parse(through))
             SectionBody(
-                stringResource(Res.string.about_checked_through, authority, format.longDate(LocalDate.parse(through))),
+                when (placeCopy) {
+                    null -> stringResource(CheckedClaim.THROUGH.sentence(null), authority, date)
+                    else -> stringResource(
+                        CheckedClaim.THROUGH.sentence(republisher, resolution.partlyRepublisher), authority, date, isolated(placeCopy),
+                    )
+                },
             )
         }
     }
     NotFollowedNote(resolution, authority)
 }
+
+/** The first tile's words: "days at N places", or "days at one place" where the stamp holds one (the second audit's G11). */
+@Composable
+private fun daysAtPlaces(places: Int, format: PlatformFormat): String =
+    if (places == 1) stringResource(Res.string.about_stat_days_at_one_place)
+    else stringResource(Res.string.about_stat_days_at_places, format.localizedDigits(places))
 
 @Composable
 private fun AuthorityUncheckedContent(
@@ -319,14 +358,38 @@ private fun AuthorityUncheckedContent(
     val worst = uncheckedWorstMinutes(resolution, stamp)
     if (stamp != null && worst != null) {
         CardDivider()
+        val days = format.localizedDigits(stamp.placeDays)
+        val minutes = format.localizedDigits(worst)
+        // Beyond the checked places the days compared are the same tables: whose copy, where it was one.
         SectionBody(
-            stringResource(
-                Res.string.about_checked_so_far_with_data,
-                format.localizedDigits(stamp.placeDays),
-                authority,
-                format.localizedDigits(worst),
-            ),
+            // The whole entry's days: a copy any of them was read from is named (ruling R276).
+            when (val copy = CheckedClaim.copyName(resolution.entry.republisher, resolution.entry.partlyRepublisher)) {
+                null -> stringResource(CheckedClaim.SO_FAR.sentence(null), days, authority, minutes)
+                else -> stringResource(
+                    CheckedClaim.SO_FAR.sentence(resolution.entry.republisher, resolution.entry.partlyRepublisher),
+                    days, authority, minutes, isolated(copy),
+                )
+            },
         )
+        // A checked authority shown as its published method on a day past its checked runs (ruling R275) says through
+        // when it was checked and that the days after are not compared yet, so the label does not change silently
+        // (Casablanca from 1 December 2026; ruling R278, the review of the second audit's G9 and G13).
+        val through = state.date?.takeIf { resolution.checkedClass != null }?.let { day ->
+            checkedThrough(resolution, stamp, day)?.takeIf { LocalDate.parse(it) < day }
+        }
+        if (through != null) {
+            val date = format.longDate(LocalDate.parse(through))
+            val placeCopy = CheckedClaim.copyName(resolution.entry.republisher, resolution.partlyRepublisher)
+            SectionBody(
+                when (placeCopy) {
+                    null -> stringResource(CheckedClaim.THROUGH.sentence(null), authority, date)
+                    else -> stringResource(
+                        CheckedClaim.THROUGH.sentence(resolution.entry.republisher, resolution.partlyRepublisher),
+                        authority, date, isolated(placeCopy),
+                    )
+                } + " " + stringResource(Res.string.about_not_compared_after),
+            )
+        }
     } else if (stamp != null) {
         CardDivider()
         SectionBody(stringResource(Res.string.about_not_measured_unit, unitLabel))
@@ -358,6 +421,19 @@ internal fun notFollowedNoteRes(resolution: Resolution): StringResource? =
         else -> null
     }
 
+/**
+ * Ruling R314 (the owner's ruling of 17 Nov 2026, R302's option (a) for Norway's Cautious times): a cautious place one of
+ * whose members follows IRN's Tromsø calendar under its clock rule meets R302's nights too short for Isha, and About
+ * says what is shown on them ([Res.string.about_cautious_short_nights]); null elsewhere. The member's placed method
+ * carries the rule only within Tromsø's reach, where R302 moves its Maghrib and Isha.
+ */
+internal fun cautiousNoteRes(resolution: Resolution): StringResource? =
+    if (resolution.members.any { it.method.clockRule?.notFollowedNoteKey == IrnArctic.NOTE_KEY }) {
+        Res.string.about_cautious_short_nights
+    } else {
+        null
+    }
+
 @Composable
 private fun CautiousContent(
     state: AboutTimesUiState.Cautious,
@@ -368,7 +444,9 @@ private fun CautiousContent(
 ) {
     val names = state.members.map { (member, _) -> authorityShortName(member.nameKey) }
     SectionHeading(stringResource(Res.string.timetable_cautious))
-    SectionBody(stringResource(Res.string.about_cautious_body, cityLabel, joinNames(names)))
+    // A place that may be on either side of a border (ruling R259) says so, and how to choose one side's timetable.
+    val body = if (state.resolution.sides.isNotEmpty()) Res.string.about_border_body else Res.string.about_cautious_body
+    SectionBody(stringResource(body, cityLabel, joinNames(names)))
     maghribGuardToday(state)?.let { guard ->
         SectionBody(
             stringResource(
@@ -378,6 +456,7 @@ private fun CautiousContent(
             ),
         )
     }
+    cautiousNoteRes(state.resolution)?.let { SectionBody(stringResource(it)) }
 
     CardDivider()
     SectionHeading(stringResource(Res.string.about_which_decides))
@@ -391,7 +470,7 @@ private fun CautiousContent(
         StatTilesRow(
             tiles = listOf(
                 format.localizedDigits(proof.placeDays) to
-                    stringResource(Res.string.about_stat_days_at_places, format.localizedDigits(proof.places)),
+                    daysAtPlaces(proof.places, format),
                 format.localizedDigits(0) to stringResource(Res.string.about_stat_never_before_decider),
             ),
         )
@@ -480,7 +559,9 @@ internal fun maghribGuardToday(state: AboutTimesUiState.Cautious): MaghribGuard?
  * [world.taqwa.app.prayer.engine.day.Cautious] counts it): at Trondheim in December the shown Maghrib is Diyanet's
  * sunset + 7, which is no member's own Maghrib (Diyanet's own is held later by its five-hour winter day), and the
  * table names Diyanet for it, never no one (item A of the adversarial check of 24 Oct 2026). A minute a table riding
- * alongside or the repair moved can still be no member's ([deciders] empty); the line then lists the others alone.
+ * alongside or the repair moved, or one the real sun's floor set (ruling R180: a Dhuhr or Maghrib raised to the first
+ * whole minute after the real transit or sunset at the user's point, above every member's own), can still be no
+ * member's ([deciders] empty); the line then lists the others alone, each with its own time as its timetable gives it.
  */
 internal data class DecidingRow(val shown: Instant, val deciders: List<Member>, val others: List<Pair<Member, Instant>>)
 
@@ -497,8 +578,22 @@ internal fun decidingRow(state: AboutTimesUiState.Cautious, prayer: Prayer): Dec
 private fun CalculatedContent(state: AboutTimesUiState.Calculated, cityLabel: String, format: PlatformFormat) {
     val method = state.resolution.method
     SectionHeading(stringResource(Res.string.timetable_calculated))
-    val description = if (method != null) methodDescription(method, format) else ""
-    SectionBody(stringResource(Res.string.about_calculated_body, cityLabel, description))
+    // A body's own table riding beside the day (Habous's at Ceuta and Melilla, ruling R285): the end of eating and the
+    // sunrise are that table's where it is the earlier, so the sentence says so rather than name one dawn alone.
+    val besideTable = state.resolution.safeSideOfTableKey?.let { authorityShortName(it) }
+    // Taqwa's own calculation: the sentence also says where it ends eating, when that is not at its Fajr's dawn.
+    val description = if (method != null) methodDescription(method, format, ownCalculation = true, eatingBeside = besideTable) else ""
+    // A body whose timetable Taqwa holds a part of is named, and what is held is said (the trust audit's F30,
+    // ruling R209): "found no official Sunni timetable" would be false there. The resolution's own (ruling R285) first.
+    val body = state.resolution.safeSideOfKey?.let { authorityShortName(it) }
+    SectionBody(
+        if (body != null) {
+            stringResource(Res.string.about_calculated_beside_body, body, cityLabel, description) + " " +
+                stringResource(Res.string.about_not_affiliated, body)
+        } else {
+            stringResource(Res.string.about_calculated_body, cityLabel, description)
+        },
+    )
 }
 
 /**
@@ -692,12 +787,23 @@ private fun listSemicolon(): String = if (uiLanguage().arabicScript) "؛ " else 
 
 /**
  * "The way {authority} calculates" (spec §2.3): the angles, the horizon rule implicit in them, the
- * authority's own minutes where any event carries them, and the rounding convention every method
- * shares — generated from [method], never hand-written per authority.
+ * authority's own minutes where any event carries them, the clocks and floors a method sets beside its angles
+ * ([methodExtras], the trust audit's F31), and the rounding convention every method shares — generated from [method],
+ * never hand-written per authority. [ownCalculation] is Taqwa's own calculation ("Calculated by Taqwa"), whose
+ * sentence also names the dawn its eating ends at where that is deeper than its Fajr's: under an authority's name
+ * that end is Taqwa's safe reading, not the way the authority calculates, so it stays out. [eatingBeside] is the body
+ * whose own table rides beside Taqwa's own calculation at the place (ruling R285: Habous at Ceuta and Melilla): the end
+ * of eating is then the earlier of the method's dawn and that table's, and sunrise never after that table's.
  */
 @Composable
-private fun methodDescription(method: TimetableMethod, format: PlatformFormat): String {
+private fun methodDescription(
+    method: TimetableMethod,
+    format: PlatformFormat,
+    ownCalculation: Boolean = false,
+    eatingBeside: String? = null,
+): String {
     val angles = methodAngleRanges(method)
+    val extras = methodExtras(method)
     val parts = mutableListOf<String>()
 
     // The sun model (spec §3.2, İstanbul mockup: "the sun's position taken once a day"):
@@ -720,6 +826,26 @@ private fun methodDescription(method: TimetableMethod, format: PlatformFormat): 
         stringResource(Res.string.about_method_fajr_angle, formatAngle(angles.fajr.first, format))
     }
 
+    // The end of eating, where the method sets it apart from its Fajr: at least so many minutes before it (Jamiatul
+    // Ulama's 5, Côte d'Ivoire's 25: counted back from the dawn as an end with its margin, so the Fajr shown, which
+    // carries its own cushion, is a few minutes more than that after it; "at least" is what is true of both), or, in Taqwa's own calculation, at a deeper dawn than Fajr's (Tajikistan's 19.5° for
+    // a 15° Fajr).
+    extras.eatingMinutesBeforeFajr?.let {
+        parts += stringResource(Res.string.about_method_eating_before_fajr, format.localizedDigits(it))
+    }
+    if (ownCalculation) {
+        // Beside a body's own table (ruling R285) the dawn alone is not where eating ends: the earlier of it and the
+        // table's is, so the sentence names both, the dawn being the Fajr's own where no deeper one is set.
+        val dawn = if (eatingBeside != null) eatingBesideDawnDegrees(method) else null
+        if (eatingBeside != null && dawn != null) {
+            parts += stringResource(Res.string.about_method_eating_angle_beside, formatAngle(dawn, format), isolated(eatingBeside))
+        } else {
+            extras.eatingDawnDegrees?.let {
+                parts += stringResource(Res.string.about_method_eating_angle, formatAngle(it, format))
+            }
+        }
+    }
+
     parts += when (val isha = method.isha) {
         is IshaRule.Angle -> if (angles.ishaIsCurve) {
             stringResource(
@@ -731,6 +857,18 @@ private fun methodDescription(method: TimetableMethod, format: PlatformFormat): 
             stringResource(Res.string.about_method_isha_angle, formatAngle(isha.degrees, format))
         }
         is IshaRule.AfterMaghrib -> stringResource(Res.string.about_method_isha_after_maghrib, format.localizedDigits(isha.minutes))
+    }
+
+    // The clocks and floors beside the angles: an Isha never less than so long after Maghrib, a Dhuhr and an Asr
+    // never before a clock time (the Council of Ulama's and COSIM's conventions, the Tatarstan Muftiate's Dhuhr).
+    extras.ishaFloorMinutesAfterMaghrib?.let {
+        parts += stringResource(Res.string.about_method_isha_floor, format.localizedDigits(it))
+    }
+    extras.dhuhrNotBeforeMinutes?.let {
+        parts += stringResource(Res.string.about_method_dhuhr_floor, isolatedClock(format.clockTime(it / 60, it % 60)))
+    }
+    extras.asrNotBeforeMinutes?.let {
+        parts += stringResource(Res.string.about_method_asr_floor, isolatedClock(format.clockTime(it / 60, it % 60)))
     }
 
     // The horizon (spec §3.2: INM and Habous by elevation, JAKIM's highland zones, Kemenag, Jordan):
@@ -775,6 +913,54 @@ internal fun methodAngleRanges(method: TimetableMethod): MethodAngles = MethodAn
         is IshaRule.AfterMaghrib -> null
     },
 )
+
+/**
+ * What [method] sets beside its two angles, each null where it sets none (the trust audit's F31): the local time
+ * Dhuhr and Asr are never before ([TimetableMethod.fixedDhuhrLocalMinutes], [TimetableMethod.fixedAsrLocalMinutes],
+ * minutes after midnight), the least Isha is after Maghrib on every date ([TimetableMethod.ishaFloorMinutesAfterMaghrib];
+ * a Ramadan-only floor is not a year-round one and stays out), the minutes its eating ends before its Fajr
+ * ([EndOfEating.MinutesBeforeFajr]), and the one dawn angle its eating ends at where that is deeper than its one
+ * Fajr angle (a curve on either side has no single figure to name). Pure (no Compose) so a test can check it directly.
+ */
+internal data class MethodExtras(
+    val dhuhrNotBeforeMinutes: Int?,
+    val asrNotBeforeMinutes: Int?,
+    val ishaFloorMinutesAfterMaghrib: Int?,
+    val eatingMinutesBeforeFajr: Int?,
+    val eatingDawnDegrees: Double?,
+)
+
+internal fun methodExtras(method: TimetableMethod): MethodExtras {
+    val eating = method.endOfEating
+    return MethodExtras(
+        dhuhrNotBeforeMinutes = method.fixedDhuhrLocalMinutes,
+        asrNotBeforeMinutes = method.fixedAsrLocalMinutes,
+        ishaFloorMinutesAfterMaghrib = method.ishaFloorMinutesAfterMaghrib,
+        eatingMinutesBeforeFajr = (eating as? EndOfEating.MinutesBeforeFajr)?.minutes,
+        eatingDawnDegrees = (eating as? EndOfEating.DawnAngle)
+            ?.takeIf { it.bySlot == null && method.fajrAngleByDayOfYear == null && it.degrees > method.fajrAngle }
+            ?.degrees,
+    )
+}
+
+/**
+ * The one dawn angle the beside sentence (ruling R285) names as where the method's own eating ends: [MethodExtras]'
+ * deeper dawn, or else the Fajr's own single angle, but only where eating ends at that dawn itself. An end counted in
+ * minutes before Fajr has its own sentence ("at least N minutes before Fajr"), and naming the Fajr's angle beside it as
+ * where eating ends would contradict it; a curve has no single figure. Null then, and the beside clause is left out
+ * (the review of the re-audit fixes, 16 Nov 2026). Spain's safe default, the one method it serves today, ends eating at
+ * its 18° dawn, deeper than its 12° Fajr, so it takes the first branch.
+ */
+internal fun eatingBesideDawnDegrees(method: TimetableMethod): Double? {
+    methodExtras(method).eatingDawnDegrees?.let { return it }
+    if (methodAngleRanges(method).fajrIsCurve) return null
+    val atFajrDawn = when (val eating = method.endOfEating) {
+        EndOfEating.SameAsFajrDawn -> true
+        is EndOfEating.DawnAngle -> eating.bySlot == null && eating.degrees == method.fajrAngle
+        else -> false
+    }
+    return method.fajrAngle.takeIf { atFajrDawn }
+}
 
 /** [TimetableMethod.horizonDeg]'s own default (the plain sea-level horizon), for the honesty check above. */
 private const val DEFAULT_HORIZON_DEG = -0.8333
@@ -845,23 +1031,28 @@ private fun startsOf(keys: Set<String>): Set<String> =
  * page's date): the end of the checked run holding [date] in the user's own unit's runs where the stamp checks the
  * entry by unit (Madinah's own tables end with 2027, Makkah's with 2030), the entry's runs otherwise. So the date
  * never runs past a day no table was checked on: Zürich's and Türkiye's tables are checked to 1 November 2026 and
- * again from 1 January 2027, and About says 1 November 2026 until then, never 31 December 2027. On a day no run
- * holds, the end of the latest run before it (a date already past, claiming nothing of the days ahead); null where
- * every run is after it. Pure so a test can check it against a committed stamp.
+ * again from 1 January 2027. Since ruling R275 a day no run holds is shown as the published method, whose About reads
+ * this too: there it is the end of the latest run before the day (a date already past, claiming nothing of the days
+ * ahead: Casablanca's 30 November 2026 on 1 December), said with "the days after it are not compared yet" (ruling
+ * R278); null where every run is after it. Pure so a test can check it against a committed stamp.
  */
 internal fun checkedThrough(resolution: Resolution, stamp: ProofStamp, date: LocalDate): String? {
     val runs = resolution.unitId?.takeIf { stamp.worstLateByUnit.isNotEmpty() }?.let { stamp.checkedByUnit[it] } ?: stamp.checked
     return checkedRunEnd(runs, date)
 }
 
-/** [runs] as a stamp writes them ("2026-09-25..2026-11-01", or one date): see [checkedThrough]. */
+/**
+ * [runs] as a stamp writes them ("2026-09-25..2026-11-01", or one date): see [checkedThrough]. Runs that touch are one
+ * run. A lone checked day extends nothing "through" (the second audit's G13): Oman's 2029 tables are read on the 1st
+ * and 15th of each month only, and "checked through 1 January 2029" would say 2028 was checked, which no table was; so
+ * a day of one is passed over ([CheckedDays.blocks], as the label reads the runs), and the date stays the end of the
+ * last run of two days or more until 2028 is held.
+ */
 internal fun checkedRunEnd(runs: List<String>, date: LocalDate): String? {
     var before: LocalDate? = null
-    for (run in runs) {
-        val start = LocalDate.parse(run.substringBefore(".."))
-        val end = LocalDate.parse(run.substringAfter(".."))
-        if (date in start..end) return end.toString()
-        if (end < date && (before == null || end > before)) before = end
+    for (run in CheckedDays.blocks(runs)) {
+        if (date in run) return run.endInclusive.toString()
+        if (run.endInclusive < date && (before == null || run.endInclusive > before)) before = run.endInclusive
     }
     return before?.toString()
 }
@@ -884,8 +1075,9 @@ internal fun uncheckedWorstMinutes(resolution: Resolution, stamp: ProofStamp?): 
     stamp?.takeIf { resolution.measured }?.let { measuredStartsWorst(resolution, it) }
 
 /**
- * "At most N minutes later" (ruling R41, ui-common.md): [lateLimitFor]'s own recorded exception for
- * [event] at [place]'s unit, else the class default (A 1, B 2, C 1 after the latest member, D 3).
+ * "At most N minutes later" (ruling R41, ui-common.md): [lateLimitFor] for [event] at [place]'s unit (its recorded
+ * exception, or its reach's measured worst where larger, ruling R270), else the class default (A 1, B 2, C 1 after the
+ * latest member, D 3).
  * Only called once a stamp exists, so this is always a figure the gate has proven, never a bare
  * promise.
  */

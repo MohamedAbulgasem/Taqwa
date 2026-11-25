@@ -24,6 +24,11 @@ package world.taqwa.app.domain
  * phone's zone data is older than the place's zone (`ZoneIds`): Kyiv on an Android 9 phone is
  * drawn in Europe/Kiev, its old name on the same clock, and Nuuk, which has no old name, in the
  * phone's own zone. The Location screen names whichever the times are on (`ZoneIds.named`).
+ *
+ * [alsoCountryCode] and [alsoRegion]: for a GPS fix whose device zone belongs to another country than its nearest
+ * city's, that country and its nearest city's region (rulings R256 and R259, `FixCountry`): the place may be on
+ * either side of a border, and the engine holds the day to both countries' timetables. Null for every other
+ * location, a city picked by hand among them.
  */
 data class GeoLocation(
     val latitude: Double,
@@ -34,4 +39,6 @@ data class GeoLocation(
     val cityId: Int? = null,
     val region: String? = null,
     val pickedTimeZoneId: String = timeZoneId,
+    val alsoCountryCode: String? = null,
+    val alsoRegion: String? = null,
 )

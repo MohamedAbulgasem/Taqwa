@@ -1,9 +1,9 @@
 {
   "entry": "ca.cautious",
   "class": "C",
-  "engineHash": "042856aecabb80dd",
+  "engineHash": "a8fcc3e1f3f5b0fb",
   "broken": 0,
-  "places": 55,
+  "places": 6,
   "first": "2026-01-01",
   "last": "2026-12-31",
   "checked": ["2026-01-01..2026-12-31"],
@@ -16,9 +16,10 @@
     "isha": ["2026-01-01..2026-12-31"],
     "endOfEating": ["2026-01-01..2026-12-31"]
   },
-  "placeDays": 7607,
-  "heldOutDays": 7607,
-  "ramadanDays": 538,
+  "placeDays": 1788,
+  "heldOutDays": 1788,
+  "tables": 5,
+  "ramadanDays": 149,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
@@ -130,115 +131,128 @@
     }
   },
   "heldOut": {
-    "placeDays": 7607,
-    "ramadanDays": 538,
+    "placeDays": 1788,
+    "ramadanDays": 149,
+    "checkedByEvent": {
+      "fajr": ["2026-01-01..2026-12-31"],
+      "sunrise": ["2026-01-01..2026-12-31"],
+      "dhuhr": ["2026-01-01..2026-12-31"],
+      "asrStandard": ["2026-01-01..2026-12-31"],
+      "maghrib": ["2026-01-01..2026-12-31"],
+      "isha": ["2026-01-01..2026-12-31"],
+      "endOfEating": ["2026-01-01..2026-12-31"]
+    },
     "events": {
       "fajr": {
-        "checked": 7607,
+        "checked": 1788,
         "early": 0,
         "late": {
-          "0": 429,
-          "1": 456,
-          "2": 1132,
-          "3+": 5590
+          "0": 45,
+          "1": 44,
+          "2": 174,
+          "3+": 1525
         },
-        "exactShare": 0.0564,
+        "exactShare": 0.0252,
         "worstLate": 36,
         "lateLimit": 36,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "sunrise": {
-        "checked": 7607,
+        "checked": 1788,
         "lateEnd": 0,
         "late": {
-          "0": 826,
-          "1": 1859,
-          "2": 2875,
-          "3+": 2047
+          "0": 82,
+          "1": 342,
+          "2": 657,
+          "3+": 707
         },
-        "exactShare": 0.1086,
-        "worstLate": 5,
+        "exactShare": 0.0459,
+        "worstLate": 4,
         "lateLimit": 5,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "dhuhr": {
-        "checked": 7607,
+        "checked": 1788,
         "early": 0,
         "late": {
-          "0": 316,
-          "1": 408,
-          "2": 44,
-          "3+": 6839
+          "0": 158,
+          "1": 204,
+          "2": 22,
+          "3+": 1404
         },
-        "exactShare": 0.0415,
-        "worstLate": 6,
+        "exactShare": 0.0884,
+        "worstLate": 5,
         "lateLimit": 6,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "asrStandard": {
-        "checked": 7607,
+        "checked": 1788,
         "early": 0,
         "late": {
-          "0": 70,
-          "1": 648,
-          "2": 1856,
-          "3+": 5033
+          "0": 31,
+          "1": 287,
+          "2": 499,
+          "3+": 971
         },
-        "exactShare": 0.0092,
+        "exactShare": 0.0173,
         "worstLate": 5,
         "lateLimit": 5,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "maghrib": {
-        "checked": 7607,
+        "checked": 1788,
         "early": 0,
         "late": {
-          "0": 141,
-          "1": 439,
-          "2": 136,
-          "3+": 6891
+          "0": 70,
+          "1": 169,
+          "2": 48,
+          "3+": 1501
         },
-        "exactShare": 0.0185,
-        "worstLate": 8,
+        "exactShare": 0.0391,
+        "worstLate": 7,
         "lateLimit": 8,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "isha": {
-        "checked": 7607,
+        "checked": 1788,
         "early": 0,
         "late": {
-          "0": 45,
-          "1": 35,
-          "2": 75,
-          "3+": 7452
+          "0": 2,
+          "1": 2,
+          "2": 15,
+          "3+": 1769
         },
-        "exactShare": 0.0059,
+        "exactShare": 0.0011,
         "worstLate": 77,
         "lateLimit": 77,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       },
       "endOfEating": {
-        "checked": 7607,
+        "checked": 1788,
         "lateEnd": 0,
         "late": {
           "0": 0,
-          "1": 56,
-          "2": 142,
-          "3+": 7409
+          "1": 24,
+          "2": 62,
+          "3+": 1702
         },
         "exactShare": 0,
-        "worstLate": 39,
+        "worstLate": 38,
         "lateLimit": 39,
         "lateLimitFrom": "entry ca.cautious",
         "overLimit": 0
       }
     }
+  },
+  "replays": {
+    "places": 49,
+    "placeDays": 5819
   },
   "members": {
     "ca.eighteen": {

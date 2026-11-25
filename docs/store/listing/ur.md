@@ -54,8 +54,11 @@
 (Plan 5 Task 10's cut, which makes room for the wrist paragraph within Play's 4,000 characters, for Mohamed's approval: the website and support lines are left out, since both stores show them in their own fields, and so is the line of interface languages, which the App Store lists itself.)
 
 ### Release notes (500)
-1.6.0 میں نیا کیا ہے:
-• آپ کی گھڑی پر تقویٰ: واچ فیس، کمپلیکیشنز اور ٹائل، تسبیح اور قبلہ، Galaxy Watch جیسی Wear OS گھڑیوں پر
+1.7.0 میں نیا کیا ہے:
+• نماز کے اوقات اب کہیں زیادہ جگہوں پر شائع شدہ نقشۂ اوقات سے ملا کر دیکھے جاتے ہیں، جن میں ترکیہ، مصر، مراکش، الجزائر، ملائیشیا، انڈونیشیا، بنگلہ دیش اور پاکستان شامل ہیں
+• سرحد کے قریب، فون کے مقام سے اوقات نکالتے ہوئے تقویٰ اب دونوں ملکوں کے نقشۂ اوقات کو مدِ نظر رکھ سکتا ہے
+• "آج کی آیت" ویجٹ میں اب 365 آیات ہیں، سال کے ہر دن کے لیے ایک
+• "نماز" کی اسکرین پر ایک کارڈ آپ کی گھڑی پر تقویٰ سیٹ اپ کرنے میں مدد کرتا ہے
 
 ## App Store
 
@@ -121,8 +124,10 @@
 (Its own text since 1.6.0, as each store names only its own watch (App Store Review Guideline 2.3.10): the Play full description above, with the Apple Watch paragraph in place of the Wear OS one, and Apple in place of Google in the bullet after the location one.)
 
 ### What's new (4000)
-1.6.0 میں نیا کیا ہے:
-• آپ کی Apple Watch پر تقویٰ: کمپلیکیشنز میں اگلی نماز، Digital Crown سے تسبیح، اور قبلہ
+1.7.0 میں نیا کیا ہے:
+• نماز کے اوقات اب کہیں زیادہ جگہوں پر شائع شدہ نقشۂ اوقات سے ملا کر دیکھے جاتے ہیں، جن میں ترکیہ، مصر، مراکش، الجزائر، ملائیشیا، انڈونیشیا، بنگلہ دیش اور پاکستان شامل ہیں
+• سرحد کے قریب، فون کے مقام سے اوقات نکالتے ہوئے تقویٰ اب دونوں ملکوں کے نقشۂ اوقات کو مدِ نظر رکھ سکتا ہے
+• "آج کی آیت" ویجٹ میں اب 365 آیات ہیں، سال کے ہر دن کے لیے ایک
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. جہاں آپ ہیں وہاں نماز کے اوقات

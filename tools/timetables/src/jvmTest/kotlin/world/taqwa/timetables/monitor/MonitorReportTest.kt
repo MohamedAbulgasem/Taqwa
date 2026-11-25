@@ -1,6 +1,7 @@
 package world.taqwa.timetables.monitor
 
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Month
 import world.taqwa.timetables.Json
 import world.taqwa.timetables.TestPaths
 import java.io.File
@@ -53,10 +54,14 @@ class MonitorReportTest {
         assertTrue(sources.all { !it.manual || it.nextExpected != null || it.fetcher != "manual" }, "a source read by hand names when its next edition is expected")
         val fetchers = TestPaths.repoRoot.resolve("tools/timetables/monitor/fetchers").listFiles { f -> f.extension == "py" }!!.map { it.nameWithoutExtension }.toSet()
         for (s in sources.filter { it.fetcher != "manual" }) assertTrue(s.fetcher in fetchers, "${s.id}: no fetcher ${s.fetcher}.py")
-        // IRN runs on its own (ruling R95); London too, monthly, since the owner's key (10 Oct 2026); the MJC's
-        // page is due each new month.
-        assertEquals("irn", sources.first { it.id == "no-irn" }.fetcher)
-        assertTrue(!sources.first { it.id == "no-irn" }.manual)
+        // IRN is read by hand each December (ruling R189: its site's data needs a key the monitor was never
+        // given), so the monitor fetches nothing and says when the coming year is due; London runs on its own,
+        // monthly, since the owner's key (10 Oct 2026); the MJC's page is due each new month.
+        val irn = sources.first { it.id == "no-irn" }
+        assertEquals("manual" to "manual", irn.fetcher to irn.cadence)
+        assertTrue(irn.manual && irn.nextExpected != null, "IRN's coming year is due by a date the monitor knows")
+        assertEquals(Month.DECEMBER, irn.nextExpected.month, "each December")
+        assertTrue(irn.note.startsWith("manual: due each December"), irn.note)
         val london = sources.first { it.id == "gb-london-lupt" }
         assertEquals("london" to "monthly", london.fetcher to london.cadence)
         assertTrue(!london.manual && london.nextExpected == null)

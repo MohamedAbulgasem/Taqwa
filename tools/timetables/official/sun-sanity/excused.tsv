@@ -1,6 +1,20 @@
 # The sun-sanity pass's excused groups (SunSanity.kt, Excuse): breaches the engine's own day accounts for, pinned like
-# the open findings so a new one, or one that grows, fails the pass. A Dhuhr before transit is never excused. Same
-# window, run and ceilings as open-findings.tsv (worst_s: the worst seconds rounded up plus one; points: points found).
+# an open finding so a new one, or one that grows, fails the pass. A Dhuhr before transit or a Maghrib before sunset
+# is never excused and never listed: the engine's own floor forbids both (ruling R180). Ruling R265's checks (an Asr
+# before its shadow, a sunrise or Fajr's end after the real sunrise, Dhuhr's end after the first shadow) are listed here
+# only with the day's own excuse: the floor stands aside where a rule sets the day's Asr or the day is polar, and the
+# sunrise stays a minute after a Fajr shown at or just before the sun; unexcused, either fails the pass. The first two
+# groups were measured on
+# 2026-11-12..2027-12-31 (run of 12 Nov 2026, found again unchanged with the floor in); ceilings: worst_s is the worst
+# seconds found rounded up plus one second for the window's drift from year to year, points the number of points found.
 entry	check	excuse	worst_s	points	note
 no.cautious	fajr-after-sunrise	declared	94	2	Norway (Automatic): Harstad on 22 Jul 2027 (93 s) and Longyearbyen on 25 Aug 2027 (66 s), 4 place-days: a member's Fajr the day declares it does not show (PrayerDay.notFollowed, ruling R82), the first days the sun sets again after the midnight sun.
 se.cautious	fajr-after-sunrise	declared	4	1	Sweden (Automatic): Boden on 27 Jun 2027, 3 s, 2 place-days: a member's Fajr the day declares it does not show (PrayerDay.notFollowed, ruling R82).
+# Ruling R265's excused groups, measured on 2026-11-14..2027-12-14 (run of 14 Nov 2026); ceilings as above.
+no.cautious	sunrise-after-real-sunrise	declared	154	7	Norway (Automatic): Harstad up to 2.5 min (22 Jul 2027), Longyearbyen 2.1 min, Alta, Mo i Rana, Tromsø and two more, 42 place-days: a member's Fajr the day declares it does not show stands at or within a minute of the real sunrise, so the sunrise stays the minute after that Fajr (ruling R265: never moving the Fajr earlier), the weeks around the midnight sun.
+no.irn	asr-before-shadow	set-by-rule	3568	3	Tromsø's unit (IRN's Makkah hold, ruling R82), 29 Apr to 13 Aug 2027, Hanafi only, up to 59.4 min before the second shadow (19 Jun), 321 place-days: IRN's rule sets Asr with the Makkah-time day and its own sunset to end it; R265 stands aside where a rule sets Asr, as no Maghrib waits for a sunset that does not come.
+no.irn	asr-before-shadow	polar	2032	3	Tromsø's unit, 18 May and 26 Jul 2027, Standard, up to 33.8 min, 6 place-days: a polar day whose times follow IRN's rule (PrayerDay.polar); R265 stands aside.
+no.irn	sunrise-after-real-sunrise	declared	25	1	Mo i Rana with IRN chosen, 5-11 Jul 2027, up to 24 s, 12 place-days: the sunrise stays the minute after a Fajr the day declares it does not show (ruling R265).
+no.irn	sunrise-after-real-sunrise	set-by-rule	33	1	Mo i Rana with IRN chosen, 13-14 Jul 2027, up to 32 s, 4 place-days: the sunrise stays the minute after a Fajr a rule set within a minute of the real sunrise (ruling R265).
+se.cautious	sunrise-after-real-sunrise	declared	64	17	Sweden's, Finland's and Iceland's cautious north (Boden up to 63 s on 27 Jun 2027, Rovaniemi, Kiruna, Tornio, Akureyri and twelve more), 100 place-days: the sunrise stays the minute after a member's Fajr the day declares it does not show (ruling R265).
+tr.diyanet.europe	sunrise-after-real-sunrise	declared	5	2	Diyanet's Luleå (4 s, 3 Jul 2027) and Oulu units, 4 place-days: the sunrise stays the minute after a Fajr the day declares it does not show (ruling R265).

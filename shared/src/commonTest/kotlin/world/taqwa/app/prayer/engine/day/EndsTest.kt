@@ -7,6 +7,7 @@ import kotlinx.datetime.plus
 import world.taqwa.app.domain.Prayer
 import world.taqwa.app.prayer.engine.astro.SunClock
 import world.taqwa.app.prayer.engine.astro.SunModel
+import world.taqwa.app.prayer.engine.astro.altitudeTime
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.method.GeoPoint
 import world.taqwa.app.prayer.engine.method.IshaRule
@@ -46,12 +47,16 @@ class EndsTest {
     fun `fajr ends at sunrise dhuhr at the standard asr and asr at sunset`() {
         val standard = compute(IshaRule.Angle(17.0))
         assertEquals(standard.sunrise, standard.ends[Prayer.FAJR])
-        assertEquals(standard.asr, standard.ends[Prayer.DHUHR])
+        // Dhuhr's end is the Standard Asr read as an end (ruling R265): rounded down, so the minute of the Asr shown
+        // (rounded up), never after it.
+        val dhuhrEnd = standard.ends.getValue(Prayer.DHUHR)
+        assertTrue(dhuhrEnd <= standard.asr && standard.asr - dhuhrEnd <= 1.minutes)
         assertEquals(standard.sunset, standard.ends[Prayer.ASR])
         assertTrue(standard.sunset <= standard.maghrib)
 
         val hanafi = compute(IshaRule.Angle(17.0), school = AsrSchool.HANAFI)
-        assertEquals(hanafi.asrOther, hanafi.ends[Prayer.DHUHR], "Dhuhr ends at the Standard Asr in either school")
+        val hanafiEnd = hanafi.ends.getValue(Prayer.DHUHR)
+        assertTrue(hanafiEnd <= hanafi.asrOther && hanafi.asrOther - hanafiEnd <= 1.minutes, "Dhuhr ends at the Standard Asr in either school")
         assertEquals(standard.ends[Prayer.DHUHR], hanafi.ends[Prayer.DHUHR])
     }
 

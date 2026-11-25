@@ -1,0 +1,19 @@
+# Engine wave W5 (18 Oct 2026, rulings R136–R138): the regional safe default for South-east Asia without a checked
+# authority (`default.safe.seasia`, Generic.kt; spec §6.2 c: Thailand, the Philippines, Myanmar, Vietnam,
+# Cambodia, Laos, Timor-Leste, Christmas and the Cocos Islands), gated for the first time, as a stress test only:
+# no table is held for any country it serves, so it is checked against the region's four authorities, each with
+# its own entry and never routed here: JAKIM's Kuala Lumpur zone (WLY01) 2026 at the zone's point, MUIS's 2026
+# (open, at the app's own Singapore point as safe-default.tsv has it), Brunei's MORA 2026 (the cleaned full-year
+# file at the Brunei-Muara point) and Kemenag's Jakarta 2026. Every row is held out. Nothing is masked.
+#
+# What the rows show is the cost of the region's design (its late limits, Generic.kt, southeastAsiaLateLimits):
+# Fajr 9 to 13 min after the 20° Subuh MUIS, Kemenag and Brunei print (this region's Fajr is JAKIM's 18°, the
+# latest in the region), the end of eating (the 20° dawn − 2 min) 4 to 6 min before Kemenag's and MUIS's Fajr and
+# up to 14 min before JAKIM's Subuh, which it prints for its zone's latest point, rounded up; and the 1986 floors
+# plus the cushion on the rest (sunrise up to 7 min before, Maghrib up to 6 after, Dhuhr up to 5, Asr and Isha
+# up to 4).
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/round/data-wide-band/off-jakim-WLY01.txt	default.safe.seasia	3.1412	101.68653	Asia/Kuala_Lumpur	F+E S D A M I	daily	standard	test	Malaysia (JAKIM, Kuala Lumpur WLY01) 2026, stress test
+open/SG-MUIS/off-muis-singapore-2026.txt	default.safe.seasia	1.28967	103.85007	Asia/Singapore	F+E S D A M I	daily	standard	test	Singapore (MUIS) 2026, the app's own point, stress test
+archive/tables/moral-auth-world/sea/off-bn-2026-clean.txt	default.safe.seasia	4.89035	114.94006	Asia/Brunei	F+E S D A M I	daily	standard	test	Brunei (MORA, Bandar Seri Begawan) 2026, stress test
+archive/tables/round/data-diyanet-kemenag/off-kemenag-jakarta.txt	default.safe.seasia	-6.2088	106.8456	Asia/Jakarta	F+E S D A M I	daily	standard	test	Indonesia (Kemenag, Jakarta) 2026, stress test

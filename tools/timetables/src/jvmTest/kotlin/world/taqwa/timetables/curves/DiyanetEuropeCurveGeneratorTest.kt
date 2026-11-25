@@ -47,19 +47,19 @@ class DiyanetEuropeCurveGeneratorTest {
         val sun = SunClock(point.lat, point.lon, date, offset, SunModel.DAILY_0H_UT)
         val next = SunClock(point.lat, point.lon, date.plus(1, DateTimeUnit.DAY), offset, SunModel.DAILY_0H_UT)
         val previous = SunClock(point.lat, point.lon, date.plus(-1, DateTimeUnit.DAY), offset, SunModel.DAILY_0H_UT)
-        val sunrise = sun.altitudeTime(-0.8333, morning = true)!!
-        val sunset = sun.altitudeTime(-0.8333, morning = false)!!
-        val dawn = sun.altitudeTime(-18.0, morning = true)
-        val dusk = sun.altitudeTime(-16.0, morning = false)
+        val sunrise = sun.crossing(-0.8333, morning = true)?.kept!!
+        val sunset = sun.crossing(-0.8333, morning = false)?.kept!!
+        val dawn = sun.crossing(-18.0, morning = true)?.kept
+        val dusk = sun.crossing(-16.0, morning = false)?.kept
         val takdir = date.month.ordinal + 1 in 5..8 || (date.month.ordinal + 1 == 4 && date.day >= 25)
         val fajr = if (takdir) {
-            val night = sunrise - previous.altitudeTime(-0.8333, morning = false)!!
+            val night = sunrise - previous.crossing(-0.8333, morning = false)?.kept!!
             max(dawn?.let { it - 12 } ?: Double.NEGATIVE_INFINITY, sunrise - 0.206 * night)
         } else {
             dawn!! - 12
         }
         val isha = if (takdir) {
-            val night = next.altitudeTime(-0.8333, morning = true)!! - sunset
+            val night = next.crossing(-0.8333, morning = true)?.kept!! - sunset
             min(dusk?.let { it + 8 } ?: Double.POSITIVE_INFINITY, sunset + 0.19 * night)
         } else {
             dusk!! + 8

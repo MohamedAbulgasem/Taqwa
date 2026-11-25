@@ -1,9 +1,9 @@
 {
   "entry": "bh.council",
   "class": "D (authority)",
-  "engineHash": "de6c28ff4555597e",
+  "engineHash": "4b3516bf5c167fd8",
   "broken": 0,
-  "places": 9,
+  "places": 1,
   "first": "2026-06-16",
   "last": "2027-06-05",
   "checked": ["2026-06-16..2027-06-05"],
@@ -16,116 +16,117 @@
     "isha": ["2026-06-16..2027-06-05"],
     "endOfEating": ["2026-06-16..2027-06-05"]
   },
-  "placeDays": 3195,
+  "placeDays": 355,
   "heldOutDays": 0,
-  "ramadanDays": 261,
+  "tables": 1,
+  "ramadanDays": 29,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 3195,
+      "checked": 7100,
       "early": 0,
       "late": {
         "0": 0,
-        "1": 1953,
-        "2": 1242,
-        "3+": 0
+        "1": 3363,
+        "2": 2621,
+        "3+": 1116
       },
       "exactShare": 0,
+      "worstLate": 5,
+      "lateLimit": 5,
+      "lateLimitFrom": "entry bh.council",
+      "overLimit": 0
+    },
+    "sunrise": {
+      "checked": 7100,
+      "lateEnd": 0,
+      "late": {
+        "0": 4999,
+        "1": 844,
+        "2": 64,
+        "3+": 1193
+      },
+      "exactShare": 0.7041,
+      "worstLate": 6,
+      "lateLimit": 6,
+      "lateLimitFrom": "entry bh.council",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 7100,
+      "early": 0,
+      "late": {
+        "0": 4547,
+        "1": 2437,
+        "2": 116,
+        "3+": 0
+      },
+      "exactShare": 0.6404,
       "worstLate": 2,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
-    "sunrise": {
-      "checked": 3195,
-      "lateEnd": 0,
-      "late": {
-        "0": 2844,
-        "1": 351,
-        "2": 0,
-        "3+": 0
-      },
-      "exactShare": 0.8901,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
-      "overLimit": 0
-    },
-    "dhuhr": {
-      "checked": 3195,
-      "early": 0,
-      "late": {
-        "0": 2547,
-        "1": 648,
-        "2": 0,
-        "3+": 0
-      },
-      "exactShare": 0.7972,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
-      "overLimit": 0
-    },
     "asrStandard": {
-      "checked": 3195,
+      "checked": 7100,
       "early": 0,
       "late": {
-        "0": 2421,
-        "1": 774,
-        "2": 0,
-        "3+": 0
+        "0": 2958,
+        "1": 2737,
+        "2": 848,
+        "3+": 557
       },
-      "exactShare": 0.7577,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.4166,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry bh.council",
       "overLimit": 0
     },
     "maghrib": {
-      "checked": 3195,
+      "checked": 7100,
       "early": 0,
       "late": {
-        "0": 2853,
-        "1": 342,
-        "2": 0,
-        "3+": 0
+        "0": 4626,
+        "1": 1427,
+        "2": 859,
+        "3+": 188
       },
-      "exactShare": 0.893,
-      "worstLate": 1,
+      "exactShare": 0.6515,
+      "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "isha": {
-      "checked": 3195,
+      "checked": 7100,
       "early": 0,
       "late": {
-        "0": 2763,
-        "1": 432,
-        "2": 0,
+        "0": 5168,
+        "1": 1686,
+        "2": 246,
         "3+": 0
       },
-      "exactShare": 0.8648,
-      "worstLate": 1,
+      "exactShare": 0.7279,
+      "worstLate": 2,
       "lateLimit": 3,
       "lateLimitFrom": "class D (authority)",
       "overLimit": 0
     },
     "endOfEating": {
-      "checked": 3195,
+      "checked": 7100,
       "lateEnd": 0,
       "late": {
-        "0": 2772,
-        "1": 423,
-        "2": 0,
-        "3+": 0
+        "0": 4942,
+        "1": 860,
+        "2": 63,
+        "3+": 1235
       },
-      "exactShare": 0.8676,
-      "worstLate": 1,
-      "lateLimit": 3,
-      "lateLimitFrom": "class D (authority)",
+      "exactShare": 0.6961,
+      "worstLate": 7,
+      "lateLimit": 7,
+      "lateLimitFrom": "entry bh.council",
       "overLimit": 0
     }
   },
@@ -134,9 +135,29 @@
     "ramadanDays": 0,
     "events": {}
   },
+  "replays": {
+    "places": 19,
+    "placeDays": 6745
+  },
   "lateLimits": {
     "class D (authority): 3 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "asrStandard", "maghrib", "isha", "endOfEating"]
+      "events": ["dhuhr", "maghrib", "isha"]
+    },
+    "entry bh.council: 4 min": {
+      "reason": "This table, read across the area the proof draws for it (ReachAreas.AREAS), not only its own point, was measured up to 4 min after it on some days, and never before it: away from the point it is printed for the user's own sun decides the time shown (rulings R270 and R297).",
+      "events": ["asrStandard"]
+    },
+    "entry bh.council: 5 min": {
+      "reason": "This table, read across the area the proof draws for it (ReachAreas.AREAS), not only its own point, was measured up to 5 min after it on some days, and never before it: away from the point it is printed for the user's own sun decides the time shown (rulings R270 and R297).",
+      "events": ["fajr"]
+    },
+    "entry bh.council: 6 min": {
+      "reason": "This table, read across the area the proof draws for it (ReachAreas.AREAS), not only its own point, was measured up to 6 min before it on some days, and never after it: away from the point it is printed for the user's own sun decides the time shown (rulings R270 and R297).",
+      "events": ["sunrise"]
+    },
+    "entry bh.council: 7 min": {
+      "reason": "This table, read across the area the proof draws for it (ReachAreas.AREAS), not only its own point, was measured up to 7 min before it on some days, and never after it: away from the point it is printed for the user's own sun decides the time shown (rulings R270 and R297).",
+      "events": ["endOfEating"]
     }
   }
 }

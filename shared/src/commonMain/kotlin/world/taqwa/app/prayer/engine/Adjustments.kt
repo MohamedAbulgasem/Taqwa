@@ -35,8 +35,9 @@ internal object Adjustments {
      * [day] with [minutes] applied under the timetable [entryId]. [dhuhrFloor] is the whole minute a
      * minute after the transit at the user's point, [asrFloor] the astronomical Standard Asr there
      * rounded up (null when the sun never casts that shadow), [maghribFloor] the sunset there with
-     * the method's horizon rounded up (null when the sun does not set); each is asked for only when
-     * an earlier start needs it.
+     * the method's horizon rounded up and never before the first whole minute after the real sunset
+     * (ruling R180; null when the sun does not set); each is asked for only when an earlier start
+     * needs it.
      */
     fun apply(
         day: PrayerDay,

@@ -106,8 +106,10 @@ object DiyanetEuropeCurveGenerator {
             val sky = Sky(point, row.date, zone)
             val printedFajr = Gate.officialInstant(row.date, row.fajrMinutes, Event.FAJR, zone).epochSeconds.toDouble()
             val printedIsha = Gate.officialInstant(row.date, row.ishaMinutes, Event.ISHA, zone).epochSeconds.toDouble()
-            val dawn = sky.clock.altitudeTime(-fajrAngle, morning = true)
-            val dusk = sky.clock.altitudeTime(-ishaAngle, morning = false)
+            val dawn = sky.clock.startTime(-fajrAngle, morning = true)
+            val dusk = sky.clock.startTime(-ishaAngle, morning = false)
+            // The end of eating reads the same dawn as an end (the daily model gives the two sides one moment).
+            val dawnEnd = sky.clock.endTime(-fajrAngle, morning = true)
 
             // A start: the earliest moment that is still no earlier than Diyanet's own.
             var fajrBound = printedFajr + 30 + SAFETY
@@ -120,8 +122,8 @@ object DiyanetEuropeCurveGenerator {
             }
             // The end: the latest moment that is still no later than Diyanet's own.
             var endBound = printedFajr - 30 - SAFETY
-            if (dawn != null && endOf(dawn + method.endOfEatingMarginSeconds) <= printedFajr) {
-                endBound = max(endBound, dawn + method.endOfEatingMarginSeconds - endMargin)
+            if (dawnEnd != null && endOf(dawnEnd + method.endOfEatingMarginSeconds) <= printedFajr) {
+                endBound = max(endBound, dawnEnd + method.endOfEatingMarginSeconds - endMargin)
             }
             require(fajrBound > sky.lowestBefore && endBound > sky.lowestBefore) {
                 "${row.date}: Diyanet's Fajr is not after the sun's lowest point at $point; no depression names it"

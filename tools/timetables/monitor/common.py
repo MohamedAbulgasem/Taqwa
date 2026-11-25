@@ -30,7 +30,9 @@ import urllib.parse
 import urllib.request
 
 USER_AGENT = "Taqwa timetable monitor (taqwa.world)"
-MIN_INTERVAL = 1.5  # seconds between requests, whatever the host
+# Seconds between requests, whatever the host. Two since 13 November 2026 (it was 1.5): the gentlest interval any
+# fetcher had asked for on its own (muftiyat.kg) is now every site's, and no fetcher can ask for less (Http._wait).
+MIN_INTERVAL = 2.0
 TIMEOUT = 60
 # After this many consecutive network failures on one host the rest of its requests fail at once
 # (review M3: a black-holed host would otherwise cost about two minutes a request).
@@ -139,10 +141,13 @@ class Http:
         if self.owner is not None:
             self.owner.made += 1
 
-    def _wait(self):
-        gap = time.monotonic() - self._last
-        if gap < MIN_INTERVAL:
-            time.sleep(MIN_INTERVAL - gap)
+    def _wait(self, gap=None):
+        """Sleeps until MIN_INTERVAL has passed since the last request, or `gap` seconds when a fetcher asks for a
+        longer one (never a shorter: the larger of the two holds)."""
+        need = MIN_INTERVAL if gap is None else max(MIN_INTERVAL, gap)
+        since = time.monotonic() - self._last
+        if since < need:
+            time.sleep(need - since)
 
     def budget_spent(self):
         return self.deadline is not None and time.monotonic() >= self.deadline
@@ -154,11 +159,13 @@ class Http:
             self.tripped.add(host)
             self.log(f"  BREAKER {host}: {n} consecutive network failures, the rest of its requests are not tried")
 
-    def get(self, url, headers=None, data=None, timeout=TIMEOUT, retries=1, jar=None):
+    def get(self, url, headers=None, data=None, timeout=TIMEOUT, retries=1, jar=None, gap=None):
         """The body (bytes) of `url`; `data` (bytes or a dict) makes it a POST. `jar` (an
         http.cookiejar.CookieJar a fetcher keeps for one site) sends back the cookies that site set,
         for a page whose form only answers within its session (awqaf.gov.jo's ASP.NET pager); no
-        other request carries cookies. Raises FetchError."""
+        other request carries cookies. `gap` (seconds) asks for a longer wait before this request than
+        MIN_INTERVAL, for a site asked many times in a row (muftiyat.kg, 230 pages); it never shortens
+        the wait. Raises FetchError."""
         shown = redact(url)
         host = host_of(url)
         if self.budget_spent():
@@ -174,7 +181,7 @@ class Http:
             hdrs.setdefault("Content-Type", "application/x-www-form-urlencoded")
         last = None
         for attempt in range(retries + 1):
-            self._wait()
+            self._wait(gap)
             self._count()
             self._last = time.monotonic()
             try:
@@ -208,8 +215,9 @@ class Http:
                     # Python's own TLS stack cannot reach this site (a certificate chain its store does
                     # not know and EXTRA_CA does not complete; a protocol the Mac's LibreSSL lacks):
                     # curl verifies against the system's store and speaks the system's TLS, so the
-                    # request goes through curl instead (review I7).
-                    return self._curl(url, hdrs, body, timeout, jar)
+                    # request goes through curl instead (review I7). It is a second request to the same
+                    # site, so it waits its interval like any other and is counted (the review of 14 Nov 2026).
+                    return self._curl_after_wait(url, hdrs, body, timeout, jar, gap)
                 self._network_failure(host)
                 last = FetchError(f"{type(e).__name__}: {getattr(e, 'reason', e)} from {shown}")
                 if attempt < retries and host not in self.tripped:
@@ -217,7 +225,7 @@ class Http:
                     continue
                 raise last
             except ssl.SSLError:
-                return self._curl(url, hdrs, body, timeout, jar)
+                return self._curl_after_wait(url, hdrs, body, timeout, jar, gap)
             except (TimeoutError, OSError) as e:
                 self._network_failure(host)
                 last = FetchError(f"{type(e).__name__}: {getattr(e, 'reason', e)} from {shown}")
@@ -230,6 +238,15 @@ class Http:
                 # the whole request path, so its text is never repeated: only its kind and the masked URL).
                 raise FetchError(f"{type(e).__name__} for {shown}")
         raise last
+
+    def _curl_after_wait(self, url, headers, body, timeout, jar, gap):
+        """The curl fallback as the second request it is: after the interval (or the fetcher's longer `gap`),
+        counted, and the next request waits from it. A request within a session (`jar`) is refused before any wait."""
+        if jar is None:
+            self._wait(gap)
+            self._count()
+            self._last = time.monotonic()
+        return self._curl(url, headers, body, timeout, jar)
 
     def _curl(self, url, headers, body, timeout, jar=None):
         """The same request through curl (still verifying the certificate, against the system store).
@@ -349,6 +366,27 @@ def add_all(ctx, table, rows, label):
         except FetchError as e:
             ctx.note(f"{label} {date}: {e}")
     return added
+
+
+def raise_imsak(ctx, label, bad, wide, limit=15):
+    """A printed imsak's findings (ruling R284): `bad` the dates whose cell is not a time or after its Subuh (left
+    '-'), `wide` (date, minutes) those printed more than `limit` min before it (kept as printed). A day still ahead is
+    an error, for a human to rule before it comes; a day already past is a note (the year's table is re-read every run,
+    and a past day raised every week would bury what is coming). Days and minutes only, never a time."""
+    today = ctx.today.isoformat()
+
+    def say(dates, what):
+        ahead = [d for d in dates if d >= today]
+        past = [d for d in dates if d < today]
+        if ahead:
+            ctx.error(f"{label}: {what(ahead)}")
+        if past:
+            ctx.note(f"{label}: {what(past)} (past days)")
+
+    say(sorted(bad), lambda ds: f"{len(ds)} imsak cell{'s' if len(ds) != 1 else ''} not a time or after Subuh (the first {ds[0]}), left '-'")
+    gaps = dict(wide)
+    say(sorted(gaps), lambda ds: f"imsak printed more than {limit} min before Subuh on {len(ds)} day{'s' if len(ds) != 1 else ''} "
+                                 f"(the first {ds[0]}, up to {max(gaps[d] for d in ds)} min), kept as printed, for a human to rule")
 
 
 def norm_time(t):

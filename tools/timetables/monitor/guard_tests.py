@@ -280,5 +280,87 @@ class QmdbGuard(unittest.TestCase):
         self.assertIn("South 2026: no days in the response", ctx.errors)
 
 
+class HeapGuard(unittest.TestCase):
+    """Ruling R280 (the second audit's G17): every JVM that runs the whole gate has the gate's heap, the runner's memory
+    is in the log, and a check or a prove that ran out of heap says so in its failure."""
+
+    ROOT = os.path.join(HERE, "..", "..", "..")
+
+    def read(self, *path):
+        with open(os.path.join(self.ROOT, *path), encoding="utf-8") as f:
+            return f.read()
+
+    def heap(self, kts, task):
+        start = kts.index(f'tasks.register<JavaExec>("{task}")')
+        end = kts.index("\ntasks.register", start + 1)
+        m = re.findall(r'maxHeapSize = "(\d+)g"', kts[start:end])
+        self.assertEqual(1, len(m), task)
+        return int(m[0])
+
+    def test_every_whole_gate_jvm_has_the_gates_heap(self):
+        kts = self.read("tools", "timetables", "build.gradle.kts")
+        gate = self.heap(kts, "gate")
+        self.assertGreaterEqual(gate, 4)
+        # The monitor's check (MonitorMain's fullGate) and prove (one whole result at a time) run the same gate.
+        self.assertEqual(gate, self.heap(kts, "monitor"))
+        self.assertEqual(gate, self.heap(kts, "prove"))
+        test = kts[kts.index("tasks.withType<Test>().configureEach"):]
+        self.assertEqual(gate, int(re.search(r'maxHeapSize = "(\d+)g"', test).group(1)), "NeverEarlyGateTest runs the whole gate too")
+
+    def test_prove_lets_the_base_result_go(self):
+        kt = self.read("tools", "timetables", "src", "jvmMain", "kotlin", "world", "taqwa", "timetables", "monitor", "Prove.kt")
+        self.assertIn("summarise(gate.evaluate(baseManifest))", kt)
+        self.assertNotIn("val base = ", kt, "no local of run() keeps the base gate's whole result")
+        self.assertIn("evaluated = null", kt)
+        # The demotion path (R185 with no row kept) lets the last round's result go before the base gate runs again.
+        nothing = kt.index("if (planned.isEmpty()) {")
+        self.assertLess(kt.index("evaluated = null", nothing), kt.index("gate.evaluate(baseManifest)", nothing))
+
+    def test_the_monitor_job_has_time_for_the_whole_gate_and_prove_stops_in_time(self):
+        yml = self.read("tools", "timetables", "monitor", "ci", "monitor-weekly.yml")
+        job = yml[yml.index("\n  monitor:\n"):yml.index("\n  publish:\n")]
+        self.assertEqual(["350"], re.findall(r"^    timeout-minutes: (\d+)$", job, re.M))
+        step = job[job.index("- name: Prove the new captures"):job.index("- name: Pack what the run changed")]
+        self.assertIn('left=$(( 350 - 25 - ', step)
+        self.assertIn('timeout --signal=TERM --kill-after=120 "${left}m" taqwa/scripts/prove.sh', step)
+        self.assertIn("git clean -fdq -- archive/tables/pinned", step)
+        self.assertIn('JOB_START=$(date +%s)', job[:job.index("- name: Run the monitor")])
+        # prove's errors stream to the log as they come, so a stopped prove still shows them.
+        self.assertIn('2> >(tee "$TMP/prove.err" >&2)', self.read("scripts", "prove.sh"))
+
+    def test_the_runner_logs_its_memory_before_the_monitor_runs(self):
+        yml = self.read("tools", "timetables", "monitor", "ci", "monitor-weekly.yml")
+        at = yml.index("- name: The runner's memory")
+        self.assertLess(at, yml.index("- name: Run the monitor"))
+        self.assertIn("/proc/meminfo", yml[at:at + 2000])
+
+    def heap_note(self):
+        sh = self.read("scripts", "monitor.sh")
+        m = re.search(r"^heap_note\(\) \{\n.*?^\}\n", sh, re.M | re.S)
+        self.assertIsNotNone(m)
+        self.assertIn('the check step wrote no result (Gradle exit $GRADLE_EXIT, see $LOG)$(heap_note "$LOG")', sh)
+        return m.group(0)
+
+    def test_a_check_that_ran_out_of_heap_says_so(self):
+        import subprocess
+        root = tempfile.mkdtemp("heap")
+        self.addCleanup(shutil.rmtree, root)
+        out = {}
+        for name, text in (("oom", 'Exception in thread "main" java.lang.OutOfMemoryError: Java heap space\n'), ("other", "BUILD FAILED\n")):
+            log = os.path.join(root, name + ".log")
+            with open(log, "w") as f:
+                f.write(text)
+            r = subprocess.run(["bash", "-c", self.heap_note() + 'printf "[%s]" "$(heap_note "$1")"', "x", log], capture_output=True, text=True)
+            self.assertEqual(0, r.returncode, r.stderr)
+            out[name] = r.stdout
+        self.assertIn("ran out of heap (java.lang.OutOfMemoryError", out["oom"])
+        self.assertIn("ruling R280", out["oom"])
+        self.assertEqual("[]", out["other"])
+        prove = self.read("scripts", "prove.sh")
+        self.assertIn("grep -q 'OutOfMemoryError' \"$TMP/prove.err\"", prove)
+        main = self.read("tools", "timetables", "src", "jvmMain", "kotlin", "world", "taqwa", "timetables", "monitor", "ProveMain.kt")
+        self.assertIn("catch (e: OutOfMemoryError)", main)
+
+
 if __name__ == "__main__":
     unittest.main()

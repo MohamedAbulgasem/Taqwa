@@ -15,8 +15,8 @@
 # Northern round (3 Oct 2026): those tables, with Almaty's 2027, are pinned as the kz-qmdb monitor fetched
 # them (archive/tables/pinned/kz-qmdb/2026-10-03/; raw JSON in archive/raw/monitor/kz-qmdb/2026-10-03/).
 # The Almaty and Astana 2026 captures equal the off_ala/off_ast tables above, so they get no second row.
-# At the 2026-only margins Astana's 2027 Fajr was 1 min early on 7 July days and the northern cities' Isha on
-# 4 August days, so the starts are refitted: Astana 2027, Kokshetau, Pavlodar and Petropavl are fit rows
+# At the 2026-only margins Astana's 2027 Fajr was 1 min early on 7 days and the northern cities' Isha on
+# 4 days, so the starts are refitted: Astana 2027, Kokshetau, Pavlodar and Petropavl are fit rows
 # (they decide Fajr, Isha, Asr and Maghrib, as they decided the end of eating); Almaty 2027 and Kostanay
 # (its own zone, the farthest west) are held out. Northern lateness grows to Petropavl and is recorded as
 # kz.qmdb's Fajr (8 min) and Isha (5 min) limits (CentralAsia.kt, proof 7f).
@@ -38,6 +38,8 @@
 # (each slot the later start, the earlier end), a 46-48N end-of-eating margin (-150 s), Asr and Maghrib refitted later
 # (-6, -14), and Isha's limit 6 min. Fit rows: Isakovka and Krasny Yar (the edge) and Oteshqali Atambayev and Ayagoz
 # (the band's top); the other 19 are held out.
+# Ruling R214 (the sweep of 13 Nov 2026): cells of the test rows below that a margin was set on are fit cells in every figure shown; the rows stay test for the other events.
+@fitted	kz.qmdb	archive/tables/pinned/kz-qmdb/2026-10-03/kostanay-*	E	the end of eating's margin above 48 N was refitted on Kostanay's tables with the four fit cities' (the fix round of 3 Oct 2026, proof 7f)
 path	entry	lat	lon	zone	columns	format	school	split	note
 archive/tables/moral-auth-world/centralasia/off_ala_h1.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Almaty, Jan-Jun 2026 (below 48N)
 archive/tables/moral-auth-world/centralasia/off_ala_h2.txt	kz.qmdb	43.238293	76.945465	Asia/Almaty	F+E S D A M I	daily	hanafi	fit	Almaty, Jul-Dec 2026 (folded in, see above)

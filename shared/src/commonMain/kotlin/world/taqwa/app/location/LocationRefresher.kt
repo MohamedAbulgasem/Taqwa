@@ -6,6 +6,7 @@ import world.taqwa.app.city.CityRepository
 import world.taqwa.app.domain.GeoLocation
 import world.taqwa.app.domain.LocationSource
 import world.taqwa.app.notifications.RescheduleTrigger
+import world.taqwa.app.prayer.ZoneCountries
 import world.taqwa.app.settings.SettingsRepository
 
 /**
@@ -92,19 +93,10 @@ class LocationRefresher(
         val zoneId = currentZoneId()
         val moved = LocationRepository.shouldRecompute(stored, coordinates)
         val zoneChanged = zoneId != stored.timeZoneId
-        if (!moved && !zoneChanged) return stored
+        if (!moved && !zoneChanged) return recheckCountry(stored)
 
         val (latitude, longitude) = coordinates
-        val nearest = cityRepository.nearest(latitude, longitude)
-        val next = GeoLocation(
-            latitude = latitude,
-            longitude = longitude,
-            timeZoneId = zoneId,
-            cityName = nearest?.name,
-            countryCode = nearest?.countryCode,
-            cityId = nearest?.id,
-            region = nearest?.region?.ifEmpty { null },
-        )
+        val next = LocationRepository.gpsLocation(latitude, longitude, zoneId, cityRepository.forFix(latitude, longitude, zoneId))
         settings.setLocation(next)
         // A silent re-resolve is still a fix, and it has just overwritten whatever city the user
         // picked, so "Use my location" has to say so. Only reached when a fix arrived at all —
@@ -112,6 +104,33 @@ class LocationRefresher(
         settings.setLocationSource(LocationSource.GPS)
         // A location save no longer writes a calculation method (spec §8): the never-early
         // engine's Automatic timetable already follows the move on its own.
+        return next
+    }
+
+    /**
+     * A fix stored before rulings R256 and R259 took its country from the nearest city alone, and a user who has not
+     * moved since keeps it until they do: at Cholpon-Ata, Kazakhstan's entry alone, eating ending up to half an hour
+     * after the Muftiate's Fajr. So a stored fix whose country is not its own zone's is resolved again where it
+     * stands, under the same zone, and saved when that gives other facts ([CityRepository.forFix]: the same nearest
+     * city, and the zone's country beside it). Only a fix reaches here ([refresh] runs for "Use my location" alone);
+     * the point, the zone and the source are kept. Costs nothing where the stored country is the zone's own, which is
+     * everywhere but at a border or under a zone two countries share.
+     */
+    private suspend fun recheckCountry(stored: GeoLocation): GeoLocation {
+        val zoneCountry = ZoneCountries.of(stored.timeZoneId) ?: return stored
+        if (stored.countryCode == zoneCountry) return stored
+        val cities = cityRepository.forFix(stored.latitude, stored.longitude, stored.timeZoneId) ?: return stored
+        val again = LocationRepository.gpsLocation(stored.latitude, stored.longitude, stored.timeZoneId, cities)
+        val next = stored.copy(
+            cityName = again.cityName,
+            countryCode = again.countryCode,
+            cityId = again.cityId,
+            region = again.region,
+            alsoCountryCode = again.alsoCountryCode,
+            alsoRegion = again.alsoRegion,
+        )
+        if (next == stored) return stored
+        settings.setLocation(next)
         return next
     }
 }

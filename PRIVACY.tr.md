@@ -1,6 +1,6 @@
 # Taqwa gizlilik politikası
 
-_Son güncelleme 9 Kasım 2026. Android ve iOS'ta Taqwa 1.0.0 ve sonrası için geçerlidir._
+_Son güncelleme 19 Kasım 2026. Android ve iOS'ta Taqwa 1.0.0 ve sonrası için geçerlidir._
 
 Taqwa; hesabı, reklamı ve analizi olmayan ücretsiz bir İslami uygulamadır. Çevrimdışı çalışır. İnterneti Kur'an
 tilavetlerini indirmek için kullanır, o da yalnızca siz istediğinizde. Taqwa'yı saatinize eklerseniz, verileri de
@@ -76,7 +76,7 @@ kendi indirme ekranını açar; iPhone'da sesler Ayarlar uygulamasından eklenir
 Taqwa, Android'in uygulama yedeklemesinin dışında kalır; böylece konumunuz ve ayarlarınız Google'a kopyalanmaz. iOS'ta
 ayarlarınız, yer imleriniz, sayaçlarınız ve indirdiğiniz tilavetler iCloud yedeklemesinin dışında tutulur; Taqwa'nın
 kendi dosyalarından yedeklenen tek şey widget'ların küçük önbellekleri, yani yaklaşan namaz vakitleri ile günün ayeti
-widget'ının sırayla gösterdiği yüz ayettir. Bunların hiçbiri konumunuzu içermez. Taqwa'yı bir Apple Watch'a eklerseniz
+widget'ının sırayla gösterdiği 365 ayettir. Bunların hiçbiri konumunuzu içermez. Taqwa'yı bir Apple Watch'a eklerseniz
 iOS, iPhone'unuzun ona gönderdiği ve şehrinizin adını taşıyan son kopyayı saklar; bu kopya iPhone'unuzun yedeğinde
 bulunabilir. iCloud yedeği, anahtarlarını Apple'ın sakladığı bir şifrelemeyle korunur; İleri Düzey Veri Koruma'yı
 açarsanız uçtan uca şifrelenir. Bilgisayardaki bir yedek ise yalnızca siz seçerseniz şifrelenir.

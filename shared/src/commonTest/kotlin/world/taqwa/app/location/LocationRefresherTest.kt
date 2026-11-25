@@ -287,4 +287,72 @@ class LocationRefresherTest {
                 .refreshFor(RescheduleTrigger.APP_FOREGROUND),
         )
     }
+
+    /** Almaty and Balykchy, either side of the Kyrgyz border from Cholpon-Ata (rulings R256 and R259). */
+    private val borderCities = """
+        id,name,region,country,countryCode,lat,lon,tz
+        1526384,Almaty,Almaty,Kazakhstan,KZ,43.25,76.91667,Asia/Almaty
+        1528121,Balykchy,Issyk-Kul,Kyrgyzstan,KG,42.46017,76.18709,Asia/Bishkek
+    """.trimIndent()
+
+    private fun borderRefresher(settings: SettingsRepository, coordinates: Pair<Double, Double>, zoneId: String) = LocationRefresher(
+        locationRepository = LocationRepository(FixedProvider(coordinates)),
+        cityRepository = CityRepository(loadCsv = { borderCities }),
+        settings = settings,
+        currentZoneId = { zoneId },
+    )
+
+    // Cholpon-Ata: Almaty is the nearest city (68 km), Balykchy the nearest Kyrgyz one (75 km).
+    private val cholponAta = 42.648 to 77.071
+
+    @Test
+    fun aFixStoredWithTheNeighboursCountryIsResolvedAgainUnderItsZoneWithoutMoving() = runTest {
+        val settings = settings("recheck-country")
+        settings.setLocation(GeoLocation(cholponAta.first, cholponAta.second, "Asia/Bishkek", "Almaty", "KZ", 1526384, "Almaty"))
+        settings.setLocationSource(LocationSource.GPS)
+        val refreshed = borderRefresher(settings, cholponAta, "Asia/Bishkek").refreshFor(RescheduleTrigger.APP_FOREGROUND)
+
+        // Still named after Almaty, the nearest city, in Kazakhstan, and now held to Kyrgyzstan too (ruling R259).
+        assertEquals("KZ", refreshed?.countryCode)
+        assertEquals("Almaty", refreshed?.cityName)
+        assertEquals("KG", refreshed?.alsoCountryCode)
+        assertEquals("Issyk-Kul", refreshed?.alsoRegion)
+        val stored = settings.location.first()
+        assertEquals("KG", stored?.alsoCountryCode)
+        assertEquals("Issyk-Kul", stored?.alsoRegion)
+        // The point and the zone are the fix's, untouched.
+        assertEquals(cholponAta.first, stored?.latitude)
+        assertEquals("Asia/Bishkek", stored?.timeZoneId)
+        assertEquals(LocationSource.GPS, settings.locationSource.first())
+    }
+
+    @Test
+    fun aMoveResolvesTheFixUnderTheZoneNotByTheNearestCityAlone() = runTest {
+        val settings = settings("move-country")
+        settings.setLocation(capeTown)
+        settings.setLocationSource(LocationSource.GPS)
+        val refreshed = borderRefresher(settings, cholponAta, "Asia/Bishkek").refreshFor(RescheduleTrigger.APP_FOREGROUND)
+
+        assertEquals("KZ", refreshed?.countryCode)
+        assertEquals("Almaty", refreshed?.cityName)
+        assertEquals("KG", refreshed?.alsoCountryCode)
+        // A fix whose zone agrees with its nearest city clears the second country again.
+        val home = borderRefresher(settings, 43.25 to 76.917, "Asia/Almaty").refreshFor(RescheduleTrigger.APP_FOREGROUND)
+        assertEquals("KZ", home?.countryCode)
+        assertEquals(null, home?.alsoCountryCode)
+        assertEquals(null, settings.location.first()?.alsoCountryCode)
+    }
+
+    @Test
+    fun aCityPickedByHandIsNeverResolvedAgainWhateverTheZone() = runTest {
+        val settings = settings("manual-country")
+        val almaty = GeoLocation(43.25, 76.917, "Asia/Almaty", "Almaty", "KZ", 1526384, "Almaty")
+        settings.setLocation(almaty)
+        settings.setLocationSource(LocationSource.MANUAL)
+        val refreshed = borderRefresher(settings, cholponAta, "Asia/Bishkek").refreshFor(RescheduleTrigger.APP_FOREGROUND)
+
+        assertEquals("KZ", refreshed?.countryCode)
+        assertEquals(null, refreshed?.alsoCountryCode)
+        assertEquals("KZ", settings.location.first()?.countryCode)
+    }
 }

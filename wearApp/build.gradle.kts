@@ -82,8 +82,8 @@ android {
         // Written by scripts/bump-version.sh: the phone's code with spec 2.1's offset
         // (watch = phone + 100000), so that Play never sees the two clash, and the phone's name.
         // scripts/check-versions.sh fails when they disagree.
-        versionCode = 100045
-        versionName = "1.6.0"
+        versionCode = 100046
+        versionName = "1.7.0"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21

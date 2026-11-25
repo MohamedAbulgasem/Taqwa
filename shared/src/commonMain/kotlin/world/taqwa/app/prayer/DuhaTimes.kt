@@ -40,8 +40,12 @@ object DuhaTimes {
      * Duha on a morning whose sun rose at [trueSunrise], whose authority shows sunrise at
      * [shownSunrise], whose sun reached 6.5° at [sunAt6_5] and crossed the meridian at
      * [solarNoon]. The later of the two sunrises counts, so an authority's margin can never pull
-     * Duha earlier. Null where the sun does not rise, never reaches 6.5° on its way up, or where
-     * Duha's start would not be before its end.
+     * Duha earlier. Since ruling R265 the engine's shown sunrise is not after the real one at the
+     * user's point (save a few far-north days whose sunrise waits a minute after Fajr), so
+     * [trueSunrise] counts almost everywhere: Duha is 50 minutes after the real sunrise, a minute or
+     * two earlier than before R265 where a print's sunrise stood after the sun (2 min at Maran,
+     * JAKIM's PHG03, in the second review's sweep). Null where the sun does not rise, never reaches
+     * 6.5° on its way up, or where Duha's start would not be before its end.
      */
     fun of(trueSunrise: Instant?, shownSunrise: Instant, sunAt6_5: Instant?, solarNoon: Instant): Duha? {
         if (trueSunrise == null || sunAt6_5 == null) return null
@@ -56,16 +60,17 @@ object DuhaTimes {
     /**
      * Duha at [location] on [date], with the sun as the engine's own sky builds it: the exact
      * model, the zone's offset at local noon ([DayPipeline.realSunset] does the same), the true
-     * sunrise at [DayPipeline.REAL_HORIZON_DEG]. [shownSunrise] is the day's shown sunrise.
+     * sunrise at [DayPipeline.REAL_HORIZON_DEG]. [shownSunrise] is the day's shown sunrise. Both crossings are read as
+     * a start reads them ([SunClock.startTime]): Duha begins after them, never before the sun's own moment.
      */
     fun forDay(location: GeoLocation, date: LocalDate, shownSunrise: Instant): Duha? {
         val zone = TimeZone.of(location.timeZoneId)
         val noonOffset = zone.offsetAt(date.atTime(12, 0).toInstant(zone)).totalSeconds
         val sun = SunClock(location.latitude, location.longitude, date, noonOffset, SunModel.EXACT)
         return of(
-            trueSunrise = sun.altitudeTime(DayPipeline.REAL_HORIZON_DEG, morning = true)?.let(::instantOf),
+            trueSunrise = sun.startTime(DayPipeline.REAL_HORIZON_DEG, morning = true)?.let(::instantOf),
             shownSunrise = shownSunrise,
-            sunAt6_5 = sun.altitudeTime(START_ALTITUDE_DEG, morning = true)?.let(::instantOf),
+            sunAt6_5 = sun.startTime(START_ALTITUDE_DEG, morning = true)?.let(::instantOf),
             solarNoon = instantOf(sun.transit()),
         )
     }

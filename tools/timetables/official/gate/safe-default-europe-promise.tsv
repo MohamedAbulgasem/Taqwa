@@ -1,0 +1,28 @@
+# Ruling R261 (14 Nov 2026, the second trust audit's finding G6, BUILD-LOG's Morocco owner question 5): the Ministry of
+# Habous's own month tables for Sebta (ville 24) and Melilla (ville 40), held to the promise alone at the app's Ceuta
+# and Melilla and at Habous's own points for them (a `-promise.tsv` file, GateRow.promiseOnly: an early start or a late
+# end breaks the gate; no late limit applies, the days are in no stamp). Kept by hand: `generateEnvelopeRows` neither
+# writes nor removes this file.
+#
+# Why: the app places Ceuta and Melilla in Spain, whose safe default (default.safe.europe, its 18° dawn less 2 min)
+# ended the fast 2 to 3 min after the Fajr Habous prints for the two cities on every held day. Habous prints a table
+# for each, and the cities' Muslims may well pray by it, so within 10 km of either table's point its own day rides
+# beside Spain's (Maghreb.spainAt): never a start before it, nor sunrise or the end of eating after it. The lateness
+# against it (Spain's Fajr is the 12° family's, its Isha the 18° one) is the region's design and no figure here.
+#
+# Splits. November 2026 is the month the tables' points, horizons and sunrise and Maghrib seconds were read on
+# (HabousCities.spain, habous_units.py spain-rows and spain-build): fit. October 2026 was held out: test. The tables
+# are printed in UTC (the clock column). Coordinates and the tables' own paths only, never a time.
+#
+# What these rows hold: October and November 2026, no more. The monitor does not read villes 24 and 40, so December
+# onward (Ramadan 1448 included) rests on November's fit and no row checks it against Habous's print until a later
+# month is held and added here.
+path	entry	lat	lon	zone	clock	columns	format	school	split	note
+archive/tables/manual/ma-habous/2026-11-12/ville-24-2026-10.txt	default.safe.europe	35.88919	-5.32042	Europe/Madrid	UTC	F+E S D A M I	daily	standard	test	Habous's Sebta (ville 24) at the app's Ceuta, October 2026 (ruling R261)
+archive/tables/manual/ma-habous/2026-11-12/ville-24-2026-11.txt	default.safe.europe	35.88919	-5.32042	Europe/Madrid	UTC	F+E S D A M I	daily	standard	fit	Habous's Sebta (ville 24) at the app's Ceuta, November 2026 (ruling R261)
+archive/tables/manual/ma-habous/2026-11-12/ville-24-2026-10.txt	default.safe.europe	35.9	-5.32	Europe/Madrid	UTC	F+E S D A M I	daily	standard	test	Habous's Sebta (ville 24) at Habous's own point for it, October 2026 (ruling R261)
+archive/tables/manual/ma-habous/2026-11-12/ville-24-2026-11.txt	default.safe.europe	35.9	-5.32	Europe/Madrid	UTC	F+E S D A M I	daily	standard	fit	Habous's Sebta (ville 24) at Habous's own point for it, November 2026 (ruling R261)
+archive/tables/manual/ma-habous/2026-11-12/ville-40-2026-10.txt	default.safe.europe	35.29369	-2.93833	Africa/Ceuta	UTC	F+E S D A M I	daily	standard	test	Habous's Melilla (ville 40) at the app's Melilla, October 2026 (ruling R261)
+archive/tables/manual/ma-habous/2026-11-12/ville-40-2026-11.txt	default.safe.europe	35.29369	-2.93833	Africa/Ceuta	UTC	F+E S D A M I	daily	standard	fit	Habous's Melilla (ville 40) at the app's Melilla, November 2026 (ruling R261)
+archive/tables/manual/ma-habous/2026-11-12/ville-40-2026-10.txt	default.safe.europe	35.32	-2.94	Africa/Ceuta	UTC	F+E S D A M I	daily	standard	test	Habous's Melilla (ville 40) at Habous's own point for it, October 2026 (ruling R261)
+archive/tables/manual/ma-habous/2026-11-12/ville-40-2026-11.txt	default.safe.europe	35.32	-2.94	Africa/Ceuta	UTC	F+E S D A M I	daily	standard	fit	Habous's Melilla (ville 40) at Habous's own point for it, November 2026 (ruling R261)

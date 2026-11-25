@@ -18,6 +18,10 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 import okio.FileSystem
 import okio.Path
 import okio.Path.Companion.toPath
@@ -29,8 +33,11 @@ import world.taqwa.app.i18n.EnglishPlatformFormat
 import world.taqwa.app.i18n.PlatformFormat
 import world.taqwa.app.prayer.ClockIssue
 import world.taqwa.app.prayer.PrayerTimesEngine
+import world.taqwa.app.prayer.engine.DayPipeline
 import world.taqwa.app.prayer.engine.method.AsrSchool
 import world.taqwa.app.prayer.engine.registry.EntryClass
+import world.taqwa.app.prayer.engine.registry.Place
+import world.taqwa.app.prayer.engine.registry.Registry
 import world.taqwa.app.settings.ResolvedCityName
 import world.taqwa.app.settings.SettingsRepository
 import world.taqwa.app.widget.KeyValueStore
@@ -331,6 +338,30 @@ class PrayerViewModelTest {
         )
     }
 
+    /**
+     * One card per launch (the owner's decisions of 19 November 2026): a launch that showed a
+     * once-only card says so for the rest of the launch, answered or not, so Home's watch card
+     * waits for the next one.
+     */
+    @Test
+    fun aLaunchThatShowedAOneTimeCardSaysSoEvenAfterItIsAnswered() = runTest {
+        val vm = cardViewModel("watch-card-toronto", toronto)
+        vm.refresh()
+        assertTrue((vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready).oneTimeCardThisLaunch)
+        vm.answerOneTimeCard(OneTimeCard.CAUTIOUS)
+        vm.refresh()
+        val ready = vm.state.value as PrayerUiState.Ready
+        assertNull(ready.oneTimeCard)
+        assertTrue(ready.oneTimeCardThisLaunch)
+    }
+
+    @Test
+    fun aLaunchWithNoOneTimeCardLeavesTheSlotToTheWatchCard() = runTest {
+        val vm = cardViewModel("watch-card-istanbul", istanbul)
+        vm.refresh()
+        assertFalse((vm.state.first { it is PrayerUiState.Ready } as PrayerUiState.Ready).oneTimeCardThisLaunch)
+    }
+
     // -- The other Asr and where timetables differ (spec §2.1) ----------------------------------
 
     private suspend fun TestScope.readyAt(
@@ -383,6 +414,52 @@ class PrayerViewModelTest {
         val line = ready.differ!!
         assertEquals(Prayer.ISHA, line.prayer)
         assertTrue(line.begun)
+    }
+
+    @Test
+    fun aTimetableBeginningBeforeTheRealSunsetIsSaidToBeginAfterIt() = runTest {
+        // Toronto on 14 November 2026, an hour before Maghrib. The earliest listed timetable gives Maghrib in the
+        // minute the real sun sets at this point, and Taqwa's Maghrib is later still: the line names that timetable
+        // at the first whole minute after the real sunset (ruling R180), not before it and not silently nothing.
+        val date = LocalDate(2026, 11, 14)
+        val zone = TimeZone.of(toronto.timeZoneId)
+        val resolution = Registry.resolve(Place(43.653, -79.383, toronto.timeZoneId, "CA"))
+        val sunset = DayPipeline.realSunset(resolution.point, date, zone)!!
+        val floor = Instant.fromEpochSeconds(sunset.epochSeconds.floorDiv(60L) * 60 + 60)
+        assertTrue(DayPipeline.members(resolution, date, zone).minOf { it.maghrib } < floor, "a member is before the sun's floor on this day")
+
+        val ready = readyAt("differ-sun", toronto, Instant.parse("2026-11-14T21:00:00Z")) { it.setShowWhereDiffer(true) }
+        val line = ready.differ!!
+        assertEquals(Prayer.MAGHRIB, line.prayer)
+        assertTrue(line.memberNameKey in torontoMembers, line.memberNameKey)
+        assertEquals(floor, line.memberStart)
+        assertTrue(line.memberStart > sunset && line.memberStart < line.shownStart)
+    }
+
+    @Test
+    fun aTimetableBeginningAsrBeforeTheRealShadowIsSaidToBeginAfterIt() = runTest {
+        // Ruling R265, Asr as R180 holds Maghrib: in Toronto, on the first day from 14 November 2026 where the
+        // earliest listed timetable gives Asr before the minute after the real shadow time at this point and Taqwa's
+        // Asr is later still (found, not assumed), the line names that timetable at the first whole minute after the
+        // shadow, not before it.
+        val zone = TimeZone.of(toronto.timeZoneId)
+        val resolution = Registry.resolve(Place(43.653, -79.383, toronto.timeZoneId, "CA"))
+        val school = resolution.entry.school
+        val (date, floor) = generateSequence(LocalDate(2026, 11, 14)) { it.plus(1, DateTimeUnit.DAY) }.take(400)
+            .firstNotNullOfOrNull { day ->
+                val shadow = DayPipeline.realAsr(resolution.point, day, zone, school) ?: return@firstNotNullOfOrNull null
+                val floor = Instant.fromEpochSeconds(shadow.epochSeconds.floorDiv(60L) * 60 + 60)
+                val shown = DayPipeline.unended(resolution, day, zone, school).asr
+                val earliest = DayPipeline.members(resolution, day, zone, school).minOf { it.asr }
+                if (earliest < floor && floor < shown) day to floor else null
+            } ?: fail("no day in Toronto with a listed Asr before the real shadow")
+
+        val ready = readyAt("differ-shadow", toronto, floor - 30.minutes) { it.setShowWhereDiffer(true) }
+        val line = ready.differ!!
+        assertEquals(Prayer.ASR, line.prayer, "$date")
+        assertTrue(line.memberNameKey in torontoMembers, line.memberNameKey)
+        assertEquals(floor, line.memberStart, "$date")
+        assertTrue(line.memberStart < line.shownStart)
     }
 
     @Test

@@ -40,7 +40,12 @@ data class Recipe(
 ) {
     val where: String get() = "recipes.tsv:$line"
 
-    fun matches(key: String): Boolean = Regex(capture.split('*').joinToString(".*") { Regex.escape(it) }).matches(key)
+    /**
+     * Whether the pattern matches [key]. A printed imsak's capture (`…-imsak`, ruling R284) is matched only by a pattern
+     * that names it so: a line written for a day's tables (`*`, `jakarta-2*`) never reads the imsak kept beside them.
+     */
+    fun matches(key: String): Boolean =
+        (!key.endsWith(IMSAK_KEY) || capture.endsWith(IMSAK_KEY)) && Regex(capture.split('*').joinToString(".*") { Regex.escape(it) }).matches(key)
 }
 
 object Recipes {

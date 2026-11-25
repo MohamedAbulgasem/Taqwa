@@ -37,8 +37,9 @@ fun main(args: Array<String>) {
     val roots = OfficialRoots(official, repo.resolve("tools/timetables/official"))
 
     try {
-        val manifest = GateManifest.load(gateDir).only(all("--group").toSet(), all("--entry").toSet())
-        val result = Gate(roots).evaluate(manifest)
+        val whole = GateManifest.load(gateDir)
+        val manifest = whole.only(all("--group").toSet(), all("--entry").toSet())
+        val result = Gate(roots).evaluate(manifest, whole)
         print(result.report())
         if (stamps) {
             val written = Stamps.write(result, repo.resolve("tools/timetables/official/stamps"), repo)

@@ -1,7 +1,7 @@
 {
   "entry": "sg.muis",
   "class": "B",
-  "engineHash": "18254c88591070f0",
+  "engineHash": "da206f5f95c40fe0",
   "broken": 0,
   "places": 1,
   "first": "2024-01-01",
@@ -14,116 +14,134 @@
     "asrStandard": ["2024-01-01..2027-12-31"],
     "maghrib": ["2024-01-01..2027-12-31"],
     "isha": ["2024-01-01..2027-12-31"],
-    "endOfEating": ["2024-01-01..2027-12-31"]
+    "endOfEating": ["2024-01-01..2027-12-31"],
+    "imsak": ["2026-02-19..2026-03-20"]
   },
   "placeDays": 1461,
   "heldOutDays": 730,
+  "tables": 4,
+  "showsImsak": true,
   "ramadanDays": 118,
   "outOfOrderDays": 0,
   "unreadableLines": 0,
   "repeatedLines": 0,
   "events": {
     "fajr": {
-      "checked": 1461,
+      "checked": 18260,
       "early": 0,
       "late": {
-        "0": 903,
-        "1": 552,
-        "2": 6,
-        "3+": 0
+        "0": 4963,
+        "1": 9407,
+        "2": 3796,
+        "3+": 94
       },
-      "exactShare": 0.6181,
-      "worstLate": 2,
-      "lateLimit": 2,
-      "lateLimitFrom": "class B",
-      "overLimit": 0
-    },
-    "sunrise": {
-      "checked": 1461,
-      "lateEnd": 0,
-      "late": {
-        "0": 965,
-        "1": 493,
-        "2": 3,
-        "3+": 0
-      },
-      "exactShare": 0.6605,
-      "worstLate": 2,
-      "lateLimit": 2,
-      "lateLimitFrom": "class B",
-      "overLimit": 0
-    },
-    "dhuhr": {
-      "checked": 1461,
-      "early": 0,
-      "late": {
-        "0": 933,
-        "1": 526,
-        "2": 2,
-        "3+": 0
-      },
-      "exactShare": 0.6386,
-      "worstLate": 2,
-      "lateLimit": 2,
-      "lateLimitFrom": "class B",
-      "overLimit": 0
-    },
-    "asrStandard": {
-      "checked": 1461,
-      "early": 0,
-      "late": {
-        "0": 797,
-        "1": 514,
-        "2": 144,
-        "3+": 6
-      },
-      "exactShare": 0.5455,
+      "exactShare": 0.2718,
       "worstLate": 3,
       "lateLimit": 3,
       "lateLimitFrom": "entry sg.muis",
       "overLimit": 0
     },
-    "maghrib": {
-      "checked": 1461,
+    "sunrise": {
+      "checked": 18260,
+      "lateEnd": 0,
+      "late": {
+        "0": 6813,
+        "1": 8300,
+        "2": 2914,
+        "3+": 233
+      },
+      "exactShare": 0.3731,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "entry sg.muis",
+      "overLimit": 0
+    },
+    "dhuhr": {
+      "checked": 18260,
       "early": 0,
       "late": {
-        "0": 936,
-        "1": 519,
-        "2": 6,
-        "3+": 0
+        "0": 5416,
+        "1": 9725,
+        "2": 3029,
+        "3+": 90
       },
-      "exactShare": 0.6407,
-      "worstLate": 2,
-      "lateLimit": 2,
-      "lateLimitFrom": "class B",
+      "exactShare": 0.2966,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "entry sg.muis",
+      "overLimit": 0
+    },
+    "asrStandard": {
+      "checked": 18260,
+      "early": 0,
+      "late": {
+        "0": 4440,
+        "1": 8726,
+        "2": 4006,
+        "3+": 1088
+      },
+      "exactShare": 0.2432,
+      "worstLate": 4,
+      "lateLimit": 4,
+      "lateLimitFrom": "entry sg.muis",
+      "overLimit": 0
+    },
+    "maghrib": {
+      "checked": 18260,
+      "early": 0,
+      "late": {
+        "0": 5491,
+        "1": 9214,
+        "2": 3402,
+        "3+": 153
+      },
+      "exactShare": 0.3007,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "entry sg.muis",
       "overLimit": 0
     },
     "isha": {
-      "checked": 1461,
+      "checked": 18260,
       "early": 0,
       "late": {
-        "0": 913,
-        "1": 545,
-        "2": 3,
+        "0": 5322,
+        "1": 9351,
+        "2": 3436,
+        "3+": 151
+      },
+      "exactShare": 0.2915,
+      "worstLate": 3,
+      "lateLimit": 3,
+      "lateLimitFrom": "entry sg.muis",
+      "overLimit": 0
+    },
+    "endOfEating": {
+      "checked": 18260,
+      "lateEnd": 0,
+      "late": {
+        "0": 10357,
+        "1": 7188,
+        "2": 715,
         "3+": 0
       },
-      "exactShare": 0.6249,
+      "exactShare": 0.5672,
       "worstLate": 2,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
       "overLimit": 0
     },
-    "endOfEating": {
-      "checked": 1461,
+    "imsak": {
+      "checked": 300,
       "lateEnd": 0,
       "late": {
-        "0": 926,
-        "1": 528,
-        "2": 7,
+        "0": 246,
+        "1": 54,
+        "2": 0,
         "3+": 0
       },
-      "exactShare": 0.6338,
-      "worstLate": 2,
+      "exactShare": 0.82,
+      "worstLate": 1,
       "lateLimit": 2,
       "lateLimitFrom": "class B",
       "overLimit": 0
@@ -132,6 +150,16 @@
   "heldOut": {
     "placeDays": 730,
     "ramadanDays": 59,
+    "checkedByEvent": {
+      "fajr": ["2026-01-01..2027-12-31"],
+      "sunrise": ["2026-01-01..2027-12-31"],
+      "dhuhr": ["2026-01-01..2027-12-31"],
+      "asrStandard": ["2026-01-01..2027-12-31"],
+      "maghrib": ["2026-01-01..2027-12-31"],
+      "isha": ["2026-01-01..2027-12-31"],
+      "endOfEating": ["2026-01-01..2027-12-31"],
+      "imsak": ["2026-02-19..2026-03-20"]
+    },
     "events": {
       "fajr": {
         "checked": 730,
@@ -144,23 +172,23 @@
         },
         "exactShare": 0.5945,
         "worstLate": 1,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
+        "lateLimit": 3,
+        "lateLimitFrom": "entry sg.muis",
         "overLimit": 0
       },
       "sunrise": {
         "checked": 730,
         "lateEnd": 0,
         "late": {
-          "0": 476,
-          "1": 252,
-          "2": 2,
+          "0": 49,
+          "1": 531,
+          "2": 150,
           "3+": 0
         },
-        "exactShare": 0.6521,
+        "exactShare": 0.0671,
         "worstLate": 2,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
+        "lateLimit": 3,
+        "lateLimitFrom": "entry sg.muis",
         "overLimit": 0
       },
       "dhuhr": {
@@ -174,8 +202,8 @@
         },
         "exactShare": 0.6397,
         "worstLate": 1,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
+        "lateLimit": 3,
+        "lateLimitFrom": "entry sg.muis",
         "overLimit": 0
       },
       "asrStandard": {
@@ -189,7 +217,7 @@
         },
         "exactShare": 0.5685,
         "worstLate": 3,
-        "lateLimit": 3,
+        "lateLimit": 4,
         "lateLimitFrom": "entry sg.muis",
         "overLimit": 0
       },
@@ -204,8 +232,8 @@
         },
         "exactShare": 0.626,
         "worstLate": 2,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
+        "lateLimit": 3,
+        "lateLimitFrom": "entry sg.muis",
         "overLimit": 0
       },
       "isha": {
@@ -219,8 +247,8 @@
         },
         "exactShare": 0.6205,
         "worstLate": 2,
-        "lateLimit": 2,
-        "lateLimitFrom": "class B",
+        "lateLimit": 3,
+        "lateLimitFrom": "entry sg.muis",
         "overLimit": 0
       },
       "endOfEating": {
@@ -237,15 +265,42 @@
         "lateLimit": 2,
         "lateLimitFrom": "class B",
         "overLimit": 0
+      },
+      "imsak": {
+        "checked": 30,
+        "lateEnd": 0,
+        "late": {
+          "0": 27,
+          "1": 3,
+          "2": 0,
+          "3+": 0
+        },
+        "exactShare": 0.9,
+        "worstLate": 1,
+        "lateLimit": 2,
+        "lateLimitFrom": "class B",
+        "overLimit": 0
       }
     }
   },
+  "replays": {
+    "places": 9,
+    "placeDays": 13149
+  },
   "lateLimits": {
     "class B: 2 min": {
-      "events": ["fajr", "sunrise", "dhuhr", "maghrib", "isha", "endOfEating"]
+      "events": ["endOfEating", "imsak"]
     },
-    "entry sg.muis: 3 min": {
-      "reason": "MUIS's own Standard Asr is not reproduced to the minute; a further minute of drift near the equinoxes past class B's own margin",
+    "entry sg.muis: 3 min (dhuhr)": {
+      "reason": "This table, read across the area the proof draws for it (ReachAreas.AREAS), not only its own point, was measured up to 3 min after it on some days, and never before it: away from the point it is printed for the user's own sun decides the time shown (rulings R270 and R297).",
+      "events": ["fajr", "dhuhr", "maghrib", "isha"]
+    },
+    "entry sg.muis: 3 min (sunrise)": {
+      "reason": "This table, read across the area the proof draws for it (ReachAreas.AREAS), not only its own point, was measured up to 3 min before it on some days, and never after it: away from the point it is printed for the user's own sun decides the time shown (rulings R270 and R297).",
+      "events": ["sunrise"]
+    },
+    "entry sg.muis: 4 min": {
+      "reason": "This table, read across the area the proof draws for it (ReachAreas.AREAS), not only its own point, was measured up to 4 min after it on some days, and never before it: away from the point it is printed for the user's own sun decides the time shown (rulings R270 and R297).",
       "events": ["asrStandard"]
     }
   }

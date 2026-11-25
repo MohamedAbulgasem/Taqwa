@@ -57,8 +57,11 @@ Prayer times from Taqwa's own engine; the Qibla bearing uses the Adhan library. 
 (Plan 5 Task 10's cut, which makes room for the wrist paragraph within Play's 4,000 characters, for Mohamed's approval: the website and support lines are left out, since both stores show them in their own fields, and so is the line of interface languages, which the App Store lists itself; and the Mushaf bullet says the same in fewer words.)
 
 ### Release notes (500)
-What's new in 1.6.0:
-• Taqwa on your watch: a watch face, complications and a Tile, tasbeeh and Qibla, on Wear OS watches such as Galaxy Watch
+What's new in 1.7.0:
+• Prayer times are now compared with the published timetable in many more places, including Türkiye, Egypt, Morocco, Algeria, Malaysia, Indonesia, Bangladesh and Pakistan
+• Near a border, times found from your location can now take both countries' timetables into account
+• The Ayah of the day widget now has 365 ayahs, one for each day of a year
+• A card on the Prayer screen helps you set up Taqwa on your watch
 
 ## App Store
 
@@ -128,8 +131,10 @@ Prayer times from Taqwa's own engine; the Qibla bearing uses the Adhan library. 
 (Its own text since 1.6.0, as each store names only its own watch (App Store Review Guideline 2.3.10): the Play full description above, with the Apple Watch paragraph in place of the Wear OS one, and Apple in place of Google in the bullet after the location one.)
 
 ### What's new (4000)
-What's new in 1.6.0:
-• Taqwa on your Apple Watch: the next prayer in your complications, tasbeeh with the Digital Crown, and Qibla
+What's new in 1.7.0:
+• Prayer times are now compared with the published timetable in many more places, including Türkiye, Egypt, Morocco, Algeria, Malaysia, Indonesia, Bangladesh and Pakistan
+• Near a border, times found from your location can now take both countries' timetables into account
+• The Ayah of the day widget now has 365 ayahs, one for each day of a year
 
 ## Screenshot captions (one short line each, set over the framed screenshot)
 1. Prayer times where you are

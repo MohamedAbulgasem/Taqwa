@@ -1,0 +1,34 @@
+# Engine wave W5 (18 Oct 2026, rulings R136–R138): the regional safe default for Latin America and the Caribbean
+# (`default.safe.americas`, Generic.kt; spec §6.2 c), gated for the first time, as a stress test only: no table
+# is held for any country it serves, so it is checked against the nearest real tables, eight ISNA-method mosque
+# calendars of the United States (us.isna's own rows; the US is never routed here), chosen for a spread from
+# Houston and Southern California to Georgia, Virginia and New York, each at its mosque's own point. Every row
+# is held out. What the rows show is the cost of the region's design (its late limits, Generic.kt,
+# americasLateLimits): Isha 15 to 30 min after the mosques' 15° one (this region's is the 18° + 2 min in use
+# further south), the end of eating 15 to 30 min before their 15° Fajr (the 18° dawn − 2 min), Fajr up to 6 min
+# after their 15° one, and the floors plus the cushion on the rest (sunrise up to 7 min before, Dhuhr up to 6
+# after, Maghrib up to 7, Asr up to 5).
+#
+# One cell is masked, a limit of the fallback for the owner (BUILD-LOG, W5), not an exception added quietly:
+# - Islamic Center of Irving: Dhuhr is not checked. It prints a Dhuhr later than this region's floor (the 1986
+#   + 2 min with the cushion, 5 min after the transit) on 7 days of 2026, by a minute: a mosque's own rounding
+#   of its + 5 against a floor the spec sets. Widening the region's floor is a §6.2 c change, so it goes to the
+#   owner; the US is never served by this region (it has us.isna, which holds this table without exception).
+#
+# Ushuaia (ruling R247, 13 Nov 2026; the audit's finding F18): the Moonsighting Committee's own 2026 table for Ushuaia
+# (54.8° S, archive/tables/manual/mcw/2026-10-11/ushuaia-2026.txt), which the safe defaults lane measured on 12 Nov and
+# left out, is held now, with the Committee's tables for sixteen more points and years of the band, in
+# safe-default-americas-promise.tsv: to the promise alone, because they are a calculator's tables that no community
+# there is known to follow, so their lateness is not this region's figure and they are no rows of this file. The early
+# Fajr they showed (243 of 365 days at Ushuaia, up to 96 min) is closed in the engine, not excused: from 43.5° of
+# latitude the region's day takes the Committee's day at the place's own point beside it (Generic.americasAt). The
+# rows below are all north of the band and read as before.
+path	entry	lat	lon	zone	columns	format	school	split	note
+archive/tables/moral-auth-world/namerica/us-sw/isgh-houston.txt	default.safe.americas	29.7369	-95.4251	America/Chicago	F+E S D A M I	daily	standard	test	United States (ISGH, Houston) 2026, stress test
+archive/tables/moral-auth-world/namerica/us-sw/maryam-sugar-land.txt	default.safe.americas	29.59449	-95.683845	America/Chicago	F+E S D A M I	daily	standard	test	United States (Masjid Maryam, Sugar Land) 2026, stress test
+archive/tables/moral-auth-world/namerica/us-sw/islamic-center-irving.txt	default.safe.americas	32.8427	-97.0107	America/Chicago	F+E S - A M I	daily	standard	test	United States (Islamic Center of Irving) 2026, stress test; Dhuhr not checked (see header)
+archive/tables/moral-auth-world/namerica/us-sw/east-cobb-marietta.txt	default.safe.americas	33.97849	-84.48726	America/New_York	F+E S D A M I	daily	hanafi	test	United States (East Cobb Islamic Center, Marietta) 2026, Hanafi Asr, stress test
+archive/tables/moral-auth-world/namerica/us-sw/iioc-anaheim.txt	default.safe.americas	33.8517	-117.8887	America/Los_Angeles	F+E S D A M I	daily	standard	test	United States (IIOC, Anaheim) 2026, stress test
+archive/tables/moral-auth-world/namerica/split-7g/icoi-irvine.txt	default.safe.americas	33.6965	-117.765	America/Los_Angeles	F+E S D A M I	daily	standard	test	United States (ICOI, Irvine) 2026, stress test
+archive/tables/moral-auth-world/namerica/us-east/adams-sterling.txt	default.safe.americas	39.037	-77.383	America/New_York	F+E S D A M I	daily	standard	test	United States (ADAMS, Sterling) 2026, stress test
+archive/tables/moral-auth-world/namerica/us-east/al-iman-mosque-astoria.txt	default.safe.americas	40.7684	-73.9116	America/New_York	F+E S D A M I	daily	standard	test	United States (Al-Iman, Astoria) 2026, stress test
