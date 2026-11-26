@@ -247,11 +247,14 @@ places, as for the upload key. **Unlike the upload key, nobody can reset a lost 
 Google does not hold it. A new key means every watch's Taqwa face is removed and added again, which
 loses its wearer's style, colour and slots.
 
-Each watch release, past the cut gate, you sign the face yourself, typing the face key's password
-(about a minute): `scripts/release-face.sh`, in a Terminal window, its output not piped or
-redirected. It builds the face, then apksigner asks for the password once, and what you type is
-not shown. It signs the face into `build/face-release/watchface-release-signed.apk`, and deletes
-it again unless its certificate is the pinned one. Then the Lead runs `scripts/release.sh`.
+Each release that ships the watch (§4, "Each watch release"), past the cut gate, you sign the face
+yourself, typing the face key's password (about a minute). Whether this release ships it, and so
+whether you sign, `scripts/watch-ships.sh` tells you at step 1, right after the bump, and
+`scripts/release.sh` asks it again before it builds anything. Run `scripts/release-face.sh` in a
+Terminal window, its output not piped or redirected. It builds the face, then apksigner asks for
+the password once, and what you type is not shown. It signs the face into
+`build/face-release/watchface-release-signed.apk`, and deletes it again unless its certificate is
+the pinned one. Then the Lead runs `scripts/release.sh`.
 
 ## 4. Built here before the uploads (nothing needs an account)
 
@@ -279,20 +282,82 @@ it again unless its certificate is the pinned one. Then the Lead runs `scripts/r
 
 ### Each watch release
 
-From the watch release on, one release is four builds at one version: the phone, the Galaxy watch
-app with the Taqwa face inside it, and the iPhone app with the Apple Watch app inside it. A
-candidate is cut only past the cut gate (every privacy line applied, every new word reviewed), and
-each takes the next version code, never one used before. In order, from the release worktree's
-root:
+From the watch release on, one release is two or four builds at one version: the phone and the
+iPhone app with the Apple Watch app inside it, always, and the Galaxy watch app with the Taqwa face
+inside it when the watch ships (below). A candidate is cut only past the cut gate (every privacy
+line applied, every new word reviewed), and each takes the next version code, never one used before.
+
+**Whether the watch ships** (Mohamed, 26 November 2026): the Galaxy watch app goes to Play's Wear OS
+track only when it has changed, because Play's Wear OS review takes days where the phone's takes
+hours (build 46 sent an unchanged watch, 100046, through it). `scripts/watch-ships.sh` decides, run
+at step 1 and again as `scripts/release.sh`'s first step, which prints its lines. It says `ships:`
+when a file under `wearApp/`, `watchcore/` or `watchface/` that reaches the release Wear AAB differs
+from the newest `wear-build-<N>` tag's commit, committed, staged or not (or no watch release is
+tagged), or when an entry of `gradle/libs.versions.toml` that only the watch's release builds with
+changed (the `wear-*` pins and `androidx-core-splashscreen` today, read from the build files each
+run in any of TOML's forms; the line names the key). It says `stays:` otherwise. The version lines
+the bump moves do not count, and neither does what never reaches that AAB: the test and debug-only
+source sets (`src/test`, `src/test<Name>`, `src/androidTest<Name>`, `src/<name>Test`, `src/debug`)
+and `watchcore/vectors/`. A `note:` line names a change to what else the watch is built with (a
+catalog entry the watch's release and another module's both build with, such as `kotlin`,
+`android-targetSdk` or `kotlinx-serialization`, the root `build.gradle.kts`, `settings.gradle.kts`,
+`gradle.properties`, `gradle/wrapper/`, and the token's `tools/watchface/push-token.sh` and
+`lib-validators.sh`), which ships it only when the Lead says so, and the phone-only PASS line
+repeats it. An `aside:` line names catalog entries the watch's release does not build with (the
+phone's own, such as `media3`, and the watch's test-only ones, such as `robolectric`) and a change
+to the catalog's comments, which are weighed for nothing. Where the build files' reading cannot be
+sure, it leans to shipping: a watch library that another module names only in a test or debug
+configuration or a test source set's block is the watch's alone, since those do not build the
+phone, and a missing watch build file is an error.
+`TAQWA_RELEASE_WATCH=1` in front of `scripts/release.sh` ships the watch, and `=0` keeps a changed
+one back. When the watch stays, there is no `scripts/release-face.sh` (step 3), no Wear AAB, no Wear
+release notes and nothing on the Wear OS track: Play keeps serving the last watch build, 100000 + N,
+and the iPhone app still carries its Apple Watch app as always. The phone still ships, though, and
+the phone writes the words that face draws (its weekdays, months, Hijri names and countdowns, as
+`tools/watchface/phone-forms.json` and the Hijri names in `:shared` hold them), so
+`scripts/release.sh` still measures them against it with the face gate's fit tools (step 2). Under
+`TAQWA_RELEASE_WATCH=0` over a change to the face or its generators, those tools measure the tree's
+face, not the one Play serves: weigh that before keeping such a change back. The bump moves the
+watch's versions all the same, so whenever it next ships its code is 100000 + the phone's then
+(100058 after 100046, say), and Play only needs the code to rise. When it ships, every step below
+is as it was, with `wear-build-<C>` tagged once its Wear AAB is submitted (step 7).
+
+**The `wear-build-<C>` tag** means "Play's Wear OS track has build C". The Lead tags it once that
+release's Wear AAB is submitted to the Wear OS track, on the commit that AAB was built from, which
+`scripts/release.sh`'s PASS line names in the `git tag` command it prints, and deletes it if that
+Wear release is abandoned, or rejected with no replacement, so the next release compares with the
+watch Play really serves. A tag on any later commit would hide every watch change between the two,
+so `scripts/watch-ships.sh` refuses (exit 2) a tag above the release being cut, one whose commit's
+`wearApp/build.gradle.kts` is not at 100000 + C, and one whose watch (the three modules and the
+catalog) is not `build-<C>`'s when `build-<C>` is there. Sending an unchanged watch again under a new
+code (after a rejection that needed no watch change, say) takes `TAQWA_RELEASE_WATCH=1`, because
+`scripts/watch-ships.sh` then says `stays:`.
+
+In order, from the release worktree's root:
 
 1. **The bump:** `scripts/bump-version.sh <V> <C>`. It writes the phone's C, the Galaxy watch
    app's 100000 + C, the face's C and every iOS plist's C, all at V, and runs
-   `scripts/check-versions.sh`. Then `scripts/test.sh` and `scripts/ios-build.sh`, which also runs
-   `scripts/test-watch-bundle-signing.sh` on the build it made.
-2. **The face gate:** `scripts/face-gate.sh`. The face's generators, its fit tools on the watch's
-   own fonts, and Google's two validators.
-3. **Mohamed:** `scripts/release-face.sh`, in a Terminal window, its output not piped or
-   redirected (§3). He types the face key's password once. It writes
+   `scripts/check-versions.sh`. Right after it, `scripts/watch-ships.sh`, for whether this release
+   ships the watch (above): its answer decides whether Mohamed signs the face (step 3), steps 2 and
+   6, the notes files to write, and step 7's tags. Then the notes: the phone's `<V>-<C>.txt` always,
+   and `<V>-<100000+C>-wear.txt` too when the watch ships. Then `scripts/test.sh` and
+   `scripts/ios-build.sh`, which also runs `scripts/test-watch-bundle-signing.sh` on the build it
+   made. `tools/store-listing-check.py`, which `scripts/test.sh` runs, asks for the phone's notes.
+   It reads the Wear OS notes when they are there but never asks for them, because only the release
+   knows whether the watch ships: the local `wear-build` tags decide, which CI's checkout does not
+   have, and the next watch change alters the answer between releases. `scripts/release.sh` asks
+   for them at its step 1 on the watch's path (`tools/store-listing-check.py --wear-notes <V> <C>`:
+   there, Play's seven blocks, no Apple name), so a watch shipped by `TAQWA_RELEASE_WATCH=1`, or by
+   a watch commit made after step 1, is refused without its notes before anything is built.
+2. **The face gate.** When the watch ships: `scripts/face-gate.sh`, the face's generators, its fit
+   tools on the watch's own fonts, and Google's two validators. When it stays:
+   `scripts/face-gate.sh --fit-only`, the generators and the fit tools alone, with no face build and
+   no validators (no key and no Gradle; 77 seconds on the Mac mini). The face Play keeps serving must
+   still draw every form this phone sends. `scripts/release.sh` runs it at its step 2 on either path
+   and refuses the phone-only run if a form does not fit: put the phone's forms back, or change the
+   face and ship the watch with it.
+3. **Mohamed,** when the watch ships: `scripts/release-face.sh`, in a Terminal window, its output
+   not piped or redirected (§3). He types the face key's password once. It writes
    `build/face-release/watchface-release-signed.apk`, signed by the key
    `watchface/face-release-cert.sha256` pins. Its face build passes `-Ptaqwa.unsignedRelease=true`,
    which leaves the face as it is and keeps `keystore.properties` unread.
@@ -302,25 +367,39 @@ root:
    scripts/release.sh
    rm keystore.properties && ls keystore.properties   # "No such file or directory": the link is gone
    ```
-   `scripts/release.sh` refuses without the link, without the face's pin (M1, §3), or with
-   `TAQWA_FACE_CERT_FILE` set. In order it runs the version and stamp checks, the face gate, the
-   signed face's checks (the pinned certificate, and the current face entry for entry: otherwise
-   "run scripts/release-face.sh again"), the four builds, then the checks of what was built, and it
-   prints the two AABs and two APKs with their sizes and certificate SHA-256s. It ends with
-   `release.sh: PASS` only when every check passed. A run that fails from the build on removes the
-   four outputs it built ("the outputs it built are removed"), so no bundle that failed a check is
-   left at the upload paths. Leave the worktree
-   alone while it runs: the face gate fails on any change to a tracked file during its run. Only
-   Gradle reads `keystore.properties`; no agent opens, prints or copies it. Before it, agents prove the same
-   path with `scripts/test-release.sh` and the dry run,
+   `scripts/release.sh` refuses without the link, and when the watch ships without the face's pin
+   (M1, §3) or with `TAQWA_FACE_CERT_FILE` set. In order it says whether the watch ships, runs the
+   version and stamp checks, the face gate, the signed face's checks (the pinned certificate, and
+   the current face entry for entry: otherwise "run scripts/release-face.sh again"), the four
+   builds, then the checks of what was built, and it prints the two AABs and two APKs with their
+   sizes and certificate SHA-256s. It ends with `release.sh: PASS` only when every check passed, and
+   that line says to tag `wear-build-<C>` once the Wear AAB is submitted to the Wear OS track,
+   giving the `git tag -a` command with the commit it built (or, when the watch's files were not all
+   committed, naming them to commit first), to delete it if that Wear release is abandoned or
+   rejected with no replacement, and that sending this watch again unchanged takes
+   `TAQWA_RELEASE_WATCH=1`. On the watch's path its step 1 also
+   asks for the Wear OS notes (step 1 above). When the watch stays, it runs the face gate's fit
+   alone (`--fit-only`), skips the signed face, builds the phone's AAB and APK alone, removes any
+   Wear AAB or APK an earlier run left at the watch's paths, runs the phone's checks (its
+   permissions, its key, its version, no test data), and ends with `release.sh: PASS (phone
+   only)`, naming the watch build Play keeps serving and repeating any `note:` line of its step 0.
+   It takes the phone-only path only when `scripts/watch-ships.sh` exits 1 and its first line says
+   `stays:`, and any answer it cannot read stops it (exit 2). A run that fails from the build on
+   removes the outputs it built ("the outputs it built are removed"), so no bundle that failed a
+   check is left at the upload paths. Leave the worktree alone while it runs: the face gate fails on
+   any change to a tracked file during its run. Only Gradle reads `keystore.properties`; no agent
+   opens, prints or copies it. Before it, agents prove the same path with `scripts/test-release.sh`
+   and the dry run. When the watch ships, that is
    `TAQWA_RELEASE_DRY_RUN=1 TAQWA_FACE_CERT_FILE=<test pin> scripts/release.sh` after
-   `scripts/release-face.sh` with the throwaway test key (`TAQWA_FACE_KS` and the rest). The dry
-   run builds unsigned, signs with the debug key into `build/release-dry-run/*-DRY-RUN.{aab,apk}`
-   for the emulators, and Play refuses those. Every build of the root project it makes passes
-   `-Ptaqwa.unsignedRelease=true`, the face gate's included, so none reads a `keystore.properties`
-   even beside one. A dry run refused before its build (the versions, the face gate, the signed
-   face) leaves the last dry run's outputs where they were; one that fails from the build on
-   removes them.
+   `scripts/release-face.sh` with the throwaway test key (`TAQWA_FACE_KS` and the rest). A
+   phone-only cut is proven by `TAQWA_RELEASE_DRY_RUN=1 scripts/release.sh` with no override (no
+   `TAQWA_RELEASE_WATCH`, so step 0 decides as the store run will) and needs no test face, since that
+   path bundles none. The dry run builds unsigned, signs with the debug key into
+   `build/release-dry-run/*-DRY-RUN.{aab,apk}` for the emulators, and Play refuses those. Every
+   build of the root project it makes passes `-Ptaqwa.unsignedRelease=true`, the face gate's
+   included, so none reads a `keystore.properties` even beside one. A dry run refused before its
+   build (the versions, the Wear OS notes, the face gate or its fit, the signed face) leaves the last
+   dry run's outputs where they were; one that fails from the build on removes them.
 5. **With Mohamed's OK in chat, each time:** `scripts/ios-release.sh archive`, then
    `scripts/ios-release.sh export-check`, then `scripts/ios-release.sh upload`. The archive's
    report runs `scripts/ios-release.sh check` on it: the Apple Watch app is inside under `Watch/`
@@ -331,11 +410,22 @@ root:
    `scripts/ios-release.sh` with no argument runs the three in that order and stops at the first
    that fails, so it never uploads an archive whose export check did not pass. If `export-check`
    cannot sign on the Mac, §6 step 2's fallback applies.
-6. **The uploads:** both AABs to Play (the phone's and the watch's, on the one listing; the watch's
-   on the Wear OS track), and the iPhone build in App Store Connect (`upload`, step 5). Upload the
-   AABs only after `scripts/release.sh` printed `release.sh: PASS` in step 4. Play never takes a
-   code twice, so a bundle that failed a check would burn its candidate. Every Play Console action
-   is Mohamed's, in the order of the next section.
+6. **The uploads:** when the watch ships, both AABs to Play (the phone's and the watch's, on the one
+   listing; the watch's on the Wear OS track), each with its notes file; when it stays, the phone's
+   AAB alone, with the phone's notes, and nothing on the Wear OS track. Then the iPhone build in App
+   Store Connect (`upload`, step 5). Upload only after `scripts/release.sh` printed its PASS line in
+   step 4, and only what that line names. Play never takes a code twice, so a bundle that failed a
+   check would burn its candidate. Every Play Console action is Mohamed's, in the order of the next
+   section.
+7. **The tags:** at the push, `build-<C>` and `ios-build-<C>` on the commit that was built, as
+   always. When the watch shipped, `wear-build-<C>` on that same commit, annotated as
+   `wear-build-45` and `wear-build-46` are, once its Wear AAB is submitted to the Wear OS track (the
+   tag means Play's Wear OS track has that build): the `git tag -a` command step 4's PASS line
+   printed, with the commit it names, whatever is checked out by then. Delete it if that Wear
+   release is abandoned, or rejected with no replacement. The next release's
+   `scripts/watch-ships.sh` compares with the newest `wear-build-<N>`'s tree, so it may sit on a
+   release commit that main took squashed, and it refuses a tag that is not on the commit built at
+   that code (above).
 
 ### The watch release in the stores (1.6.0), in Mohamed's order
 
@@ -589,15 +679,15 @@ time; the real `scripts/release.sh` is the Lead's alone.
 - **targetSdk 36** (`gradle/libs.versions.toml`), the level Play requires for new apps since
   31 August 2026; verified on an Android 16 emulator and on the S23.
 - **Release signing** reads `keystore.properties` (git-ignored; `scripts/make-upload-key.sh`
-  writes it); `scripts/release.sh` builds the phone's and the Galaxy watch app's signed App
-  Bundles and APKs together, with each R8 mapping inside its bundle. Both are signed with the one
-  upload key, which Play re-signs, and the Taqwa face inside the watch app with Mohamed's face key
-  alone. `-Ptaqwa.unsignedRelease=true` keeps every key out of a release-type build and leaves
+  writes it); `scripts/release.sh` builds the phone's signed App Bundle and APK and, when the watch
+  ships, the Galaxy watch app's with them: two or four store outputs, with each R8 mapping inside
+  its bundle. Phone and watch are signed with the one upload key, which Play re-signs, and the Taqwa
+  face inside the watch app with Mohamed's face key alone. `-Ptaqwa.unsignedRelease=true` keeps every key out of a release-type build and leaves
   `keystore.properties` unread. The dry run passes it to every build of the root project it makes,
   `tools/watchface/validate.sh` (the face gate's) to its face builds, and `scripts/release-face.sh`
   to the face it signs, which the flag leaves as it is, so none reads a `keystore.properties`
   beside it (`scripts/test-release.sh`). `scripts/release.sh`'s own builds in the store run never
-  pass it, so the upload key signs the four store outputs.
+  pass it, so the upload key signs the two or four store outputs.
 - **The watch builds' permissions**: the Galaxy watch app's merged release manifest asks for
   exactly `wearApp/permissions.txt`: `VIBRATE`, androidx.core's
   `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, `PUSH_WATCH_FACES` and
@@ -611,8 +701,11 @@ time; the real `scripts/release.sh` is the Lead's alone.
 
   | What | Checked by | Run by |
   |---|---|---|
-  | One version for the four builds | `scripts/check-versions.sh` | `release.sh` step 1, `scripts/test.sh`, CI |
-  | The face's generators, fit tools and validators | `scripts/face-gate.sh` | `release.sh` step 2 |
+  | One version in every build's files, whether the watch ships or not | `scripts/check-versions.sh` | `release.sh` step 1, `scripts/test.sh`, CI |
+  | Whether the watch ships: a change since the newest `wear-build-<N>` that reaches its release AAB (not its version lines, tests, debug code or vectors), or a catalog entry only its release builds with; a `wear-build-<N>` off the commit built at that code is refused | `scripts/watch-ships.sh` | the bump's step 1 by hand, `release.sh` step 0; its test `scripts/test-watch-ships.sh` in `scripts/test.sh` |
+  | The face's generators, fit tools and validators | `scripts/face-gate.sh` | `release.sh` step 2, when the watch ships |
+  | The face Play keeps serving against the phone's forms: the generators and fit tools alone | `scripts/face-gate.sh --fit-only` | `release.sh` step 2, when the watch stays |
+  | The Wear OS notes of a release that ships the watch | `tools/store-listing-check.py --wear-notes <V> <C>` | `release.sh` step 1, when the watch ships |
   | The face's key, its pin and its freshness | `release.sh` step 3 (pin `watchface/face-release-cert.sha256`) | `release.sh`; `scripts/release-face.sh` holds the pin too |
   | The face inside the watch app: its package, code, key and token | `tools/watchface/check-bundle.sh` | `release.sh` step 5 |
   | The watch's R8 build: mapping, no debug code or test data, permissions, `wear-sdk` | `tools/wear-release-check.sh release` | `release.sh` step 5 |

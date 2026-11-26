@@ -14,7 +14,8 @@ import os
 import shutil
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
+from unittest import mock
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
@@ -316,14 +317,41 @@ class ReleaseNotes(Tree):
         self.write("docs/store/release-notes/1.4.0-40.txt", text[:start] + text[end:])
         self.assertFailsNaming("1.4.0-40.txt: no <ur>")
 
-    def test_the_newest_codes_wear_notes_must_be_there(self):
+    def test_the_newest_codes_wear_notes_are_not_asked_for_here(self):
+        # Mohamed, 26 November 2026: the watch goes to Play only when it has changed, which only
+        # scripts/release.sh can tell, from the local wear-build tags; so it asks for these notes
+        # (--wear-notes, WearNotesOfARelease below), and this check reads them when they are there.
         os.remove(os.path.join(self.root, "docs/store/release-notes/1.4.0-100040-wear.txt"))
-        self.assertFailsNaming("1.4.0-100040-wear.txt")
+        code, out = self.run_check()
+        self.assertEqual(code, 0, out)
+        self.assertIn("has its phone notes; its Wear OS notes, 1.4.0-100040-wear.txt, are asked for by "
+                      "scripts/release.sh if the watch ships", out)
+
+    def test_the_bump_asks_for_the_phones_notes_and_names_the_wear_ones_as_the_releases_to_ask(self):
+        self.write("androidApp/build.gradle.kts",
+                   "android {\n    defaultConfig {\n        versionCode = 41\n        versionName = \"1.4.1\"\n    }\n}\n")
+        self.assertFailsNaming("write 1.4.1-41.txt, and 1.4.1-100041-wear.txt if the watch ships (scripts/watch-ships.sh)")
 
     def test_the_wear_notes_must_carry_the_phones_version(self):
         os.rename(os.path.join(self.root, "docs/store/release-notes/1.4.0-100040-wear.txt"),
                   os.path.join(self.root, "docs/store/release-notes/1.3.0-100040-wear.txt"))
         self.assertFailsNaming("1.4.0-100040-wear.txt")
+
+    def test_the_check_runs_no_command_whatever_the_tree_says(self):
+        # The review of 26 November 2026: when this check asked scripts/watch-ships.sh, its answer
+        # hung on the clone's wear-build tags (CI's checkout has none) and on the tree's next watch
+        # change, so after a phone-only release scripts/test.sh failed on any watch work. Here a
+        # watch file, scripts/watch-ships.sh and TAQWA_RELEASE_WATCH=1, which would all say "ships",
+        # and no Wear OS notes: the check passes, and starts no process at all.
+        os.makedirs(os.path.join(self.root, "scripts"))
+        shutil.copy(os.path.join(ROOT, "scripts/watch-ships.sh"), os.path.join(self.root, "scripts"))
+        self.write("wearApp/src/main/kotlin/Changed.kt", "class Changed\n")
+        os.remove(os.path.join(self.root, "docs/store/release-notes/1.4.0-100040-wear.txt"))
+        with mock.patch.dict(os.environ, {"TAQWA_RELEASE_WATCH": "1"}), \
+                mock.patch("subprocess.Popen", side_effect=AssertionError("the check started a process")), \
+                mock.patch("os.system", side_effect=AssertionError("the check ran a command")):
+            code, out = self.run_check()
+        self.assertEqual(code, 0, out)
 
     def test_a_phone_code_without_its_notes_fails(self):
         # The cut gate: once bump-version.sh sets a code, that code's two files must exist.
@@ -346,6 +374,59 @@ class ReleaseNotes(Tree):
         self.write("docs/store/release-notes/1.4.0-41-production.txt", notes(lambda tag: "• Taqwa"))
         code, out = self.run_check()
         self.assertEqual(code, 0, out)
+
+
+class WearNotesOfARelease(Tree):
+    """--wear-notes <V> <C>, scripts/release.sh's check at its step 1 when the watch ships: the Wear OS
+    track's notes for that release, <V>-<100000+C>-wear.txt, are there and held to Play's rules."""
+
+    def run_wear(self, *args):
+        out = io.StringIO()
+        with redirect_stdout(out), redirect_stderr(out):
+            code = slc.main(["--wear-notes", *args], root=self.root)
+        return code, out.getvalue()
+
+    def assertWearFails(self, *words, args=("1.4.0", "40")):
+        code, out = self.run_wear(*args)
+        self.assertEqual(code, 1, out)
+        for word in words:
+            self.assertIn(word, out)
+
+    def test_the_releases_wear_notes_pass(self):
+        code, out = self.run_wear("1.4.0", "40")
+        self.assertEqual(code, 0, out)
+        self.assertIn("wear-notes: 1.4.0-100040-wear.txt: clean", out)
+
+    def test_a_release_without_its_wear_notes_fails_naming_the_file(self):
+        self.assertWearFails("1.4.1-100041-wear.txt is missing", "Play's Wear OS track", args=("1.4.1", "41"))
+
+    def test_the_notes_must_carry_the_releases_version(self):
+        self.assertWearFails("1.5.0-100040-wear.txt is missing", args=("1.5.0", "40"))
+
+    def test_a_language_over_500_characters_fails(self):
+        self.write("docs/store/release-notes/1.4.0-100040-wear.txt",
+                   notes(lambda tag: "x" * 501 if tag == "id" else "The Taqwa face."))
+        self.assertWearFails("1.4.0-100040-wear.txt: id  501/500")
+
+    def test_a_missing_language_fails(self):
+        self.write("docs/store/release-notes/1.4.0-100040-wear.txt",
+                   notes(lambda tag: "The Taqwa face.").replace("<bn-BD>\nThe Taqwa face.\n</bn-BD>\n", ""))
+        self.assertWearFails("1.4.0-100040-wear.txt: no <bn-BD> block")
+
+    def test_an_apple_name_fails(self):
+        self.write("docs/store/release-notes/1.4.0-100040-wear.txt", notes(lambda tag: "Like the Apple Watch's."))
+        self.assertWearFails("1.4.0-100040-wear.txt: names Apple Watch")
+
+    def test_the_word_mohamed_replaced_fails(self):
+        self.write("docs/store/release-notes/1.4.0-100040-wear.txt",
+                   notes(lambda tag: "واجهة تقوى، ومضاعفات لأي واجهة." if tag == "ar" else "The Taqwa face."))
+        self.assertWearFails("1.4.0-100040-wear.txt: ar: 'مضاعف' is not the word Mohamed chose")
+
+    def test_a_bad_call_exits_2(self):
+        for args in ([], ["1.4.0"], ["1.4", "40"], ["1.4.0", "x"], ["1.4.0", "0"], ["1.4.0", "40", "more"]):
+            code, out = self.run_wear(*args)
+            self.assertEqual(code, 2, f"{args}: {out}")
+            self.assertIn("usage:", out)
 
 
 class AppStoreWhatsNew(Tree):

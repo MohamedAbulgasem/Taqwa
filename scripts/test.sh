@@ -7,11 +7,14 @@ set -e
 cd "$(dirname "$0")/.."
 # First, and without Gradle: the version is the same in every file that carries it (the phone, the
 # Galaxy watch app, the face, the iOS plists, the version strings), and bump-version.sh, tried on a
-# scratch copy, still writes every one of them (its lines are shown only when it fails); then the
-# privacy lines and the store copy (below).
+# scratch copy, still writes every one of them; watch-ships.sh, tried on scratch git repositories,
+# still tells a watch that changed from one whose versions alone moved (the lines of either test are
+# shown only when it fails); then the privacy lines and the store copy (below).
 bash scripts/check-versions.sh
 if ! bump_test=$(bash scripts/test-bump-version.sh 2>&1); then echo "$bump_test"; exit 1; fi
 echo "test-bump-version.sh: PASS"
+if ! ships_test=$(bash scripts/test-watch-ships.sh 2>&1); then echo "$ships_test"; exit 1; fi
+echo "test-watch-ships.sh: PASS"
 # The privacy lines (plan 5 Task 9): the gate's own tests, then every line of plan 2's privacy
 # report, as ruled or as Mohamed approved it (M3, 31 October 2026), in each of its languages, with
 # the policies' dates and plan 2's sweep. Since M3 this is the cut gate's own strict run: a row
@@ -22,8 +25,10 @@ if ! privacy=$(python3 tools/privacy-check.py 2>&1); then echo "$privacy"; exit 
 echo "${privacy##*$'\n'}"
 # The store copy (plan 5 Task 10): the check's own tests, then every listing against the stores'
 # limits and each store's own watch, the App Store Connect notes en.md points to, and the release
-# notes, with the newest code's two files no older than androidApp's code. A failure shows the
-# whole output; a pass, its last line.
+# notes, with the newest code's phone file no older than androidApp's code and its Wear OS file read
+# when it is there (scripts/release.sh asks for that one when the watch ships; this check makes no
+# git call, so it says the same in every clone). A failure shows the whole output; a pass, its last
+# line.
 if ! listing_test=$(python3 tools/test_store_listing_check.py 2>&1); then echo "$listing_test"; exit 1; fi
 echo "test_store_listing_check.py: PASS"
 if ! listing=$(python3 tools/store-listing-check.py 2>&1); then echo "$listing"; exit 1; fi

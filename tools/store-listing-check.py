@@ -4,6 +4,7 @@ release notes and App Review notes that go with them.
 
     python3 tools/store-listing-check.py          # all languages, the notes too
     python3 tools/store-listing-check.py fr ur    # only these listings
+    python3 tools/store-listing-check.py --wear-notes <V> <C>   # scripts/release.sh's, below
 
 A field is a `### Heading (limit)` followed by its text up to the next heading; lines in
 parentheses are notes and are skipped. A field holding nothing but notes fails as empty (the App
@@ -39,11 +40,23 @@ With no languages named, it also checks:
   (main's separate App Store sets since 1.4.0 (40)) holds one `=== <localization> ===` block for
   each of the seven App Store localizations, each at most 4,000 characters (the What's New field),
   naming only the App Store's platforms;
-- the newest phone code's two files, <V>-<C>.txt and the Wear OS track's <V>-<100000+C>-wear.txt,
-  both there and naming no Apple Watch; and that C is no older than androidApp/build.gradle.kts's
-  versionCode, with the same version once they are equal, so a code bump-version.sh sets cannot
-  reach a store without its notes (erratum p5 #6: keyed to the newest notes code, since the bump
-  comes only at the cut).
+- the newest phone code's file, <V>-<C>.txt, there and naming no Apple Watch, and the Wear OS
+  track's <V>-<100000+C>-wear.txt held to the same when it is there (and under no other version);
+  and that C is no older than androidApp/build.gradle.kts's versionCode, with the same version once
+  they are equal, so a code bump-version.sh sets cannot reach a store without its notes (erratum p5
+  #6: keyed to the newest notes code, since the bump comes only at the cut).
+
+The Wear OS file is not asked for here: since Mohamed's decision of 26 November 2026 the watch goes
+to Play only when it has changed since the last watch release, and whether it does is
+scripts/watch-ships.sh's answer at the release, from the local wear-build tags, which no other
+clone (CI's included) holds and which the tree's next watch change alters between releases. So
+the release asks for it where that is decided: scripts/release.sh, on the watch's path, runs
+
+    python3 tools/store-listing-check.py --wear-notes <V> <C>
+
+which fails unless docs/store/release-notes/<V>-<100000+C>-wear.txt is there and passes the checks
+above (Play's seven blocks, 500 characters each, no Apple name, Mohamed's words). This check makes
+no git call.
 """
 import glob
 import os
@@ -59,6 +72,7 @@ RELEASE_NOTES_LIMIT = 500  # Play's release notes, per language, in characters
 RELEASE_NOTES_TAGS = ["en-GB", "ar", "fr-FR", "tr-TR", "id", "ur", "bn-BD"]
 WEAR_CODE_OFFSET = 100000  # the Wear OS app's code is the phone's plus this (spec 2.1)
 PHONE_NOTES = re.compile(r"^(\d+\.\d+\.\d+)-(\d+)\.txt$")
+WEAR_NOTES = re.compile(r"^(\d+\.\d+\.\d+)-(\d+)-wear\.txt$")
 # main's App Store "What's New" sets (since 1.4.0 (40)): one `=== <localization> ===` block each, in
 # this order, each at most the What's New field's 4,000 characters.
 APPSTORE_NOTES = re.compile(r"^\d+\.\d+\.\d+-\d+-appstore\.txt$")
@@ -252,9 +266,44 @@ def check_appstore_notes(name, text):
     return problems
 
 
+def check_play_blocks(name, text):
+    """A Play notes file's tag template: one block for each of the seven languages, each at most 500
+    characters, and none Play's template has no place for."""
+    problems = 0
+    blocks = dict(re.findall(r"<([A-Za-z-]+)>\n?(.*?)\n?</\1>", text, re.S))
+    for tag in RELEASE_NOTES_TAGS:
+        if tag not in blocks:
+            print(f"release-notes: {name}: no <{tag}> block")
+            problems += 1
+            continue
+        n = len(blocks[tag].strip())
+        if n > RELEASE_NOTES_LIMIT:
+            print(f"release-notes: {name}: {tag}  {n}/{RELEASE_NOTES_LIMIT}  <-- OVER")
+            problems += 1
+    extra = sorted(set(blocks) - set(RELEASE_NOTES_TAGS))
+    if extra:
+        print(f"release-notes: {name}: blocks Play's template has no place for: {', '.join(extra)}")
+        problems += 1
+    return problems
+
+
+def check_play_words(name, text):
+    """A newest code's Play notes: no Apple name, and the words Mohamed chose at M8."""
+    problems = 0
+    found = names_in(text, "Google Play")
+    if found:
+        print(f"release-notes: {name}: names {', '.join(found)} (Play's notes)")
+        problems += 1
+    for tag, block in re.findall(r"<([A-Za-z-]+)>\n?(.*?)\n?</\1>", text, re.S):
+        for message in not_chosen(block, tag.split("-")[0]):
+            print(f"release-notes: {name}: {tag}: {message}")
+            problems += 1
+    return problems
+
+
 def check_release_notes(root=ROOT):
-    """Every release-notes file's seven blocks at 500 characters, and the newest phone code's two
-    files, against the phone's version lines."""
+    """Every release-notes file's seven blocks at 500 characters, and the newest phone code's file
+    (and its Wear OS file, when there), against the phone's version lines."""
     problems = 0
     folder = os.path.join(root, "docs/store/release-notes")
     files = sorted(os.path.basename(p) for p in glob.glob(os.path.join(folder, "*.txt")))
@@ -264,20 +313,7 @@ def check_release_notes(root=ROOT):
         if APPSTORE_NOTES.match(name):
             problems += check_appstore_notes(name, text)
             continue
-        blocks = dict(re.findall(r"<([A-Za-z-]+)>\n?(.*?)\n?</\1>", text, re.S))
-        for tag in RELEASE_NOTES_TAGS:
-            if tag not in blocks:
-                print(f"release-notes: {name}: no <{tag}> block")
-                problems += 1
-                continue
-            n = len(blocks[tag].strip())
-            if n > RELEASE_NOTES_LIMIT:
-                print(f"release-notes: {name}: {tag}  {n}/{RELEASE_NOTES_LIMIT}  <-- OVER")
-                problems += 1
-        extra = sorted(set(blocks) - set(RELEASE_NOTES_TAGS))
-        if extra:
-            print(f"release-notes: {name}: blocks Play's template has no place for: {', '.join(extra)}")
-            problems += 1
+        problems += check_play_blocks(name, text)
 
     phone = [(int(m.group(2)), m.group(1)) for m in map(PHONE_NOTES.match, files)
              if m and int(m.group(2)) < WEAR_CODE_OFFSET]
@@ -286,36 +322,65 @@ def check_release_notes(root=ROOT):
         print(f"release-notes: none for the phone; its code is {code}")
         return problems + 1
     newest, newest_version = max(phone)
-    pair = [f"{newest_version}-{newest}.txt", f"{newest_version}-{WEAR_CODE_OFFSET + newest}-wear.txt"]
+    phone_name = f"{newest_version}-{newest}.txt"
+    wear_name = f"{newest_version}-{WEAR_CODE_OFFSET + newest}-wear.txt"
     before = problems
-    for name in pair:
-        if name not in files:
-            print(f"release-notes: {name} is missing (the newest code's {'phone' if name == pair[0] else 'Wear OS'} notes)")
+    if phone_name in files:
+        with open(os.path.join(folder, phone_name), encoding="utf-8") as f:
+            problems += check_play_words(phone_name, f.read())
+    else:
+        print(f"release-notes: {phone_name} is missing (the newest code's phone notes)")
+        problems += 1
+    if wear_name in files:
+        with open(os.path.join(folder, wear_name), encoding="utf-8") as f:
+            problems += check_play_words(wear_name, f.read())
+    # The newest code's Wear OS notes under another version would not be the ones release.sh asks for.
+    for name in files:
+        m = WEAR_NOTES.match(name)
+        if m and int(m.group(2)) == WEAR_CODE_OFFSET + newest and name != wear_name:
+            print(f"release-notes: {name} is the newest code's Wear OS notes under another version: "
+                  f"the phone's notes are {newest_version}'s, so it is {wear_name}")
             problems += 1
-            continue
-        with open(os.path.join(folder, name), encoding="utf-8") as f:
-            text = f.read()
-        found = names_in(text, "Google Play")
-        if found:
-            print(f"release-notes: {name}: names {', '.join(found)} (Play's notes)")
-            problems += 1
-        for tag, block in re.findall(r"<([A-Za-z-]+)>\n?(.*?)\n?</\1>", text, re.S):
-            for message in not_chosen(block, tag.split("-")[0]):
-                print(f"release-notes: {name}: {tag}: {message}")
-                problems += 1
     if newest < code:
         print(f"release-notes: androidApp's code is {code} ({version}), and the newest notes are for {newest}: "
-              f"write {version}-{code}.txt and {version}-{WEAR_CODE_OFFSET + code}-wear.txt")
+              f"write {version}-{code}.txt, and {version}-{WEAR_CODE_OFFSET + code}-wear.txt if the watch ships "
+              f"(scripts/watch-ships.sh)")
         problems += 1
     elif newest == code and newest_version != version:
         print(f"release-notes: the notes for code {code} are {newest_version}'s, and androidApp says {version}")
         problems += 1
-    elif problems == before:
+    elif problems == before and wear_name in files:
         print(f"release-notes: {len(files)} files; the newest code, {newest} ({newest_version}), has both")
+    elif problems == before:
+        print(f"release-notes: {len(files)} files; the newest code, {newest} ({newest_version}), has its phone notes; "
+              f"its Wear OS notes, {wear_name}, are asked for by scripts/release.sh if the watch ships")
     return problems
 
 
+def check_wear_notes(version, code, root=ROOT):
+    """scripts/release.sh's check on the watch's path: the Wear OS track's notes for this release,
+    <version>-<100000+code>-wear.txt, there and held to every check above."""
+    name = f"{version}-{WEAR_CODE_OFFSET + code}-wear.txt"
+    path = os.path.join(root, "docs/store/release-notes", name)
+    if not os.path.isfile(path):
+        print(f"release-notes: {name} is missing: the watch ships, and its AAB goes to Play's Wear OS track "
+              f"with these notes (docs/store/release-notes/, Play's seven blocks, as the phone's file)")
+        print("wear-notes: 1 problems")
+        return 1
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    problems = check_play_blocks(name, text) + check_play_words(name, text)
+    print(f"wear-notes: {name}: clean" if not problems else f"wear-notes: {problems} problems")
+    return 1 if problems else 0
+
+
 def main(argv, root=ROOT):
+    if argv[:1] == ["--wear-notes"]:
+        if len(argv) != 3 or not re.fullmatch(r"\d+\.\d+\.\d+", argv[1]) or not re.fullmatch(r"[1-9]\d*", argv[2]):
+            print("usage: tools/store-listing-check.py --wear-notes <version name, 1.7.1> <the phone's code, 47>",
+                  file=sys.stderr)
+            return 2
+        return check_wear_notes(argv[1], int(argv[2]), root)
     only = set(argv)
     total = 0
     for path in sorted(glob.glob(os.path.join(root, "docs/store/listing/*.md"))):
